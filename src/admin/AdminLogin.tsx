@@ -1,20 +1,21 @@
 import { useState, type FormEvent } from 'react';
-import { Lock, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Lock, Mail, ShieldCheck, ArrowRight, Loader } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 import { ADMIN_IMAGES } from './adminMockData';
 
 export default function AdminLogin() {
   const { login } = useAdminAuth();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (login(password)) {
-      setError('');
-    } else {
-      setError('Mật khẩu không đúng. Vui lòng thử lại.');
-    }
+    setIsSubmitting(true);
+    const result = await login(email, password);
+    setIsSubmitting(false);
+    setError(result.success ? '' : result.error ?? 'Đăng nhập thất bại.');
   };
 
   return (
@@ -52,10 +53,25 @@ export default function AdminLogin() {
 
           <h1 className="font-display text-2xl text-cream-50 mb-2">Đăng nhập quản trị</h1>
           <p className="text-cream-300/60 text-sm mb-8">
-            Nhập mật khẩu nội bộ để tiếp tục vào hệ thống vận hành.
+            Đăng nhập bằng tài khoản quản trị nội bộ để tiếp tục vào hệ thống vận hành.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs text-cream-300/70 mb-2 tracking-wide uppercase">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-400/50" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@vkdgroup.vn"
+                  autoFocus
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-cream-50 placeholder:text-cream-500/40 focus:outline-none focus:border-gold-400/60 focus:bg-white/[0.07] transition-colors"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs text-cream-300/70 mb-2 tracking-wide uppercase">Mật khẩu</label>
               <div className="relative">
@@ -65,7 +81,6 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  autoFocus
                   className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-cream-50 placeholder:text-cream-500/40 focus:outline-none focus:border-gold-400/60 focus:bg-white/[0.07] transition-colors"
                 />
               </div>
@@ -75,9 +90,10 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full btn-gold justify-center mt-2"
+              disabled={isSubmitting}
+              className="w-full btn-gold justify-center mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Vào hệ thống <ArrowRight className="w-4 h-4" />
+              {isSubmitting ? <Loader className="w-4 h-4 animate-spin" /> : <>Vào hệ thống <ArrowRight className="w-4 h-4" /></>}
             </button>
           </form>
 

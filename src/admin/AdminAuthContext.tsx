@@ -1,46 +1,63 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import type { Session } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabaseClient';
 
-/**
- * DEMO-ONLY GATE. This checks a hardcoded password entirely in the browser and
- * flips a sessionStorage flag — it ships inside the public JS bundle, so anyone
- * can read the password from devtools or view-source. It stops casual visitors
- * from stumbling into /gate-vkd-control-2026, it does NOT stop a motivated
- * person. Before real internal/customer data ever flows through these admin
- * pages, replace this with server-verified auth (e.g. Supabase Auth session +
- * a role check enforced on the API/DB side, not just in the React route).
- */
-const DEMO_PASSWORD = 'VKD@NgocLinh2026';
-const SESSION_KEY = 'vkd_admin_session';
+// Real server-verified auth: Supabase Auth session + a role check read from
+// app_metadata (server-controlled, not user-editable) — enforced here in the
+// route AND meant to be enforced again on the DB/API side (RLS policies
+// checking auth.jwt() -> 'app_metadata' ->> 'role' = 'admin') once admin pages
+// read/write real Supabase tables instead of local mock data.
 
 interface AdminAuthContextValue {
   isAuthenticated: boolean;
-  login: (password: string) => boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
-export function AdminAuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => sessionStorage.getItem(SESSION_KEY) === '1'
-  );
+function hasAdminRole(session: Session | null) {
+  return session?.user?.app_metadata?.role === 'admin';
+}
 
-  const login = (password: string) => {
-    if (password === DEMO_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      setIsAuthenticated(true);
-      return true;
+export function AdminAuthProvider({ children }: { children: ReactNode }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+      setIsAuthenticated(hasAdminRole(data.session));
+      setIsLoading(false);
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+      setIsAuthenticated(hasAdminRole(session));
+    });
+
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      return { success: false, error: 'Email hoặc mật khẩu không đúng.' };
     }
-    return false;
+    if (!hasAdminRole(data.session)) {
+      await supabase.auth.signOut();
+      return { success: false, error: 'Tài khoản này không có quyền quản trị.' };
+    }
+    setIsAuthenticated(true);
+    return { success: true };
   };
 
   const logout = () => {
-    sessionStorage.removeItem(SESSION_KEY);
+    supabase.auth.signOut();
     setIsAuthenticated(false);
   };
 
   return (
-    <AdminAuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AdminAuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
       {children}
     </AdminAuthContext.Provider>
   );

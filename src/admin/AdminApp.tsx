@@ -12,7 +12,10 @@ import ShowroomsPage from './pages/ShowroomsPage';
 import RevenuePage from './pages/RevenuePage';
 
 function Gate() {
-  const { isAuthenticated } = useAdminAuth();
+  const { isAuthenticated, isLoading } = useAdminAuth();
+  if (isLoading) {
+    return <div className="min-h-screen bg-forest-950" />;
+  }
   return isAuthenticated ? <AdminLayout /> : <AdminLogin />;
 }
 
