@@ -29,12 +29,12 @@ function fmtPrice(amount: number, region: Region) {
   return `${symbol}${amount.toFixed(2)}`;
 }
 
-export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutProps) {
-  const { items, subtotalVND, clearCart } = useCart();
+export default function Checkout({ lang, onNavigate }: CheckoutProps) {
+  const { items, subtotalVND } = useCart();
   const isVi = lang === 'vi';
 
   const [region, setRegion] = useState<Region>('vn');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('stripe');
+  const [paymentMethod] = useState<PaymentMethod>('payos');
   const [paymentState, setPaymentState] = useState<PaymentState>('idle');
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', country: 'Vietnam' });
@@ -78,34 +78,15 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
 
   const handlePlaceOrder = async () => {
     if (!form.name || !form.email || !form.address) return;
-
-    if (paymentMethod === 'payos') {
-      await handlePayOSCheckout();
-      return;
-    }
-
-    setPaymentState('processing');
-    await new Promise(r => setTimeout(r, 1800));
-    setPaymentState('verifying');
-    await new Promise(r => setTimeout(r, 1400));
-    const success = Math.random() > 0.1;
-    if (success) {
-      setPaymentState('success');
-      const orderId = 'VKD-' + Date.now().toString(36).toUpperCase();
-      clearCart();
-      await new Promise(r => setTimeout(r, 900));
-      onOrderSuccess(orderId);
-    } else {
-      setPaymentState('failed');
-    }
+    await handlePayOSCheckout();
   };
 
-  const paymentOptions: { key: PaymentMethod; label: string; logo: string; type: string }[] = [
+  const paymentOptions: { key: PaymentMethod; label: string; logo: string; type: string; comingSoon?: boolean }[] = [
     { key: 'payos',   label: 'PayOS · Chuyển khoản QR', logo: '🏦', type: 'VietQR Napas 24/7' },
-    { key: 'stripe',  label: 'Credit / Debit Card', logo: '💳', type: 'International' },
-    { key: 'paypal',  label: 'PayPal',              logo: '🅿',  type: 'International' },
-    { key: 'vnpay',   label: 'VNPAY',               logo: '🇻🇳', type: 'Domestic (VN)' },
-    { key: 'momo',    label: 'MoMo Wallet',         logo: '💜', type: 'Domestic (VN)' },
+    { key: 'stripe',  label: 'Credit / Debit Card', logo: '💳', type: 'International', comingSoon: true },
+    { key: 'paypal',  label: 'PayPal',              logo: '🅿',  type: 'International', comingSoon: true },
+    { key: 'vnpay',   label: 'VNPAY',               logo: '🇻🇳', type: 'Domestic (VN)', comingSoon: true },
+    { key: 'momo',    label: 'MoMo Wallet',         logo: '💜', type: 'Domestic (VN)', comingSoon: true },
   ];
 
   if (paymentState === 'processing' || paymentState === 'verifying') {
@@ -233,46 +214,37 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
                 {paymentOptions.map((opt) => (
                   <button
                     key={opt.key}
-                    onClick={() => setPaymentMethod(opt.key)}
-                    className={`p-4 rounded-xl border-2 text-left transition-all ${paymentMethod === opt.key ? 'border-forest-600 bg-forest-50' : 'border-cream-200 hover:border-forest-300'}`}
+                    disabled={opt.comingSoon}
+                    className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                      opt.comingSoon
+                        ? 'border-cream-200 opacity-50 cursor-not-allowed'
+                        : paymentMethod === opt.key
+                          ? 'border-forest-600 bg-forest-50'
+                          : 'border-cream-200 hover:border-forest-300'
+                    }`}
                   >
+                    {opt.comingSoon && (
+                      <span className="absolute top-2 right-2 text-[10px] font-semibold uppercase tracking-wide text-forest-500 bg-cream-100 px-2 py-0.5 rounded-full">
+                        {isVi ? 'Sắp Ra Mắt' : 'Coming Soon'}
+                      </span>
+                    )}
                     <div className="text-2xl mb-1">{opt.logo}</div>
                     <div className="font-semibold text-forest-900 text-sm">{opt.label}</div>
                     <div className="text-forest-400 text-xs">{opt.type}</div>
                   </button>
                 ))}
               </div>
-              {paymentMethod === 'payos' && (
-                <div className="p-4 rounded-xl bg-forest-50 border border-forest-100 text-sm text-forest-700 space-y-1">
-                  <p className="font-semibold text-forest-900">Thanh toán bằng mã VietQR</p>
-                  <p>
-                    Bấm “Đặt Hàng” để mở trang thanh toán an toàn của PayOS. Quét mã QR bằng app
-                    ngân hàng để chuyển khoản — đơn hàng xác nhận tự động ngay khi chuyển khoản
-                    thành công.
-                  </p>
-                  <p className="text-forest-500 text-xs pt-1">
-                    Số tiền thanh toán qua PayOS: <span className="font-semibold">{fmtPrice(payosTotal, 'vn')}</span> (VND)
-                  </p>
-                </div>
-              )}
-              {(paymentMethod === 'stripe') && (
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-forest-600 mb-1.5 uppercase tracking-wide">{isVi ? 'Số Thẻ' : 'Card Number'}</label>
-                    <input placeholder="4242 4242 4242 4242" className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 outline-none text-forest-900 text-sm bg-cream-50" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-forest-600 mb-1.5 uppercase tracking-wide">MM/YY</label>
-                      <input placeholder="12/27" className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 outline-none text-forest-900 text-sm bg-cream-50" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-forest-600 mb-1.5 uppercase tracking-wide">CVV</label>
-                      <input placeholder="123" className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 outline-none text-forest-900 text-sm bg-cream-50" />
-                    </div>
-                  </div>
-                </div>
-              )}
+              <div className="p-4 rounded-xl bg-forest-50 border border-forest-100 text-sm text-forest-700 space-y-1">
+                <p className="font-semibold text-forest-900">Thanh toán bằng mã VietQR</p>
+                <p>
+                  Bấm “Đặt Hàng” để mở trang thanh toán an toàn của PayOS. Quét mã QR bằng app
+                  ngân hàng để chuyển khoản — đơn hàng xác nhận tự động ngay khi chuyển khoản
+                  thành công.
+                </p>
+                <p className="text-forest-500 text-xs pt-1">
+                  Số tiền thanh toán qua PayOS: <span className="font-semibold">{fmtPrice(payosTotal, 'vn')}</span> (VND)
+                </p>
+              </div>
               <div className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-forest-50">
                 <ShieldCheck className="w-4 h-4 text-forest-600 flex-shrink-0" />
                 <p className="text-forest-600 text-xs">{isVi ? 'Thanh toán được mã hóa 256-bit SSL. VKD không lưu thông tin thẻ của bạn.' : '256-bit SSL encrypted. VKD never stores your card details.'}</p>
