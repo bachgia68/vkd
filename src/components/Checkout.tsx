@@ -38,6 +38,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   const [paymentState, setPaymentState] = useState<PaymentState>('idle');
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', country: 'Vietnam' });
+  const [formError, setFormError] = useState<string | null>(null);
 
   const rc = regionConfig[region];
   const subtotal = region === 'vn' ? subtotalVND : items.reduce((s, item) => s + (item[rc.priceKey] as number) * item.quantity, 0);
@@ -77,7 +78,15 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   };
 
   const handlePlaceOrder = async () => {
-    if (!form.name || !form.email || !form.address) return;
+    if (!form.name || !form.email || !form.address) {
+      setFormError(
+        isVi
+          ? 'Vui lòng điền đầy đủ Họ Tên, Email và Địa Chỉ trước khi đặt hàng.'
+          : 'Please fill in your Name, Email, and Address before placing the order.'
+      );
+      return;
+    }
+    setFormError(null);
     await handlePayOSCheckout();
   };
 
@@ -302,6 +311,10 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                   {isVi ? 'Đặt Hàng' : 'Place Order'}
                   <ArrowRight className="w-4 h-4" />
                 </button>
+
+                {formError && (
+                  <p className="text-center text-red-600 text-xs mt-3">{formError}</p>
+                )}
 
                 {items.length === 0 && (
                   <p className="text-center text-forest-400 text-xs mt-3">{isVi ? 'Giỏ hàng trống' : 'Your cart is empty'}</p>
