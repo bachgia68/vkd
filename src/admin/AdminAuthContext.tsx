@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 // Real server-verified auth: Supabase Auth session + a role check read from
 // app_metadata (server-controlled, not user-editable) — enforced here in the
@@ -26,6 +26,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
       setIsAuthenticated(hasAdminRole(data.session));
       setIsLoading(false);
@@ -39,6 +44,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
+    if (!isSupabaseConfigured) {
+      return { success: false, error: 'Chưa cấu hình Supabase trên môi trường này (thiếu VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY).' };
+    }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       return { success: false, error: 'Email hoặc mật khẩu không đúng.' };
