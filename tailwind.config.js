@@ -1,0 +1,138 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        forest: {
+          50: '#f0f7f3',
+          100: '#dcebe2',
+          200: '#bbd6c9',
+          300: '#8bb8a3',
+          400: '#5a9479',
+          500: '#3a7359',
+          600: '#2a5a44',
+          700: '#1f4536',
+          800: '#163328',
+          900: '#0B2F1D',
+          950: '#061a12',
+        },
+        gold: {
+          50: '#fbf8f0',
+          100: '#f5ebd5',
+          200: '#ecd9ac',
+          300: '#e0c178',
+          400: '#D4AF37',
+          500: '#c19a2e',
+          600: '#a07d24',
+          700: '#7e6119',
+          800: '#5f4a13',
+          900: '#3d2f0c',
+        },
+        cream: {
+          50: '#fefdfb',
+          100: '#faf8f3',
+          200: '#f4f0e6',
+          300: '#ebe5d4',
+          400: '#ddd4bc',
+          500: '#c9bd9d',
+          600: '#b3a584',
+          700: '#98876a',
+          800: '#7a6b54',
+          900: '#5e5340',
+        },
+        earth: {
+          50: '#faf7f2',
+          100: '#f2ece2',
+          200: '#e4d8c5',
+          300: '#d0bf9f',
+          400: '#b8a07a',
+          500: '#a08560',
+          600: '#826b4e',
+          700: '#655440',
+          800: '#4a3d30',
+          900: '#2e2419',
+        },
+        primary: {
+          50: '#f0f7f3',
+          100: '#dcebe2',
+          200: '#bbd6c9',
+          300: '#8bb8a3',
+          400: '#5a9479',
+          500: '#3a7359',
+          600: '#2a5a44',
+          700: '#1f4536',
+          800: '#163328',
+          900: '#0B2F1D',
+          950: '#061a12',
+        },
+      },
+      fontFamily: {
+        display: ['"Playfair Display"', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'display-sm': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-md': ['3.5rem', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+        'display-lg': ['4.5rem', { lineHeight: '1.0', letterSpacing: '-0.03em' }],
+        'display-xl': ['6rem', { lineHeight: '0.95', letterSpacing: '-0.04em' }],
+      },
+      maxWidth: {
+        'container': '1280px',
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.6s ease-out forwards',
+        'fade-in-up': 'fadeInUp 0.7s ease-out forwards',
+        'fade-in-down': 'fadeInDown 0.7s ease-out forwards',
+        'float': 'float 4s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s ease-in-out infinite',
+        'slide-in-left': 'slideInLeft 0.6s ease-out forwards',
+        'slide-in-right': 'slideInRight 0.6s ease-out forwards',
+        'shimmer': 'shimmer 3s linear infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        fadeInDown: {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-12px)' },
+        },
+        slideInLeft: {
+          '0%': { opacity: '0', transform: 'translateX(-30px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideInRight: {
+          '0%': { opacity: '0', transform: 'translateX(30px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% center' },
+          '100%': { backgroundPosition: '200% center' },
+        },
+      },
+      boxShadow: {
+        'elegant': '0 2px 20px rgba(11, 47, 29, 0.06)',
+        'elegant-lg': '0 10px 50px rgba(11, 47, 29, 0.12)',
+        'gold': '0 4px 20px rgba(212, 175, 55, 0.25)',
+      },
+    },
+  },
+  plugins: [],
+}
