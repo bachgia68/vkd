@@ -4,8 +4,36 @@ import { PayOS } from '@payos/node';
 // chuyển khoản thành công. payOS gọi endpoint này trực tiếp — không qua trình duyệt khách.
 //
 // LƯU Ý: dự án hiện CHƯA có database, nên endpoint này mới chỉ xác thực chữ ký (chống giả
-// mạo) và ghi log. Muốn tự động cập nhật trạng thái đơn hàng thật, cần nối thêm một nơi lưu
-// trữ (vd. Supabase) ở bước "TODO" bên dưới.
+// mạo), gửi email báo đơn cho VKD, và ghi log. Muốn tự động cập nhật trạng thái đơn hàng thật,
+// cần nối thêm một nơi lưu trữ (vd. Supabase) ở bước "TODO" bên dưới.
+
+async function notifyNewOrder(webhookData: { orderCode: number; amount: number; reference: string; transactionDateTime: string; description: string }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const to = process.env.ORDER_NOTIFY_EMAIL;
+  if (!apiKey || !to) return;
+
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        from: 'VKD Group <onboarding@resend.dev>',
+        to: [to],
+        subject: `[VKD] Đơn hàng mới #${webhookData.orderCode} — đã thanh toán`,
+        html: `
+          <h2>Đơn hàng mới đã thanh toán qua PayOS</h2>
+          <p><b>Mã đơn:</b> ${webhookData.orderCode}</p>
+          <p><b>Số tiền:</b> ${webhookData.amount.toLocaleString('vi-VN')}đ</p>
+          <p><b>Mã tham chiếu ngân hàng:</b> ${webhookData.reference}</p>
+          <p><b>Thời gian:</b> ${webhookData.transactionDateTime}</p>
+          <p><b>Nội dung CK:</b> ${webhookData.description}</p>
+        `,
+      }),
+    });
+  } catch (err) {
+    console.error('Resend notify failed:', err);
+  }
+}
 
 export default async (req: Request) => {
   if (req.method !== 'POST') {
@@ -42,6 +70,8 @@ export default async (req: Request) => {
       reference: webhookData.reference,
       transactionDateTime: webhookData.transactionDateTime,
     });
+
+    await notifyNewOrder(webhookData);
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
