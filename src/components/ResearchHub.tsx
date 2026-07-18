@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Download, BookOpen, Microscope, Beaker, Clock, ChevronRight } from 'lucide-react';
-import { researchStudies, educationGuides, saponinComparison } from '../data/mockData';
+import { BookOpen, Microscope, Clock, ChevronRight } from 'lucide-react';
+import { educationGuides, saponinComparison } from '../data/mockData';
 import type { Language } from '../i18n/translations';
 
 
@@ -8,7 +8,7 @@ interface ResearchHubProps {
   lang: Language;
 }
 
-type Tab = 'saponin' | 'studies' | 'guides';
+type Tab = 'saponin' | 'guides';
 
 export default function ResearchHub({ lang }: ResearchHubProps) {
   const isVi = lang === 'vi';
@@ -17,7 +17,6 @@ export default function ResearchHub({ lang }: ResearchHubProps) {
 
   const tabs: { key: Tab; label: string; labelVi: string; icon: typeof Microscope }[] = [
     { key: 'saponin', labelVi: 'Ma Trận Saponin', label: 'Saponin Matrix', icon: Microscope },
-    { key: 'studies', labelVi: 'Nghiên Cứu Lâm Sàng', label: 'Clinical Studies', icon: Beaker },
     { key: 'guides', labelVi: 'Hướng Dẫn Sử Dụng', label: 'Education Guides', icon: BookOpen },
   ];
 
@@ -204,55 +203,6 @@ export default function ResearchHub({ lang }: ResearchHubProps) {
           </div>
         )}
 
-        {/* Clinical Studies Tab */}
-        {activeTab === 'studies' && (
-          <div className="animate-fade-in">
-            <div className="grid md:grid-cols-2 gap-6">
-              {researchStudies.map((study) => (
-                <div
-                  key={study.id}
-                  className="bg-cream-50 rounded-2xl p-6 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 group"
-                >
-                  {/* Category badge + Date */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="px-3 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-semibold">
-                      {study.category}
-                    </span>
-                    <span className="text-xs text-forest-400">{study.date}</span>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="font-display text-lg font-semibold text-forest-900 mb-3 leading-tight">
-                    {isVi ? study.titleVi : study.title}
-                  </h3>
-
-                  {/* Abstract */}
-                  <p className="text-forest-600 text-sm leading-relaxed mb-4 line-clamp-3">
-                    {isVi ? study.abstractVi : study.abstract}
-                  </p>
-
-                  {/* Author badge */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-forest-100 flex items-center justify-center">
-                      <Microscope className="w-4 h-4 text-forest-600" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-medium text-forest-700">{study.authors}</div>
-                      <div className="text-xs text-forest-400">{study.journal}</div>
-                    </div>
-                  </div>
-
-                  {/* Download button */}
-                  <button className="inline-flex items-center gap-2 text-sm font-medium text-forest-600 hover:text-gold-600 transition-colors group/btn">
-                    <Download className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-                    {isVi ? 'Tải PDF' : 'Download PDF'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Education Guides Tab */}
         {activeTab === 'guides' && (
           <div className="animate-fade-in">
@@ -263,12 +213,8 @@ export default function ResearchHub({ lang }: ResearchHubProps) {
                   className="bg-cream-50 rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 group cursor-pointer"
                 >
                   {/* Image */}
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img
-                      src={guide.image}
-                      alt={`VKD Group Education Guide: ${isVi ? guide.titleVi : guide.title}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
+                  <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-forest-900 to-forest-700 flex items-center justify-center">
+                    <BookOpen className="w-12 h-12 text-white/20 group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute top-3 left-3">
                       <span className="px-3 py-1 rounded-full bg-gold-400 text-forest-900 text-xs font-semibold">
                         {guide.category}

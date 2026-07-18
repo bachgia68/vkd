@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingBag, Tv2, CheckCircle, Crown, Star, ArrowRight, Zap, Gift, Users, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Tv2, CheckCircle, Crown, ArrowRight, Zap, Gift, Users } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 
 interface OmniChannelProps {
@@ -40,19 +40,6 @@ const stores = [
   },
 ];
 
-const liveEvents = [
-  { title: 'VKD Expert LIVE: MR2 Saponin Deep Dive', titleVi: 'VKD Expert LIVE: Khám Phá MR2 Saponin', platform: 'TikTok', time: 'Every Tue & Thu, 8PM ICT', timeVi: 'Thứ 3 & 5 hàng tuần, 20:00 ICT', live: true },
-  { title: 'VKD Plantation Tour — Behind the Scenes Kon Tum', titleVi: 'Tham Quan Vùng Trồng Kon Tum — Hậu Trường', platform: 'FB', time: 'Every Sat, 10AM ICT', timeVi: 'Thứ 7 hàng tuần, 10:00 ICT', live: false },
-  { title: 'Pn\'s Beauty Science with Dr. Nguyen Minh Hoang', titleVi: 'Khoa Học Làm Đẹp Pn\'s Cùng Bác Sĩ Nguyễn Minh Hoàng', platform: 'Instagram', time: 'Every Wed, 7PM ICT', timeVi: 'Thứ 4 hàng tuần, 19:00 ICT', live: false },
-];
-
-const reviews = [
-  { handle: '@dr.minhthu_wellness', platform: 'Instagram', text: 'After 3 months on VKD ginseng capsules, my patients report measurable improvements in fatigue and cognitive resilience. MR2 is not marketing — it\'s pharmacology.', textVi: 'Sau 3 tháng dùng viên nang sâm VKD, bệnh nhân của tôi báo cáo cải thiện rõ về mệt mỏi và nhận thức. MR2 không phải marketing — đó là dược lý học.', stars: 5, image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=100&h=100&fit=crop' },
-  { handle: '@executive.life.vn', platform: 'FB', text: 'PanaxX has replaced my morning espresso. Clean energy, no crash, and I can actually focus for 6-hour strategy sessions. Worth every dong.', textVi: 'PanaxX đã thay thế cà phê sáng của tôi. Năng lượng sạch, không mệt đột ngột và tôi có thể tập trung cho các buổi chiến lược 6 tiếng.', stars: 5, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
-  { handle: '@nguyen.phuong.beauty', platform: 'Instagram', text: 'The Pn\'s Gold Serum is genuinely transformative. My dermatologist confirmed collagen density improvement at the 6-week check-in. Quiet luxury — real results.', textVi: 'Serum Vàng Pn\'s thực sự đột phá. Bác sĩ da liễu của tôi xác nhận mật độ collagen cải thiện rõ sau 6 tuần.', stars: 5, image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop' },
-  { handle: '@kontumlover', platform: 'TikTok', text: 'I visited the Kon Tum plantation on the VVIP tour. Seeing 6-year-old roots in their natural habitat at 1,800m — no supplement brand does this. VKD is the real deal.', textVi: 'Tôi đã tham quan vùng trồng Kon Tum trong chuyến tour VVIP. Nhìn thấy sâm 6 năm tuổi trong môi trường tự nhiên ở 1.800m — không thương hiệu nào làm được điều này.', stars: 5, image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
-];
-
 export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
   const isVi = lang === 'vi';
   const isRTL = lang === 'ar';
@@ -72,7 +59,7 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
               </span>
             </div>
             <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-4">
-              {isVi ? 'Mua Hàng Chính Hãng — Không Gian Giả Mạo' : 'Buy Authentic — Zero Counterfeits Guaranteed'}
+              {isVi ? 'Mua Hàng Chính Hãng — Không Lo Hàng Giả' : 'Buy Authentic — Zero Counterfeits Guaranteed'}
             </h2>
             <p className="text-forest-600">
               {isVi
@@ -106,92 +93,6 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
                 </a>
               );
             })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── LIVE & SOCIAL HUB ── */}
-      <div className="section-padding bg-forest-950 text-white">
-        <div className="container-wide">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-
-            {/* Live Events */}
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-500/20 rounded-full mb-6">
-                <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-                <span className="text-xs font-semibold tracking-wider uppercase text-red-400">
-                  {isVi ? 'VKD Live & Mạng Xã Hội' : 'VKD Live & Social Hub'}
-                </span>
-              </div>
-              <h2 className="font-display text-2xl md:text-3xl text-white mb-4">
-                {isVi ? 'Livestream Chuyên Gia & Cộng Đồng' : 'Expert Livestreams & Community'}
-              </h2>
-              <p className="text-white/60 mb-8">
-                {isVi
-                  ? 'Theo dõi chương trình phát sóng trực tiếp hàng tuần từ hội đồng y khoa VKD, tham quan vùng trồng và hội thảo làm đẹp.'
-                  : 'Tune into weekly live broadcasts from the VKD medical board, plantation tours, and beauty science workshops.'}
-              </p>
-
-              <div className="space-y-4">
-                {liveEvents.map((ev, i) => (
-                  <div key={i} className="flex gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
-                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                      {ev.platform === 'TikTok'    && <Tv2        className="w-5 h-5 text-white" />}
-                      {ev.platform === 'FB'  && <Users   className="w-5 h-5 text-blue-400" />}
-                      {ev.platform === 'Instagram' && <MessageSquare  className="w-5 h-5 text-pink-400" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium text-white/50">{ev.platform}</span>
-                        {ev.live && (
-                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/30 text-red-300 text-xs font-bold">
-                            <span className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />LIVE
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-white font-medium text-sm leading-snug mb-1">{isVi ? ev.titleVi : ev.title}</p>
-                      <p className="text-white/40 text-xs">{isVi ? ev.timeVi : ev.time}</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-gold-400 transition-colors self-center flex-shrink-0" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Social Proof Gallery */}
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gold-400/20 rounded-full mb-6">
-                <Star className="w-3.5 h-3.5 text-gold-400 fill-gold-400" />
-                <span className="text-xs font-semibold tracking-wider uppercase text-gold-400">
-                  {isVi ? 'Phản Hồi Cộng Đồng' : 'Social Proof Gallery'}
-                </span>
-              </div>
-              <h2 className="font-display text-2xl md:text-3xl text-white mb-8">
-                {isVi ? 'Khách Hàng Nói Gì Về VKD' : 'What Our Community Says'}
-              </h2>
-
-              <div className="grid grid-cols-2 gap-4">
-                {reviews.map((rev, i) => (
-                  <div key={i} className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors">
-                    <div className="flex items-center gap-3 mb-3">
-                      <img src={rev.image} alt={rev.handle} className="w-9 h-9 rounded-full object-cover" />
-                      <div>
-                        <div className="text-white text-xs font-semibold">{rev.handle}</div>
-                        <div className="text-white/40 text-xs">{rev.platform}</div>
-                      </div>
-                    </div>
-                    <div className="flex gap-0.5 mb-2">
-                      {Array.from({ length: rev.stars }).map((_, s) => (
-                        <Star key={s} className="w-3 h-3 fill-gold-400 text-gold-400" />
-                      ))}
-                    </div>
-                    <p className="text-white/70 text-xs leading-relaxed line-clamp-3">
-                      {isVi ? rev.textVi : rev.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>

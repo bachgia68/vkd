@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   ShoppingBag,
   Heart,
-  Star,
   Leaf,
   FlaskConical,
   AlertTriangle,
@@ -112,23 +111,7 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
               {product.name}
             </h1>
 
-            <p className="text-forest-400 text-sm mb-5">Mã sản phẩm: {product.sku}</p>
-
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star
-                    key={s}
-                    className={`w-4 h-4 ${
-                      s <= Math.round(product.rating) ? 'fill-gold-400 text-gold-400' : 'text-cream-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-sm font-semibold text-forest-700">{product.rating.toFixed(1)}</span>
-              <span className="text-xs text-forest-400">({product.reviews} đánh giá)</span>
-            </div>
+            <p className="text-forest-400 text-sm mb-6">Mã sản phẩm: {product.sku}</p>
 
             {/* Price */}
             <div className="text-3xl font-display font-bold text-forest-900 mb-6 pb-6 border-b border-cream-200">

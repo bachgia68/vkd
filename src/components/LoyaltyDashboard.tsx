@@ -7,23 +7,14 @@ interface LoyaltyProps {
   onNavigate: (page: string) => void;
 }
 
-const mockActivity = [
-  { date: '2024-11-15', desc: 'Online Order #VKD-A9B2C3', descVi: 'Đơn hàng #VKD-A9B2C3', pts: +450, channel: 'Website' },
-  { date: '2024-11-02', desc: 'Vo Kim Duong — Hanoi', descVi: 'Cửa hàng Võ Kim Đường — Hà Nội', pts: +280, channel: 'Showroom' },
-  { date: '2024-10-20', desc: 'Shopee Mall Purchase', descVi: 'Mua hàng Shopee Mall', pts: +190, channel: 'Shopee' },
-  { date: '2024-10-08', desc: 'TikTok Flash Deal', descVi: 'Flash Deal TikTok', pts: +95, channel: 'TikTok' },
-  { date: '2024-09-30', desc: 'Referral Bonus — Dr. Nguyen', descVi: 'Thưởng giới thiệu — Bác sĩ Nguyễn', pts: +500, channel: 'Referral' },
-];
-
-const channelIcons: Record<string, string> = {
-  Website: '🌐', Showroom: '🏪', Shopee: '🛍', TikTok: '📱', Referral: '🤝',
-};
-
+// Chưa có hệ thống tài khoản/backend thật (xem AdminAuthContext.tsx) nên trang này
+// hiển thị trạng thái của một hội viên MỚI (0 điểm, chưa có hoạt động) thay vì bịa
+// lịch sử giao dịch — tránh hiển thị dữ liệu giả là "của bạn".
 export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
   const isVi = lang === 'vi';
-  const currentPoints = 1515;
-  const currentTierIdx = 1; // VIP
-  const nextTier = loyaltyTiers[2];
+  const currentPoints = 0;
+  const currentTierIdx = 0; // Standard — hội viên mới luôn bắt đầu ở hạng này
+  const nextTier = loyaltyTiers[1];
 
   const progress = ((currentPoints - loyaltyTiers[currentTierIdx].minPoints) /
     (nextTier.minPoints - loyaltyTiers[currentTierIdx].minPoints)) * 100;
@@ -62,7 +53,7 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <Crown className="w-5 h-5 text-gold-400" />
-                    <span className="text-gold-400 font-semibold text-sm">VIP Member</span>
+                    <span className="text-gold-400 font-semibold text-sm">{isVi ? loyaltyTiers[currentTierIdx].nameVi : loyaltyTiers[currentTierIdx].name} Member</span>
                   </div>
                   <img src="/assets/images/logo-sam-ngoc-linh.png" alt="VKD Logo" className="h-8 opacity-80" />
                 </div>
@@ -78,7 +69,8 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                   <div className="h-full bg-gradient-to-r from-gold-400 to-gold-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }} />
                 </div>
                 <div className="flex justify-between text-xs text-white/40 mt-1">
-                  <span>VIP</span><span>VVIP Elite (20,000 pts)</span>
+                  <span>{isVi ? loyaltyTiers[currentTierIdx].nameVi : loyaltyTiers[currentTierIdx].name}</span>
+                  <span>{isVi ? nextTier.nameVi : nextTier.name} ({nextTier.minPoints.toLocaleString()} pts)</span>
                 </div>
               </div>
             </div>
@@ -136,8 +128,8 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
             <div className="grid grid-cols-3 gap-4">
               {[
                 { label: isVi ? 'Tổng Điểm' : 'Total Points', value: currentPoints.toLocaleString(), icon: Star },
-                { label: isVi ? 'Đơn Hàng' : 'Orders Placed', value: '12', icon: ShoppingBag },
-                { label: isVi ? 'Tiết Kiệm Được' : 'Total Saved', value: '$84', icon: TrendingUp },
+                { label: isVi ? 'Đơn Hàng' : 'Orders Placed', value: '0', icon: ShoppingBag },
+                { label: isVi ? 'Tiết Kiệm Được' : 'Total Saved', value: isVi ? '0₫' : '$0', icon: TrendingUp },
               ].map(({ label, value, icon: Icon }) => (
                 <div key={label} className="bg-white rounded-2xl p-4 shadow-elegant text-center">
                   <Icon className="w-5 h-5 text-gold-500 mx-auto mb-2" />
@@ -155,19 +147,10 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                 </h3>
                 <Zap className="w-4 h-4 text-gold-500" />
               </div>
-              <div className="divide-y divide-cream-100">
-                {mockActivity.map((act, i) => (
-                  <div key={i} className="flex items-center gap-4 px-5 py-4 hover:bg-cream-50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl bg-cream-100 flex items-center justify-center text-lg flex-shrink-0">
-                      {channelIcons[act.channel] || '•'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-forest-800 text-sm font-medium">{isVi ? act.descVi : act.desc}</p>
-                      <p className="text-forest-400 text-xs">{act.date} · {act.channel}</p>
-                    </div>
-                    <span className="font-bold text-forest-600 text-sm flex-shrink-0">+{act.pts} pts</span>
-                  </div>
-                ))}
+              <div className="text-center py-12 text-forest-400">
+                <Zap className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                <p className="text-sm">{isVi ? 'Chưa có hoạt động tích điểm nào.' : 'No points activity yet.'}</p>
+                <p className="text-xs mt-1">{isVi ? 'Mua hàng để bắt đầu tích điểm.' : 'Shop to start earning points.'}</p>
               </div>
             </div>
 
@@ -180,12 +163,12 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                     {isVi ? 'Đổi Điểm Lấy Quà' : 'Redeem Your Points'}
                   </p>
                   <p className="text-forest-800/70 text-sm">
-                    {isVi ? `${currentPoints} điểm = giảm ngay ${Math.floor(currentPoints / 100) * 5}k₫` : `${currentPoints} pts = $${(currentPoints * 0.005).toFixed(2)} off`}
+                    {isVi ? 'Bắt đầu mua hàng để tích điểm đổi quà.' : 'Start shopping to earn points you can redeem.'}
                   </p>
                 </div>
               </div>
               <button onClick={() => onNavigate('catalog')} className="btn-primary text-sm flex-shrink-0">
-                {isVi ? 'Đổi Ngay' : 'Redeem'}
+                {isVi ? 'Mua Ngay' : 'Shop Now'}
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

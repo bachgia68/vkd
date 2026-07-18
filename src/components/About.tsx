@@ -73,7 +73,7 @@ export default function About({ lang }: AboutProps) {
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden shadow-elegant-lg">
               <img
-                src="https://images.unsplash.com/photo-1515942400420-2b98fed1f515?w=900&h=1100&fit=crop&q=90"
+                src="/assets/images/sam-ngoc-linh-plant.png"
                 alt="Panax Vietnamensis"
                 className="w-full aspect-[4/5] object-cover"
               />

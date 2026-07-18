@@ -13,12 +13,12 @@ type PaymentMethod = 'stripe' | 'paypal' | 'vnpay' | 'momo' | 'payos';
 type PaymentState = 'idle' | 'processing' | 'verifying' | 'success' | 'failed';
 type Region = 'vn' | 'us' | 'eu' | 'jp' | 'cn';
 
-const regionConfig: Record<Region, { currency: string; symbol: string; shippingBase: number; shippingExpress: number; taxRate: number; priceKey: 'priceVND' | 'priceUSD' | 'priceEUR' | 'priceJPY' | 'priceCNY' }> = {
-  vn: { currency: 'VND', symbol: '₫', shippingBase: 35000,  shippingExpress: 80000,  taxRate: 0.08, priceKey: 'priceVND' },
-  us: { currency: 'USD', symbol: '$', shippingBase: 18,      shippingExpress: 38,     taxRate: 0.09, priceKey: 'priceUSD' },
-  eu: { currency: 'EUR', symbol: '€', shippingBase: 15,      shippingExpress: 32,     taxRate: 0.10, priceKey: 'priceEUR' },
-  jp: { currency: 'JPY', symbol: '¥', shippingBase: 1800,    shippingExpress: 3800,   taxRate: 0.10, priceKey: 'priceJPY' },
-  cn: { currency: 'CNY', symbol: '¥', shippingBase: 120,     shippingExpress: 280,    taxRate: 0.09, priceKey: 'priceCNY' },
+const regionConfig: Record<Region, { currency: string; symbol: string; taxRate: number; priceKey: 'priceVND' | 'priceUSD' | 'priceEUR' | 'priceJPY' | 'priceCNY' }> = {
+  vn: { currency: 'VND', symbol: '₫', taxRate: 0.08, priceKey: 'priceVND' },
+  us: { currency: 'USD', symbol: '$', taxRate: 0.09, priceKey: 'priceUSD' },
+  eu: { currency: 'EUR', symbol: '€', taxRate: 0.10, priceKey: 'priceEUR' },
+  jp: { currency: 'JPY', symbol: '¥', taxRate: 0.10, priceKey: 'priceJPY' },
+  cn: { currency: 'CNY', symbol: '¥', taxRate: 0.09, priceKey: 'priceCNY' },
 };
 
 function fmtPrice(amount: number, region: Region) {
@@ -34,7 +34,6 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
   const isVi = lang === 'vi';
 
   const [region, setRegion] = useState<Region>('vn');
-  const [expressShipping, setExpressShipping] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('stripe');
   const [paymentState, setPaymentState] = useState<PaymentState>('idle');
 
@@ -42,13 +41,12 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
 
   const rc = regionConfig[region];
   const subtotal = region === 'vn' ? subtotalVND : items.reduce((s, item) => s + (item[rc.priceKey] as number) * item.quantity, 0);
-  const shipping = expressShipping ? rc.shippingExpress : rc.shippingBase;
   const tax = subtotal * rc.taxRate;
-  const total = subtotal + shipping + tax;
+  const total = subtotal + tax;
 
-  // PayOS chỉ hỗ trợ VND — tính riêng theo mức phí VN, không phụ thuộc khu vực đang chọn.
-  const payosShipping = expressShipping ? regionConfig.vn.shippingExpress : regionConfig.vn.shippingBase;
-  const payosTotal = Math.round(subtotalVND + payosShipping + subtotalVND * regionConfig.vn.taxRate);
+  // PayOS chỉ hỗ trợ VND — tính riêng theo tổng VN, không phụ thuộc khu vực đang chọn.
+  // Phí vận chuyển KHÔNG tính ở bước đặt hàng — nhân viên VKD liên hệ xác nhận sau khi nhận đơn.
+  const payosTotal = Math.round(subtotalVND + subtotalVND * regionConfig.vn.taxRate);
 
   const handlePayOSCheckout = async () => {
     setPaymentState('processing');
@@ -185,7 +183,7 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
             <div className="bg-white rounded-2xl p-6 shadow-elegant">
               <h3 className="font-display font-semibold text-forest-900 mb-4 flex items-center gap-2">
                 <Truck className="w-5 h-5 text-gold-500" />
-                {isVi ? 'Thông Tin Giao Hàng' : 'Shipping Details'}
+                {isVi ? 'Thông Tin Nhận Hàng' : 'Delivery Information'}
               </h3>
               <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 {[
@@ -215,24 +213,13 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
                 </div>
               </div>
 
-              {/* Shipping type */}
-              <div className="grid sm:grid-cols-2 gap-3">
-                <button
-                  onClick={() => setExpressShipping(false)}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${!expressShipping ? 'border-forest-600 bg-forest-50' : 'border-cream-200 hover:border-forest-300'}`}
-                >
-                  <div className="font-semibold text-forest-900 text-sm mb-0.5">{isVi ? 'Giao Tiêu Chuẩn' : 'Standard Delivery'}</div>
-                  <div className="text-forest-500 text-xs mb-1">{region === 'vn' ? 'GHTK Express · 2-3 ngày' : 'DHL Standard · 7–14 days'}</div>
-                  <div className="font-bold text-forest-800">{fmtPrice(rc.shippingBase, region)}</div>
-                </button>
-                <button
-                  onClick={() => setExpressShipping(true)}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${expressShipping ? 'border-gold-500 bg-gold-50' : 'border-cream-200 hover:border-gold-300'}`}
-                >
-                  <div className="font-semibold text-forest-900 text-sm mb-0.5">{isVi ? 'Giao Hỏa Tốc' : 'Premium Express'}</div>
-                  <div className="text-forest-500 text-xs mb-1">{region === 'vn' ? 'GHTK Same Day · Trong ngày' : 'DHL Express · 2–4 days'}</div>
-                  <div className="font-bold text-gold-600">{fmtPrice(rc.shippingExpress, region)}</div>
-                </button>
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-gold-50 border border-gold-100">
+                <Truck className="w-4 h-4 text-gold-600 flex-shrink-0" />
+                <p className="text-gold-800 text-xs">
+                  {isVi
+                    ? 'Phí và phương thức vận chuyển sẽ được nhân viên VKD liên hệ xác nhận với bạn ngay sau khi đặt hàng.'
+                    : 'Shipping method and fee will be confirmed by VKD staff by phone shortly after you place this order.'}
+                </p>
               </div>
             </div>
 
@@ -318,13 +305,16 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
                 <div className="space-y-2 pt-4 border-t border-cream-200">
                   {[
                     { label: isVi ? 'Tạm Tính' : 'Subtotal', value: fmtPrice(subtotal, region) },
-                    { label: isVi ? `Vận chuyển (${expressShipping ? 'Hỏa tốc' : 'Tiêu chuẩn'})` : `Shipping (${expressShipping ? 'Express' : 'Standard'})`, value: fmtPrice(shipping, region) },
                     { label: isVi ? `Thuế (${(rc.taxRate * 100).toFixed(0)}%)` : `Tax (${(rc.taxRate * 100).toFixed(0)}%)`, value: fmtPrice(tax, region) },
                   ].map(({ label, value }) => (
                     <div key={label} className="flex justify-between text-sm text-forest-600">
                       <span>{label}</span><span>{value}</span>
                     </div>
                   ))}
+                  <div className="flex justify-between text-sm text-forest-400 italic">
+                    <span>{isVi ? 'Phí vận chuyển' : 'Shipping fee'}</span>
+                    <span>{isVi ? 'Xác nhận sau' : 'Confirmed later'}</span>
+                  </div>
                   <div className="flex justify-between pt-3 border-t border-cream-200">
                     <span className="font-bold text-forest-900">{isVi ? 'Tổng Cộng' : 'Total'}</span>
                     <span className="font-display font-bold text-forest-900 text-xl">{fmtPrice(total, region)}</span>

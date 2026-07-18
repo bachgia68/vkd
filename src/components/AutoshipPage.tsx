@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RefreshCw, CheckCircle, Info, Calendar, Pause, X, Plus } from 'lucide-react';
-import { products } from '../data/mockData';
+import { vkdProducts, toCartProduct } from '../data/vkdProducts';
 import type { Language } from '../i18n/translations';
 
 interface AutoshipProps {
@@ -14,7 +14,9 @@ const frequencies = [
   { days: 90, labelEn: 'Every 90 days', labelVi: 'Mỗi 90 ngày' },
 ];
 
-const subscriptionProducts = products.filter(p => p.subscriptionEligible);
+// Sản phẩm dùng hàng ngày/định kỳ (thực phẩm bổ sung) phù hợp đặt hàng tự động.
+const products = vkdProducts.filter(p => p.category === 'supplements').map(toCartProduct);
+const subscriptionProducts = products;
 
 interface MockSubscription {
   productId: string;
@@ -26,8 +28,8 @@ interface MockSubscription {
 export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) {
   const isVi = lang === 'vi';
   const [subscriptions, setSubscriptions] = useState<MockSubscription[]>([
-    { productId: 'panaxx-energy-330ml', frequencyDays: 30, nextDate: '2024-12-10', status: 'active' },
-    { productId: 'concentrated-capsules', frequencyDays: 30, nextDate: '2024-12-10', status: 'active' },
+    { productId: 'VKD-010', frequencyDays: 30, nextDate: '2026-08-10', status: 'active' },
+    { productId: 'VKD-003', frequencyDays: 30, nextDate: '2026-08-10', status: 'active' },
   ]);
   const [freq, setFreq] = useState(30);
 
