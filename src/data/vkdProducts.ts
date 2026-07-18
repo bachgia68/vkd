@@ -1,8 +1,10 @@
-// Dữ liệu sản phẩm thật VKD Group — đồng bộ từ samngoclinhvkdgroup.com/san-pham/ ngày 2026-07-17.
+﻿// Dữ liệu sản phẩm thật VKD Group — đồng bộ từ samngoclinhvkdgroup.com/san-pham/ ngày 2026-07-17.
 // Đã loại bỏ 6 SKU hiện đang "HẾT HÀNG" trên web gốc (xác nhận trực tiếp trên từng trang danh mục):
 //   Kẹo Sâm Ngọc Linh (PanaxX Candy), Set 5 Lon Nước Tăng Lực (5 Vị),
 //   PanaxX Bản Kim/Mộc/Thuỷ/Hoả 325ml (dòng Ngũ Hành — Kim Mộc Thủy Hỏa Thổ — đã ngừng sản xuất).
 // Mọi mô tả, thành phần, công dụng, lưu ý bên dưới lấy nguyên văn/sát nghĩa từ trang chi tiết gốc.
+
+import type { Language } from '../i18n/translations';
 
 export type CategoryId = 'ginseng' | 'supplements' | 'tea_wine' | 'cosmetics';
 
@@ -592,8 +594,35 @@ export const vkdProducts: VKDProduct[] = [
   },
 ];
 
+import { productTranslations, categoryTranslations } from './vkdProductTranslations';
+
 export const findVKDProduct = (slug: string): VKDProduct | undefined =>
   vkdProducts.find((p) => p.slug === slug);
+
+export const getLocalizedProduct = (product: VKDProduct, lang: Language): VKDProduct => {
+  if (lang === 'vi') return product;
+  const t = productTranslations[lang][product.slug];
+  if (!t) return product;
+  return {
+    ...product,
+    name: t.name,
+    badge: t.badge ?? product.badge,
+    activeIngredient: t.activeIngredient,
+    description: t.description,
+    ingredients: t.ingredients ?? product.ingredients,
+    volume: t.volume ?? product.volume,
+    benefits: t.benefits ?? product.benefits,
+    warnings: t.warnings ?? product.warnings,
+    origin: t.origin ?? product.origin,
+  };
+};
+
+export const getLocalizedCategory = (category: Category, lang: Language): Category => {
+  if (lang === 'vi') return category;
+  const t = categoryTranslations[lang][category.id];
+  if (!t) return category;
+  return { ...category, label: t.label, desc: t.desc };
+};
 
 export const formatVND = (price: number): string =>
   new Intl.NumberFormat('vi-VN').format(price) + '₫';

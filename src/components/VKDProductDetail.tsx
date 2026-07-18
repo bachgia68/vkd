@@ -11,35 +11,161 @@ import {
   AlertTriangle,
   MapPin,
 } from 'lucide-react';
-import { findVKDProduct, formatVND, toCartProduct, categories } from '../data/vkdProducts';
+import {
+  findVKDProduct,
+  formatVND,
+  toCartProduct,
+  categories,
+  getLocalizedProduct,
+  getLocalizedCategory,
+} from '../data/vkdProducts';
+import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
 
 interface VKDProductDetailProps {
   slug: string;
+  lang: Language;
   onNavigate: (page: string, slug?: string) => void;
 }
 
-export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailProps) {
+interface DetailUiStrings {
+  notFoundTitle: string;
+  backToCatalog: string;
+  skuLabel: string;
+  authenticBadge: string;
+  activeIngredientLabel: string;
+  addToCart: string;
+  buyNow: string;
+  fulfillmentNote: string;
+  ingredientsTitle: string;
+  benefitsTitle: string;
+  warningsTitle: string;
+  originTitle: string;
+  ctaTitle: string;
+  ctaText: string;
+  ctaButton: string;
+}
+
+const detailUi: Record<Language, DetailUiStrings> = {
+  vi: {
+    notFoundTitle: 'Không tìm thấy sản phẩm',
+    backToCatalog: 'Quay lại danh mục',
+    skuLabel: 'Mã sản phẩm:',
+    authenticBadge: 'Hàng chính hãng VKD',
+    activeIngredientLabel: 'Hoạt chất chính',
+    addToCart: 'Thêm Vào Giỏ',
+    buyNow: 'Mua Ngay',
+    fulfillmentNote:
+      'Đặt hàng, thanh toán và giao nhận thực hiện trọn gói trên VKD Group — không chuyển hướng ra ngoài.',
+    ingredientsTitle: 'Thành Phần',
+    benefitsTitle: 'Công Dụng',
+    warningsTitle: 'Lưu Ý',
+    originTitle: 'Nguồn Gốc Xuất Xứ',
+    ctaTitle: 'Khám phá toàn bộ hệ sinh thái VKD',
+    ctaText:
+      'Đặt hàng chính hãng, kiểm tra chứng chỉ cGMP/HACCP và truy xuất nguồn gốc vùng trồng Tu Mơ Rông — Nam Trà My — Puxailaileng.',
+    ctaButton: 'Xem thêm sản phẩm khác',
+  },
+  en: {
+    notFoundTitle: 'Product not found',
+    backToCatalog: 'Back to catalog',
+    skuLabel: 'Product code:',
+    authenticBadge: 'Genuine VKD product',
+    activeIngredientLabel: 'Key Active Ingredient',
+    addToCart: 'Add to Cart',
+    buyNow: 'Buy Now',
+    fulfillmentNote:
+      'Ordering, payment, and delivery are handled entirely on VKD Group — no external redirects.',
+    ingredientsTitle: 'Ingredients',
+    benefitsTitle: 'Benefits',
+    warningsTitle: 'Warnings',
+    originTitle: 'Origin',
+    ctaTitle: 'Explore the full VKD ecosystem',
+    ctaText:
+      'Order genuine products, verify cGMP/HACCP certifications, and trace the origin of our Tu Mo Rong — Nam Tra My — Puxailaileng growing regions.',
+    ctaButton: 'View more products',
+  },
+  zh: {
+    notFoundTitle: '未找到产品',
+    backToCatalog: '返回目录',
+    skuLabel: '产品编号:',
+    authenticBadge: 'VKD正品',
+    activeIngredientLabel: '核心活性成分',
+    addToCart: '加入购物车',
+    buyNow: '立即购买',
+    fulfillmentNote: '下单、支付与配送均在VKD Group内完整处理——不会跳转至外部平台。',
+    ingredientsTitle: '成分',
+    benefitsTitle: '功效',
+    warningsTitle: '注意事项',
+    originTitle: '产地来源',
+    ctaTitle: '探索VKD完整生态系统',
+    ctaText: '订购正品,查验cGMP/HACCP认证,并追溯土莫隆—南茶眉—普赛莱恩种植区的来源。',
+    ctaButton: '查看更多产品',
+  },
+  fr: {
+    notFoundTitle: 'Produit introuvable',
+    backToCatalog: 'Retour au catalogue',
+    skuLabel: 'Référence produit :',
+    authenticBadge: 'Produit authentique VKD',
+    activeIngredientLabel: 'Principal Actif',
+    addToCart: 'Ajouter au Panier',
+    buyNow: 'Acheter Maintenant',
+    fulfillmentNote:
+      'La commande, le paiement et la livraison sont entièrement gérés sur VKD Group — aucune redirection externe.',
+    ingredientsTitle: 'Ingrédients',
+    benefitsTitle: 'Bienfaits',
+    warningsTitle: 'Précautions',
+    originTitle: 'Origine',
+    ctaTitle: "Découvrez tout l'écosystème VKD",
+    ctaText:
+      "Commandez des produits authentiques, vérifiez les certifications cGMP/HACCP et retracez l'origine de nos zones de culture Tu Mo Rong — Nam Tra My — Puxailaileng.",
+    ctaButton: 'Voir plus de produits',
+  },
+  ar: {
+    notFoundTitle: 'المنتج غير موجود',
+    backToCatalog: 'العودة إلى الكتالوج',
+    skuLabel: 'رمز المنتج:',
+    authenticBadge: 'منتج أصلي من VKD',
+    activeIngredientLabel: 'المكوّن الفعّال الرئيسي',
+    addToCart: 'أضف إلى السلة',
+    buyNow: 'اشترِ الآن',
+    fulfillmentNote: 'يتم تنفيذ الطلب والدفع والتسليم بالكامل عبر VKD Group — دون أي تحويل خارجي.',
+    ingredientsTitle: 'المكونات',
+    benefitsTitle: 'الفوائد',
+    warningsTitle: 'تحذيرات',
+    originTitle: 'المنشأ',
+    ctaTitle: 'استكشف منظومة VKD بالكامل',
+    ctaText:
+      'اطلب منتجات أصلية، وتحقق من شهادات cGMP/HACCP، وتتبّع أصل مناطق الزراعة في توو مو رونغ — نام ترا مي — بوكسايلايانغ.',
+    ctaButton: 'عرض المزيد من المنتجات',
+  },
+};
+
+export default function VKDProductDetail({ slug, lang, onNavigate }: VKDProductDetailProps) {
   const [qty, setQty] = useState(1);
   const [liked, setLiked] = useState(false);
   const { addToCart } = useCart();
 
-  const product = findVKDProduct(slug);
+  const ui = detailUi[lang];
+  const isRTL = lang === 'ar';
+  const rawProduct = findVKDProduct(slug);
 
-  if (!product) {
+  if (!rawProduct) {
     return (
       <section className="bg-cream-50 min-h-screen flex items-center justify-center" style={{ paddingTop: '6rem' }}>
         <div className="text-center">
-          <p className="font-display text-2xl text-forest-900 mb-4">Không tìm thấy sản phẩm</p>
+          <p className="font-display text-2xl text-forest-900 mb-4">{ui.notFoundTitle}</p>
           <button onClick={() => onNavigate('catalog')} className="btn-primary text-xs">
-            Quay lại danh mục
+            {ui.backToCatalog}
           </button>
         </div>
       </section>
     );
   }
 
-  const category = categories.find((c) => c.id === product.category);
+  const product = getLocalizedProduct(rawProduct, lang);
+  const rawCategory = categories.find((c) => c.id === product.category);
+  const category = rawCategory ? getLocalizedCategory(rawCategory, lang) : undefined;
 
   const handleAddToCart = () => {
     const cartProduct = toCartProduct(product);
@@ -52,7 +178,11 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
   };
 
   return (
-    <section className="bg-cream-50 min-h-screen" style={{ paddingTop: '6rem', paddingBottom: '5rem' }}>
+    <section
+      className="bg-cream-50 min-h-screen"
+      style={{ paddingTop: '6rem', paddingBottom: '5rem' }}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="container-wide" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-forest-500 mb-8 animate-fade-in flex-wrap">
@@ -61,7 +191,7 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
             className="inline-flex items-center gap-1 hover:text-forest-800 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Quay lại danh mục
+            {ui.backToCatalog}
           </button>
           <ChevronRight className="w-3 h-3 text-forest-300" />
           <span className="text-forest-400">{category?.label}</span>
@@ -93,7 +223,7 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
               )}
               <div className="absolute top-5 right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur">
                 <ShieldCheck className="w-3.5 h-3.5 text-forest-600" />
-                <span className="text-[11px] font-semibold text-forest-700">Hàng chính hãng VKD</span>
+                <span className="text-[11px] font-semibold text-forest-700">{ui.authenticBadge}</span>
               </div>
             </div>
           </div>
@@ -111,7 +241,9 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
               {product.name}
             </h1>
 
-            <p className="text-forest-400 text-sm mb-6">Mã sản phẩm: {product.sku}</p>
+            <p className="text-forest-400 text-sm mb-6">
+              {ui.skuLabel} {product.sku}
+            </p>
 
             {/* Price */}
             <div className="text-3xl font-display font-bold text-forest-900 mb-6 pb-6 border-b border-cream-200">
@@ -129,7 +261,7 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
               <FlaskConical className="w-5 h-5 text-forest-600 mt-0.5 shrink-0" />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-forest-500 mb-1">
-                  Hoạt chất chính
+                  {ui.activeIngredientLabel}
                 </p>
                 <p className="text-sm text-forest-800 font-medium">{product.activeIngredient}</p>
               </div>
@@ -158,14 +290,14 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
                 className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 bg-white border border-forest-900 hover:bg-forest-50 text-forest-900 text-sm font-bold py-4 px-6 rounded-full uppercase tracking-wider transition-all active:scale-95"
               >
                 <ShoppingBag className="w-4 h-4" />
-                Thêm Vào Giỏ
+                {ui.addToCart}
               </button>
 
               <button
                 onClick={handleBuyNow}
                 className="flex-1 min-w-[160px] inline-flex items-center justify-center gap-2 bg-forest-900 hover:bg-forest-800 text-cream-50 text-sm font-bold py-4 px-6 rounded-full uppercase tracking-wider transition-all hover:shadow-elegant-lg active:scale-95"
               >
-                Mua Ngay
+                {ui.buyNow}
               </button>
 
               <button
@@ -182,7 +314,7 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
 
             <p className="text-xs text-forest-400 flex items-center gap-1.5">
               <ShieldCheck className="w-3 h-3" />
-              Đặt hàng, thanh toán và giao nhận thực hiện trọn gói trên VKD Group — không chuyển hướng ra ngoài.
+              {ui.fulfillmentNote}
             </p>
           </div>
         </div>
@@ -190,22 +322,22 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
         {/* Full detail sections synced from source site */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-16">
           {product.ingredients && (
-            <DetailCard icon={FlaskConical} title="Thành Phần">
+            <DetailCard icon={FlaskConical} title={ui.ingredientsTitle}>
               {product.ingredients}
             </DetailCard>
           )}
           {product.benefits && (
-            <DetailCard icon={Check} title="Công Dụng">
+            <DetailCard icon={Check} title={ui.benefitsTitle}>
               {product.benefits}
             </DetailCard>
           )}
           {product.warnings && (
-            <DetailCard icon={AlertTriangle} title="Lưu Ý">
+            <DetailCard icon={AlertTriangle} title={ui.warningsTitle}>
               {product.warnings}
             </DetailCard>
           )}
           {product.origin && (
-            <DetailCard icon={MapPin} title="Nguồn Gốc Xuất Xứ">
+            <DetailCard icon={MapPin} title={ui.originTitle}>
               {product.origin}
             </DetailCard>
           )}
@@ -213,18 +345,13 @@ export default function VKDProductDetail({ slug, onNavigate }: VKDProductDetailP
 
         {/* Footer CTA */}
         <div className="rounded-3xl bg-gradient-to-br from-forest-800 to-forest-900 p-8 md:p-10 text-center shadow-elegant-lg">
-          <h3 className="font-display text-2xl md:text-3xl text-cream-50 mb-3">
-            Khám phá toàn bộ hệ sinh thái VKD
-          </h3>
-          <p className="text-cream-200 mb-6 max-w-xl mx-auto leading-relaxed">
-            Đặt hàng chính hãng, kiểm tra chứng chỉ cGMP/HACCP và truy xuất nguồn gốc vùng trồng
-            Tu Mơ Rông — Nam Trà My — Puxailaileng.
-          </p>
+          <h3 className="font-display text-2xl md:text-3xl text-cream-50 mb-3">{ui.ctaTitle}</h3>
+          <p className="text-cream-200 mb-6 max-w-xl mx-auto leading-relaxed">{ui.ctaText}</p>
           <button
             onClick={() => onNavigate('catalog')}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gold-400 text-forest-900 text-sm font-semibold hover:bg-gold-300 transition-all hover:shadow-gold active:scale-95"
           >
-            Xem thêm sản phẩm khác
+            {ui.ctaButton}
           </button>
         </div>
       </div>

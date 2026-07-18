@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import Header from './components/Header';
@@ -99,11 +99,11 @@ function App() {
           )}
 
           {currentPage === 'catalog' && (
-            <VKDProductCatalog onNavigate={navigate} />
+            <VKDProductCatalog lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'product-detail' && (
-            <VKDProductDetail slug={selectedSlug} onNavigate={navigate} />
+            <VKDProductDetail slug={selectedSlug} lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'research' && (

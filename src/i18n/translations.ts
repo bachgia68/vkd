@@ -1,4 +1,4 @@
-export type Language = 'vi' | 'en' | 'zh' | 'fr' | 'ar';
+﻿export type Language = 'vi' | 'en' | 'zh' | 'fr' | 'ar';
 
 export interface Translation {
   nav: {
@@ -209,7 +209,7 @@ export const translations: Record<Language, Translation> = {
       hoursLabel: 'Giờ hoạt động',
       addressLabel: 'Địa chỉ',
       phoneLabel: 'Điện thoại',
-      bookVisit: 'Đặt Lịch Khám',
+      bookVisit: 'ĐẶT LỊCH TƯ VẤN',
       locations: [
         { name: 'Showroom Hà Nội', address: 'Số 44 Ngõ 120 Trường Chinh, Phường Phương Mai, Quận Đống Đa, TP. Hà Nội', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
         { name: 'Chi Nhánh Miền Nam (TP.HCM)', address: '170 Bis Trần Hưng Đạo, Phường Nguyễn Cư Trinh, Quận 1, TP. Hồ Chí Minh', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
