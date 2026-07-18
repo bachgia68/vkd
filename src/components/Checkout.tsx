@@ -58,7 +58,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           amount: payosTotal,
-          items: items.map((i) => ({ name: i.nameVi || i.name, quantity: i.quantity, price: i.priceVND })),
+          items: items.map((i) => ({ sku: i.id, name: i.nameVi || i.name, quantity: i.quantity, price: i.priceVND })),
           buyerName: form.name,
           buyerEmail: form.email,
           buyerPhone: form.phone,
