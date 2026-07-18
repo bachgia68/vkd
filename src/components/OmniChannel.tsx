@@ -59,7 +59,7 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
               </span>
             </div>
             <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-4">
-              {isVi ? 'Mua Hàng Chính Hãng — Không Lo Hàng Giả' : 'Buy Authentic — Zero Counterfeits Guaranteed'}
+              {isVi ? 'Chuẩn Sâm Ngọc Linh — Vẹn Danh Quốc Bảo' : 'Buy Authentic — Zero Counterfeits Guaranteed'}
             </h2>
             <p className="text-forest-600">
               {isVi
