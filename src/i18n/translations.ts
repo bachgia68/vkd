@@ -211,10 +211,10 @@ export const translations: Record<Language, Translation> = {
       phoneLabel: 'Điện thoại',
       bookVisit: 'Đặt Lịch Khám',
       locations: [
-        { name: 'Showroom Hà Nội', address: 'Tòa nhà 44/120 Trường Chinh, Phường Kim Liên, Hà Nội', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
-        { name: 'Showroom TP.HCM', address: 'Số 12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, TP.HCM', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
-        { name: 'Showroom Đà Nẵng', address: 'Số 88 Bà Huyện Thanh Quan, Hải Châu, Đà Nẵng', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
-        { name: 'Showroom Kon Tum', address: 'Khu du lịch sinh thái Ngọc Linh, Tu Mơ Rông, Kon Tum', hours: '7:00 — 18:00 (T2 — CN)', phone: '1800 28 28 66' },
+        { name: 'Showroom Hà Nội', address: 'Số 44 Ngõ 120 Trường Chinh, Phường Phương Mai, Quận Đống Đa, TP. Hà Nội', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
+        { name: 'Chi Nhánh Miền Nam (TP.HCM)', address: '170 Bis Trần Hưng Đạo, Phường Nguyễn Cư Trinh, Quận 1, TP. Hồ Chí Minh', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
+        { name: 'Chi Nhánh Đà Nẵng', address: '259 Lê Thanh Nghị, Phường Hòa Cường Nam, Quận Hải Châu, TP. Đà Nẵng', hours: '8:00 — 20:00 (T2 — CN)', phone: '1800 28 28 66' },
+        { name: 'Vùng Trồng Kon Tum', address: 'Đỉnh núi Ngọc Linh, xã Ngọc Lây, huyện Tu Mơ Rông, tỉnh Kon Tum', hours: 'Vùng nguyên liệu — không mở bán trực tiếp', phone: '1800 28 28 66' },
       ],
     },
     traceability: {
@@ -346,10 +346,10 @@ export const translations: Record<Language, Translation> = {
       phoneLabel: 'Phone',
       bookVisit: 'Book a Visit',
       locations: [
-        { name: 'Hanoi Showroom', address: 'Building 44/120 Truong Chinh, Kim Lien Ward, Hanoi', hours: '8:00 — 20:00 (Mon — Sun)', phone: '1800 28 28 66' },
-        { name: 'Ho Chi Minh Showroom', address: '12 Nguyen Van Bao, Ward 4, Go Vap, HCMC', hours: '8:00 — 20:00 (Mon — Sun)', phone: '1800 28 28 66' },
-        { name: 'Da Nang Showroom', address: '88 Ba Huyen Thanh Quan, Hai Chau, Da Nang', hours: '8:00 — 20:00 (Mon — Sun)', phone: '1800 28 28 66' },
-        { name: 'Kon Tum Showroom', address: 'Ngoc Linh Ecotourism Area, Tu Mo Rong, Kon Tum', hours: '7:00 — 18:00 (Mon — Sun)', phone: '1800 28 28 66' },
+        { name: 'Hanoi Showroom', address: '44 Alley 120 Truong Chinh St, Phuong Mai Ward, Dong Da District, Hanoi', hours: '8:00 — 20:00 (Mon — Sun)', phone: '1800 28 28 66' },
+        { name: 'Southern Branch (Ho Chi Minh City)', address: '170 Bis Tran Hung Dao St, Nguyen Cu Trinh Ward, District 1, Ho Chi Minh City', hours: '8:00 — 20:00 (Mon — Sun)', phone: '1800 28 28 66' },
+        { name: 'Da Nang Branch', address: '259 Le Thanh Nghi St, Hoa Cuong Nam Ward, Hai Chau District, Da Nang', hours: '8:00 — 20:00 (Mon — Sun)', phone: '1800 28 28 66' },
+        { name: 'Kon Tum Growing Region', address: 'Ngoc Linh Mountain, Ngoc Lay Commune, Tu Mo Rong District, Kon Tum', hours: 'Cultivation area — not open for retail visits', phone: '1800 28 28 66' },
       ],
     },
     traceability: {
@@ -481,10 +481,10 @@ export const translations: Record<Language, Translation> = {
       phoneLabel: '电话',
       bookVisit: '预约参观',
       locations: [
-        { name: '河内展厅', address: 'Truong Chinh 44/120号, 金莲坊, 河内', hours: '8:00 — 20:00 (周一 — 周日)', phone: '1800 28 28 66' },
-        { name: '胡志明展厅', address: 'Nguyen Van Bao 12号, 第4坊, 旧邑, 胡志明市', hours: '8:00 — 20:00 (周一 — 周日)', phone: '1800 28 28 66' },
-        { name: '岘港展厅', address: 'Ba Huyen Thanh Quan 88号, 海洲, 岘港', hours: '8:00 — 20:00 (周一 — 周日)', phone: '1800 28 28 66' },
-        { name: '昆嵩展厅', address: '玉灵生态旅游区, 涂摩荣, 昆嵩', hours: '7:00 — 18:00 (周一 — 周日)', phone: '1800 28 28 66' },
+        { name: '河内展厅', address: 'Số 44 Ngõ 120 Trường Chinh, Phường Phương Mai, Quận Đống Đa, TP. Hà Nội (越南河内)', hours: '8:00 — 20:00 (周一 — 周日)', phone: '1800 28 28 66' },
+        { name: '南部分公司（胡志明市）', address: '170 Bis Trần Hưng Đạo, Phường Nguyễn Cư Trinh, Quận 1, TP. Hồ Chí Minh (越南胡志明市)', hours: '8:00 — 20:00 (周一 — 周日)', phone: '1800 28 28 66' },
+        { name: '岘港分公司', address: '259 Lê Thanh Nghị, Phường Hòa Cường Nam, Quận Hải Châu, TP. Đà Nẵng (越南岘港)', hours: '8:00 — 20:00 (周一 — 周日)', phone: '1800 28 28 66' },
+        { name: '昆嵩种植区', address: 'Đỉnh núi Ngọc Linh, xã Ngọc Lây, huyện Tu Mơ Rông, tỉnh Kon Tum (越南昆嵩)', hours: '种植区 — 不对外零售', phone: '1800 28 28 66' },
       ],
     },
     traceability: {
@@ -616,10 +616,10 @@ export const translations: Record<Language, Translation> = {
       phoneLabel: 'Téléphone',
       bookVisit: 'Réserver une Visite',
       locations: [
-        { name: 'Showroom Hanoï', address: 'Immeuble 44/120 Truong Chinh, Quartier Kim Lien, Hanoï', hours: '8h00 — 20h00 (Lun — Dim)', phone: '1800 28 28 66' },
-        { name: 'Showroom HCM', address: '12 Nguyen Van Bao, Quartier 4, Go Vap, HCM', hours: '8h00 — 20h00 (Lun — Dim)', phone: '1800 28 28 66' },
-        { name: 'Showroom Da Nang', address: '88 Ba Huyen Thanh Quan, Hai Chau, Da Nang', hours: '8h00 — 20h00 (Lun — Dim)', phone: '1800 28 28 66' },
-        { name: 'Showroom Kon Tum', address: 'Zone écotouristique Ngoc Linh, Tu Mo Rong, Kon Tum', hours: '7h00 — 18h00 (Lun — Dim)', phone: '1800 28 28 66' },
+        { name: 'Showroom Hanoï', address: 'Số 44 Ngõ 120 Trường Chinh, Phường Phương Mai, Quận Đống Đa, Hanoï', hours: '8h00 — 20h00 (Lun — Dim)', phone: '1800 28 28 66' },
+        { name: 'Succursale Sud (Hô Chi Minh-Ville)', address: '170 Bis Trần Hưng Đạo, Phường Nguyễn Cư Trinh, Quận 1, Hô Chi Minh-Ville', hours: '8h00 — 20h00 (Lun — Dim)', phone: '1800 28 28 66' },
+        { name: 'Succursale Da Nang', address: '259 Lê Thanh Nghị, Phường Hòa Cường Nam, Quận Hải Châu, Da Nang', hours: '8h00 — 20h00 (Lun — Dim)', phone: '1800 28 28 66' },
+        { name: 'Zone de culture Kon Tum', address: 'Đỉnh núi Ngọc Linh, xã Ngọc Lây, huyện Tu Mơ Rông, Kon Tum', hours: 'Zone de culture — pas ouverte à la vente directe', phone: '1800 28 28 66' },
       ],
     },
     traceability: {
@@ -751,10 +751,10 @@ export const translations: Record<Language, Translation> = {
       phoneLabel: 'الهاتف',
       bookVisit: 'احجز زيارة',
       locations: [
-        { name: 'صالة عرض هانوي', address: 'مبنى 44/120 تشانغ تشينغ، حي كيم لين، هانوي', hours: '8:00 — 20:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
-        { name: 'صالة عرض هوش مينه', address: '12 نغوين فان باو، الحي 4، غو فاب، هوش مينه', hours: '8:00 — 20:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
-        { name: 'صالة عرض دا نانغ', address: '88 با هوين ثانه كوان، هاي تشاو، دا نانغ', hours: '8:00 — 20:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
-        { name: 'صالة عرض كون توم', address: 'منطقة سايكو السياحية، تو مو رونغ، كون توم', hours: '7:00 — 18:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
+        { name: 'صالة عرض هانوي', address: 'Số 44 Ngõ 120 Trường Chinh, Phường Phương Mai, Quận Đống Đa, هانوي', hours: '8:00 — 20:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
+        { name: 'الفرع الجنوبي (هوشي منه)', address: '170 Bis Trần Hưng Đạo, Phường Nguyễn Cư Trinh, Quận 1, هوشي منه', hours: '8:00 — 20:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
+        { name: 'فرع دا نانغ', address: '259 Lê Thanh Nghị, Phường Hòa Cường Nam, Quận Hải Châu, دا نانغ', hours: '8:00 — 20:00 (الإثنين — الأحد)', phone: '1800 28 28 66' },
+        { name: 'منطقة زراعة كون توم', address: 'Đỉnh núi Ngọc Linh, xã Ngọc Lây, huyện Tu Mơ Rông, كون توم', hours: 'منطقة زراعية — غير مفتوحة للبيع المباشر', phone: '1800 28 28 66' },
       ],
     },
     traceability: {
