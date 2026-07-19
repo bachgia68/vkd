@@ -1,6 +1,30 @@
-import { useState, useRef } from 'react';
-import { Plus, Pencil, EyeOff, Eye, Trash2, Leaf, Package, ShieldCheck, Upload, Check, X } from 'lucide-react';
-import { ADMIN_PRODUCTS, PRODUCT_CATEGORIES, fmt, type AdminProduct, type ProductStatus } from '../adminMockData';
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, EyeOff, Eye, Trash2, Leaf, Package, ShieldCheck, Check, X } from 'lucide-react';
+import { fmt } from '../adminMockData';
+import {
+  fetchProducts,
+  fetchProductCategories,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  type DbProduct,
+  type ProductCategory,
+} from '../adminApi';
+
+type ProductStatus = 'active' | 'hidden' | 'out_of_stock';
+
+function statusOf(p: DbProduct): ProductStatus {
+  if (!p.active) return 'hidden';
+  if (p.stock_qty <= 0) return 'out_of_stock';
+  return 'active';
+}
+
+function iconOf(categoryName: string | undefined): 'leaf' | 'box' | 'shield' {
+  const n = (categoryName ?? '').toLowerCase();
+  if (n.includes('sâm') || n.includes('nước')) return 'leaf';
+  if (n.includes('bổ sung') || n.includes('tpcn')) return 'shield';
+  return 'box';
+}
 
 const ICONS = { leaf: Leaf, box: Package, shield: ShieldCheck };
 
@@ -16,45 +40,77 @@ const STATUS_TONE: Record<ProductStatus, string> = {
 };
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<AdminProduct[]>(ADMIN_PRODUCTS);
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<{ name: string; price: string }>({ name: '', price: '' });
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  const load = () => {
+    setLoading(true);
+    Promise.all([fetchProducts(), fetchProductCategories()])
+      .then(([p, c]) => {
+        setProducts(p);
+        setCategories(c);
+        setLoadError(null);
+      })
+      .catch((e) => setLoadError(e.message))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const categoryName = (id: number | null) => categories.find((c) => c.id === id)?.name_vi ?? '—';
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2400);
   };
 
-  const startEdit = (p: AdminProduct) => {
+  const startEdit = (p: DbProduct) => {
     setEditingId(p.id);
-    setEditDraft({ name: p.name, price: String(p.price) });
+    setEditDraft({ name: p.name_vi, price: String(p.price_vnd ?? 0) });
   };
 
-  const saveEdit = (id: string) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, name: editDraft.name, price: Number(editDraft.price) || p.price } : p))
-    );
-    setEditingId(null);
-    showToast('Đã cập nhật sản phẩm');
+  const saveEdit = async (id: string) => {
+    try {
+      await updateProduct(id, { name_vi: editDraft.name, price_vnd: Number(editDraft.price) || 0 });
+      setEditingId(null);
+      showToast('Đã cập nhật sản phẩm');
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi cập nhật');
+    }
   };
 
-  const toggleVisibility = (id: string) => {
-    setProducts((prev) =>
-      prev.map((p) => {
-        if (p.id !== id || p.status === 'out_of_stock') return p;
-        return { ...p, status: p.status === 'active' ? 'hidden' : 'active' };
-      })
-    );
+  const toggleVisibility = async (p: DbProduct) => {
+    if (statusOf(p) === 'out_of_stock') return;
+    try {
+      await updateProduct(p.id, { active: !p.active });
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi cập nhật');
+    }
   };
 
-  const confirmDelete = () => {
-    setProducts((prev) => prev.filter((p) => p.id !== deleteTarget));
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await deleteProduct(deleteTarget);
+    if (error) {
+      showToast('Không thể xoá — sản phẩm đã có đơn hàng/lô hàng liên kết. Hãy ẩn thay vì xoá.');
+    } else {
+      showToast('Đã xoá sản phẩm');
+      load();
+    }
     setDeleteTarget(null);
-    showToast('Đã xoá sản phẩm');
   };
+
+  if (loading) return <p className="text-sm text-forest-500">Đang tải dữ liệu sản phẩm…</p>;
+  if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
 
   return (
     <div className="space-y-6">
@@ -85,7 +141,9 @@ export default function ProductsPage() {
           </thead>
           <tbody>
             {products.map((p) => {
-              const Icon = ICONS[p.icon];
+              const status = statusOf(p);
+              const cat = categoryName(p.category_id);
+              const Icon = ICONS[iconOf(cat)];
               const isEditing = editingId === p.id;
               return (
                 <tr key={p.id} className="border-t border-forest-50">
@@ -102,11 +160,11 @@ export default function ProductsPage() {
                         className="w-full border border-gold-400 rounded-lg px-2 py-1.5 text-sm"
                       />
                     ) : (
-                      <span className="font-medium text-forest-900">{p.name}</span>
+                      <span className="font-medium text-forest-900">{p.name_vi}</span>
                     )}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-forest-400">{p.sku}</td>
-                  <td className="px-4 py-3 text-forest-600">{p.category}</td>
+                  <td className="px-4 py-3 text-forest-600">{cat}</td>
                   <td className="px-4 py-3 text-right">
                     {isEditing ? (
                       <input
@@ -115,12 +173,12 @@ export default function ProductsPage() {
                         className="w-32 border border-gold-400 rounded-lg px-2 py-1.5 text-sm text-right font-mono"
                       />
                     ) : (
-                      <span className="font-mono tabular-nums">{fmt(p.price)}đ</span>
+                      <span className="font-mono tabular-nums">{fmt(p.price_vnd ?? 0)}đ</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${STATUS_TONE[p.status]}`}>
-                      {STATUS_LABEL[p.status]}
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${STATUS_TONE[status]}`}>
+                      {STATUS_LABEL[status]}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -140,12 +198,12 @@ export default function ProductsPage() {
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => toggleVisibility(p.id)}
-                            disabled={p.status === 'out_of_stock'}
+                            onClick={() => toggleVisibility(p)}
+                            disabled={status === 'out_of_stock'}
                             className="p-1.5 rounded-lg hover:bg-forest-50 text-forest-600 disabled:opacity-30"
                             title="Ẩn/Hiện"
                           >
-                            {p.status === 'active' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            {status === 'active' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                           </button>
                           <button
                             onClick={() => setDeleteTarget(p.id)}
@@ -167,11 +225,17 @@ export default function ProductsPage() {
 
       {showAddModal && (
         <AddProductModal
+          categories={categories}
           onClose={() => setShowAddModal(false)}
-          onCreate={(p) => {
-            setProducts((prev) => [{ ...p, id: `p${Date.now()}` }, ...prev]);
-            setShowAddModal(false);
-            showToast('Đã thêm sản phẩm mới');
+          onCreate={async (input) => {
+            try {
+              await createProduct(input);
+              setShowAddModal(false);
+              showToast('Đã thêm sản phẩm mới');
+              load();
+            } catch (e) {
+              showToast(e instanceof Error ? e.message : 'Lỗi thêm sản phẩm');
+            }
           }}
         />
       )}
@@ -184,7 +248,7 @@ export default function ProductsPage() {
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
             <h3 className="font-display text-lg text-forest-900">Xoá sản phẩm?</h3>
             <p className="text-sm text-forest-500 mt-2">
-              Sản phẩm <b>{products.find((p) => p.id === deleteTarget)?.name}</b> sẽ bị xoá khỏi danh mục. Hành động
+              Sản phẩm <b>{products.find((p) => p.id === deleteTarget)?.name_vi}</b> sẽ bị xoá khỏi danh mục. Hành động
               này không thể hoàn tác.
             </p>
             <div className="flex justify-end gap-3 mt-5">
@@ -209,23 +273,18 @@ export default function ProductsPage() {
 }
 
 function AddProductModal({
+  categories,
   onClose,
   onCreate,
 }: {
+  categories: ProductCategory[];
   onClose: () => void;
-  onCreate: (p: Omit<AdminProduct, 'id'>) => void;
+  onCreate: (p: { sku: string; name_vi: string; category_id: number | null; price_vnd: number }) => void;
 }) {
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
   const [price, setPrice] = useState('');
-  const [category, setCategory] = useState(PRODUCT_CATEGORIES[0]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = (file: File | undefined) => {
-    if (!file) return;
-    setPreviewUrl(URL.createObjectURL(file));
-  };
+  const [categoryId, setCategoryId] = useState<number | null>(categories[0]?.id ?? null);
 
   const canSubmit = name.trim() && sku.trim() && Number(price) > 0;
 
@@ -233,26 +292,6 @@ function AddProductModal({
     <div className="fixed inset-0 bg-forest-950/50 z-50 flex items-center justify-center p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-white rounded-2xl p-6 w-full max-w-md">
         <h3 className="font-display text-lg text-forest-900 mb-4">Thêm sản phẩm mới</h3>
-
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="w-full h-32 rounded-xl border-2 border-dashed border-forest-200 hover:border-gold-400 flex items-center justify-center overflow-hidden mb-4 transition-colors"
-        >
-          {previewUrl ? (
-            <img src={previewUrl} alt="Xem trước" className="w-full h-full object-cover" />
-          ) : (
-            <span className="flex flex-col items-center gap-1.5 text-forest-400 text-xs">
-              <Upload className="w-5 h-5" /> Bấm để chọn ảnh sản phẩm
-            </span>
-          )}
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => handleFile(e.target.files?.[0])}
-        />
 
         <div className="space-y-3">
           <input
@@ -277,12 +316,14 @@ function AddProductModal({
             />
           </div>
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={categoryId ?? ''}
+            onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : null)}
             className="w-full border border-forest-100 rounded-lg px-3 py-2.5 text-sm"
           >
-            {PRODUCT_CATEGORIES.map((c) => (
-              <option key={c}>{c}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name_vi}
+              </option>
             ))}
           </select>
         </div>
@@ -293,9 +334,7 @@ function AddProductModal({
           </button>
           <button
             disabled={!canSubmit}
-            onClick={() =>
-              onCreate({ name, sku, category, price: Number(price), status: 'active', icon: 'box' })
-            }
+            onClick={() => onCreate({ sku, name_vi: name, category_id: categoryId, price_vnd: Number(price) })}
             className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
           >
             Lưu sản phẩm

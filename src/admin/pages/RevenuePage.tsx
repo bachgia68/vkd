@@ -1,8 +1,30 @@
-import { CHANNEL_REVENUE, SOCIAL_CAMPAIGNS, fmt } from '../adminMockData';
+import { useEffect, useState } from 'react';
+import { fmt } from '../adminMockData';
+import { fetchChannelRevenue, fetchSocialCampaigns, type ChannelRevenueRow, type SocialCampaignRow } from '../adminApi';
 
 export default function RevenuePage() {
-  const totalRevenue = CHANNEL_REVENUE.reduce((s, c) => s + c.revenue, 0);
-  const maxReach = Math.max(...SOCIAL_CAMPAIGNS.map((c) => c.reach));
+  const [channels, setChannels] = useState<ChannelRevenueRow[]>([]);
+  const [campaigns, setCampaigns] = useState<SocialCampaignRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([fetchChannelRevenue(), fetchSocialCampaigns()])
+      .then(([c, s]) => {
+        setChannels(c);
+        setCampaigns(s);
+        setLoadError(null);
+      })
+      .catch((e) => setLoadError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p className="text-sm text-forest-500">Đang tải dữ liệu doanh thu…</p>;
+  if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
+
+  const totalRevenue = channels.reduce((s, c) => s + c.revenue, 0);
+  const maxReach = Math.max(1, ...campaigns.map((c) => c.reach));
 
   return (
     <div className="space-y-6">
@@ -16,8 +38,12 @@ export default function RevenuePage() {
           <h3 className="font-display text-lg text-forest-900">Doanh thu theo kênh bán</h3>
           <span className="font-mono text-sm text-forest-500">Tổng: {fmt(totalRevenue)}đ</span>
         </div>
+        <p className="text-xs text-forest-400 mb-3">
+          Kênh Website/TMĐT tính từ đơn hàng PayOS thật đã thanh toán. Showroom, Affiliate, OTC-KA hiện là 0 do chưa
+          có tích hợp POS/đối soát — sẽ tự cập nhật khi các kênh đó được kết nối.
+        </p>
         <div className="space-y-3">
-          {CHANNEL_REVENUE.map((c) => (
+          {channels.map((c) => (
             <div key={c.channel} className="flex items-center gap-3 text-sm">
               <span className="w-56 flex-shrink-0 text-forest-700">{c.channel}</span>
               <div className="flex-1 h-2.5 rounded-full bg-cream-200 overflow-hidden">
@@ -44,7 +70,7 @@ export default function RevenuePage() {
             </tr>
           </thead>
           <tbody>
-            {SOCIAL_CAMPAIGNS.map((c) => (
+            {campaigns.map((c) => (
               <tr key={c.platform} className="border-t border-forest-50">
                 <td className="px-4 py-3 font-medium text-forest-900">{c.platform}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums">{fmt(c.reach)}</td>
@@ -60,6 +86,9 @@ export default function RevenuePage() {
             ))}
           </tbody>
         </table>
+        <p className="text-xs text-forest-400 px-4 py-3 border-t border-forest-50">
+          Chưa kết nối Ads API (Facebook/TikTok/Zalo) — số liệu bắt đầu ở 0 cho đến khi tích hợp thật.
+        </p>
       </div>
     </div>
   );

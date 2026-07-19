@@ -1,14 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, CheckCircle2 } from 'lucide-react';
-import {
-  WAREHOUSES,
-  INVENTORY,
-  PROVINCE_COORDS,
-  QR_HEATMAP,
-  ADMIN_IMAGES,
-  haversineKm,
-  fmt,
-} from '../adminMockData';
+import { PROVINCE_COORDS, ADMIN_IMAGES, haversineKm, fmt } from '../adminMockData';
+import { fetchWarehouses, fetchInventory, fetchQrHeatmap, type Warehouse, type InventoryRow } from '../adminApi';
 
 interface RouteResult {
   code: string;
@@ -17,23 +10,47 @@ interface RouteResult {
   totalStock: number;
 }
 
-function autoRoute(province: string): RouteResult | null {
-  const dest = PROVINCE_COORDS[province];
-  let best: RouteResult | null = null;
-  WAREHOUSES.forEach((w) => {
-    const totalStock = INVENTORY.reduce((s, item) => s + (item.stock[w.code] ?? 0), 0);
-    if (totalStock <= 0) return;
-    const d = haversineKm(dest, { lat: w.lat, lng: w.lng });
-    if (!best || d < best.distanceKm) best = { code: w.code, name: w.name, distanceKm: d, totalStock };
-  });
-  return best;
-}
-
 export default function InventoryQrPage() {
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [inventory, setInventory] = useState<InventoryRow[]>([]);
+  const [heatmap, setHeatmap] = useState<{ region: string; count: number; suspect: boolean }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [routeOpen, setRouteOpen] = useState(false);
   const [province, setProvince] = useState('Huế');
   const [result, setResult] = useState<RouteResult | null>(null);
-  const maxHeat = Math.max(...QR_HEATMAP.map((h) => h.count));
+  const [ranOnce, setRanOnce] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([fetchWarehouses(), fetchInventory(), fetchQrHeatmap()])
+      .then(([w, inv, h]) => {
+        setWarehouses(w);
+        setInventory(inv);
+        setHeatmap(h);
+        setLoadError(null);
+      })
+      .catch((e) => setLoadError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const maxHeat = Math.max(1, ...heatmap.map((h) => h.count));
+
+  function autoRoute(prov: string): RouteResult | null {
+    const dest = PROVINCE_COORDS[prov];
+    if (!dest) return null;
+    let best: RouteResult | null = null;
+    warehouses.forEach((w) => {
+      const totalStock = inventory.reduce((s, item) => s + (item.stock[w.code] ?? 0), 0);
+      if (totalStock <= 0) return;
+      const d = haversineKm(dest, { lat: w.lat, lng: w.lng });
+      if (!best || d < best.distanceKm) best = { code: w.code, name: w.name, distanceKm: d, totalStock };
+    });
+    return best;
+  }
+
+  if (loading) return <p className="text-sm text-forest-500">Đang tải dữ liệu kho hàng…</p>;
+  if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
 
   return (
     <div className="space-y-6">
@@ -47,11 +64,12 @@ export default function InventoryQrPage() {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm text-forest-500">Cập nhật thời gian thực · {WAREHOUSES.length} kho/showroom</p>
+        <p className="text-sm text-forest-500">Cập nhật thời gian thực · {warehouses.length} kho/showroom</p>
         <button
           onClick={() => {
             setRouteOpen(true);
             setResult(null);
+            setRanOnce(false);
           }}
           className="btn-primary text-xs"
         >
@@ -64,7 +82,7 @@ export default function InventoryQrPage() {
           <thead>
             <tr className="bg-forest-900 text-cream-100 text-xs uppercase tracking-wide">
               <th className="text-left font-medium px-4 py-3">SKU / Sản phẩm</th>
-              {WAREHOUSES.map((w) => (
+              {warehouses.map((w) => (
                 <th key={w.code} className="text-right font-medium px-4 py-3">
                   {w.name}
                 </th>
@@ -72,13 +90,13 @@ export default function InventoryQrPage() {
             </tr>
           </thead>
           <tbody>
-            {INVENTORY.map((item) => (
+            {inventory.map((item) => (
               <tr key={item.sku} className="border-t border-forest-50">
                 <td className="px-4 py-3">
                   <p className="font-medium text-forest-900">{item.name}</p>
                   <p className="text-xs font-mono text-forest-400">{item.sku}</p>
                 </td>
-                {WAREHOUSES.map((w) => {
+                {warehouses.map((w) => {
                   const qty = item.stock[w.code] ?? 0;
                   const low = qty < item.threshold;
                   return (
@@ -103,23 +121,30 @@ export default function InventoryQrPage() {
         <h4 className="text-xs uppercase tracking-wide text-gold-600 mb-3">
           Bản đồ nhiệt vị trí quét QR (theo khu vực)
         </h4>
-        <div className="space-y-2">
-          {QR_HEATMAP.map((h) => (
-            <div key={h.region} className="flex items-center gap-3 text-sm">
-              <span className="w-24 flex-shrink-0 text-forest-600">{h.region}</span>
-              <div className="flex-1 h-2 rounded-full bg-cream-200 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-gold-300 to-red-500"
-                  style={{ width: `${(h.count / maxHeat) * 100}%` }}
-                />
+        {heatmap.length === 0 ? (
+          <p className="text-sm text-forest-400">
+            Chưa ghi nhận lượt quét QR truy xuất nguồn gốc nào. Dữ liệu sẽ tự cập nhật khi khách hàng quét mã trên
+            cổng truy xuất.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {heatmap.map((h) => (
+              <div key={h.region} className="flex items-center gap-3 text-sm">
+                <span className="w-24 flex-shrink-0 text-forest-600">{h.region}</span>
+                <div className="flex-1 h-2 rounded-full bg-cream-200 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-gold-300 to-red-500"
+                    style={{ width: `${(h.count / maxHeat) * 100}%` }}
+                  />
+                </div>
+                <span className={`w-16 text-right font-mono ${h.suspect ? 'text-red-600 font-semibold' : ''}`}>
+                  {h.count}
+                  {h.suspect ? ' ⚠' : ''}
+                </span>
               </div>
-              <span className={`w-16 text-right font-mono ${h.suspect ? 'text-red-600 font-semibold' : ''}`}>
-                {h.count}
-                {h.suspect ? ' ⚠' : ''}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {routeOpen && (
@@ -143,7 +168,13 @@ export default function InventoryQrPage() {
                 <option key={p}>{p}</option>
               ))}
             </select>
-            <button onClick={() => setResult(autoRoute(province))} className="btn-primary text-xs w-full justify-center">
+            <button
+              onClick={() => {
+                setResult(autoRoute(province));
+                setRanOnce(true);
+              }}
+              className="btn-primary text-xs w-full justify-center"
+            >
               Chạy thuật toán định tuyến
             </button>
 
@@ -157,6 +188,9 @@ export default function InventoryQrPage() {
                   sản phẩm
                 </span>
               </div>
+            )}
+            {ranOnce && result === null && (
+              <p className="text-xs text-red-600 mt-2">Không có kho nào còn tồn kho khả dụng cho tuyến này.</p>
             )}
 
             <div className="flex justify-end mt-5">
