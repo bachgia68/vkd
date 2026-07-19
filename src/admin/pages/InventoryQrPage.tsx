@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { Route, CheckCircle2, QrCode, Download, Copy } from 'lucide-react';
+import { Route, CheckCircle2, QrCode, Download, Copy, Printer, ClipboardList, FlaskConical } from 'lucide-react';
 import { PROVINCE_COORDS, ADMIN_IMAGES, haversineKm, fmt } from '../adminMockData';
 import {
   fetchWarehouses,
@@ -54,6 +54,10 @@ export default function InventoryQrPage() {
   const [batchError, setBatchError] = useState('');
   const [creatingBatch, setCreatingBatch] = useState(false);
   const [copiedHash, setCopiedHash] = useState('');
+
+  const [printMode, setPrintMode] = useState<'single' | 'all' | null>(null);
+  const [printTarget, setPrintTarget] = useState<Batch | null>(null);
+  const [hiResQr, setHiResQr] = useState<Record<string, string>>({});
 
   const loadBatchDeps = () => {
     Promise.all([fetchProducts(), fetchCultivationRegions(), fetchBatches()]).then(([p, r, b]) => {
@@ -112,6 +116,41 @@ export default function InventoryQrPage() {
     setTimeout(() => setCopiedHash(''), 1500);
   };
 
+  const ensureHiResQr = async (hashes: string[]) => {
+    const missing = hashes.filter((h) => !hiResQr[h]);
+    if (missing.length === 0) return;
+    const entries = await Promise.all(
+      missing.map(async (h) => [h, await QRCode.toDataURL(traceUrl(h), { width: 480, margin: 1 })] as const)
+    );
+    setHiResQr((cur) => ({ ...cur, ...Object.fromEntries(entries) }));
+  };
+
+  const printSingleLabel = async (batch: Batch) => {
+    await ensureHiResQr([batch.qr_hash]);
+    setPrintTarget(batch);
+    setPrintMode('single');
+  };
+
+  const printAllLabels = async () => {
+    await ensureHiResQr(batches.map((b) => b.qr_hash));
+    setPrintTarget(null);
+    setPrintMode('all');
+  };
+
+  useEffect(() => {
+    if (!printMode) return;
+    const timer = setTimeout(() => window.print(), 80);
+    const onAfterPrint = () => {
+      setPrintMode(null);
+      setPrintTarget(null);
+    };
+    window.addEventListener('afterprint', onAfterPrint);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('afterprint', onAfterPrint);
+    };
+  }, [printMode]);
+
   useEffect(() => {
     setLoading(true);
     Promise.all([fetchWarehouses(), fetchInventory(), fetchQrHeatmap()])
@@ -144,7 +183,8 @@ export default function InventoryQrPage() {
   if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
 
   return (
-    <div className="space-y-6">
+    <>
+    <div className="space-y-6 print:hidden">
       <div className="relative rounded-2xl overflow-hidden h-36">
         <img src={ADMIN_IMAGES.warehouseHero} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-forest-950/65" />
@@ -238,6 +278,34 @@ export default function InventoryQrPage() {
         )}
       </div>
 
+      <div className="bg-forest-50 rounded-2xl border border-forest-100 p-5">
+        <h4 className="text-xs uppercase tracking-wide text-gold-600 mb-3 flex items-center gap-2">
+          <ClipboardList className="w-3.5 h-3.5" /> Hướng dẫn triển khai cho nhân viên kho/đóng gói
+        </h4>
+        <ol className="space-y-2 text-sm text-forest-700 list-decimal list-inside">
+          <li>
+            <b>Trước khi đóng gói</b>, vào mục bên dưới tạo 1 lô hàng mới cho đúng sản phẩm + vùng trồng + ngày thu
+            hoạch thật — hệ thống tự sinh 1 mã QR duy nhất cho lô đó.
+          </li>
+          <li>
+            Bấm <b>"In nhãn"</b> trên lô vừa tạo để in trực tiếp ra khổ tem dán (hoặc <b>"Tải QR"</b> nếu dùng máy in
+            tem riêng), rồi dán/in lên từng thùng/đơn vị sản phẩm trước khi niêm phong.
+          </li>
+          <li className="flex items-start gap-1.5">
+            <FlaskConical className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-forest-500" />
+            <span>
+              Dùng điện thoại quét thử 1 tem sau khi dán để xác nhận link truy xuất hiển thị đúng sản phẩm/vùng
+              trồng/ngày thu hoạch trước khi xuất kho.
+            </span>
+          </li>
+          <li>
+            <b>Không dùng lại mã QR cũ</b> cho lô khác — mỗi lô hàng luôn phải có mã riêng để đảm bảo truy xuất chính
+            xác và phát hiện hàng giả (hệ thống tự cảnh báo nếu 1 mã bị quét từ nhiều vùng khác nhau trong 24h).
+          </li>
+          <li>Nếu lô bị huỷ hoặc in lỗi tem, tạo lô mới thay vì sửa lại lô cũ.</li>
+        </ol>
+      </div>
+
       <div className="grid lg:grid-cols-[1fr_1.4fr] gap-6 items-start">
         <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
           <h3 className="font-display text-lg text-forest-900 mb-1">Tạo lô hàng &amp; mã QR truy xuất</h3>
@@ -325,7 +393,17 @@ export default function InventoryQrPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
-          <h3 className="font-display text-lg text-forest-900 mb-4">Lô hàng đã tạo ({batches.length})</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display text-lg text-forest-900">Lô hàng đã tạo ({batches.length})</h3>
+            {batches.length > 0 && (
+              <button
+                onClick={printAllLabels}
+                className="text-[11px] px-2.5 py-1.5 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+              >
+                <Printer className="w-3.5 h-3.5" /> In tất cả nhãn
+              </button>
+            )}
+          </div>
           {batches.length === 0 ? (
             <p className="text-sm text-forest-400">Chưa có lô hàng nào — tạo lô đầu tiên ở bên trái.</p>
           ) : (
@@ -338,10 +416,17 @@ export default function InventoryQrPage() {
                     <div className="w-20 h-20 rounded-lg bg-white flex-shrink-0" />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="font-mono text-xs text-forest-900 font-semibold truncate">{b.batch_id}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-mono text-xs text-forest-900 font-semibold truncate">{b.batch_id}</p>
+                      {b.is_demo && (
+                        <span className="flex-shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-gold-100 text-gold-800 border border-gold-300 font-semibold">
+                          DEMO
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-forest-600 mt-0.5 truncate">{b.product_sku} · {b.cultivation_region_name}</p>
                     <p className="text-xs text-forest-400">{b.harvest_date ? new Date(b.harvest_date).toLocaleDateString('vi-VN') : '—'}</p>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
                       <a
                         href={qrImages[b.qr_hash]}
                         download={`qr-${b.batch_id}.png`}
@@ -354,6 +439,12 @@ export default function InventoryQrPage() {
                         className="text-[11px] px-2 py-1 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
                       >
                         <Copy className="w-3 h-3" /> {copiedHash === b.qr_hash ? 'Đã chép!' : 'Sao chép link'}
+                      </button>
+                      <button
+                        onClick={() => printSingleLabel(b)}
+                        className="text-[11px] px-2 py-1 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+                      >
+                        <Printer className="w-3 h-3" /> In nhãn
                       </button>
                     </div>
                   </div>
@@ -422,5 +513,51 @@ export default function InventoryQrPage() {
         </div>
       )}
     </div>
+
+    {printMode && (
+      <div className="hidden print:block">
+        <style>{`
+          @page { size: auto; margin: 10mm; }
+          .qr-label-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+          .qr-label { border: 1px dashed #999; border-radius: 3mm; padding: 4mm; display: flex; flex-direction: column; align-items: center; text-align: center; page-break-inside: avoid; }
+          .qr-label-brand { font-family: Georgia, serif; font-size: 10pt; font-weight: 700; color: #0B2F1D; letter-spacing: 0.05em; }
+          .qr-label-brand-sub { font-family: Arial, sans-serif; font-size: 7pt; color: #9c7f2e; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 1mm; }
+          .qr-label-qr { width: 28mm; height: 28mm; margin: 3mm 0; }
+          .qr-label-batch { font-family: 'Courier New', monospace; font-size: 8pt; font-weight: 700; color: #1B1E1B; word-break: break-all; }
+          .qr-label-product { font-size: 7.5pt; color: #1B1E1B; margin-top: 1mm; }
+          .qr-label-cta { font-size: 6.5pt; color: #666; margin-top: 1.5mm; }
+          .qr-label-single { width: 60mm; margin: 0 auto; }
+          .qr-label-single .qr-label-qr { width: 36mm; height: 36mm; }
+        `}</style>
+        {printMode === 'single' && printTarget && (
+          <div className="qr-label qr-label-single">
+            <div className="qr-label-brand">VKD GROUP</div>
+            <div className="qr-label-brand-sub">Sâm Ngọc Linh</div>
+            {hiResQr[printTarget.qr_hash] && <img src={hiResQr[printTarget.qr_hash]} alt="QR" className="qr-label-qr" />}
+            <p className="qr-label-batch">{printTarget.batch_id}</p>
+            <p className="qr-label-product">
+              {printTarget.product_sku}
+              {printTarget.harvest_date ? ` · ${new Date(printTarget.harvest_date).toLocaleDateString('vi-VN')}` : ''}
+            </p>
+            <p className="qr-label-cta">Quét mã QR để truy xuất nguồn gốc</p>
+          </div>
+        )}
+        {printMode === 'all' && (
+          <div className="qr-label-grid">
+            {batches.map((b) => (
+              <div key={b.id} className="qr-label">
+                <div className="qr-label-brand">VKD GROUP</div>
+                <div className="qr-label-brand-sub">Sâm Ngọc Linh</div>
+                {hiResQr[b.qr_hash] && <img src={hiResQr[b.qr_hash]} alt="QR" className="qr-label-qr" />}
+                <p className="qr-label-batch">{b.batch_id}</p>
+                <p className="qr-label-product">{b.product_sku}</p>
+                <p className="qr-label-cta">Quét mã QR để truy xuất nguồn gốc</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+    </>
   );
 }

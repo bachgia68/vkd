@@ -320,7 +320,7 @@ export async function fetchChannelRevenue(): Promise<ChannelRevenueRow[]> {
   const orders = throwIfError(await supabase.from('orders').select('total').eq('status', 'paid'));
   const onlineRevenue = (orders as { total: number }[]).reduce((s, o) => s + Number(o.total), 0);
   const showroomEntries = throwIfError(
-    await supabase.from('showroom_revenue_entries').select('revenue_amount, orders_count')
+    await supabase.from('showroom_revenue_entries').select('revenue_amount, orders_count').eq('is_demo', false)
   );
   const showroomRevenue = (showroomEntries as { revenue_amount: number; orders_count: number }[]).reduce(
     (s, e) => s + Number(e.revenue_amount),
@@ -378,6 +378,7 @@ export interface Batch {
   warehouse_location: string | null;
   qr_hash: string;
   created_at: string;
+  is_demo: boolean;
 }
 
 export async function fetchCultivationRegions(): Promise<CultivationRegion[]> {
@@ -389,7 +390,7 @@ export async function fetchBatches(): Promise<Batch[]> {
     await supabase
       .from('batches')
       .select(
-        'id, batch_id, product_id, cultivation_region_code, harvest_date, qc_status, qty_kg, warehouse_location, qr_hash, created_at, products(sku, name_vi), cultivation_regions(name_vi)'
+        'id, batch_id, product_id, cultivation_region_code, harvest_date, qc_status, qty_kg, warehouse_location, qr_hash, created_at, is_demo, products(sku, name_vi), cultivation_regions(name_vi)'
       )
       .order('created_at', { ascending: false })
   );
@@ -405,6 +406,7 @@ export async function fetchBatches(): Promise<Batch[]> {
       warehouse_location: string | null;
       qr_hash: string;
       created_at: string;
+      is_demo: boolean;
       products: { sku: string; name_vi: string } | { sku: string; name_vi: string }[] | null;
       cultivation_regions: { name_vi: string } | { name_vi: string }[] | null;
     }[]
@@ -425,6 +427,7 @@ export async function fetchBatches(): Promise<Batch[]> {
       warehouse_location: r.warehouse_location,
       qr_hash: r.qr_hash,
       created_at: r.created_at,
+      is_demo: r.is_demo,
     };
   });
 }
@@ -463,10 +466,11 @@ export async function createBatch(input: {
       .single();
     if (!error) {
       return {
-        ...(data as Omit<Batch, 'product_sku' | 'product_name' | 'cultivation_region_name'>),
+        ...(data as Omit<Batch, 'product_sku' | 'product_name' | 'cultivation_region_name' | 'is_demo'>),
         product_sku: input.product_sku,
         product_name: '',
         cultivation_region_name: null,
+        is_demo: false,
       };
     }
     if (!error.message.includes('duplicate key')) throw new Error(error.message);
@@ -478,13 +482,34 @@ export async function fetchShowroomRevenueToday(): Promise<Record<string, number
   const warehouses = throwIfError(await supabase.from('warehouses').select('code').eq('type', 'showroom'));
   const today = new Date().toISOString().slice(0, 10);
   const entries = throwIfError(
-    await supabase.from('showroom_revenue_entries').select('warehouse_code, revenue_amount').eq('revenue_date', today)
+    await supabase
+      .from('showroom_revenue_entries')
+      .select('warehouse_code, revenue_amount')
+      .eq('revenue_date', today)
+      .eq('is_demo', false)
   );
   const byWarehouse = Object.fromEntries((warehouses as { code: string }[]).map((w) => [w.code, 0]));
   for (const e of entries as { warehouse_code: string; revenue_amount: number }[]) {
     byWarehouse[e.warehouse_code] = (byWarehouse[e.warehouse_code] ?? 0) + Number(e.revenue_amount);
   }
   return byWarehouse;
+}
+
+export interface DemoRevenueRow {
+  warehouse_code: string;
+  revenue_amount: number;
+  orders_count: number;
+  revenue_date: string;
+}
+
+export async function fetchDemoShowroomRevenue(): Promise<DemoRevenueRow[]> {
+  return throwIfError(
+    await supabase
+      .from('showroom_revenue_entries')
+      .select('warehouse_code, revenue_amount, orders_count, revenue_date')
+      .eq('is_demo', true)
+      .order('revenue_date', { ascending: false })
+  );
 }
 
 export interface ShowroomRevenueUploadRow {

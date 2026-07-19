@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, ShieldAlert, Leaf, CalendarDays, MapPin, FlaskConical, ArrowRight } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Leaf, CalendarDays, MapPin, FlaskConical, ArrowRight, Info } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { fetchBatchByQr, logScanEvent, type PublicBatch } from '../lib/traceabilityApi';
 
@@ -72,6 +72,16 @@ export default function BatchTraceabilityLookup({ lang, qrHash, onNavigate }: Pr
 
         {!loading && !error && batch && (
           <div className="bg-white rounded-2xl border border-forest-100 shadow-elegant-lg overflow-hidden">
+            {batch.is_demo && (
+              <div className="flex items-center gap-2.5 bg-gold-100 border-b border-gold-300 text-gold-800 text-xs px-6 py-3">
+                <Info className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  {isVi
+                    ? 'Đây là lô hàng minh hoạ (demo) để giới thiệu cách hoạt động của cổng truy xuất nguồn gốc — không phải sản phẩm thật đang lưu thông.'
+                    : 'This is a demo batch showcasing how the traceability portal works — not a real product currently in circulation.'}
+                </span>
+              </div>
+            )}
             <div className="bg-gradient-to-br from-forest-950 via-forest-900 to-forest-800 text-white p-8 text-center">
               <ShieldCheck className="w-14 h-14 text-gold-400 mx-auto mb-3" />
               <h1 className="font-display text-2xl">{isVi ? 'Sản phẩm chính hãng VKD Group' : 'Genuine VKD Group product'}</h1>

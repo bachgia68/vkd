@@ -13,13 +13,14 @@ export interface PublicBatch {
   qc_lab: string | null;
   gacp_who_certified: boolean;
   photo_urls: string[];
+  is_demo: boolean;
 }
 
 export async function fetchBatchByQr(qrHash: string): Promise<PublicBatch | null> {
   const { data, error } = await supabase
     .from('batches')
     .select(
-      'id, batch_id, harvest_date, qc_status, qc_lab, gacp_who_certified, photo_urls, products(name_vi, image_url), cultivation_regions(name_vi, province)'
+      'id, batch_id, harvest_date, qc_status, qc_lab, gacp_who_certified, photo_urls, is_demo, products(name_vi, image_url), cultivation_regions(name_vi, province)'
     )
     .eq('qr_hash', qrHash)
     .maybeSingle();
@@ -35,6 +36,7 @@ export async function fetchBatchByQr(qrHash: string): Promise<PublicBatch | null
     qc_lab: string | null;
     gacp_who_certified: boolean;
     photo_urls: string[] | null;
+    is_demo: boolean;
     products: { name_vi: string; image_url: string | null } | { name_vi: string; image_url: string | null }[] | null;
     cultivation_regions: { name_vi: string; province: string } | { name_vi: string; province: string }[] | null;
   };
@@ -53,6 +55,7 @@ export async function fetchBatchByQr(qrHash: string): Promise<PublicBatch | null
     qc_lab: row.qc_lab,
     gacp_who_certified: row.gacp_who_certified ?? false,
     photo_urls: row.photo_urls ?? [],
+    is_demo: row.is_demo ?? false,
   };
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRightLeft, CheckCircle2, Upload, Download } from 'lucide-react';
+import { ArrowRightLeft, CheckCircle2, Upload, Download, Info } from 'lucide-react';
 import { fmt } from '../adminMockData';
 import {
   fetchWarehouses,
@@ -8,10 +8,12 @@ import {
   fetchTransferLog,
   transferStock,
   uploadShowroomRevenue,
+  fetchDemoShowroomRevenue,
   type Warehouse,
   type InventoryRow,
   type TransferLogRow,
   type ShowroomRevenueUploadRow,
+  type DemoRevenueRow,
 } from '../adminApi';
 
 const CSV_HEADER = 'warehouse_code,revenue_date,revenue_amount,orders_count';
@@ -68,17 +70,19 @@ export default function ShowroomsPage() {
   const [uploadMsg, setUploadMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [demoRevenue, setDemoRevenue] = useState<DemoRevenueRow[]>([]);
 
   const showrooms = warehouses.filter((w) => w.type === 'showroom');
 
   const load = () => {
     setLoading(true);
-    Promise.all([fetchWarehouses(), fetchInventory(), fetchShowroomRevenueToday(), fetchTransferLog()])
-      .then(([w, inv, rev, tlog]) => {
+    Promise.all([fetchWarehouses(), fetchInventory(), fetchShowroomRevenueToday(), fetchTransferLog(), fetchDemoShowroomRevenue()])
+      .then(([w, inv, rev, tlog, demo]) => {
         setWarehouses(w);
         setInventory(inv);
         setRevenueToday(rev);
         setLog(tlog);
+        setDemoRevenue(demo);
         const sr = w.filter((x) => x.type === 'showroom');
         setFrom((cur) => cur || sr[0]?.code || '');
         setTo((cur) => cur || sr[1]?.code || sr[0]?.code || '');
@@ -196,6 +200,30 @@ export default function ShowroomsPage() {
           <p className={`text-xs mt-3 ${uploadMsg.type === 'ok' ? 'text-forest-600' : 'text-red-600'}`}>{uploadMsg.text}</p>
         )}
       </div>
+
+      {demoRevenue.length > 0 && (
+        <div className="bg-gold-50 rounded-2xl border border-gold-300 p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Info className="w-4 h-4 text-gold-700 flex-shrink-0" />
+            <h4 className="text-xs uppercase tracking-wide text-gold-800 font-semibold">
+              Dữ liệu minh hoạ (demo) — không tính vào doanh thu thật
+            </h4>
+          </div>
+          <p className="text-xs text-gold-700 mb-3">
+            Ví dụ cho thấy tính năng nạp doanh thu showroom hoạt động ra sao. Các dòng này không được cộng vào tổng
+            doanh thu ở trang Doanh thu hay "doanh thu hôm nay" phía trên.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {demoRevenue.map((r, i) => (
+              <div key={i} className="bg-white/70 rounded-xl p-3 border border-gold-200">
+                <p className="text-[11px] uppercase tracking-wide text-forest-500">{nameOf(r.warehouse_code)}</p>
+                <p className="font-display text-lg text-forest-900 mt-1">{fmt(r.revenue_amount)}đ</p>
+                <p className="text-[11px] text-forest-400">{r.orders_count} đơn · {new Date(r.revenue_date).toLocaleDateString('vi-VN')}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="overflow-x-auto bg-white rounded-2xl border border-forest-100 shadow-elegant">
         <table className="w-full text-sm min-w-[560px]">
