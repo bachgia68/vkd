@@ -39,8 +39,8 @@ export default function RevenuePage() {
           <span className="font-mono text-sm text-forest-500">Tổng: {fmt(totalRevenue)}đ</span>
         </div>
         <p className="text-xs text-forest-400 mb-3">
-          Kênh Website/TMĐT tính từ đơn hàng PayOS thật đã thanh toán. Showroom, Affiliate, OTC-KA hiện là 0 do chưa
-          có tích hợp POS/đối soát — sẽ tự cập nhật khi các kênh đó được kết nối.
+          Kênh Website/TMĐT tính từ đơn hàng PayOS thật đã thanh toán. Showroom tính từ file doanh thu nạp thủ công ở
+          trang Showroom (chưa có POS trực tiếp). Affiliate, OTC-KA hiện là 0 do chưa có nguồn dữ liệu.
         </p>
         <div className="space-y-3">
           {channels.map((c) => (

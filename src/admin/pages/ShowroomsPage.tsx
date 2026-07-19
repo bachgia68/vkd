@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ArrowRightLeft, CheckCircle2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRightLeft, CheckCircle2, Upload, Download } from 'lucide-react';
 import { fmt } from '../adminMockData';
 import {
   fetchWarehouses,
@@ -7,10 +7,49 @@ import {
   fetchShowroomRevenueToday,
   fetchTransferLog,
   transferStock,
+  uploadShowroomRevenue,
   type Warehouse,
   type InventoryRow,
   type TransferLogRow,
+  type ShowroomRevenueUploadRow,
 } from '../adminApi';
+
+const CSV_HEADER = 'warehouse_code,revenue_date,revenue_amount,orders_count';
+
+function parseRevenueCsv(text: string, validCodes: Set<string>): ShowroomRevenueUploadRow[] {
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) throw new Error('File rỗng hoặc thiếu dữ liệu (cần ít nhất 1 dòng dữ liệu sau dòng tiêu đề).');
+
+  const header = lines[0].split(',').map((h) => h.trim().toLowerCase());
+  const idx = {
+    warehouse_code: header.indexOf('warehouse_code'),
+    revenue_date: header.indexOf('revenue_date'),
+    revenue_amount: header.indexOf('revenue_amount'),
+    orders_count: header.indexOf('orders_count'),
+  };
+  if (idx.warehouse_code === -1 || idx.revenue_date === -1 || idx.revenue_amount === -1) {
+    throw new Error('Thiếu cột bắt buộc: warehouse_code, revenue_date, revenue_amount.');
+  }
+
+  return lines.slice(1).map((line, i) => {
+    const cols = line.split(',').map((c) => c.trim());
+    const warehouse_code = cols[idx.warehouse_code];
+    const revenue_date = cols[idx.revenue_date];
+    const revenue_amount = Number(cols[idx.revenue_amount]);
+    const orders_count = idx.orders_count === -1 ? 0 : Number(cols[idx.orders_count] || 0);
+
+    if (!validCodes.has(warehouse_code)) {
+      throw new Error(`Dòng ${i + 2}: mã showroom "${warehouse_code}" không tồn tại.`);
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(revenue_date)) {
+      throw new Error(`Dòng ${i + 2}: revenue_date phải theo định dạng YYYY-MM-DD.`);
+    }
+    if (!Number.isFinite(revenue_amount) || revenue_amount < 0) {
+      throw new Error(`Dòng ${i + 2}: revenue_amount không hợp lệ.`);
+    }
+    return { warehouse_code, revenue_date, revenue_amount, orders_count };
+  });
+}
 
 export default function ShowroomsPage() {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -25,6 +64,10 @@ export default function ShowroomsPage() {
   const [productId, setProductId] = useState('');
   const [qty, setQty] = useState(1);
   const [error, setError] = useState('');
+
+  const [uploadMsg, setUploadMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const showrooms = warehouses.filter((w) => w.type === 'showroom');
 
@@ -68,6 +111,39 @@ export default function ShowroomsPage() {
     }
   };
 
+  const downloadTemplate = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const sample = showrooms.length
+      ? showrooms.map((s, i) => `${s.code},${today},${(80 + i * 15) * 1000000},${10 + i * 3}`).join('\n')
+      : `SR-DN,${today},84000000,12\nSR-HN,${today},96000000,14\nSR-HCM,${today},121000000,18`;
+    const csv = `${CSV_HEADER}\n${sample}\n`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mau_doanh_thu_showroom.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setUploading(true);
+    setUploadMsg(null);
+    try {
+      const text = await file.text();
+      const validCodes = new Set(showrooms.map((s) => s.code));
+      const rows = parseRevenueCsv(text, validCodes);
+      await uploadShowroomRevenue(rows);
+      setUploadMsg({ type: 'ok', text: `Đã nạp ${rows.length} dòng doanh thu thành công.` });
+      load();
+    } catch (e) {
+      setUploadMsg({ type: 'err', text: e instanceof Error ? e.message : 'Lỗi không xác định khi nạp file.' });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   if (loading) return <p className="text-sm text-forest-500">Đang tải dữ liệu showroom…</p>;
   if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
 
@@ -83,9 +159,42 @@ export default function ShowroomsPage() {
           <div key={s.code} className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
             <p className="text-xs uppercase tracking-wide text-forest-500">{s.name}</p>
             <p className="font-display text-2xl text-forest-900 mt-2">{fmt(revenueToday[s.code] ?? 0)}đ</p>
-            <p className="text-xs text-forest-400 mt-1">Doanh thu hôm nay (chưa nối POS — hiển thị 0 cho đến khi có tích hợp)</p>
+            <p className="text-xs text-forest-400 mt-1">Doanh thu hôm nay (nạp thủ công qua file — 0 nếu chưa nạp dữ liệu hôm nay)</p>
           </div>
         ))}
+      </div>
+
+      <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
+        <h3 className="font-display text-lg text-forest-900 mb-1">Nạp doanh thu showroom/OTC (chưa có POS thật)</h3>
+        <p className="text-xs text-forest-500 mb-4">
+          Chưa có tích hợp POS trực tiếp. Tạm thời nạp doanh thu bằng file CSV (mở/lưu được bằng Excel) — tải file mẫu,
+          điền số liệu thật rồi nạp lại lên đây.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <button onClick={downloadTemplate} className="px-4 py-2 rounded-lg border border-forest-200 text-xs text-forest-700 flex items-center gap-1.5">
+            <Download className="w-3.5 h-3.5" /> Tải file mẫu (CSV)
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="btn-primary text-xs flex items-center gap-1.5 disabled:opacity-60"
+          >
+            <Upload className="w-3.5 h-3.5" /> {uploading ? 'Đang nạp…' : 'Nạp file doanh thu'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFileUpload(f);
+            }}
+          />
+        </div>
+        {uploadMsg && (
+          <p className={`text-xs mt-3 ${uploadMsg.type === 'ok' ? 'text-forest-600' : 'text-red-600'}`}>{uploadMsg.text}</p>
+        )}
       </div>
 
       <div className="overflow-x-auto bg-white rounded-2xl border border-forest-100 shadow-elegant">

@@ -1,3 +1,5 @@
+export { PROVINCE_COORDS, haversineKm } from '../lib/geo';
+
 export const ADMIN_IMAGES = {
   loginHero: 'https://images.unsplash.com/photo-1580927752452-89d86da3fa0a?w=1400&q=80&auto=format&fit=crop',
   cmsHero: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80&auto=format&fit=crop',
@@ -38,15 +40,6 @@ export const INVENTORY: InventoryRow[] = [
   { sku: 'VKD-VN5', name: 'Viên nang chiết xuất MR2', threshold: 15, stock: { 'KHO-TMR': 95, 'KHO-DN': 140, 'SR-DN': 18, 'SR-HN': 9, 'SR-HCM': 24 } },
   { sku: 'VKD-RS6', name: 'Rượu sâm hạ thổ 3 năm', threshold: 5, stock: { 'KHO-TMR': 18, 'KHO-DN': 26, 'SR-DN': 3, 'SR-HN': 2, 'SR-HCM': 7 } },
 ];
-
-export const PROVINCE_COORDS: Record<string, { lat: number; lng: number }> = {
-  'Đà Nẵng': { lat: 16.05, lng: 108.2 },
-  'Hà Nội': { lat: 21.03, lng: 105.85 },
-  'TP.HCM': { lat: 10.78, lng: 106.7 },
-  Huế: { lat: 16.46, lng: 107.59 },
-  'Kon Tum': { lat: 14.35, lng: 108.0 },
-  'Cần Thơ': { lat: 10.03, lng: 105.79 },
-};
 
 export const QR_HEATMAP = [
   { region: 'TP.HCM', count: 312, suspect: false },
@@ -239,12 +232,3 @@ export const SOCIAL_CAMPAIGNS = [
   { platform: 'YouTube Shorts', reach: 214000, engagement: 15100, conversions: 208, convRate: 1.38 },
 ];
 
-export function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
-  const R = 6371;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
-}

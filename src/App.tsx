@@ -22,15 +22,17 @@ import Checkout from './components/Checkout';
 import OrderConfirmation from './components/OrderConfirmation';
 import LoyaltyDashboard from './components/LoyaltyDashboard';
 import AutoshipPage from './components/AutoshipPage';
+import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
 import type { Language } from './i18n/translations';
 
-type Page = 'home' | 'catalog' | 'product-detail' | 'research' | 'checkout' | 'order-success' | 'loyalty' | 'autoship';
+type Page = 'home' | 'catalog' | 'product-detail' | 'research' | 'checkout' | 'order-success' | 'loyalty' | 'autoship' | 'trace';
 
 function App() {
   const [lang, setLang] = useState<Language>('vi');
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [orderId, setOrderId] = useState('');
   const [selectedSlug, setSelectedSlug] = useState('');
+  const [traceQr, setTraceQr] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Xử lý khi trình duyệt quay lại từ trang thanh toán PayOS (VietQR).
@@ -48,6 +50,9 @@ function App() {
     } else if (searchParams.get('payos_cancel') === '1') {
       setSearchParams({}, { replace: true });
       setCurrentPage('checkout');
+    } else if (searchParams.get('trace')) {
+      setTraceQr(searchParams.get('trace') as string);
+      setCurrentPage('trace');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -133,9 +138,13 @@ function App() {
           {currentPage === 'autoship' && (
             <AutoshipPage lang={lang} onNavigate={navigate} />
           )}
+
+          {currentPage === 'trace' && (
+            <BatchTraceabilityLookup lang={lang} qrHash={traceQr} onNavigate={navigate} />
+          )}
         </main>
 
-        {currentPage !== 'checkout' && currentPage !== 'order-success' && (
+        {currentPage !== 'checkout' && currentPage !== 'order-success' && currentPage !== 'trace' && (
           <Footer lang={lang} onLangChange={setLang} onNavigate={navigate} />
         )}
 

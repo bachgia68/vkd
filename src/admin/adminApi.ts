@@ -319,9 +319,20 @@ export interface ChannelRevenueRow {
 export async function fetchChannelRevenue(): Promise<ChannelRevenueRow[]> {
   const orders = throwIfError(await supabase.from('orders').select('total').eq('status', 'paid'));
   const onlineRevenue = (orders as { total: number }[]).reduce((s, o) => s + Number(o.total), 0);
+  const showroomEntries = throwIfError(
+    await supabase.from('showroom_revenue_entries').select('revenue_amount, orders_count')
+  );
+  const showroomRevenue = (showroomEntries as { revenue_amount: number; orders_count: number }[]).reduce(
+    (s, e) => s + Number(e.revenue_amount),
+    0
+  );
+  const showroomOrders = (showroomEntries as { revenue_amount: number; orders_count: number }[]).reduce(
+    (s, e) => s + Number(e.orders_count),
+    0
+  );
   const rows: ChannelRevenueRow[] = [
     { channel: 'Website/TMĐT (Online)', revenue: onlineRevenue, orders: orders.length, share: 0 },
-    { channel: 'Showroom (Offline)', revenue: 0, orders: 0, share: 0 },
+    { channel: 'Showroom (Offline)', revenue: showroomRevenue, orders: showroomOrders, share: 0 },
     { channel: 'Affiliate (KOL/KOC)', revenue: 0, orders: 0, share: 0 },
     { channel: 'Nhà thuốc/Siêu thị (OTC-KA)', revenue: 0, orders: 0, share: 0 },
   ];
@@ -345,8 +356,147 @@ export async function fetchSocialCampaigns(): Promise<SocialCampaignRow[]> {
   }));
 }
 
+// ---------- Batches / QR truy xuất ----------
+
+export interface CultivationRegion {
+  code: string;
+  name_vi: string;
+  province: string;
+}
+
+export interface Batch {
+  id: string;
+  batch_id: string;
+  product_id: string;
+  product_sku: string;
+  product_name: string;
+  cultivation_region_code: string | null;
+  cultivation_region_name: string | null;
+  harvest_date: string | null;
+  qc_status: string;
+  qty_kg: number | null;
+  warehouse_location: string | null;
+  qr_hash: string;
+  created_at: string;
+}
+
+export async function fetchCultivationRegions(): Promise<CultivationRegion[]> {
+  return throwIfError(await supabase.from('cultivation_regions').select('code, name_vi, province').order('code'));
+}
+
+export async function fetchBatches(): Promise<Batch[]> {
+  const rows = throwIfError(
+    await supabase
+      .from('batches')
+      .select(
+        'id, batch_id, product_id, cultivation_region_code, harvest_date, qc_status, qty_kg, warehouse_location, qr_hash, created_at, products(sku, name_vi), cultivation_regions(name_vi)'
+      )
+      .order('created_at', { ascending: false })
+  );
+  return (
+    rows as unknown as {
+      id: string;
+      batch_id: string;
+      product_id: string;
+      cultivation_region_code: string | null;
+      harvest_date: string | null;
+      qc_status: string;
+      qty_kg: number | null;
+      warehouse_location: string | null;
+      qr_hash: string;
+      created_at: string;
+      products: { sku: string; name_vi: string } | { sku: string; name_vi: string }[] | null;
+      cultivation_regions: { name_vi: string } | { name_vi: string }[] | null;
+    }[]
+  ).map((r) => {
+    const product = Array.isArray(r.products) ? r.products[0] : r.products;
+    const region = Array.isArray(r.cultivation_regions) ? r.cultivation_regions[0] : r.cultivation_regions;
+    return {
+      id: r.id,
+      batch_id: r.batch_id,
+      product_id: r.product_id,
+      product_sku: product?.sku ?? '',
+      product_name: product?.name_vi ?? '',
+      cultivation_region_code: r.cultivation_region_code,
+      cultivation_region_name: region?.name_vi ?? null,
+      harvest_date: r.harvest_date,
+      qc_status: r.qc_status,
+      qty_kg: r.qty_kg,
+      warehouse_location: r.warehouse_location,
+      qr_hash: r.qr_hash,
+      created_at: r.created_at,
+    };
+  });
+}
+
+function randomBatchSuffix() {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+export async function createBatch(input: {
+  product_id: string;
+  product_sku: string;
+  cultivation_region_code: string;
+  harvest_date: string;
+  qty_kg: number;
+  warehouse_location: string;
+  qc_status: string;
+}): Promise<Batch> {
+  const dateTag = input.harvest_date.replace(/-/g, '');
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const suffix = randomBatchSuffix();
+    const batch_id = `${input.product_sku}-${dateTag}-${suffix}`;
+    const qr_hash = `${batch_id}-${randomBatchSuffix()}`;
+    const { data, error } = await supabase
+      .from('batches')
+      .insert({
+        batch_id,
+        product_id: input.product_id,
+        cultivation_region_code: input.cultivation_region_code,
+        harvest_date: input.harvest_date,
+        qty_kg: input.qty_kg,
+        warehouse_location: input.warehouse_location,
+        qc_status: input.qc_status,
+        qr_hash,
+      })
+      .select('id, batch_id, product_id, cultivation_region_code, harvest_date, qc_status, qty_kg, warehouse_location, qr_hash, created_at')
+      .single();
+    if (!error) {
+      return {
+        ...(data as Omit<Batch, 'product_sku' | 'product_name' | 'cultivation_region_name'>),
+        product_sku: input.product_sku,
+        product_name: '',
+        cultivation_region_name: null,
+      };
+    }
+    if (!error.message.includes('duplicate key')) throw new Error(error.message);
+  }
+  throw new Error('Không tạo được mã lô hàng duy nhất, thử lại.');
+}
+
 export async function fetchShowroomRevenueToday(): Promise<Record<string, number>> {
-  // No POS integration yet — every showroom reports 0 until a real channel/POS feed exists.
   const warehouses = throwIfError(await supabase.from('warehouses').select('code').eq('type', 'showroom'));
-  return Object.fromEntries((warehouses as { code: string }[]).map((w) => [w.code, 0]));
+  const today = new Date().toISOString().slice(0, 10);
+  const entries = throwIfError(
+    await supabase.from('showroom_revenue_entries').select('warehouse_code, revenue_amount').eq('revenue_date', today)
+  );
+  const byWarehouse = Object.fromEntries((warehouses as { code: string }[]).map((w) => [w.code, 0]));
+  for (const e of entries as { warehouse_code: string; revenue_amount: number }[]) {
+    byWarehouse[e.warehouse_code] = (byWarehouse[e.warehouse_code] ?? 0) + Number(e.revenue_amount);
+  }
+  return byWarehouse;
+}
+
+export interface ShowroomRevenueUploadRow {
+  warehouse_code: string;
+  revenue_date: string;
+  revenue_amount: number;
+  orders_count: number;
+}
+
+export async function uploadShowroomRevenue(rows: ShowroomRevenueUploadRow[]) {
+  const { error } = await supabase
+    .from('showroom_revenue_entries')
+    .insert(rows.map((r) => ({ ...r, source: 'manual_upload' })));
+  if (error) throw new Error(error.message);
 }

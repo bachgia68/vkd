@@ -1,7 +1,25 @@
 import { useEffect, useState } from 'react';
-import { Route, CheckCircle2 } from 'lucide-react';
+import QRCode from 'qrcode';
+import { Route, CheckCircle2, QrCode, Download, Copy } from 'lucide-react';
 import { PROVINCE_COORDS, ADMIN_IMAGES, haversineKm, fmt } from '../adminMockData';
-import { fetchWarehouses, fetchInventory, fetchQrHeatmap, type Warehouse, type InventoryRow } from '../adminApi';
+import {
+  fetchWarehouses,
+  fetchInventory,
+  fetchQrHeatmap,
+  fetchProducts,
+  fetchCultivationRegions,
+  fetchBatches,
+  createBatch,
+  type Warehouse,
+  type InventoryRow,
+  type DbProduct,
+  type CultivationRegion,
+  type Batch,
+} from '../adminApi';
+
+function traceUrl(qrHash: string) {
+  return `${window.location.origin}/?trace=${encodeURIComponent(qrHash)}`;
+}
 
 interface RouteResult {
   code: string;
@@ -20,6 +38,79 @@ export default function InventoryQrPage() {
   const [province, setProvince] = useState('Huế');
   const [result, setResult] = useState<RouteResult | null>(null);
   const [ranOnce, setRanOnce] = useState(false);
+
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [regions, setRegions] = useState<CultivationRegion[]>([]);
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [qrImages, setQrImages] = useState<Record<string, string>>({});
+  const [batchForm, setBatchForm] = useState({
+    product_id: '',
+    cultivation_region_code: '',
+    harvest_date: new Date().toISOString().slice(0, 10),
+    qty_kg: 1,
+    warehouse_location: '',
+    qc_status: 'pending',
+  });
+  const [batchError, setBatchError] = useState('');
+  const [creatingBatch, setCreatingBatch] = useState(false);
+  const [copiedHash, setCopiedHash] = useState('');
+
+  const loadBatchDeps = () => {
+    Promise.all([fetchProducts(), fetchCultivationRegions(), fetchBatches()]).then(([p, r, b]) => {
+      setProducts(p);
+      setRegions(r);
+      setBatches(b);
+      setBatchForm((f) => ({
+        ...f,
+        product_id: f.product_id || p[0]?.id || '',
+        cultivation_region_code: f.cultivation_region_code || r[0]?.code || '',
+      }));
+    });
+  };
+
+  useEffect(loadBatchDeps, []);
+
+  useEffect(() => {
+    batches.forEach((b) => {
+      if (qrImages[b.qr_hash]) return;
+      QRCode.toDataURL(traceUrl(b.qr_hash), { width: 160, margin: 1 }).then((url) => {
+        setQrImages((cur) => ({ ...cur, [b.qr_hash]: url }));
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [batches]);
+
+  const submitBatch = async () => {
+    const product = products.find((p) => p.id === batchForm.product_id);
+    if (!product) {
+      setBatchError('Chọn sản phẩm.');
+      return;
+    }
+    if (!batchForm.cultivation_region_code) {
+      setBatchError('Chọn vùng trồng.');
+      return;
+    }
+    if (batchForm.qty_kg <= 0) {
+      setBatchError('Khối lượng phải lớn hơn 0.');
+      return;
+    }
+    setCreatingBatch(true);
+    setBatchError('');
+    try {
+      await createBatch({ ...batchForm, product_sku: product.sku });
+      loadBatchDeps();
+    } catch (e) {
+      setBatchError(e instanceof Error ? e.message : 'Lỗi tạo lô hàng.');
+    } finally {
+      setCreatingBatch(false);
+    }
+  };
+
+  const copyLink = (qrHash: string) => {
+    navigator.clipboard.writeText(traceUrl(qrHash));
+    setCopiedHash(qrHash);
+    setTimeout(() => setCopiedHash(''), 1500);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -145,6 +236,132 @@ export default function InventoryQrPage() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="grid lg:grid-cols-[1fr_1.4fr] gap-6 items-start">
+        <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
+          <h3 className="font-display text-lg text-forest-900 mb-1">Tạo lô hàng &amp; mã QR truy xuất</h3>
+          <p className="text-xs text-forest-500 mb-4">Mỗi lô hàng có một mã QR duy nhất để in lên bao bì.</p>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Sản phẩm</label>
+              <select
+                value={batchForm.product_id}
+                onChange={(e) => setBatchForm((f) => ({ ...f, product_id: e.target.value }))}
+                className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+              >
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.sku} — {p.name_vi}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Vùng trồng</label>
+              <select
+                value={batchForm.cultivation_region_code}
+                onChange={(e) => setBatchForm((f) => ({ ...f, cultivation_region_code: e.target.value }))}
+                className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+              >
+                {regions.map((r) => (
+                  <option key={r.code} value={r.code}>
+                    {r.name_vi} ({r.province})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] uppercase tracking-wide text-forest-400">Ngày thu hoạch</label>
+                <input
+                  type="date"
+                  value={batchForm.harvest_date}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, harvest_date: e.target.value }))}
+                  className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-wide text-forest-400">Khối lượng (kg)</label>
+                <input
+                  type="number"
+                  min={0.1}
+                  step={0.1}
+                  value={batchForm.qty_kg}
+                  onChange={(e) => setBatchForm((f) => ({ ...f, qty_kg: Number(e.target.value) || 0 }))}
+                  className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1 font-mono"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Vị trí kho</label>
+              <input
+                type="text"
+                value={batchForm.warehouse_location}
+                onChange={(e) => setBatchForm((f) => ({ ...f, warehouse_location: e.target.value }))}
+                placeholder="VD: KHO-TMR - Kệ A3"
+                className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Trạng thái kiểm định</label>
+              <select
+                value={batchForm.qc_status}
+                onChange={(e) => setBatchForm((f) => ({ ...f, qc_status: e.target.value }))}
+                className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+              >
+                <option value="pending">Đang chờ kiểm định</option>
+                <option value="passed">Đạt kiểm định chất lượng</option>
+                <option value="failed">Không đạt kiểm định</option>
+              </select>
+            </div>
+
+            {batchError && <p className="text-xs text-red-600">{batchError}</p>}
+
+            <button onClick={submitBatch} disabled={creatingBatch} className="btn-primary text-xs w-full justify-center mt-2 disabled:opacity-60">
+              <QrCode className="w-4 h-4" /> {creatingBatch ? 'Đang tạo…' : 'Tạo lô hàng & sinh mã QR'}
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
+          <h3 className="font-display text-lg text-forest-900 mb-4">Lô hàng đã tạo ({batches.length})</h3>
+          {batches.length === 0 ? (
+            <p className="text-sm text-forest-400">Chưa có lô hàng nào — tạo lô đầu tiên ở bên trái.</p>
+          ) : (
+            <div className="space-y-3 max-h-[560px] overflow-y-auto pr-1">
+              {batches.map((b) => (
+                <div key={b.id} className="flex items-start gap-4 bg-forest-50 rounded-xl p-3">
+                  {qrImages[b.qr_hash] ? (
+                    <img src={qrImages[b.qr_hash]} alt="QR" className="w-20 h-20 rounded-lg bg-white p-1 flex-shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-lg bg-white flex-shrink-0" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-mono text-xs text-forest-900 font-semibold truncate">{b.batch_id}</p>
+                    <p className="text-xs text-forest-600 mt-0.5 truncate">{b.product_sku} · {b.cultivation_region_name}</p>
+                    <p className="text-xs text-forest-400">{b.harvest_date ? new Date(b.harvest_date).toLocaleDateString('vi-VN') : '—'}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <a
+                        href={qrImages[b.qr_hash]}
+                        download={`qr-${b.batch_id}.png`}
+                        className="text-[11px] px-2 py-1 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+                      >
+                        <Download className="w-3 h-3" /> Tải QR
+                      </a>
+                      <button
+                        onClick={() => copyLink(b.qr_hash)}
+                        className="text-[11px] px-2 py-1 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+                      >
+                        <Copy className="w-3 h-3" /> {copiedHash === b.qr_hash ? 'Đã chép!' : 'Sao chép link'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {routeOpen && (

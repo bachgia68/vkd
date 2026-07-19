@@ -5,6 +5,7 @@
       "name": "vkd-dev",
       "runtimeExecutable": "cmd",
       "runtimeArgs": ["/c", "npm run dev"],
+      "cwd": "C:\\dev\\vkd",
       "port": 5173
     }
   ]
