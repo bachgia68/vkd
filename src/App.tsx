@@ -23,6 +23,7 @@ import OrderConfirmation from './components/OrderConfirmation';
 import LoyaltyDashboard from './components/LoyaltyDashboard';
 import AutoshipPage from './components/AutoshipPage';
 import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
+import ChatWidget from './components/ChatWidget';
 import type { Language } from './i18n/translations';
 
 type Page = 'home' | 'catalog' | 'product-detail' | 'research' | 'checkout' | 'order-success' | 'loyalty' | 'autoship' | 'trace';
@@ -149,6 +150,7 @@ function App() {
         )}
 
         <CartDrawer lang={lang} onCheckout={() => navigate('checkout')} />
+        <ChatWidget lang={lang} onNavigate={navigate} />
       </div>
     </CartProvider>
   );
