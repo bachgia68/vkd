@@ -51,7 +51,7 @@ Skill nay dung khi can them / sua / xoa / dong bo lai danh muc san pham that cua
   PowerShell/git. Neu can tao file moi (vd. them 1 skill khac, thay doi launch.json), phai tao
   bang PowerShell (`New-Item`, `[System.IO.File]::WriteAllText` voi UTF8 khong BOM), khong dung
   Write tool cho file moi trong repo nay.
-- Duong dan project chua dau tieng Viet (`...\VKD\site\project-bolt-sb1-hravyvsn.10.7\project`).
+- Duong dan project chua dau tieng Viet (`...\VKD\site\vkd-production\project`).
   Khong bao gio tu go lai doan "Tai lieu" trong path tuyet doi cho PowerShell/Node - de gay loi
   ENOENT gia (do lech chuan hoa Unicode) du file ro rang ton tai. Luon dung `Set-Location` voi path
   **tuong doi** tu thu muc lam viec mac dinh cua phien, hoac cwd da dung san tu lenh truoc.
