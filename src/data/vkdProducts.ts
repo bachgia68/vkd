@@ -627,8 +627,8 @@ export const getLocalizedCategory = (category: Category, lang: Language): Catego
 export const formatVND = (price: number): string =>
   new Intl.NumberFormat('vi-VN').format(price) + '₫';
 
-// Quy đổi tham khảo — cùng tỉ giá đã dùng khi khởi tạo dữ liệu sản phẩm (25.500 VND/USD)
-const VND_PER_USD = 25500;
+// Quy đổi tham khảo — chuẩn hóa theo tỉ giá dùng thống nhất toàn site (25.000 VND/USD, xem src/data/products.ts)
+const VND_PER_USD = 25000;
 
 export interface CartCompatibleProduct {
   id: string;

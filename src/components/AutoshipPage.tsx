@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RefreshCw, CheckCircle, Info, Calendar, Pause, X, Plus } from 'lucide-react';
-import { vkdProducts, toCartProduct } from '../data/vkdProducts';
+import { products as unifiedProducts, toCartProduct } from '../data/products';
 import type { Language } from '../i18n/translations';
 
 interface AutoshipProps {
@@ -14,8 +14,13 @@ const frequencies = [
   { days: 90, labelEn: 'Every 90 days', labelVi: 'Mỗi 90 ngày' },
 ];
 
-// Sản phẩm dùng hàng ngày/định kỳ (thực phẩm bổ sung) phù hợp đặt hàng tự động.
-const products = vkdProducts.filter(p => p.category === 'supplements').map(toCartProduct);
+// Sản phẩm dùng hàng ngày/định kỳ phù hợp đặt hàng tự động.
+// Taxonomy cũ (vkdProducts.ts) có category 'supplements' (Thực phẩm bảo vệ sức khỏe);
+// trong taxonomy hợp nhất mới (products.ts, 7 productType), toàn bộ SKU thuộc
+// 'supplements' cũ (VKD-002, 003, 004, 009, 010, 011) đã được phân loại vào
+// productType 'tra-nuoc-uong-sam' (Trà & Nước Uống Sâm) — nhóm sản phẩm tiêu
+// thụ định kỳ/hàng ngày, phù hợp nhất với mô hình autoship.
+const products = unifiedProducts.filter(p => p.productType === 'tra-nuoc-uong-sam').map(toCartProduct);
 const subscriptionProducts = products;
 
 interface MockSubscription {

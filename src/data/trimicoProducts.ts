@@ -910,7 +910,8 @@ export const findTrimicoProduct = (slug: string): TrimicoProduct | undefined =>
 export const formatVNDorContact = (price: number | null): string =>
   price == null ? 'Liên hệ' : new Intl.NumberFormat('vi-VN').format(price) + '₫';
 
-const VND_PER_USD = 25500;
+// Chuẩn hóa theo tỉ giá dùng thống nhất toàn site (25.000 VND/USD, xem src/data/products.ts)
+const VND_PER_USD = 25000;
 
 export interface TrimicoCartCompatibleProduct {
   id: string;

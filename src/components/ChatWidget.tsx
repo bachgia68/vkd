@@ -16,8 +16,14 @@ import {
 } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import TaWordmark from './TaWordmark';
-import { categories, vkdProducts, getLocalizedProduct, getLocalizedCategory, formatVND, type CategoryId } from '../data/vkdProducts';
+import { products } from '../data/products';
+import { productTypes, type ProductTypeId } from '../data/productTypes';
 import { submitCustomerLead } from '../lib/siteContentApi';
+
+function formatVND(n: number | null): string {
+  if (n === null) return 'Liên hệ';
+  return n.toLocaleString('vi-VN') + '₫';
+}
 
 interface ChatWidgetProps {
   lang: Language;
@@ -41,8 +47,8 @@ const menuItems: { id: NodeId; icon: typeof ShoppingBag; vi: string; en: string 
 
 const nodeText: Record<Exclude<NodeId, 'menu'>, { vi: string; en: string }> = {
   product_advice: {
-    vi: 'TA có 4 dòng sản phẩm từ Sâm Ngọc Linh: Đồ uống, Thực phẩm bổ sung, Mỹ phẩm và Đặc sản, được lọc theo 4 mục tiêu sức khỏe. Bạn có thể xem toàn bộ danh mục sản phẩm ngay bên dưới.',
-    en: 'TA offers 4 Ngoc Linh Ginseng product lines: beverages, supplements, cosmetics, and specialty items, filterable by health goal. You can browse the full catalog below.',
+    vi: 'TA có nhiều dòng sản phẩm từ Sâm Ngọc Linh: sâm ngâm mật ong, trà & nước uống sâm, rượu sâm, mỹ phẩm sâm và nhiều dòng khác. Bạn có thể xem toàn bộ danh mục sản phẩm ngay bên dưới.',
+    en: 'TA offers many Ngoc Linh Ginseng product lines: honey-steeped ginseng, ginseng tea & drinks, ginseng wine, ginseng cosmetics and more. You can browse the full catalog below.',
   },
   order_status: {
     vi: 'Để tra cứu tình trạng đơn hàng, vui lòng gửi mã đơn hàng cho nhân viên CSKH qua hotline hoặc Messenger bên dưới — chúng tôi sẽ kiểm tra và phản hồi ngay.',
@@ -66,7 +72,7 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [node, setNode] = useState<NodeId>('menu');
-  const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<ProductTypeId | null>(null);
   const [leadCaptureOpen, setLeadCaptureOpen] = useState(false);
   const [leadName, setLeadName] = useState('');
   const [leadPhone, setLeadPhone] = useState('');
@@ -125,7 +131,7 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
   };
 
   const categoryProducts = selectedCategory
-    ? vkdProducts.filter((p) => p.category === selectedCategory).slice(0, 2)
+    ? products.filter((p) => p.productType === selectedCategory).slice(0, 2)
     : [];
 
   const submitConsult = async () => {
@@ -137,7 +143,7 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
     setLeadError('');
     try {
       const categoryLabel = selectedCategory
-        ? getLocalizedCategory(categories.find((c) => c.id === selectedCategory)!, lang).label
+        ? productTypes.find((t) => t.id === selectedCategory)?.[l === 'vi' ? 'labelVi' : 'labelEn'] ?? ''
         : '';
       await submitCustomerLead({
         name: leadName.trim(),
@@ -218,15 +224,15 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
                 {node === 'product_advice' && !selectedCategory && (
                   <>
                     <div className="space-y-2">
-                      {categories.map((cat) => {
-                        const localized = getLocalizedCategory(cat, lang);
+                      {productTypes.map((pt) => {
+                        const label = l === 'vi' ? pt.labelVi : pt.labelEn;
                         return (
                           <button
-                            key={cat.id}
-                            onClick={() => setSelectedCategory(cat.id)}
+                            key={pt.id}
+                            onClick={() => setSelectedCategory(pt.id)}
                             className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-forest-100 hover:border-gold-400 hover:bg-gold-50 transition-colors text-left"
                           >
-                            <span className="text-sm text-forest-900 font-medium">{localized.label}</span>
+                            <span className="text-sm text-forest-900 font-medium">{label}</span>
                           </button>
                         );
                       })}
@@ -244,10 +250,9 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
                   <>
                     <div className="space-y-2">
                       {categoryProducts.map((p) => {
-                        const localized = getLocalizedProduct(p, lang);
                         return (
                           <div key={p.slug} className="border border-forest-100 rounded-xl p-3">
-                            <p className="text-sm font-medium text-forest-900">{localized.name}</p>
+                            <p className="text-sm font-medium text-forest-900">{p.name}</p>
                             <p className="text-sm text-gold-600 font-semibold mt-0.5">{formatVND(p.price)}</p>
                             <button
                               onClick={() => viewProduct(p.slug)}
