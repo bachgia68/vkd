@@ -14,11 +14,8 @@ import Certifications from './components/Certifications';
 import Blog from './components/Blog';
 import OmniChannel from './components/OmniChannel';
 import Footer from './components/Footer';
-import VKDProductCatalog from './components/VKDProductCatalog';
-import VKDProductDetail from './components/VKDProductDetail';
-import TrimicoProductCatalog from './components/TrimicoProductCatalog';
-import TrimicoProductDetail from './components/TrimicoProductDetail';
-import TrimicoTeaser from './components/TrimicoTeaser';
+import ProductCatalog from './components/ProductCatalog';
+import ProductDetail from './components/ProductDetail';
 import ProductAdvisor from './components/ProductAdvisor';
 import ResearchHub from './components/ResearchHub';
 import CartDrawer from './components/CartDrawer';
@@ -30,22 +27,9 @@ import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
 import ChatWidget from './components/ChatWidget';
 import type { Language } from './i18n/translations';
 
-type Page =
-  | 'home'
-  | 'catalog'
-  | 'product-detail'
-  | 'trimico-catalog'
-  | 'trimico-product-detail'
-  | 'research'
-  | 'checkout'
-  | 'order-success'
-  | 'loyalty'
-  | 'autoship'
-  | 'trace';
-
 function App() {
   const [lang, setLang] = useState<Language>('vi');
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [currentPage, setCurrentPage] = useState<string>('home');
   const [orderId, setOrderId] = useState('');
   const [selectedSlug, setSelectedSlug] = useState('');
   const [traceQr, setTraceQr] = useState('');
@@ -84,13 +68,16 @@ function App() {
 
   const navigate = (page: string, slug?: string) => {
     if (slug) setSelectedSlug(slug);
-    setCurrentPage(page as Page);
+    setCurrentPage(page);
   };
 
   const handleOrderSuccess = (id: string) => {
     setOrderId(id);
     setCurrentPage('order-success');
   };
+
+  const [basePage, queryString] = currentPage.split('?');
+  const catalogType = new URLSearchParams(queryString).get('type') ?? undefined;
 
   return (
     <CartProvider>
@@ -111,7 +98,6 @@ function App() {
               <About lang={lang} />
               <Heritage lang={lang} />
               <Products lang={lang} onNavigate={navigate} />
-              <TrimicoTeaser onNavigate={navigate} />
               <OmniChannel lang={lang} onNavigate={navigate} />
               <Showrooms lang={lang} />
               <Traceability lang={lang} />
@@ -121,20 +107,12 @@ function App() {
             </>
           )}
 
-          {currentPage === 'catalog' && (
-            <VKDProductCatalog lang={lang} onNavigate={navigate} />
+          {basePage === 'catalog' && (
+            <ProductCatalog lang={lang} onNavigate={navigate} initialType={catalogType} />
           )}
 
-          {currentPage === 'product-detail' && (
-            <VKDProductDetail slug={selectedSlug} lang={lang} onNavigate={navigate} />
-          )}
-
-          {currentPage === 'trimico-catalog' && (
-            <TrimicoProductCatalog lang={lang} onNavigate={navigate} />
-          )}
-
-          {currentPage === 'trimico-product-detail' && (
-            <TrimicoProductDetail slug={selectedSlug} onNavigate={navigate} />
+          {basePage === 'product-detail' && (
+            <ProductDetail slug={selectedSlug} lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'research' && (

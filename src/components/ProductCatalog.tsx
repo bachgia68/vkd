@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -194,11 +194,26 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
 export default function ProductCatalog({
   lang,
   onNavigate,
+  initialType,
 }: {
   lang: Language;
   onNavigate: (page: string, slug?: string) => void;
+  initialType?: string;
 }) {
-  const [activeType, setActiveType] = useState<ProductTypeId | 'all'>('all');
+  const isValidProductType = (id?: string): id is ProductTypeId =>
+    !!id && productTypes.some((t) => t.id === id);
+
+  const [activeType, setActiveType] = useState<ProductTypeId | 'all'>(
+    isValidProductType(initialType) ? initialType : 'all'
+  );
+
+  // App.tsx keeps ProductCatalog mounted across in-page navigations (e.g. header
+  // nav "catalog?type=X" -> "catalog?type=Y"), so re-sync the filter whenever the
+  // caller passes a new initialType rather than relying only on the initial mount.
+  useEffect(() => {
+    setActiveType(isValidProductType(initialType) ? initialType : 'all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialType]);
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
