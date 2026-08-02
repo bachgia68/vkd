@@ -110,7 +110,7 @@ export default function TrimicoProductDetail({ slug, onNavigate }: TrimicoProduc
               {!product.displayOnly18Plus && (
                 <div className="absolute top-5 right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur">
                   <ShieldCheck className="w-3.5 h-3.5 text-forest-600" />
-                  <span className="text-[11px] font-semibold text-forest-700">Hàng chính hãng TRIMICO</span>
+                  <span className="text-[11px] font-semibold text-forest-700">Hàng chính hãng TA</span>
                 </div>
               )}
             </div>
@@ -147,9 +147,7 @@ export default function TrimicoProductDetail({ slug, onNavigate }: TrimicoProduc
                     Chỉ trưng bày — chưa mở bán
                   </p>
                   <p className="text-sm text-red-700/90">
-                    Sản phẩm có cồn hiện chỉ trưng bày, đang chờ xác nhận của Bộ Công Thương. TA và
-                    TRIMICO cam kết không bán rượu cho người chưa đủ 18 tuổi. Vui lòng liên hệ
-                    hotline TRIMICO (0235 3.555.999) để được tư vấn khi sản phẩm được cấp phép.
+                    Sản phẩm có cồn hiện chỉ trưng bày, đang chờ xác nhận của Bộ Công Thương. TA cam kết không bán rượu cho người chưa đủ 18 tuổi. Vui lòng liên hệ TA để được tư vấn khi sản phẩm được cấp phép.
                   </p>
                 </div>
               </div>
