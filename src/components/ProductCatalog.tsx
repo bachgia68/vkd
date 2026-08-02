@@ -218,6 +218,13 @@ export default function ProductCatalog({
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  const TRENDING_QUERIES = ['sâm ngâm mật ong', 'nước hồng sâm', 'quà tết', 'mỹ phẩm sâm', 'rượu sâm'];
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const popularProducts = useMemo(
+    () => products.filter((p) => p.badge?.toLowerCase().includes('bán chạy')).slice(0, 4),
+    []
+  );
+
   const ui = catalogUi[lang];
   const isRTL = lang === 'ar';
 
@@ -269,9 +276,49 @@ export default function ProductCatalog({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setTimeout(() => setIsSearchFocused(false), 150)}
               placeholder={ui.searchPlaceholder}
               className="w-full pl-11 pr-4 py-3 rounded-full bg-white border border-cream-200 text-sm text-forest-800 placeholder:text-forest-400 focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-200 transition-all"
             />
+
+            {isSearchFocused && query.trim() === '' && (
+              <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-2xl shadow-elegant-lg border border-cream-200 p-5 z-40">
+                <p className="text-xs font-semibold uppercase tracking-wider text-forest-500 mb-3">
+                  Đang Thịnh Hành
+                </p>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {TRENDING_QUERIES.map((q) => (
+                    <button
+                      key={q}
+                      onMouseDown={() => setQuery(q)}
+                      className="px-3 py-1.5 rounded-full bg-cream-100 text-xs text-forest-700 hover:bg-gold-100 transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+                {popularProducts.length > 0 && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-forest-500 mb-3">
+                      Sản Phẩm Phổ Biến
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {popularProducts.map((p) => (
+                        <button
+                          key={p.sku}
+                          onMouseDown={() => onNavigate('product-detail', p.slug)}
+                          className="flex items-center gap-2 text-left"
+                        >
+                          <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
+                          <span className="text-xs text-forest-700 line-clamp-2">{p.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sort */}
