@@ -1,8 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Newspaper, ArrowRight } from 'lucide-react';
-import { useBlogPosts } from '../lib/siteStore';
+import { fetchBlogPosts, type BlogPost } from '../lib/siteContentApi';
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('vi-VN');
+}
 
 export default function Blog() {
-  const posts = useBlogPosts();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+
+  useEffect(() => {
+    fetchBlogPosts().then(setPosts).catch(() => setPosts([]));
+  }, []);
 
   if (posts.length === 0) return null;
 
@@ -29,7 +38,7 @@ export default function Blog() {
               <div className="w-12 h-12 rounded-xl bg-forest-100 flex items-center justify-center mb-6">
                 <Newspaper className="w-6 h-6 text-forest-700" />
               </div>
-              <p className="text-xs text-forest-400 mb-2">{post.createdAt}</p>
+              <p className="text-xs text-forest-400 mb-2">{formatDate(post.created_at)}</p>
               <h3 className="font-display text-xl font-semibold text-forest-900 mb-3">{post.title}</h3>
               <p className="text-forest-600 leading-relaxed line-clamp-3">{post.excerpt}</p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium text-forest-600">

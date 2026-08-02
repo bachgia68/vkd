@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
 import { MapPin, Phone, Mail, Share2, MessageCircle, Music2, Video, Link2 } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations, languageNames } from '../i18n/translations';
-import { useContactSettings } from '../lib/siteStore';
+import { fetchContactPhones, fetchSocialLinks, type ContactPhone, type SocialLink } from '../lib/siteContentApi';
 
 interface FooterProps {
   lang: Language;
@@ -21,7 +22,13 @@ const SOCIAL_ICONS: Record<string, typeof Share2> = {
 export default function Footer({ lang, onLangChange }: FooterProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
-  const contact = useContactSettings();
+  const [phones, setPhones] = useState<ContactPhone[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+
+  useEffect(() => {
+    fetchContactPhones().then(setPhones).catch(() => setPhones([]));
+    fetchSocialLinks().then(setSocialLinks).catch(() => setSocialLinks([]));
+  }, []);
 
   const navItems = [
     { key: 'home', href: '#home' },
@@ -55,7 +62,7 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
 
             {/* Social Links */}
             <div className="flex items-center gap-4">
-              {contact.socialLinks.map((link) => {
+              {socialLinks.map((link) => {
                 const Icon = SOCIAL_ICONS[link.platform] ?? Link2;
                 return (
                   <a
@@ -98,7 +105,7 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
                 <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
                 <span className="text-forest-300">{t.footer.address}</span>
               </li>
-              {contact.phones.map((phone) => (
+              {phones.map((phone) => (
                 <li key={phone.id} className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-gold-400 flex-shrink-0" />
                   <a

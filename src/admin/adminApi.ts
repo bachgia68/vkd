@@ -1,4 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost } from '../lib/siteContentApi';
+
+export type { SiteAddress, ContactPhone, SocialLink, BlogPost };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
 // the Supabase client with the signed-in admin's session — RLS policies
@@ -523,5 +526,91 @@ export async function uploadShowroomRevenue(rows: ShowroomRevenueUploadRow[]) {
   const { error } = await supabase
     .from('showroom_revenue_entries')
     .insert(rows.map((r) => ({ ...r, source: 'manual_upload' })));
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Site settings: addresses / contact / social / blog / B2B leads ----------
+// Public-read tables (footer, showroom section, homepage blog) — writes here
+// require an authenticated admin session (is_admin()), reads are open to
+// everyone including the anonymous storefront. The read side (fetchSiteAddresses,
+// fetchContactPhones, fetchSocialLinks, fetchBlogPosts) lives in
+// ../lib/siteContentApi.ts since the public storefront needs them too — the
+// types are re-exported above for admin page convenience.
+
+export async function createSiteAddress(input: Omit<SiteAddress, 'id'>): Promise<SiteAddress> {
+  const res = await supabase
+    .from('site_addresses')
+    .insert(input)
+    .select('id, name, address, hours, phone, category')
+    .single();
+  return throwIfError(res);
+}
+
+export async function deleteSiteAddress(id: string) {
+  const { error } = await supabase.from('site_addresses').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function createContactPhone(label: string, value: string): Promise<ContactPhone> {
+  const res = await supabase.from('contact_phones').insert({ label, value }).select('id, label, value').single();
+  return throwIfError(res);
+}
+
+export async function deleteContactPhone(id: string) {
+  const { error } = await supabase.from('contact_phones').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function createSocialLink(platform: string, url: string): Promise<SocialLink> {
+  const res = await supabase.from('social_links').insert({ platform, url }).select('id, platform, url').single();
+  return throwIfError(res);
+}
+
+export async function deleteSocialLink(id: string) {
+  const { error } = await supabase.from('social_links').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function createBlogPost(input: { title: string; excerpt: string; body: string }): Promise<BlogPost> {
+  const res = await supabase
+    .from('blog_posts')
+    .insert(input)
+    .select('id, title, excerpt, body, created_at')
+    .single();
+  return throwIfError(res);
+}
+
+export async function deleteBlogPost(id: string) {
+  const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export interface B2BLead {
+  id: string;
+  type: 'distributor' | 'investor' | 'oem';
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+  status: 'new' | 'contacted';
+  created_at: string;
+}
+
+export async function fetchB2BLeads(): Promise<B2BLead[]> {
+  return throwIfError(
+    await supabase
+      .from('b2b_leads')
+      .select('id, type, name, phone, email, message, status, created_at')
+      .order('created_at', { ascending: false })
+  );
+}
+
+export async function markLeadContacted(id: string) {
+  const { error } = await supabase.from('b2b_leads').update({ status: 'contacted' }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteLead(id: string) {
+  const { error } = await supabase.from('b2b_leads').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }

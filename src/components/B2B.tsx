@@ -3,7 +3,7 @@ import { Building2, TrendingUp, Package, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import PartnerRegisterModal from './PartnerRegisterModal';
-import type { B2BLeadType } from '../lib/siteStore';
+import type { B2BLeadType } from '../lib/siteContentApi';
 
 interface B2BProps {
   lang: Language;

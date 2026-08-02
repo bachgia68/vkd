@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react';
 import { MapPin, Clock, Phone, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
-import { useAddresses } from '../lib/siteStore';
+import { fetchSiteAddresses, type SiteAddress } from '../lib/siteContentApi';
 
 interface ShowroomsProps {
   lang: Language;
@@ -10,7 +11,12 @@ interface ShowroomsProps {
 export default function Showrooms({ lang }: ShowroomsProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
-  const extraAddresses = useAddresses();
+  const [extraAddresses, setExtraAddresses] = useState<SiteAddress[]>([]);
+
+  useEffect(() => {
+    fetchSiteAddresses().then(setExtraAddresses).catch(() => setExtraAddresses([]));
+  }, []);
+
   const locations = [
     ...t.showrooms.locations,
     ...extraAddresses.map((a) => ({ name: a.name, address: a.address, hours: a.hours, phone: a.phone })),

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Search, CheckCircle2, AlertTriangle, Info, Plus, Save, Trash2, Globe } from 'lucide-react';
 import { BANNED_KEYWORDS, MANDATORY_DISCLAIMER, ADMIN_IMAGES } from '../adminMockData';
-import { fetchArticles, createArticle, updateArticle, type CmsArticle } from '../adminApi';
-import { useBlogPosts, saveBlogPosts, genId } from '../../lib/siteStore';
+import { fetchArticles, createArticle, updateArticle, createBlogPost, deleteBlogPost, type CmsArticle, type BlogPost } from '../adminApi';
+import { fetchBlogPosts } from '../../lib/siteContentApi';
 
 const STAGE_LABELS = ['Bản nháp', 'Chờ Hội đồng Y khoa', 'Đã xuất bản'];
 
@@ -33,30 +33,41 @@ export default function CmsPage() {
   const [showNewModal, setShowNewModal] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  const posts = useBlogPosts();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [newExcerpt, setNewExcerpt] = useState('');
   const [newBody, setNewBody] = useState('');
 
-  const publishPost = () => {
+  const loadPosts = () => {
+    fetchBlogPosts()
+      .then(setPosts)
+      .catch((e) => showToast(e instanceof Error ? e.message : 'Lỗi tải bài viết SEO'));
+  };
+
+  const publishPost = async () => {
     if (!newTitle.trim() || !newBody.trim()) return;
-    saveBlogPosts([
-      {
-        id: genId(),
+    try {
+      await createBlogPost({
         title: newTitle.trim(),
         excerpt: newExcerpt.trim() || newBody.trim().slice(0, 140),
         body: newBody.trim(),
-        createdAt: new Date().toLocaleDateString('vi-VN'),
-      },
-      ...posts,
-    ]);
-    setNewTitle('');
-    setNewExcerpt('');
-    setNewBody('');
+      });
+      setNewTitle('');
+      setNewExcerpt('');
+      setNewBody('');
+      loadPosts();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi đăng bài viết');
+    }
   };
 
-  const deletePost = (id: string) => {
-    saveBlogPosts(posts.filter((p) => p.id !== id));
+  const deletePost = async (id: string) => {
+    try {
+      await deleteBlogPost(id);
+      loadPosts();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá bài viết');
+    }
   };
 
   const load = () => {
@@ -72,6 +83,7 @@ export default function CmsPage() {
   };
 
   useEffect(load, []);
+  useEffect(loadPosts, []);
 
   const selected = articles.find((a) => a.id === selectedId) ?? null;
 
@@ -289,7 +301,7 @@ export default function CmsPage() {
                 <div key={p.id} className="flex items-start justify-between gap-3 bg-cream-50 rounded-xl p-3.5">
                   <div>
                     <p className="text-sm font-medium text-forest-900">{p.title}</p>
-                    <p className="text-xs text-forest-500 mt-0.5">{p.createdAt}</p>
+                    <p className="text-xs text-forest-500 mt-0.5">{new Date(p.created_at).toLocaleDateString('vi-VN')}</p>
                   </div>
                   <button
                     onClick={() => deletePost(p.id)}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, CheckCircle2 } from 'lucide-react';
-import { getLeads, saveLeads, genId, type B2BLeadType } from '../lib/siteStore';
+import { submitB2BLead, type B2BLeadType } from '../lib/siteContentApi';
 
 interface PartnerRegisterModalProps {
   type: B2BLeadType;
@@ -19,28 +19,29 @@ export default function PartnerRegisterModal({ type, onClose }: PartnerRegisterM
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!name.trim() || !phone.trim()) {
       setError('Vui lòng nhập họ tên và số điện thoại liên hệ.');
       return;
     }
-    const leads = getLeads();
-    saveLeads([
-      {
-        id: genId(),
+    setSubmitting(true);
+    try {
+      await submitB2BLead({
         type,
         name: name.trim(),
         phone: phone.trim(),
         email: email.trim(),
         message: message.trim(),
-        createdAt: new Date().toLocaleString('vi-VN'),
-        status: 'new',
-      },
-      ...leads,
-    ]);
-    setSubmitted(true);
+      });
+      setSubmitted(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Có lỗi xảy ra, vui lòng thử lại.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -120,8 +121,12 @@ export default function PartnerRegisterModal({ type, onClose }: PartnerRegisterM
 
               {error && <p className="text-xs text-red-600">{error}</p>}
 
-              <button onClick={submit} className="btn-gold text-sm w-full justify-center mt-2">
-                Gửi Đăng Ký
+              <button
+                onClick={submit}
+                disabled={submitting}
+                className="btn-gold text-sm w-full justify-center mt-2 disabled:opacity-60 disabled:pointer-events-none"
+              >
+                {submitting ? 'Đang gửi...' : 'Gửi Đăng Ký'}
               </button>
             </div>
           </>

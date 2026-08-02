@@ -1,15 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Trash2, MapPin, Phone, Share2, Handshake } from 'lucide-react';
 import {
-  useAddresses,
-  saveAddresses,
-  useContactSettings,
-  saveContactSettings,
-  useLeads,
-  saveLeads,
-  genId,
-  type StoredAddress,
-} from '../../lib/siteStore';
+  createSiteAddress,
+  deleteSiteAddress,
+  createContactPhone,
+  deleteContactPhone,
+  createSocialLink,
+  deleteSocialLink,
+  fetchB2BLeads,
+  markLeadContacted,
+  deleteLead,
+  type SiteAddress,
+  type ContactPhone,
+  type SocialLink,
+  type B2BLead,
+} from '../adminApi';
+import { fetchSiteAddresses, fetchContactPhones, fetchSocialLinks } from '../../lib/siteContentApi';
 
 const LEAD_TYPE_LABELS: Record<string, string> = {
   distributor: 'Nhà Phân Phối',
@@ -18,56 +24,124 @@ const LEAD_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function SettingsPage() {
-  const addresses = useAddresses();
-  const contact = useContactSettings();
-  const leads = useLeads();
+  const [addresses, setAddresses] = useState<SiteAddress[]>([]);
+  const [phones, setPhones] = useState<ContactPhone[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [leads, setLeads] = useState<B2BLead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const [newAddr, setNewAddr] = useState<Omit<StoredAddress, 'id'>>({
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2600);
+  };
+
+  const load = () => {
+    setLoading(true);
+    Promise.all([fetchSiteAddresses(), fetchContactPhones(), fetchSocialLinks(), fetchB2BLeads()])
+      .then(([a, p, s, l]) => {
+        setAddresses(a);
+        setPhones(p);
+        setSocialLinks(s);
+        setLeads(l);
+        setLoadError(null);
+      })
+      .catch((e) => setLoadError(e instanceof Error ? e.message : 'Lỗi tải dữ liệu'))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const [newAddr, setNewAddr] = useState<Omit<SiteAddress, 'id'>>({
     name: '',
     address: '',
     hours: '',
     phone: '(84) 984 999 309',
     category: 'showroom',
   });
-
   const [newPhoneLabel, setNewPhoneLabel] = useState('');
   const [newPhoneValue, setNewPhoneValue] = useState('');
   const [newPlatform, setNewPlatform] = useState('Facebook');
   const [newUrl, setNewUrl] = useState('');
 
-  const addAddress = () => {
+  const addAddress = async () => {
     if (!newAddr.name.trim() || !newAddr.address.trim()) return;
-    saveAddresses([...addresses, { ...newAddr, id: genId() }]);
-    setNewAddr({ name: '', address: '', hours: '', phone: '(84) 984 999 309', category: 'showroom' });
+    try {
+      await createSiteAddress(newAddr);
+      setNewAddr({ name: '', address: '', hours: '', phone: '(84) 984 999 309', category: 'showroom' });
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi thêm địa chỉ');
+    }
   };
-  const removeAddress = (id: string) => saveAddresses(addresses.filter((a) => a.id !== id));
+  const removeAddress = async (id: string) => {
+    try {
+      await deleteSiteAddress(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá địa chỉ');
+    }
+  };
 
-  const addPhone = () => {
+  const addPhone = async () => {
     if (!newPhoneLabel.trim() || !newPhoneValue.trim()) return;
-    saveContactSettings({
-      ...contact,
-      phones: [...contact.phones, { id: genId(), label: newPhoneLabel.trim(), value: newPhoneValue.trim() }],
-    });
-    setNewPhoneLabel('');
-    setNewPhoneValue('');
+    try {
+      await createContactPhone(newPhoneLabel.trim(), newPhoneValue.trim());
+      setNewPhoneLabel('');
+      setNewPhoneValue('');
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi thêm số điện thoại');
+    }
   };
-  const removePhone = (id: string) =>
-    saveContactSettings({ ...contact, phones: contact.phones.filter((p) => p.id !== id) });
+  const removePhone = async (id: string) => {
+    try {
+      await deleteContactPhone(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá số điện thoại');
+    }
+  };
 
-  const addSocial = () => {
+  const addSocial = async () => {
     if (!newUrl.trim()) return;
-    saveContactSettings({
-      ...contact,
-      socialLinks: [...contact.socialLinks, { id: genId(), platform: newPlatform, url: newUrl.trim() }],
-    });
-    setNewUrl('');
+    try {
+      await createSocialLink(newPlatform, newUrl.trim());
+      setNewUrl('');
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi thêm liên kết');
+    }
   };
-  const removeSocial = (id: string) =>
-    saveContactSettings({ ...contact, socialLinks: contact.socialLinks.filter((s) => s.id !== id) });
+  const removeSocial = async (id: string) => {
+    try {
+      await deleteSocialLink(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá liên kết');
+    }
+  };
 
-  const markContacted = (id: string) =>
-    saveLeads(leads.map((l) => (l.id === id ? { ...l, status: 'contacted' } : l)));
-  const removeLead = (id: string) => saveLeads(leads.filter((l) => l.id !== id));
+  const markContacted = async (id: string) => {
+    try {
+      await markLeadContacted(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi cập nhật trạng thái');
+    }
+  };
+  const removeLead = async (id: string) => {
+    try {
+      await deleteLead(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá đăng ký');
+    }
+  };
+
+  if (loading) return <p className="text-sm text-forest-500">Đang tải dữ liệu…</p>;
+  if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
 
   return (
     <div className="space-y-6">
@@ -75,7 +149,7 @@ export default function SettingsPage() {
         <p className="text-xs uppercase tracking-widest text-forest-500 mb-1">Cài đặt / Website công khai</p>
         <h1 className="font-display text-3xl text-forest-900">Địa Chỉ, Liên Hệ &amp; Đối Tác</h1>
         <p className="text-sm text-forest-500 mt-1">
-          Thay đổi ở đây hiển thị ngay trên trang chủ và footer khách hàng (lưu trên trình duyệt hiện tại).
+          Thay đổi ở đây lưu vào database thật và hiển thị ngay trên trang chủ và footer khách hàng.
         </p>
       </div>
 
@@ -119,7 +193,7 @@ export default function SettingsPage() {
           />
           <select
             value={newAddr.category}
-            onChange={(e) => setNewAddr({ ...newAddr, category: e.target.value as StoredAddress['category'] })}
+            onChange={(e) => setNewAddr({ ...newAddr, category: e.target.value as SiteAddress['category'] })}
             className="border border-forest-100 rounded-lg px-3 py-2 text-sm"
           >
             <option value="showroom">Showroom / Chi nhánh</option>
@@ -157,7 +231,7 @@ export default function SettingsPage() {
             <h3 className="font-display text-lg text-forest-900">Số điện thoại liên hệ</h3>
           </div>
           <div className="space-y-2 mb-4">
-            {contact.phones.map((p) => (
+            {phones.map((p) => (
               <div key={p.id} className="flex items-center justify-between bg-cream-50 rounded-xl p-3 text-sm">
                 <span><b>{p.label}</b>: {p.value}</span>
                 <button onClick={() => removePhone(p.id)} aria-label="Xoá số điện thoại" className="text-forest-400 hover:text-red-600">
@@ -179,7 +253,7 @@ export default function SettingsPage() {
             <h3 className="font-display text-lg text-forest-900">Mạng xã hội (Facebook, TikTok...)</h3>
           </div>
           <div className="space-y-2 mb-4">
-            {contact.socialLinks.map((s) => (
+            {socialLinks.map((s) => (
               <div key={s.id} className="flex items-center justify-between bg-cream-50 rounded-xl p-3 text-sm">
                 <span><b>{s.platform}</b>: <span className="text-forest-500 truncate">{s.url}</span></span>
                 <button onClick={() => removeSocial(s.id)} aria-label="Xoá liên kết" className="text-forest-400 hover:text-red-600 flex-shrink-0 ml-2">
@@ -233,7 +307,7 @@ export default function SettingsPage() {
                     </td>
                     <td className="px-4 py-3">{LEAD_TYPE_LABELS[l.type]}</td>
                     <td className="px-4 py-3 text-forest-600 max-w-xs truncate">{l.message || '—'}</td>
-                    <td className="px-4 py-3 text-forest-500">{l.createdAt}</td>
+                    <td className="px-4 py-3 text-forest-500">{new Date(l.created_at).toLocaleString('vi-VN')}</td>
                     <td className="px-4 py-3">
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${l.status === 'new' ? 'bg-gold-100 text-gold-700' : 'bg-forest-100 text-forest-600'}`}>
                         {l.status === 'new' ? 'Mới' : 'Đã liên hệ'}
@@ -256,6 +330,12 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
+
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-forest-950 text-cream-50 px-5 py-3 rounded-xl text-sm shadow-elegant-lg z-50 border border-gold-400/30">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
