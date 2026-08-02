@@ -30,6 +30,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
     { key: 'home', href: 'home' },
     { key: 'about', href: 'about' },
     { key: 'products', href: 'catalog' },
+    { key: 'trimico', href: 'trimico-catalog' },
     { key: 'research', href: 'research' },
     { key: 'traceability', href: 'traceability' },
     { key: 'b2b', href: 'b2b' },

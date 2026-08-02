@@ -1,5 +1,5 @@
 export type HealthGoal = 'energy' | 'stress' | 'immunity' | 'youth';
-export type TargetAudience = 'men' | 'women' | 'seniors' | 'executives';
+export type TargetAudience = 'men' | 'women' | 'seniors' | 'executives' | 'family';
 
 export interface Product {
   id: string;
@@ -21,6 +21,7 @@ export interface Product {
   rating: number;
   reviews: number;
   subscriptionEligible?: boolean;
+  familySafe?: boolean;
 }
 
 export const healthGoalLabels: Record<HealthGoal, { en: string; vi: string; icon: string }> = {
@@ -35,6 +36,7 @@ export const audienceLabels: Record<TargetAudience, { en: string; vi: string }> 
   women:      { en: 'Women',      vi: 'Nữ'               },
   seniors:    { en: 'Seniors',    vi: 'Người Lớn Tuổi'   },
   executives: { en: 'Executives', vi: 'Doanh Nhân'       },
+  family:     { en: 'Family',     vi: 'Gia Đình'         },
 };
 
 // Mảng dữ liệu sản phẩm mẫu (fake, ảnh Unsplash) trước đây đã bị xóa khỏi đây —

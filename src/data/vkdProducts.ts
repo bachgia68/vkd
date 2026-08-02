@@ -636,7 +636,7 @@ export interface CartCompatibleProduct {
   nameVi: string;
   category: string;
   healthGoal: 'energy' | 'stress' | 'immunity' | 'youth';
-  audiences: ('men' | 'women' | 'seniors' | 'executives')[];
+  audiences: ('men' | 'women' | 'seniors' | 'executives' | 'family')[];
   priceUSD: number;
   priceVND: number;
   priceJPY: number;
@@ -649,6 +649,7 @@ export interface CartCompatibleProduct {
   badge: string;
   rating: number;
   reviews: number;
+  familySafe?: boolean;
 }
 
 const healthGoalByCategory: Record<CategoryId, CartCompatibleProduct['healthGoal']> = {
@@ -658,15 +659,27 @@ const healthGoalByCategory: Record<CategoryId, CartCompatibleProduct['healthGoal
   cosmetics: 'youth',
 };
 
+// Nhóm rượu (tea_wine) chỉ gồm SP có cồn → chỉ Nam/Doanh nhân, không an toàn cho gia đình/trẻ em.
+// Trà & bánh nhẹ trong "supplements" (không cồn, không caffeine cao) mới đưa vào nhóm Gia đình.
+const audiencesByCategory: Record<CategoryId, CartCompatibleProduct['audiences']> = {
+  ginseng: ['men', 'women', 'seniors', 'executives'],
+  supplements: ['men', 'women', 'seniors'],
+  tea_wine: ['men', 'executives'],
+  cosmetics: ['women'],
+};
+
+const familySafeSlugs = new Set(['banh-sam-ngoc-linh-panaxx-cookie', 'tra-sam-ngoc-linh']);
+
 export function toCartProduct(p: VKDProduct): CartCompatibleProduct {
   const priceUSD = Math.round((p.price / VND_PER_USD) * 100) / 100;
+  const familySafe = familySafeSlugs.has(p.slug);
   return {
     id: p.sku,
     name: p.name,
     nameVi: p.name,
     category: p.category,
     healthGoal: healthGoalByCategory[p.category],
-    audiences: ['men', 'women', 'seniors', 'executives'],
+    audiences: familySafe ? [...audiencesByCategory[p.category], 'family'] : audiencesByCategory[p.category],
     priceUSD,
     priceVND: p.price,
     priceJPY: Math.round(priceUSD * 150),
@@ -679,5 +692,6 @@ export function toCartProduct(p: VKDProduct): CartCompatibleProduct {
     badge: p.badge ?? '',
     rating: p.rating,
     reviews: p.reviews,
+    familySafe,
   };
 }

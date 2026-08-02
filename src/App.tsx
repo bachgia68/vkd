@@ -16,6 +16,10 @@ import OmniChannel from './components/OmniChannel';
 import Footer from './components/Footer';
 import VKDProductCatalog from './components/VKDProductCatalog';
 import VKDProductDetail from './components/VKDProductDetail';
+import TrimicoProductCatalog from './components/TrimicoProductCatalog';
+import TrimicoProductDetail from './components/TrimicoProductDetail';
+import TrimicoTeaser from './components/TrimicoTeaser';
+import ProductAdvisor from './components/ProductAdvisor';
 import ResearchHub from './components/ResearchHub';
 import CartDrawer from './components/CartDrawer';
 import Checkout from './components/Checkout';
@@ -26,7 +30,18 @@ import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
 import ChatWidget from './components/ChatWidget';
 import type { Language } from './i18n/translations';
 
-type Page = 'home' | 'catalog' | 'product-detail' | 'research' | 'checkout' | 'order-success' | 'loyalty' | 'autoship' | 'trace';
+type Page =
+  | 'home'
+  | 'catalog'
+  | 'product-detail'
+  | 'trimico-catalog'
+  | 'trimico-product-detail'
+  | 'research'
+  | 'checkout'
+  | 'order-success'
+  | 'loyalty'
+  | 'autoship'
+  | 'trace';
 
 function App() {
   const [lang, setLang] = useState<Language>('vi');
@@ -92,9 +107,11 @@ function App() {
             <>
               <Hero lang={lang} onNavigate={navigate} />
               <Stats lang={lang} />
+              <ProductAdvisor lang={lang} onNavigate={navigate} />
               <About lang={lang} />
               <Heritage lang={lang} />
               <Products lang={lang} onNavigate={navigate} />
+              <TrimicoTeaser onNavigate={navigate} />
               <OmniChannel lang={lang} onNavigate={navigate} />
               <Showrooms lang={lang} />
               <Traceability lang={lang} />
@@ -110,6 +127,14 @@ function App() {
 
           {currentPage === 'product-detail' && (
             <VKDProductDetail slug={selectedSlug} lang={lang} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'trimico-catalog' && (
+            <TrimicoProductCatalog lang={lang} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'trimico-product-detail' && (
+            <TrimicoProductDetail slug={selectedSlug} onNavigate={navigate} />
           )}
 
           {currentPage === 'research' && (
