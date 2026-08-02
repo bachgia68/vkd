@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3 } from 'lucide-react';
+import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 
 const NAV = [
@@ -11,6 +11,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/cms', end: false, label: 'Duyệt Bài CMS', icon: FileText },
   { to: '/gate-vkd-control-2026/crm-erp', end: false, label: 'CRM & ERP', icon: Users },
   { to: '/gate-vkd-control-2026/inventory-qr', end: false, label: 'Kho hàng & QR', icon: Warehouse },
+  { to: '/gate-vkd-control-2026/settings', end: false, label: 'Địa chỉ & Liên hệ', icon: Settings },
 ];
 
 export default function AdminLayout() {
@@ -22,7 +23,7 @@ export default function AdminLayout() {
         <div className="container-wide flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <Leaf className="w-5 h-5 text-gold-400" />
-            <span className="font-display text-sm tracking-wide">Võ Kim Đường — Control Portal</span>
+            <span className="font-display text-sm tracking-wide">TA — Control Portal</span>
           </div>
           <nav className="hidden md:flex items-center gap-1">
             {NAV.map((item) => (

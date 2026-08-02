@@ -10,6 +10,7 @@ import ProductsPage from './pages/ProductsPage';
 import AgentsPage from './pages/AgentsPage';
 import ShowroomsPage from './pages/ShowroomsPage';
 import RevenuePage from './pages/RevenuePage';
+import SettingsPage from './pages/SettingsPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -32,6 +33,7 @@ export default function AdminApp() {
           <Route path="agents" element={<AgentsPage />} />
           <Route path="showrooms" element={<ShowroomsPage />} />
           <Route path="revenue" element={<RevenuePage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </AdminAuthProvider>

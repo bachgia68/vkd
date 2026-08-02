@@ -1,6 +1,7 @@
 import { MapPin, Clock, Phone, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { useAddresses } from '../lib/siteStore';
 
 interface ShowroomsProps {
   lang: Language;
@@ -9,6 +10,11 @@ interface ShowroomsProps {
 export default function Showrooms({ lang }: ShowroomsProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const extraAddresses = useAddresses();
+  const locations = [
+    ...t.showrooms.locations,
+    ...extraAddresses.map((a) => ({ name: a.name, address: a.address, hours: a.hours, phone: a.phone })),
+  ];
 
   return (
     <section id="showrooms"  className="section-padding bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -31,7 +37,7 @@ export default function Showrooms({ lang }: ShowroomsProps) {
 
         {/* Showroom cards */}
         <div className="grid md:grid-cols-2 gap-6">
-          {t.showrooms.locations.map((location, index) => (
+          {locations.map((location, index) => (
             <div
               key={index}
               className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-cream-50 to-cream-100 border border-cream-200 p-8 transition-all duration-500 hover:shadow-elegant-lg hover:border-gold-300"

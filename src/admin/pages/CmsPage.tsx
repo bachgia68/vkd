@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Search, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
+import { Search, CheckCircle2, AlertTriangle, Info, Plus, Trash2, Globe } from 'lucide-react';
 import { ARTICLES, BANNED_KEYWORDS, MANDATORY_DISCLAIMER, ADMIN_IMAGES, type Article, type ArticleStage } from '../adminMockData';
+import { useBlogPosts, saveBlogPosts, genId } from '../../lib/siteStore';
 
 const STAGE_LABELS = ['Bản nháp', 'Chờ Hội đồng Y khoa', 'Đã xuất bản'];
 
@@ -27,6 +28,32 @@ export default function CmsPage() {
   const [selectedId, setSelectedId] = useState(articles[2].id);
   const [bodies, setBodies] = useState<Record<number, string>>({});
   const [scan, setScan] = useState<{ clean: boolean; hits: string[]; text: string } | null>(null);
+
+  const posts = useBlogPosts();
+  const [newTitle, setNewTitle] = useState('');
+  const [newExcerpt, setNewExcerpt] = useState('');
+  const [newBody, setNewBody] = useState('');
+
+  const publishPost = () => {
+    if (!newTitle.trim() || !newBody.trim()) return;
+    saveBlogPosts([
+      {
+        id: genId(),
+        title: newTitle.trim(),
+        excerpt: newExcerpt.trim() || newBody.trim().slice(0, 140),
+        body: newBody.trim(),
+        createdAt: new Date().toLocaleDateString('vi-VN'),
+      },
+      ...posts,
+    ]);
+    setNewTitle('');
+    setNewExcerpt('');
+    setNewBody('');
+  };
+
+  const deletePost = (id: string) => {
+    saveBlogPosts(posts.filter((p) => p.id !== id));
+  };
 
   const selected = articles.find((a) => a.id === selectedId)!;
   const body = bodies[selected.id] ?? selected.body;
@@ -146,6 +173,75 @@ export default function CmsPage() {
               )}
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Blog SEO công khai — hiện thẳng lên trang chủ, không qua quy trình duyệt y khoa */}
+      <div className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant">
+        <div className="flex items-center gap-2 mb-1">
+          <Globe className="w-4 h-4 text-gold-600" />
+          <h3 className="font-display text-lg text-forest-900">Bài viết SEO công khai (hiển thị ngay trên trang chủ)</h3>
+        </div>
+        <p className="text-xs text-forest-500 mb-5">
+          Khác với quy trình duyệt y khoa ở trên — bài viết ở đây xuất bản ngay lập tức lên mục "Bài Viết Từ TA" trên
+          trang chủ khách hàng.
+        </p>
+
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6">
+          <div className="space-y-3">
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Tiêu đề</label>
+              <input
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                placeholder="Tiêu đề bài viết"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Tóm tắt ngắn (tuỳ chọn)</label>
+              <input
+                value={newExcerpt}
+                onChange={(e) => setNewExcerpt(e.target.value)}
+                className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                placeholder="Hiện trên thẻ bài viết ở trang chủ"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Nội dung</label>
+              <textarea
+                value={newBody}
+                onChange={(e) => setNewBody(e.target.value)}
+                className="w-full min-h-28 border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                placeholder="Nội dung đầy đủ bài viết..."
+              />
+            </div>
+            <button onClick={publishPost} className="btn-gold text-xs">
+              <Plus className="w-4 h-4" /> Đăng bài lên trang chủ
+            </button>
+          </div>
+
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {posts.length === 0 ? (
+              <p className="text-sm text-forest-400">Chưa có bài viết SEO nào được đăng.</p>
+            ) : (
+              posts.map((p) => (
+                <div key={p.id} className="flex items-start justify-between gap-3 bg-cream-50 rounded-xl p-3.5">
+                  <div>
+                    <p className="text-sm font-medium text-forest-900">{p.title}</p>
+                    <p className="text-xs text-forest-500 mt-0.5">{p.createdAt}</p>
+                  </div>
+                  <button
+                    onClick={() => deletePost(p.id)}
+                    aria-label="Xoá bài viết"
+                    className="text-forest-400 hover:text-red-600 flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

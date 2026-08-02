@@ -30,7 +30,7 @@ export default function AdminLogin() {
         <div className="relative h-full flex flex-col justify-end p-14">
           <span className="text-gold-400 text-xs tracking-[0.2em] uppercase mb-3">Enterprise Control</span>
           <h2 className="font-display text-4xl text-cream-50 leading-tight max-w-md">
-            Vận hành nội bộ Võ Kim Đường
+            Vận hành nội bộ TA
           </h2>
           <p className="text-cream-200/70 text-sm mt-4 max-w-sm leading-relaxed">
             Khu vực dành riêng cho đội ngũ vận hành: nội dung y khoa, CRM &amp; ERP khách hàng VIP,
@@ -46,7 +46,7 @@ export default function AdminLogin() {
               <ShieldCheck className="w-5 h-5 text-gold-400" />
             </div>
             <div>
-              <p className="text-cream-50 font-display text-lg leading-none">Võ Kim Đường</p>
+              <p className="text-cream-50 font-display text-lg leading-none">TA</p>
               <p className="text-gold-400/80 text-[10px] tracking-[0.18em] uppercase mt-1">Control Portal</p>
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function AdminLogin() {
 
           <p className="text-cream-500/40 text-xs mt-10 leading-relaxed">
             Đây là khu vực nội bộ không được liên kết từ menu công khai. Nếu bạn không thuộc đội
-            ngũ vận hành VKD, vui lòng quay lại{' '}
+            ngũ vận hành TA, vui lòng quay lại{' '}
             <a href="/" className="text-gold-400/80 hover:text-gold-400 underline underline-offset-2">
               trang chủ
             </a>

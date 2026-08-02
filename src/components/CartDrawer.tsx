@@ -73,7 +73,7 @@ export default function CartDrawer({ lang, onCheckout }: CartDrawerProps) {
                 <div className="w-20 h-24 rounded-lg overflow-hidden flex-shrink-0">
                   <img
                     src={item.image}
-                    alt={`VKD Group Premium ${item.name}`}
+                    alt={`TA Premium ${item.name}`}
                     className="w-full h-full object-cover"
                   />
                 </div>

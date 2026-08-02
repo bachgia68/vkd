@@ -22,7 +22,7 @@ export default function Hero({ lang, onNavigate }: HeroProps) {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/assets/images/cay-sam-vkd.png')`,
+            backgroundImage: `url('/assets/images/cay-sam-ngoc-linh.png')`,
             backgroundPosition: 'center 30%',
           }}
         />

@@ -1,6 +1,7 @@
-import { MapPin, Phone, Mail, Share2, Globe, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Share2, MessageCircle, Music2, Video, Link2 } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations, languageNames } from '../i18n/translations';
+import { useContactSettings } from '../lib/siteStore';
 
 interface FooterProps {
   lang: Language;
@@ -8,9 +9,19 @@ interface FooterProps {
   onNavigate?: (page: string) => void;
 }
 
+const SOCIAL_ICONS: Record<string, typeof Share2> = {
+  Facebook: Link2,
+  TikTok: Music2,
+  YouTube: Video,
+  Instagram: Link2,
+  Zalo: MessageCircle,
+  WhatsApp: Share2,
+};
+
 export default function Footer({ lang, onLangChange }: FooterProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const contact = useContactSettings();
 
   const navItems = [
     { key: 'home', href: '#home' },
@@ -33,7 +44,7 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
             <div className="mb-6">
               <img
                 src="/assets/images/logo-sam-ngoc-linh.png"
-                alt="VKD Group"
+                alt="TA — Sàn giao dịch Sâm Ngọc Linh"
                 className="h-16 w-auto object-contain"
               />
             </div>
@@ -44,26 +55,21 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
 
             {/* Social Links */}
             <div className="flex items-center gap-4">
-              <a
-                href="https://www.facebook.com/tapdoanyduocsamngoclinhvn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-forest-800 hover:bg-forest-600 flex items-center justify-center transition-colors"
-              >
-                <Share2 className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-lg bg-forest-800 hover:bg-forest-600 flex items-center justify-center transition-colors"
-              >
-                <Globe className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-lg bg-forest-800 hover:bg-forest-600 flex items-center justify-center transition-colors"
-              >
-                <MessageCircle className="w-5 h-5" />
-              </a>
+              {contact.socialLinks.map((link) => {
+                const Icon = SOCIAL_ICONS[link.platform] ?? Link2;
+                return (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.platform}
+                    className="w-10 h-10 rounded-lg bg-forest-800 hover:bg-forest-600 flex items-center justify-center transition-colors"
+                  >
+                    <Icon className="w-5 h-5" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -92,15 +98,20 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
                 <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
                 <span className="text-forest-300">{t.footer.address}</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-gold-400 flex-shrink-0" />
-                <a href="tel:1800282866" className="text-forest-300 hover:text-white transition-colors">
-                  {t.footer.phone}
-                </a>
-              </li>
+              {contact.phones.map((phone) => (
+                <li key={phone.id} className="flex items-center gap-3">
+                  <Phone className="w-5 h-5 text-gold-400 flex-shrink-0" />
+                  <a
+                    href={`tel:${phone.value.replace(/[^\d+]/g, '')}`}
+                    className="text-forest-300 hover:text-white transition-colors"
+                  >
+                    {phone.label}: {phone.value}
+                  </a>
+                </li>
+              ))}
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
-                <a href="mailto:info@vkdnature.com" className="text-forest-300 hover:text-white transition-colors">
+                <a href="mailto:lienhe@samngoclinh-ta.vn" className="text-forest-300 hover:text-white transition-colors">
                   {t.footer.email}
                 </a>
               </li>

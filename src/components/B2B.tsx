@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Building2, TrendingUp, Package, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import PartnerRegisterModal from './PartnerRegisterModal';
+import type { B2BLeadType } from '../lib/siteStore';
 
 interface B2BProps {
   lang: Language;
@@ -9,25 +12,29 @@ interface B2BProps {
 export default function B2B({ lang }: B2BProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const [openType, setOpenType] = useState<B2BLeadType | null>(null);
 
-  const partnershipTypes = [
+  const partnershipTypes: { icon: typeof Building2; title: string; desc: string; color: string; type: B2BLeadType }[] = [
     {
       icon: Building2,
       title: t.b2b.distributorTitle,
       desc: t.b2b.distributorDesc,
       color: 'forest',
+      type: 'distributor',
     },
     {
       icon: TrendingUp,
       title: t.b2b.investorTitle,
       desc: t.b2b.investorDesc,
       color: 'gold',
+      type: 'investor',
     },
     {
       icon: Package,
       title: t.b2b.oemTitle,
       desc: t.b2b.oemDesc,
       color: 'forest',
+      type: 'oem',
     },
   ];
 
@@ -58,7 +65,11 @@ export default function B2B({ lang }: B2BProps) {
             const isGold = type.color === 'gold';
 
             return (
-              <div key={index} className="bg-white rounded-2xl p-8 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 group hover:-translate-y-1">
+              <button
+                key={index}
+                onClick={() => setOpenType(type.type)}
+                className="text-left bg-white rounded-2xl p-8 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 group hover:-translate-y-1"
+              >
                 <div
                   className={`w-16 h-16 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 ${
                     isGold ? 'bg-gold-100 group-hover:bg-gold-200' : 'bg-forest-100 group-hover:bg-forest-200'
@@ -82,7 +93,7 @@ export default function B2B({ lang }: B2BProps) {
                   </span>
                   <ArrowRight className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${isRTL ? 'rotate-180' : ''}`} />
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -122,13 +133,15 @@ export default function B2B({ lang }: B2BProps) {
             <div className="text-forest-700 font-medium">
               {t.b2b.title}
             </div>
-            <a href="#contact" className="btn-gold">
+            <button onClick={() => setOpenType('distributor')} className="btn-gold">
               {t.b2b.cta}
               <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      {openType && <PartnerRegisterModal type={openType} onClose={() => setOpenType(null)} />}
     </section>
   );
 }

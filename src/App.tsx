@@ -11,7 +11,7 @@ import Showrooms from './components/Showrooms';
 import Traceability from './components/Traceability';
 import B2B from './components/B2B';
 import Certifications from './components/Certifications';
-import NewsFeed from './components/NewsFeed';
+import Blog from './components/Blog';
 import OmniChannel from './components/OmniChannel';
 import Footer from './components/Footer';
 import VKDProductCatalog from './components/VKDProductCatalog';
@@ -94,7 +94,7 @@ function App() {
               <Traceability lang={lang} />
               <B2B lang={lang} />
               <Certifications lang={lang} />
-              <NewsFeed lang={lang} />
+              <Blog />
             </>
           )}
 
