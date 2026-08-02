@@ -46,11 +46,11 @@ const certNames: Record<Language, { cgmp: string; haccp: string; iso9001: string
 };
 
 const certDesc: Record<Language, string> = {
-  vi: 'Chứng chỉ gốc — Tập Đoàn Y Dược Sâm Ngọc Linh Việt Nam',
-  en: 'Original certificate — Vietnam Ngoc Linh Ginseng Pharma Group',
-  zh: '原始证书 — 越南玉琳参医药集团',
-  fr: 'Certificat original — Groupe Pharmaceutique Ngoc Linh Vietnam',
-  ar: 'الشهادة الأصلية — مجموعة نوك لين الدوائية الفيتنامية',
+  vi: 'Chứng chỉ gốc — sản phẩm chính hãng TA',
+  en: 'Original certificate — Authentic TA product',
+  zh: '原始证书 — TA正品认证',
+  fr: 'Certificat original — Produit authentique TA',
+  ar: 'الشهادة الأصلية — منتج TA أصلي',
 };
 
 export default function Certifications({ lang }: CertificationsProps) {

@@ -39,6 +39,7 @@ const BANNED_PATTERNS = [
   /\bTRIMICO\b/i,
   /Tri[eế]t\s*Minh/i,
   /V[oõ]\s*Kim\s*Đư[oờ]ng/i,
+  /T[aậ]p\s*Đo[aà]n\s*Y\s*Dư[oợ]c\s*S[aâ]m\s*Ng[oọ]c\s*Linh/i,
 ];
 
 // Dòng chứa các chuỗi này được phép (dùng cho comment giải thích rule, tên biến kỹ thuật, v.v.)
@@ -73,7 +74,11 @@ const TYPE_DECLARATION = /:\s*string;\s*$/;
 // cho khách dưới dạng TEXT — chỉ là identifier/URL/đường dẫn asset nội bộ):
 // "sku": "VKD-001", "supplierId": "vkd", "sourceUrl": "https://...trimico.vn/...",
 // "image": "/products/trimico/01-....png" (đường dẫn asset, không phải text hiển thị).
-const PRODUCTS_JSON_ID_FIELD = /^\s*"(sku|supplierId|sourceUrl|image)"\s*:/;
+// "slug" cũng là identifier nội bộ (dùng cho routing/URL, không phải text hiển thị) —
+// cùng nhóm với sku/supplierId. LƯU Ý: một số giá trị slug hiện chứa "trimico" literal
+// (vd "tra-sam-ngoc-linh-trimico") — bản thân các slug này có thể cần dọn lại khi làm
+// routing trang chi tiết sản phẩm sau này; việc đó nằm ngoài phạm vi guard này.
+const PRODUCTS_JSON_ID_FIELD = /^\s*"(sku|supplierId|sourceUrl|image|slug)"\s*:/;
 // Khai báo type nội bộ (vd: export type SupplierId = 'vkd' | 'trimico';) không phải
 // text hiển thị cho khách — cần thiết để code phân loại NCC ở tầng data.
 const SUPPLIER_TYPE_ALIAS = /^\s*export\s+type\s+SupplierId\s*=/;
@@ -84,12 +89,28 @@ const allFiles = [
   ...PRODUCTS_DATA_FILES.map((f) => path.join(root, f)).filter(fs.existsSync),
 ];
 
+const productsDataFullPaths = new Set(
+  PRODUCTS_DATA_FILES.map((f) => path.join(root, f)).filter(fs.existsSync)
+);
+
 const violations = [];
 for (const file of allFiles) {
+  const isProductsDataFile = productsDataFullPaths.has(file);
   const lines = fs.readFileSync(file, 'utf-8').split('\n');
   lines.forEach((line, i) => {
     if (EXCEPTION_MARKERS.some((m) => line.includes(m))) return;
-    if (IDENTIFIER_ADJACENT.test(line)) return;
+    // IDENTIFIER_ADJACENT bảo vệ route/slug identifier trong code (vd:
+    // onNavigate('trimico-catalog')) — hợp lệ áp dụng toàn dòng cho file
+    // component/i18n. Nhưng trong products.ts, một field hiển thị (name/description/
+    // badge...) có thể vô tình chứa "trimico"/"vkd" sát dấu gạch ngang trong câu văn
+    // (vd tương lai: "name": "TRIMICO-MITRI Tea") — nếu miễn trừ toàn dòng ở đây thì
+    // lộ tên NCC sẽ lọt qua guard. Nên với products.ts, chỉ cho IDENTIFIER_ADJACENT
+    // miễn trừ khi dòng đó CŨNG là field định danh nội bộ đã biết (sku/supplierId/
+    // sourceUrl/image/slug) — không áp dụng cho các field text hiển thị khác.
+    if (IDENTIFIER_ADJACENT.test(line)) {
+      if (!isProductsDataFile) return;
+      if (PRODUCTS_JSON_ID_FIELD.test(line)) return;
+    }
     if (NON_DISPLAY.test(line)) return;
     if (TYPE_DECLARATION.test(line)) return;
     if (PRODUCTS_JSON_ID_FIELD.test(line)) return;

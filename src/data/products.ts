@@ -212,7 +212,7 @@ export const products: Product[] = [
     "giftEligible": false,
     "badge": "Cao cấp",
     "activeIngredient": "Sâm Ngọc Linh ngâm ủ truyền thống",
-    "description": "Dòng rượu Ngọc Đế cao cấp, ngâm ủ truyền thống cùng Sâm Ngọc Linh — sản phẩm của Tập Đoàn Y Dược Sâm Ngọc Linh Việt Nam.",
+    "description": "Dòng rượu Ngọc Đế cao cấp, ngâm ủ truyền thống cùng Sâm Ngọc Linh — sản phẩm chính hãng TA.",
     "volume": "750ml",
     "warnings": "Không dành cho người dưới 18 tuổi, phụ nữ mang thai hoặc đang cho con bú.",
     "sourceUrl": "https://samngoclinhvkdgroup.com/san-pham/ruou-ngoc-de-thien-huong-750ml/"
@@ -279,7 +279,7 @@ export const products: Product[] = [
     "familySafe": false,
     "giftEligible": false,
     "activeIngredient": "Sâm Ngọc Linh 8+ năm tuổi",
-    "description": "Rượu Ngọc Đế dòng Thăng Long, chai cao — sản phẩm của Tập Đoàn Y Dược Sâm Ngọc Linh Việt Nam.",
+    "description": "Rượu Ngọc Đế dòng Thăng Long, chai cao — sản phẩm chính hãng TA.",
     "volume": "500ml",
     "warnings": "Không dành cho người dưới 18 tuổi, phụ nữ đang mang thai.",
     "sourceUrl": "https://samngoclinhvkdgroup.com/san-pham/ruou-ngoc-de-thang-long-chai-cao-500ml/"
