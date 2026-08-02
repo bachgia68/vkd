@@ -2,8 +2,7 @@ import { useMemo, useState } from 'react';
 import { ArrowRight, RotateCcw, ShoppingBag, Sparkles } from 'lucide-react';
 import type { HealthGoal, TargetAudience } from '../data/mockData';
 import { healthGoalLabels, audienceLabels } from '../data/mockData';
-import { vkdProducts, toCartProduct } from '../data/vkdProducts';
-import { trimicoProducts, toTrimicoCartProduct } from '../data/trimicoProducts';
+import { products, toCartProduct } from '../data/products';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
 
@@ -11,7 +10,8 @@ import type { Language } from '../i18n/translations';
  * ProductAdvisor — "Tìm Sản Phẩm Phù Hợp Trong 10 Giây"
  * -----------------------------------------------------------------------------
  * Khôi phục từ GinsengAdvisor.tsx (bản cũ, đã gỡ khi dữ liệu sản phẩm mẫu/fake bị
- * xóa). Bản mới chạy trên dữ liệu SẢN PHẨM THẬT của cả VKD + TRIMICO, không hiển
+ * xóa). Bản mới chạy trên dữ liệu SẢN PHẨM THẬT của cả hai nguồn NCC (nội bộ,
+ * gộp hiển thị dưới brand TA — supplier-guard-allow), không hiển
  * thị rating/reviews giả (đã bị gỡ khỏi UI toàn site — xem update-vkd-products
  * skill), và bổ sung nhóm "Gia Đình" — CHỈ gợi ý sản phẩm được đánh dấu
  * `familySafe` (không rượu, không sâm/mật ong cô đặc, không liều dùng theo bệnh lý).
@@ -47,12 +47,10 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
   const audiences = Object.keys(audienceLabels) as TargetAudience[];
 
   const pool = useMemo(
-    () => [
-      ...vkdProducts.map(toCartProduct),
-      ...trimicoProducts
+    () =>
+      products
         .filter((p) => p.price != null && !p.displayOnly18Plus)
-        .map(toTrimicoCartProduct),
-    ],
+        .map(toCartProduct),
     []
   );
 
@@ -83,7 +81,7 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
 
   const viewAllMatching = () => {
     if (!match) return;
-    onNavigate(match.id.startsWith('TRM-') ? 'trimico-catalog' : 'catalog');
+    onNavigate('catalog');
   };
 
   return (
@@ -103,8 +101,8 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
           </h2>
           <p className="text-forest-600 text-lg mt-4">
             {isVi
-              ? 'Trả lời 2 câu hỏi ngắn — hệ thống đề xuất sản phẩm phù hợp nhất từ toàn bộ danh mục VKD Group & TRIMICO.'
-              : 'Answer two quick questions for an instant, personalized recommendation across VKD Group & TRIMICO.'}
+              ? 'Trả lời 2 câu hỏi ngắn — hệ thống đề xuất sản phẩm phù hợp nhất từ toàn bộ danh mục TA.'
+              : 'Answer two quick questions for an instant, personalized recommendation across the full TA catalog.'}
           </p>
         </div>
 
@@ -126,7 +124,7 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
                 {isVi ? 'Câu 1 / 2' : 'Question 1 / 2'}
               </span>
               <h3 className="font-display text-2xl md:text-3xl text-forest-900 mt-2 mb-8">
-                {isVi ? 'Bạn là ai?' : 'Who are you shopping for?'}
+                {isVi ? 'Ai sẽ dùng sản phẩm?' : 'Who will use the product?'}
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 {audiences.map((a) => (
