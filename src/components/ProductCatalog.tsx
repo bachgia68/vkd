@@ -423,7 +423,7 @@ function ProductCard({
   onNavigate: (page: string, slug?: string) => void;
 }) {
   const { addToCart } = useCart();
-  const canOrder = product.price != null;
+  const canOrder = product.price != null && !product.displayOnly18Plus;
 
   return (
     <div className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-cream-200 hover:border-gold-300 transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1">
@@ -447,6 +447,13 @@ function ProductCard({
           <div className="absolute top-3 left-3">
             <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-gold-400 text-forest-900 shadow-sm">
               {product.badge}
+            </span>
+          </div>
+        )}
+        {product.displayOnly18Plus && (
+          <div className="absolute top-3 right-3">
+            <span className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full bg-red-600 text-white shadow-sm">
+              18+ Trưng bày
             </span>
           </div>
         )}
