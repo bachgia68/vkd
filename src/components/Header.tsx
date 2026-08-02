@@ -3,6 +3,7 @@ import { Menu, X, Globe, ChevronDown, ShoppingBag } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations, languageNames } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
+import { productTypes } from '../data/productTypes';
 
 interface HeaderProps {
   lang: Language;
@@ -17,6 +18,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +31,8 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
   const navItems = [
     { key: 'home', href: 'home' },
     { key: 'about', href: 'about' },
-    { key: 'products', href: 'catalog' },
+    { key: 'products', href: 'catalog' }, // render dropdown riêng, xem desktop nav
+    { key: 'giftSets', href: 'catalog?type=set-qua-tang' },
     { key: 'research', href: 'research' },
     { key: 'traceability', href: 'traceability' },
     { key: 'b2b', href: 'b2b' },
@@ -75,21 +78,62 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            {navItems.map((item) => (
-              <button
-                key={item.key}
-                onClick={() => handleNav(item.href)}
-                className={`nav-link text-sm font-medium tracking-wide ${
-                  currentPage === item.href
-                    ? 'text-gold-600'
-                    : useLightText
-                    ? 'text-white/90 hover:text-white'
-                    : 'text-forest-700 hover:text-forest-900'
-                }`}
-              >
-                {t.nav[item.key as keyof typeof t.nav] || item.key}
-              </button>
-            ))}
+            {navItems.map((item) =>
+              item.key === 'products' ? (
+                <div
+                  key={item.key}
+                  className="relative"
+                  onMouseEnter={() => setIsProductMenuOpen(true)}
+                  onMouseLeave={() => setIsProductMenuOpen(false)}
+                >
+                  <button
+                    onClick={() => handleNav('catalog')}
+                    className={`nav-link text-sm font-medium tracking-wide flex items-center gap-1 ${
+                      currentPage === item.href
+                        ? 'text-gold-600'
+                        : useLightText
+                        ? 'text-white/90 hover:text-white'
+                        : 'text-forest-700 hover:text-forest-900'
+                    }`}
+                  >
+                    {t.nav.products}
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                  {isProductMenuOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-72 bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3 z-50">
+                      {productTypes
+                        .filter((pt) => pt.id !== 'set-qua-tang')
+                        .map((pt) => (
+                          <button
+                            key={pt.id}
+                            onClick={() => {
+                              setIsProductMenuOpen(false);
+                              onNavigate(`catalog?type=${pt.id}`);
+                            }}
+                            className="w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                          >
+                            {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  key={item.key}
+                  onClick={() => handleNav(item.href)}
+                  className={`nav-link text-sm font-medium tracking-wide ${
+                    currentPage === item.href
+                      ? 'text-gold-600'
+                      : useLightText
+                      ? 'text-white/90 hover:text-white'
+                      : 'text-forest-700 hover:text-forest-900'
+                  }`}
+                >
+                  {t.nav[item.key as keyof typeof t.nav] || item.key}
+                </button>
+              )
+            )}
           </div>
 
           {/* Right Actions */}

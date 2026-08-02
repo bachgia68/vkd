@@ -5,7 +5,7 @@ export interface Translation {
     home: string;
     about: string;
     products: string;
-    trimico: string;
+    giftSets: string;
     research: string;
     traceability: string;
     b2b: string;
@@ -138,7 +138,7 @@ export const translations: Record<Language, Translation> = {
       home: 'Trang chủ',
       about: 'Giới thiệu',
       products: 'Sản phẩm',
-      trimico: 'Trimico',
+      giftSets: 'Set Quà Tặng',
       research: 'Nghiên Cứu',
       traceability: 'Truy xuất',
       b2b: 'Hợp tác',
@@ -274,7 +274,7 @@ export const translations: Record<Language, Translation> = {
       home: 'Home',
       about: 'About',
       products: 'Products',
-      trimico: 'Trimico',
+      giftSets: 'Gift Sets',
       research: 'Research',
       traceability: 'Traceability',
       b2b: 'Partners',
@@ -410,7 +410,7 @@ export const translations: Record<Language, Translation> = {
       home: '首页',
       about: '关于我们',
       products: '产品',
-      trimico: 'Trimico',
+      giftSets: '礼品套装',
       research: '研究',
       traceability: '溯源',
       b2b: '合作',
@@ -546,7 +546,7 @@ export const translations: Record<Language, Translation> = {
       home: 'Accueil',
       about: 'À Propos',
       products: 'Produits',
-      trimico: 'Trimico',
+      giftSets: 'Coffrets Cadeaux',
       research: 'Recherche',
       traceability: 'Traçabilité',
       b2b: 'Partenariats',
@@ -682,7 +682,7 @@ export const translations: Record<Language, Translation> = {
       home: 'الرئيسية',
       about: 'عنا',
       products: 'المنتجات',
-      trimico: 'تريميكو',
+      giftSets: 'أطقم الهدايا',
       research: 'البحث',
       traceability: 'التتبع',
       b2b: 'الشراكات',
