@@ -531,7 +531,7 @@ export default function InventoryQrPage() {
         `}</style>
         {printMode === 'single' && printTarget && (
           <div className="qr-label qr-label-single">
-            <div className="qr-label-brand">VKD GROUP</div>
+            <div className="qr-label-brand">TA</div>
             <div className="qr-label-brand-sub">Sâm Ngọc Linh</div>
             {hiResQr[printTarget.qr_hash] && <img src={hiResQr[printTarget.qr_hash]} alt="QR" className="qr-label-qr" />}
             <p className="qr-label-batch">{printTarget.batch_id}</p>
@@ -546,7 +546,7 @@ export default function InventoryQrPage() {
           <div className="qr-label-grid">
             {batches.map((b) => (
               <div key={b.id} className="qr-label">
-                <div className="qr-label-brand">VKD GROUP</div>
+                <div className="qr-label-brand">TA</div>
                 <div className="qr-label-brand-sub">Sâm Ngọc Linh</div>
                 {hiResQr[b.qr_hash] && <img src={hiResQr[b.qr_hash]} alt="QR" className="qr-label-qr" />}
                 <p className="qr-label-batch">{b.batch_id}</p>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle, Crown, Package, Truck, Star, Download, Share2, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
+import TaWordmark from './TaWordmark';
 
 interface OrderConfirmProps {
   lang: Language;
@@ -49,17 +50,17 @@ export default function OrderConfirmation({ lang, orderId, onNavigate }: OrderCo
           </h1>
           <p className="text-forest-500">
             {isVi
-              ? `Cảm ơn bạn đã tin tưởng VKD Group. Mã đơn hàng của bạn là`
-              : 'Thank you for your trust in VKD Group. Your order ID is'}
+              ? `Cảm ơn bạn đã tin tưởng TA. Mã đơn hàng của bạn là`
+              : 'Thank you for your trust in TA. Your order ID is'}
             &nbsp;<span className="font-bold text-forest-800 font-mono">{orderId}</span>
           </p>
         </div>
 
-        {/* VKD Elite Points earned */}
+        {/* TA Elite Points earned */}
         <div className="bg-gradient-to-r from-gold-500 to-gold-600 rounded-2xl p-6 mb-6 text-center shadow-gold">
           <div className="flex items-center justify-center gap-3 mb-2">
             <Crown className="w-6 h-6 text-forest-900" />
-            <span className="font-display font-bold text-forest-900 text-lg">VKD Elite Club</span>
+            <span className="font-display font-bold text-forest-900 text-lg"><TaWordmark /> Elite Club</span>
           </div>
           <div className="flex items-center justify-center gap-2">
             <span className="text-forest-800">{isVi ? 'Bạn vừa tích được' : 'You just earned'}</span>
@@ -67,7 +68,7 @@ export default function OrderConfirmation({ lang, orderId, onNavigate }: OrderCo
             <span className="text-forest-800">{isVi ? 'điểm' : 'points'}</span>
           </div>
           <p className="text-forest-800/70 text-sm mt-1">
-            {isVi ? 'Điểm tích lũy ngay — đồng bộ trên mọi kênh VKD' : 'Points credited instantly — synced across all VKD channels'}
+            {isVi ? 'Điểm tích lũy ngay — đồng bộ trên mọi kênh TA' : 'Points credited instantly — synced across all TA channels'}
           </p>
         </div>
 
@@ -128,8 +129,8 @@ export default function OrderConfirmation({ lang, orderId, onNavigate }: OrderCo
             </h4>
             <p className="text-forest-500 text-sm mb-3">
               {isVi
-                ? 'Quét mã QR để xác minh nguồn gốc sản phẩm VKD Group của bạn trên blockchain.'
-                : 'Scan to verify your VKD Group product origin on our blockchain traceability system.'}
+                ? 'Quét mã QR để xác minh nguồn gốc sản phẩm TA của bạn trên blockchain.'
+                : 'Scan to verify your TA product origin on our blockchain traceability system.'}
             </p>
             <div className="flex gap-3">
               <button className="btn-secondary text-xs px-4 py-2">
@@ -152,7 +153,7 @@ export default function OrderConfirmation({ lang, orderId, onNavigate }: OrderCo
           </button>
           <button onClick={() => onNavigate('loyalty')} className="btn-secondary">
             <Crown className="w-4 h-4" />
-            {isVi ? 'Xem Điểm VKD Elite' : 'View Elite Points'}
+            {isVi ? 'Xem Điểm TA Elite' : 'View Elite Points'}
           </button>
         </div>
       </div>

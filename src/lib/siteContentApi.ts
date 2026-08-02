@@ -66,6 +66,21 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
   return data ?? [];
 }
 
+export async function submitCustomerLead(input: {
+  name: string;
+  phone: string;
+  interest: string;
+  message: string;
+}) {
+  const { error } = await supabase.rpc('submit_customer_lead', {
+    p_name: input.name,
+    p_phone: input.phone,
+    p_interest: input.interest,
+    p_message: input.message,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export type B2BLeadType = 'distributor' | 'investor' | 'oem';
 
 export async function submitB2BLead(input: {

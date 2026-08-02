@@ -46,7 +46,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   const total = subtotal + tax;
 
   // PayOS chỉ hỗ trợ VND — tính riêng theo tổng VN, không phụ thuộc khu vực đang chọn.
-  // Phí vận chuyển KHÔNG tính ở bước đặt hàng — nhân viên VKD liên hệ xác nhận sau khi nhận đơn.
+  // Phí vận chuyển KHÔNG tính ở bước đặt hàng — nhân viên TA liên hệ xác nhận sau khi nhận đơn.
   const payosTotal = Math.round(subtotalVND + subtotalVND * regionConfig.vn.taxRate);
 
   const handlePayOSCheckout = async () => {
@@ -207,8 +207,8 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                 <Truck className="w-4 h-4 text-gold-600 flex-shrink-0" />
                 <p className="text-gold-800 text-xs">
                   {isVi
-                    ? 'Phí và phương thức vận chuyển sẽ được nhân viên VKD liên hệ xác nhận với bạn ngay sau khi đặt hàng.'
-                    : 'Shipping method and fee will be confirmed by VKD staff by phone shortly after you place this order.'}
+                    ? 'Phí và phương thức vận chuyển sẽ được nhân viên TA liên hệ xác nhận với bạn ngay sau khi đặt hàng.'
+                    : 'Shipping method and fee will be confirmed by TA staff by phone shortly after you place this order.'}
                 </p>
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
               </div>
               <div className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-forest-50">
                 <ShieldCheck className="w-4 h-4 text-forest-600 flex-shrink-0" />
-                <p className="text-forest-600 text-xs">{isVi ? 'Thanh toán được mã hóa 256-bit SSL. VKD không lưu thông tin thẻ của bạn.' : '256-bit SSL encrypted. VKD never stores your card details.'}</p>
+                <p className="text-forest-600 text-xs">{isVi ? 'Thanh toán được mã hóa 256-bit SSL. TA không lưu thông tin thẻ của bạn.' : '256-bit SSL encrypted. TA never stores your card details.'}</p>
               </div>
             </div>
           </div>

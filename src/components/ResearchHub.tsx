@@ -38,8 +38,8 @@ export default function ResearchHub({ lang }: ResearchHubProps) {
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
             {isVi
-              ? 'Cơ sở dữ liệu khoa học được duy trì bởi VKD Medical Board — hội đồng y khoa hàng đầu Việt Nam về Sâm Ngọc Linh.'
-              : 'A scientific database maintained by the VKD Medical Board — Vietnam\u2019s leading medical authority on Ngoc Linh Ginseng.'}
+              ? 'Cơ sở dữ liệu khoa học được duy trì bởi TA Medical Board — hội đồng y khoa hàng đầu Việt Nam về Sâm Ngọc Linh.'
+              : 'A scientific database maintained by the TA Medical Board — Vietnam\u2019s leading medical authority on Ngoc Linh Ginseng.'}
           </p>
         </div>
 

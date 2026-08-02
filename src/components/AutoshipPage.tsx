@@ -59,7 +59,7 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-100 rounded-full mb-6">
             <RefreshCw className="w-3.5 h-3.5 text-forest-600" />
             <span className="text-xs font-semibold uppercase tracking-wider text-forest-700">
-              {isVi ? 'VKD Autoship' : 'VKD Autoship'}
+              {isVi ? 'TA Autoship' : 'TA Autoship'}
             </span>
           </div>
           <h1 className="font-display text-display-sm text-forest-900 mb-4">
@@ -218,7 +218,7 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
           <div className="space-y-3">
             {[
               { icon: '📦', msg: isVi ? 'Đơn PanaxX của bạn sẽ tự động gửi sau 3 ngày.' : 'Your PanaxX autoship will dispatch in 3 days.', time: isVi ? '7 ngày trước' : '7 days ago', type: 'reminder' },
-              { icon: '✅', msg: isVi ? 'Đơn định kỳ #VKD-SUB-001 đã được xác nhận và giao thành công.' : 'Subscription #VKD-SUB-001 confirmed and delivered successfully.', time: isVi ? '37 ngày trước' : '37 days ago', type: 'success' },
+              { icon: '✅', msg: isVi ? 'Đơn định kỳ #TA-SUB-001 đã được xác nhận và giao thành công.' : 'Subscription #TA-SUB-001 confirmed and delivered successfully.', time: isVi ? '37 ngày trước' : '37 days ago', type: 'success' },
               { icon: '🎁', msg: isVi ? 'Tích thêm 280 điểm Elite từ đơn Autoship tháng trước.' : 'Earned +280 Elite points from last month\'s Autoship.', time: isVi ? '37 ngày trước' : '37 days ago', type: 'points' },
             ].map((n, i) => (
               <div key={i} className="flex gap-3 p-3 rounded-xl bg-cream-50">

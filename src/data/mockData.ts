@@ -211,7 +211,7 @@ export const loyaltyTiers: LoyaltyTier[] = [
     name: 'VVIP Elite',   nameVi: 'VVIP Elite',
     minPoints: 20000,     discount: 12,
     color: 'from-gold-500 to-gold-700',
-    perks: ['12% cashback','Dedicated VKD concierge','Private plantation tours (Kon Tum)','Exclusive limited-edition drops','Quarterly MR2 health screening'],
-    perksVi: ['Hoàn 12% mọi đơn hàng','Quản lý VKD riêng','Tham quan vùng trồng độc quyền (Kon Tum)','Phiên bản giới hạn độc quyền','Kiểm tra sức khỏe MR2 hàng quý'],
+    perks: ['12% cashback','Dedicated TA concierge','Private plantation tours (Kon Tum)','Exclusive limited-edition drops','Quarterly MR2 health screening'],
+    perksVi: ['Hoàn 12% mọi đơn hàng','Quản lý TA riêng','Tham quan vùng trồng độc quyền (Kon Tum)','Phiên bản giới hạn độc quyền','Kiểm tra sức khỏe MR2 hàng quý'],
   },
 ];

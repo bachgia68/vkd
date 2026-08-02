@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, MapPin, Phone, Share2, Handshake } from 'lucide-react';
+import { Plus, Trash2, MapPin, Phone, Share2, Handshake, MessageCircle } from 'lucide-react';
 import {
   createSiteAddress,
   deleteSiteAddress,
@@ -10,10 +10,14 @@ import {
   fetchB2BLeads,
   markLeadContacted,
   deleteLead,
+  fetchCustomerLeads,
+  markCustomerLeadContacted,
+  deleteCustomerLead,
   type SiteAddress,
   type ContactPhone,
   type SocialLink,
   type B2BLead,
+  type CustomerLead,
 } from '../adminApi';
 import { fetchSiteAddresses, fetchContactPhones, fetchSocialLinks } from '../../lib/siteContentApi';
 
@@ -28,6 +32,7 @@ export default function SettingsPage() {
   const [phones, setPhones] = useState<ContactPhone[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [leads, setLeads] = useState<B2BLead[]>([]);
+  const [customerLeads, setCustomerLeads] = useState<CustomerLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -39,12 +44,13 @@ export default function SettingsPage() {
 
   const load = () => {
     setLoading(true);
-    Promise.all([fetchSiteAddresses(), fetchContactPhones(), fetchSocialLinks(), fetchB2BLeads()])
-      .then(([a, p, s, l]) => {
+    Promise.all([fetchSiteAddresses(), fetchContactPhones(), fetchSocialLinks(), fetchB2BLeads(), fetchCustomerLeads()])
+      .then(([a, p, s, l, cl]) => {
         setAddresses(a);
         setPhones(p);
         setSocialLinks(s);
         setLeads(l);
+        setCustomerLeads(cl);
         setLoadError(null);
       })
       .catch((e) => setLoadError(e instanceof Error ? e.message : 'Lỗi tải dữ liệu'))
@@ -137,6 +143,23 @@ export default function SettingsPage() {
       load();
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Lỗi xoá đăng ký');
+    }
+  };
+
+  const markCustomerContacted = async (id: string) => {
+    try {
+      await markCustomerLeadContacted(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi cập nhật trạng thái');
+    }
+  };
+  const removeCustomerLead = async (id: string) => {
+    try {
+      await deleteCustomerLead(id);
+      load();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá yêu cầu tư vấn');
     }
   };
 
@@ -320,6 +343,58 @@ export default function SettingsPage() {
                         </button>
                       )}
                       <button onClick={() => removeLead(l.id)} aria-label="Xoá" className="text-forest-400 hover:text-red-600">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Customer consultation leads (chatbot) */}
+      <div className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant">
+        <div className="flex items-center gap-2 mb-4">
+          <MessageCircle className="w-4 h-4 text-gold-600" />
+          <h3 className="font-display text-lg text-forest-900">Yêu cầu tư vấn từ Chatbot</h3>
+        </div>
+        {customerLeads.length === 0 ? (
+          <p className="text-sm text-forest-400">Chưa có yêu cầu tư vấn nào từ chatbot trên trang chủ.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[640px]">
+              <thead>
+                <tr className="bg-forest-900 text-cream-100 text-xs uppercase tracking-wide">
+                  <th className="text-left font-medium px-4 py-3">Liên hệ</th>
+                  <th className="text-left font-medium px-4 py-3">Quan tâm</th>
+                  <th className="text-left font-medium px-4 py-3">Thời gian</th>
+                  <th className="text-left font-medium px-4 py-3">Trạng thái</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {customerLeads.map((cl) => (
+                  <tr key={cl.id} className="border-t border-forest-50">
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-forest-900">{cl.name}</p>
+                      <p className="text-xs text-forest-500">{cl.phone}</p>
+                    </td>
+                    <td className="px-4 py-3 text-forest-600 max-w-xs truncate">{cl.interest || '—'}</td>
+                    <td className="px-4 py-3 text-forest-500">{new Date(cl.created_at).toLocaleString('vi-VN')}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${cl.status === 'new' ? 'bg-gold-100 text-gold-700' : 'bg-forest-100 text-forest-600'}`}>
+                        {cl.status === 'new' ? 'Mới' : 'Đã liên hệ'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 flex items-center gap-2">
+                      {cl.status === 'new' && (
+                        <button onClick={() => markCustomerContacted(cl.id)} className="text-xs text-forest-600 hover:underline">
+                          Đánh dấu đã liên hệ
+                        </button>
+                      )}
+                      <button onClick={() => removeCustomerLead(cl.id)} aria-label="Xoá" className="text-forest-400 hover:text-red-600">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </td>

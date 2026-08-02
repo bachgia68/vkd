@@ -61,8 +61,8 @@ export default function BatchTraceabilityLookup({ lang, qrHash, onNavigate }: Pr
             </h1>
             <p className="text-forest-500 text-sm mb-6">
               {isVi
-                ? 'Mã QR này không khớp với bất kỳ lô hàng thật nào của VKD Group. Đây có thể là dấu hiệu sản phẩm không chính hãng — vui lòng liên hệ chúng tôi để xác minh.'
-                : 'This QR code does not match any real VKD Group batch. This may indicate a counterfeit product — please contact us to verify.'}
+                ? 'Mã QR này không khớp với bất kỳ lô hàng thật nào của TA. Đây có thể là dấu hiệu sản phẩm không chính hãng — vui lòng liên hệ chúng tôi để xác minh.'
+                : 'This QR code does not match any real TA batch. This may indicate a counterfeit product — please contact us to verify.'}
             </p>
             <button onClick={() => onNavigate('home')} className="btn-primary text-sm">
               {isVi ? 'Về trang chủ' : 'Back to home'} <ArrowRight className="w-4 h-4" />
@@ -84,7 +84,7 @@ export default function BatchTraceabilityLookup({ lang, qrHash, onNavigate }: Pr
             )}
             <div className="bg-gradient-to-br from-forest-950 via-forest-900 to-forest-800 text-white p-8 text-center">
               <ShieldCheck className="w-14 h-14 text-gold-400 mx-auto mb-3" />
-              <h1 className="font-display text-2xl">{isVi ? 'Sản phẩm chính hãng VKD Group' : 'Genuine VKD Group product'}</h1>
+              <h1 className="font-display text-2xl">{isVi ? 'Sản phẩm chính hãng TA' : 'Genuine TA product'}</h1>
               <p className="text-white/60 text-xs font-mono mt-2">{batch.batch_id}</p>
             </div>
 

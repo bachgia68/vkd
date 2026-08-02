@@ -614,3 +614,33 @@ export async function deleteLead(id: string) {
   const { error } = await supabase.from('b2b_leads').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export interface CustomerLead {
+  id: string;
+  name: string;
+  phone: string;
+  interest: string;
+  message: string;
+  source: string;
+  status: 'new' | 'contacted';
+  created_at: string;
+}
+
+export async function fetchCustomerLeads(): Promise<CustomerLead[]> {
+  return throwIfError(
+    await supabase
+      .from('customer_leads')
+      .select('id, name, phone, interest, message, source, status, created_at')
+      .order('created_at', { ascending: false })
+  );
+}
+
+export async function markCustomerLeadContacted(id: string) {
+  const { error } = await supabase.from('customer_leads').update({ status: 'contacted' }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteCustomerLead(id: string) {
+  const { error } = await supabase.from('customer_leads').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}

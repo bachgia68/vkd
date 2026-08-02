@@ -11,16 +11,11 @@ interface ShowroomsProps {
 export default function Showrooms({ lang }: ShowroomsProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
-  const [extraAddresses, setExtraAddresses] = useState<SiteAddress[]>([]);
+  const [locations, setLocations] = useState<SiteAddress[]>([]);
 
   useEffect(() => {
-    fetchSiteAddresses().then(setExtraAddresses).catch(() => setExtraAddresses([]));
+    fetchSiteAddresses().then(setLocations).catch(() => setLocations([]));
   }, []);
-
-  const locations = [
-    ...t.showrooms.locations,
-    ...extraAddresses.map((a) => ({ name: a.name, address: a.address, hours: a.hours, phone: a.phone })),
-  ];
 
   return (
     <section id="showrooms"  className="section-padding bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -45,7 +40,7 @@ export default function Showrooms({ lang }: ShowroomsProps) {
         <div className="grid md:grid-cols-2 gap-6">
           {locations.map((location, index) => (
             <div
-              key={index}
+              key={location.id}
               className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-cream-50 to-cream-100 border border-cream-200 p-8 transition-all duration-500 hover:shadow-elegant-lg hover:border-gold-300"
             >
               {/* Decorative corner */}

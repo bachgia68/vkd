@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ShoppingBag, Tv2, CheckCircle, Crown, ArrowRight, Zap, Gift, Users } from 'lucide-react';
 import type { Language } from '../i18n/translations';
+import TaWordmark from './TaWordmark';
 
 interface OmniChannelProps {
   lang: Language;
@@ -19,8 +20,8 @@ const stores = [
     url: '#',
   },
   {
-    name: 'TikTok Shop VKD',
-    name_vi: 'TikTok Shop VKD',
+    name: 'TikTok Shop TA',
+    name_vi: 'TikTok Shop TA',
     desc: 'Live commerce & exclusive flash deals',
     desc_vi: 'Live thương mại & flash deals độc quyền',
     badge: 'Live Now',
@@ -63,8 +64,8 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
             </h2>
             <p className="text-forest-600">
               {isVi
-                ? 'VKD Group chỉ phân phối qua các kênh được xác minh. Mua từ bất kỳ cửa hàng nào dưới đây để đảm bảo tính xác thực và được bảo hành 200%.'
-                : 'VKD Group distributes exclusively through verified channels. Purchase from any store below for a 200% authenticity guarantee.'}
+                ? 'TA chỉ phân phối qua các kênh được xác minh. Mua từ bất kỳ cửa hàng nào dưới đây để đảm bảo tính xác thực và được bảo hành 200%.'
+                : 'TA distributes exclusively through verified channels. Purchase from any store below for a 200% authenticity guarantee.'}
             </p>
           </div>
 
@@ -97,7 +98,7 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
         </div>
       </div>
 
-      {/* ── VKD ELITE CLUB BANNER ── */}
+      {/* ── TA ELITE CLUB BANNER ── */}
       <div className="section-padding-sm bg-gradient-to-r from-gold-700 via-gold-500 to-gold-600 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='1'%3E%3Cpath d='M30 5l4 12h13l-10 8 4 12-11-8-11 8 4-12-10-8h13z'/%3E%3C/g%3E%3C/svg%3E\")" }} />
         <div className="container-wide relative">
@@ -108,12 +109,12 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
               </div>
               <div>
                 <h3 className="font-display text-xl font-bold text-forest-900">
-                  {isVi ? 'VKD Elite Club — Đặc Quyền Đồng Bộ Đa Kênh' : 'VKD Elite Club — Omni-Channel Loyalty'}
+                  <TaWordmark /> {isVi ? 'Elite Club — Đặc Quyền Đồng Bộ Đa Kênh' : 'Elite Club — Omni-Channel Loyalty'}
                 </h3>
                 <p className="text-forest-800/80 text-sm">
                   {isVi
-                    ? 'Điểm tích lũy, hạng thành viên và ưu đãi sức khỏe đồng bộ trên Website, TikTok, Shopee và tại showroom Võ Kim Đường.'
-                    : 'Points, membership tier, and health benefits sync seamlessly across Website, TikTok Shop, Shopee, and Vo Kim Duong showrooms.'}
+                    ? 'Điểm tích lũy, hạng thành viên và ưu đãi sức khỏe đồng bộ trên Website, TikTok, Shopee và tại showroom TA.'
+                    : 'Points, membership tier, and health benefits sync seamlessly across Website, TikTok Shop, Shopee, and TA showrooms.'}
                 </p>
               </div>
             </div>
@@ -148,11 +149,11 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center mx-auto mb-4">
                 <Crown className="w-8 h-8 text-forest-900" />
               </div>
-              <h3 className="font-display text-2xl font-bold text-forest-900 mb-2">VKD Elite Club</h3>
+              <h3 className="font-display text-2xl font-bold text-forest-900 mb-2"><TaWordmark /> Elite Club</h3>
               <p className="text-forest-500 text-sm">
                 {isVi
-                  ? 'Mỗi đơn hàng — dù trên website, Shopee, TikTok hay tại showroom Võ Kim Đường — đều tích điểm vào một tài khoản duy nhất.'
-                  : 'Every purchase — whether on the website, Shopee, TikTok, or in a Vo Kim Duong showroom — earns points to a single unified account.'}
+                  ? 'Mỗi đơn hàng — dù trên website, Shopee, TikTok hay tại showroom TA — đều tích điểm vào một tài khoản duy nhất.'
+                  : 'Every purchase — whether on the website, Shopee, TikTok, or in a TA showroom — earns points to a single unified account.'}
               </p>
             </div>
             <div className="space-y-3 mb-6">

@@ -1,6 +1,7 @@
 import { Crown, Star, Gift, Zap, Globe, ShoppingBag, TrendingUp, ChevronRight } from 'lucide-react';
 import { loyaltyTiers } from '../data/mockData';
 import type { Language } from '../i18n/translations';
+import TaWordmark from './TaWordmark';
 
 interface LoyaltyProps {
   lang: Language;
@@ -28,7 +29,7 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gold-100 rounded-full mb-3">
               <Crown className="w-3.5 h-3.5 text-gold-600" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-gold-700">VKD Elite Club</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gold-700"><TaWordmark /> Elite Club</span>
             </div>
             <h1 className="font-display text-display-sm text-forest-900">
               {isVi ? 'Hội Viên Của Tôi' : 'My Membership'}
@@ -118,8 +119,8 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                 </p>
                 <p className="text-white/60 text-sm">
                   {isVi
-                    ? 'Điểm từ Website, Shopee, TikTok và showroom Võ Kim Đường được gộp tự động vào tài khoản này.'
-                    : 'Points from Website, Shopee, TikTok, and Vo Kim Duong showrooms automatically merge into this account.'}
+                    ? 'Điểm từ Website, Shopee, TikTok và showroom TA được gộp tự động vào tài khoản này.'
+                    : 'Points from Website, Shopee, TikTok, and TA showrooms automatically merge into this account.'}
                 </p>
               </div>
             </div>

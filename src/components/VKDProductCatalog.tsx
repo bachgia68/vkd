@@ -28,7 +28,7 @@ import { useCart } from '../context/CartContext';
 /**
  * VKDProductCatalog
  * -----------------------------------------------------------------------------
- * Trang danh mục sản phẩm Võ Kim Đường (VKD Group) — phong cách "Quiet Luxury".
+ * Trang danh mục sản phẩm TA — phong cách "Quiet Luxury".
  *
  * - Dữ liệu sản phẩm thật lấy từ samngoclinhvkdgroup.com, đồng bộ 2026-07-17.
  * - Chỉ hiển thị sản phẩm ĐANG BÁN — đã loại các SKU "Hết hàng"/ngừng sản xuất
@@ -77,7 +77,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
   vi: {
     title: 'Danh Mục Sản Phẩm',
     subtitle:
-      'Bộ sưu tập Sâm Ngọc Linh thật — từ củ sâm nguyên bản vùng trồng Tu Mơ Rông đến dòng mỹ phẩm Pn’s Choice cao cấp. Đặt hàng và thanh toán trực tiếp trên VKD Group.',
+      'Bộ sưu tập Sâm Ngọc Linh thật — từ củ sâm nguyên bản vùng trồng Tu Mơ Rông đến dòng mỹ phẩm Pn’s Choice cao cấp. Đặt hàng và thanh toán trực tiếp trên TA.',
     searchPlaceholder: 'Tìm sản phẩm theo tên…',
     sortDefault: 'Sắp xếp: Mặc định',
     sortPriceAsc: 'Giá: Thấp → Cao',
@@ -86,7 +86,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
     showFilters: 'Bộ lọc',
     categoryGroup: 'Nhóm Danh Mục',
     allProducts: 'Tất cả sản phẩm',
-    commitmentLabel: 'Cam kết VKD',
+    commitmentLabel: 'Cam kết TA',
     commitmentText:
       'Toàn bộ thông tin, hình ảnh và giá bán được đồng bộ trực tiếp từ hệ thống chính thức. Đặt hàng, giỏ hàng và thanh toán xử lý trọn gói tại đây.',
     productsCountSuffix: 'sản phẩm',
@@ -100,7 +100,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
   en: {
     title: 'Product Catalog',
     subtitle:
-      "An authentic Ngoc Linh ginseng collection — from whole roots grown in Tu Mo Rong to the premium Pn's Choice cosmetics line. Order and pay directly on VKD Group.",
+      "An authentic Ngoc Linh ginseng collection — from whole roots grown in Tu Mo Rong to the premium Pn's Choice cosmetics line. Order and pay directly on TA.",
     searchPlaceholder: 'Search products by name…',
     sortDefault: 'Sort: Default',
     sortPriceAsc: 'Price: Low → High',
@@ -109,7 +109,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
     showFilters: 'Filters',
     categoryGroup: 'Categories',
     allProducts: 'All Products',
-    commitmentLabel: 'VKD Commitment',
+    commitmentLabel: 'TA Commitment',
     commitmentText:
       'All information, images, and prices are synced directly from our official system. Ordering, cart, and checkout are handled entirely here.',
     productsCountSuffix: 'products',
@@ -122,7 +122,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
   },
   zh: {
     title: '产品目录',
-    subtitle: '正宗玉琳参精选系列——从土莫隆产区的原生参根,到高端Pn\'s Choice化妆品系列。在VKD Group直接下单与支付。',
+    subtitle: '正宗玉琳参精选系列——从土莫隆产区的原生参根,到高端Pn\'s Choice化妆品系列。在TA直接下单与支付。',
     searchPlaceholder: '按名称搜索产品…',
     sortDefault: '排序:默认',
     sortPriceAsc: '价格:从低到高',
@@ -131,7 +131,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
     showFilters: '筛选',
     categoryGroup: '分类',
     allProducts: '全部产品',
-    commitmentLabel: 'VKD承诺',
+    commitmentLabel: 'TA承诺',
     commitmentText: '所有信息、图片及价格均直接同步自官方系统。下单、购物车与支付均在此完整处理。',
     productsCountSuffix: '件产品',
     clearSearch: '清除搜索',
@@ -144,7 +144,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
   fr: {
     title: 'Catalogue de Produits',
     subtitle:
-      "Une collection authentique de ginseng Ngoc Linh — des racines entières cultivées à Tu Mo Rong à la gamme de cosmétiques premium Pn's Choice. Commandez et payez directement sur VKD Group.",
+      "Une collection authentique de ginseng Ngoc Linh — des racines entières cultivées à Tu Mo Rong à la gamme de cosmétiques premium Pn's Choice. Commandez et payez directement sur TA.",
     searchPlaceholder: 'Rechercher un produit par nom…',
     sortDefault: 'Trier : Par défaut',
     sortPriceAsc: 'Prix : Croissant',
@@ -153,7 +153,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
     showFilters: 'Filtres',
     categoryGroup: 'Catégories',
     allProducts: 'Tous les produits',
-    commitmentLabel: 'Engagement VKD',
+    commitmentLabel: 'Engagement TA',
     commitmentText:
       'Toutes les informations, images et prix sont synchronisés directement depuis notre système officiel. Commande, panier et paiement sont entièrement gérés ici.',
     productsCountSuffix: 'produits',
@@ -167,7 +167,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
   ar: {
     title: 'كتالوج المنتجات',
     subtitle:
-      "مجموعة أصيلة من جينسنغ نوك لين — من الجذور الكاملة المزروعة في توو مو رونغ إلى سلسلة مستحضرات Pn's Choice الفاخرة. اطلب وادفع مباشرة عبر VKD Group.",
+      "مجموعة أصيلة من جينسنغ نوك لين — من الجذور الكاملة المزروعة في توو مو رونغ إلى سلسلة مستحضرات Pn's Choice الفاخرة. اطلب وادفع مباشرة عبر TA.",
     searchPlaceholder: 'ابحث عن المنتجات بالاسم…',
     sortDefault: 'الترتيب: افتراضي',
     sortPriceAsc: 'السعر: من الأقل إلى الأعلى',
@@ -176,7 +176,7 @@ const catalogUi: Record<Language, CatalogUiStrings> = {
     showFilters: 'الفلاتر',
     categoryGroup: 'الفئات',
     allProducts: 'جميع المنتجات',
-    commitmentLabel: 'التزام VKD',
+    commitmentLabel: 'التزام TA',
     commitmentText:
       'جميع المعلومات والصور والأسعار متزامنة مباشرة مع نظامنا الرسمي. تتم إدارة الطلب وسلة التسوق والدفع بالكامل هنا.',
     productsCountSuffix: 'منتج',
@@ -243,7 +243,7 @@ export default function VKDProductCatalog({
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-100 rounded-full mb-6 animate-fade-in-down">
             <span className="w-2 h-2 bg-gold-400 rounded-full" />
             <span className="text-xs font-semibold tracking-[0.2em] uppercase text-forest-700">
-              Võ Kim Đường · VKD Group
+              TA
             </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-4 animate-fade-in-up">
