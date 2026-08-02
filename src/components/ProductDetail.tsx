@@ -27,7 +27,6 @@ interface ProductDetailProps {
 interface DetailUiStrings {
   notFoundTitle: string;
   backToCatalog: string;
-  skuLabel: string;
   authenticBadge: string;
   activeIngredientLabel: string;
   targetUsersLabel: string;
@@ -51,7 +50,6 @@ const detailUi: Record<Language, DetailUiStrings> = {
   vi: {
     notFoundTitle: 'Không tìm thấy sản phẩm',
     backToCatalog: 'Quay lại danh mục',
-    skuLabel: 'Mã sản phẩm:',
     authenticBadge: 'Hàng chính hãng TA',
     activeIngredientLabel: 'Hoạt chất chính',
     targetUsersLabel: 'Đối tượng sử dụng',
@@ -76,7 +74,6 @@ const detailUi: Record<Language, DetailUiStrings> = {
   en: {
     notFoundTitle: 'Product not found',
     backToCatalog: 'Back to catalog',
-    skuLabel: 'Product code:',
     authenticBadge: 'Genuine TA product',
     activeIngredientLabel: 'Key Active Ingredient',
     targetUsersLabel: 'Intended users',
@@ -101,7 +98,6 @@ const detailUi: Record<Language, DetailUiStrings> = {
   zh: {
     notFoundTitle: '未找到产品',
     backToCatalog: '返回目录',
-    skuLabel: '产品编号:',
     authenticBadge: 'TA正品',
     activeIngredientLabel: '核心活性成分',
     targetUsersLabel: '适用对象',
@@ -124,7 +120,6 @@ const detailUi: Record<Language, DetailUiStrings> = {
   fr: {
     notFoundTitle: 'Produit introuvable',
     backToCatalog: 'Retour au catalogue',
-    skuLabel: 'Référence produit :',
     authenticBadge: 'Produit authentique TA',
     activeIngredientLabel: 'Principal Actif',
     targetUsersLabel: 'Public visé',
@@ -150,7 +145,6 @@ const detailUi: Record<Language, DetailUiStrings> = {
   ar: {
     notFoundTitle: 'المنتج غير موجود',
     backToCatalog: 'العودة إلى الكتالوج',
-    skuLabel: 'رمز المنتج:',
     authenticBadge: 'منتج أصلي من TA',
     activeIngredientLabel: 'المكوّن الفعّال الرئيسي',
     targetUsersLabel: 'الفئة المستهدفة',
@@ -289,10 +283,6 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
             <h1 className="font-display text-3xl md:text-4xl text-forest-900 mb-3 leading-tight">
               {product.name}
             </h1>
-
-            <p className="text-forest-400 text-sm mb-6">
-              {ui.skuLabel} {product.sku}
-            </p>
 
             <div className="text-3xl font-display font-bold text-forest-900 mb-6 pb-6 border-b border-cream-200">
               {formatVND(product.price)}

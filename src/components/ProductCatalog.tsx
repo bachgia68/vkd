@@ -218,7 +218,7 @@ export default function ProductCatalog({
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const TRENDING_QUERIES = ['sâm ngâm mật ong', 'nước hồng sâm', 'quà tết', 'mỹ phẩm sâm', 'rượu sâm'];
+  const TRENDING_QUERIES = ['ngâm mật ong', 'nước cốt sâm', 'set quà', 'kem dưỡng', 'rượu sâm'];
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const popularProducts = useMemo(
     () => products.filter((p) => p.badge?.toLowerCase().includes('bán chạy')).slice(0, 4),
