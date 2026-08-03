@@ -8,7 +8,61 @@ export const config = { runtime: 'nodejs' };
 //
 // Xác thực chữ ký (chống giả mạo), đánh dấu đơn hàng "đã thanh toán" trên Supabase
 // (xem api/create-payos-payment.ts — đơn được ghi lại lúc tạo link thanh
-// toán), rồi gửi email báo đơn cho TA.
+// toán), rồi gửi email báo đơn cho TA và email xác nhận cho khách.
+
+async function fetchBuyerEmail(orderCode: string): Promise<string | null> {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/rpc/get_order_buyer_email`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        apikey: supabaseAnonKey,
+        authorization: `Bearer ${supabaseAnonKey}`,
+      },
+      body: JSON.stringify({ p_order_code: orderCode }),
+    });
+    const email = await res.json();
+    return typeof email === 'string' && email ? email : null;
+  } catch (err) {
+    console.error('get_order_buyer_email failed:', err);
+    return null;
+  }
+}
+
+async function notifyCustomer(
+  buyerEmail: string,
+  webhookData: { orderCode: number; amount: number; transactionDateTime: string }
+) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        from: 'TA Sâm Ngọc Linh <onboarding@resend.dev>',
+        to: [buyerEmail],
+        subject: `Xác nhận đơn hàng #${webhookData.orderCode} — TA Sâm Ngọc Linh`,
+        html: `
+          <h2>Cảm ơn anh/chị đã đặt hàng tại TA Sâm Ngọc Linh</h2>
+          <p>Chúng tôi đã nhận được thanh toán cho đơn hàng của anh/chị.</p>
+          <p><b>Mã đơn:</b> ${webhookData.orderCode}</p>
+          <p><b>Số tiền:</b> ${webhookData.amount.toLocaleString('vi-VN')}đ</p>
+          <p><b>Thời gian thanh toán:</b> ${webhookData.transactionDateTime}</p>
+          <p>Đội ngũ TA sẽ liên hệ xác nhận và tiến hành giao hàng trong thời gian sớm nhất.
+          Mọi thắc mắc xin liên hệ Zalo/hotline 0984 999 309.</p>
+        `,
+      }),
+    });
+  } catch (err) {
+    console.error('Resend customer notify failed:', err);
+  }
+}
 
 async function markOrderPaid(orderCode: string, paymentRef: string) {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -94,8 +148,12 @@ export async function POST(req: Request) {
       transactionDateTime: webhookData.transactionDateTime,
     });
 
-    await markOrderPaid(String(webhookData.orderCode), webhookData.reference);
+    const orderCode = String(webhookData.orderCode);
+    await markOrderPaid(orderCode, webhookData.reference);
     await notifyNewOrder(webhookData);
+
+    const buyerEmail = await fetchBuyerEmail(orderCode);
+    if (buyerEmail) await notifyCustomer(buyerEmail, webhookData);
 
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
