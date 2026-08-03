@@ -49,7 +49,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      return { success: false, error: 'Email hoặc mật khẩu không đúng.' };
+      // Chỉ báo "sai email/mật khẩu" khi Supabase THẬT SỰ xác nhận sai (status 400).
+      // Mọi lỗi khác (mất mạng, bị chặn bởi extension/firewall, CORS, rate limit...)
+      // hiện nguyên message gốc — trước đây gộp chung hết vào 1 câu chung chung khiến
+      // không thể phân biệt "sai mật khẩu" với "request không tới được Supabase".
+      const error_ = error as { status?: number; message?: string };
+      const msg =
+        error_.status === 400
+          ? 'Email hoặc mật khẩu không đúng.'
+          : `Không đăng nhập được (${error_.message ?? 'lỗi không xác định'}). Có thể do mất mạng, VPN/firewall, hoặc trình duyệt chặn kết nối tới Supabase — thử mạng khác hoặc tắt tiện ích chặn quảng cáo.`;
+      return { success: false, error: msg };
     }
     if (!hasAdminRole(data.session)) {
       await supabase.auth.signOut();
