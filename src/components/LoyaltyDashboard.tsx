@@ -2,23 +2,62 @@ import { Crown, Star, Gift, Zap, Globe, ShoppingBag, TrendingUp, ChevronRight } 
 import { loyaltyTiers } from '../data/mockData';
 import type { Language } from '../i18n/translations';
 import TaWordmark from './TaWordmark';
+import { useLoyaltyData } from '../hooks/useLoyaltyData';
 
 interface LoyaltyProps {
   lang: Language;
   onNavigate: (page: string) => void;
+  /** Email of the logged-in customer, or undefined/null if anonymous. */
+  userEmail?: string;
 }
 
-// Chưa có hệ thống tài khoản/backend thật (xem AdminAuthContext.tsx) nên trang này
-// hiển thị trạng thái của một hội viên MỚI (0 điểm, chưa có hoạt động) thay vì bịa
-// lịch sử giao dịch — tránh hiển thị dữ liệu giả là "của bạn".
-export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
+export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: LoyaltyProps) {
   const isVi = lang === 'vi';
-  const currentPoints = 0;
-  const currentTierIdx = 0; // Standard — hội viên mới luôn bắt đầu ở hạng này
-  const nextTier = loyaltyTiers[1];
+  const { data: loyaltyData, loading, error } = useLoyaltyData(userEmail || null);
 
-  const progress = ((currentPoints - loyaltyTiers[currentTierIdx].minPoints) /
-    (nextTier.minPoints - loyaltyTiers[currentTierIdx].minPoints)) * 100;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cream-50 pt-28 pb-16 flex items-center justify-center">
+        <p className="text-forest-600">{isVi ? 'Đang tải...' : 'Loading...'}</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-cream-50 pt-28 pb-16 flex items-center justify-center">
+        <p className="text-red-600">{isVi ? 'Lỗi: ' : 'Error: '}{error}</p>
+      </div>
+    );
+  }
+
+  // No email, or the email doesn't match a known customer yet — show the
+  // same "new member" (0 points, Standard tier, no history) state that this
+  // page always showed before real data existed. Never fabricate activity.
+  const isNewMember = !userEmail || !loyaltyData?.customer;
+  const currentPoints = isNewMember ? 0 : loyaltyData!.totalPoints;
+  const currentTierIdx = isNewMember ? 0 : loyaltyData!.currentTierIndex;
+  const orders = isNewMember ? [] : loyaltyData!.orders;
+
+  const isMaxTier = currentTierIdx === loyaltyTiers.length - 1;
+  const nextTierIdx = Math.min(currentTierIdx + 1, loyaltyTiers.length - 1);
+  const nextTier = loyaltyTiers[nextTierIdx];
+
+  const progress = isMaxTier
+    ? 100
+    : ((currentPoints - loyaltyTiers[currentTierIdx].minPoints) /
+       (nextTier.minPoints - loyaltyTiers[currentTierIdx].minPoints)) * 100;
+
+  // Cashback "saved" estimate = current tier's discount % applied to real
+  // order totals. Not a stored ledger value (none exists yet) — a derived
+  // figure from real order amounts, same spirit as calculatePointsFromOrder().
+  const tierDiscount = loyaltyTiers[currentTierIdx].discount;
+  const totalSavedVnd = Math.round(
+    orders.reduce((sum, o) => sum + o.totalAmountVnd, 0) * (tierDiscount / 100)
+  );
+  const totalSavedUsd = Math.round(
+    orders.reduce((sum, o) => sum + o.totalAmountUsd, 0) * (tierDiscount / 100)
+  );
 
   return (
     <div className="min-h-screen bg-cream-50 pt-28 pb-16">
@@ -61,13 +100,19 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                 <p className="text-white/60 text-xs uppercase tracking-wider mb-1">
                   {isVi ? 'Điểm Tích Lũy' : 'Total Points'}
                 </p>
-                <p className="font-display text-4xl font-black text-white mb-1">{currentPoints.toLocaleString()}</p>
+                <p className="font-display text-4xl font-black text-white mb-1">
+                  {loading ? '...' : currentPoints.toLocaleString()}
+                </p>
                 <p className="text-white/50 text-xs">
-                  {isVi ? `Còn ${(nextTier.minPoints - currentPoints).toLocaleString()} điểm để lên ${nextTier.nameVi}` : `${(nextTier.minPoints - currentPoints).toLocaleString()} pts to ${nextTier.name}`}
+                  {isMaxTier
+                    ? (isVi ? 'Bạn đã đạt hạng cao nhất' : "You've reached the top tier")
+                    : (isVi
+                        ? `Còn ${(nextTier.minPoints - currentPoints).toLocaleString()} điểm để lên ${nextTier.nameVi}`
+                        : `${(nextTier.minPoints - currentPoints).toLocaleString()} pts to ${nextTier.name}`)}
                 </p>
                 {/* Progress bar */}
                 <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-gold-400 to-gold-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }} />
+                  <div className="h-full bg-gradient-to-r from-gold-400 to-gold-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }} />
                 </div>
                 <div className="flex justify-between text-xs text-white/40 mt-1">
                   <span>{isVi ? loyaltyTiers[currentTierIdx].nameVi : loyaltyTiers[currentTierIdx].name}</span>
@@ -129,8 +174,8 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
             <div className="grid grid-cols-3 gap-4">
               {[
                 { label: isVi ? 'Tổng Điểm' : 'Total Points', value: currentPoints.toLocaleString(), icon: Star },
-                { label: isVi ? 'Đơn Hàng' : 'Orders Placed', value: '0', icon: ShoppingBag },
-                { label: isVi ? 'Tiết Kiệm Được' : 'Total Saved', value: isVi ? '0₫' : '$0', icon: TrendingUp },
+                { label: isVi ? 'Đơn Hàng' : 'Orders Placed', value: orders.length.toLocaleString(), icon: ShoppingBag },
+                { label: isVi ? 'Tiết Kiệm Được' : 'Total Saved', value: isVi ? `${totalSavedVnd.toLocaleString('vi-VN')}₫` : `$${totalSavedUsd.toLocaleString()}`, icon: TrendingUp },
               ].map(({ label, value, icon: Icon }) => (
                 <div key={label} className="bg-white rounded-2xl p-4 shadow-elegant text-center">
                   <Icon className="w-5 h-5 text-gold-500 mx-auto mb-2" />
@@ -148,11 +193,31 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                 </h3>
                 <Zap className="w-4 h-4 text-gold-500" />
               </div>
-              <div className="text-center py-12 text-forest-400">
-                <Zap className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">{isVi ? 'Chưa có hoạt động tích điểm nào.' : 'No points activity yet.'}</p>
-                <p className="text-xs mt-1">{isVi ? 'Mua hàng để bắt đầu tích điểm.' : 'Shop to start earning points.'}</p>
-              </div>
+              {orders.length > 0 ? (
+                <div className="p-5 space-y-3">
+                  {orders.slice(0, 5).map((order) => (
+                    <div key={order.id} className="flex items-center justify-between pb-3 border-b border-cream-100 last:border-0 last:pb-0">
+                      <div>
+                        <p className="text-sm font-medium text-forest-900">
+                          {isVi ? 'Đơn hàng' : 'Order'} #{order.orderNumber}
+                        </p>
+                        <p className="text-xs text-forest-400">
+                          {new Date(order.purchasedAt).toLocaleDateString(isVi ? 'vi-VN' : 'en-US')}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-gold-500">
+                        +{Math.round(order.totalAmountUsd)} {isVi ? 'điểm' : 'pts'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-forest-400">
+                  <Zap className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">{isVi ? 'Chưa có hoạt động tích điểm nào.' : 'No points activity yet.'}</p>
+                  <p className="text-xs mt-1">{isVi ? 'Mua hàng để bắt đầu tích điểm.' : 'Shop to start earning points.'}</p>
+                </div>
+              )}
             </div>
 
             {/* Redeem CTA */}
