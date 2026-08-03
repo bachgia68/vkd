@@ -62,11 +62,9 @@ async function notifyNewOrder(webhookData: { orderCode: number; amount: number; 
   }
 }
 
-export default async (req: Request) => {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
-
+// Named export (not `export default (req) => Response`) - see comment in
+// api/create-payos-payment.ts for why the default-export arrow form hangs on Vercel.
+export async function POST(req: Request) {
   const clientId = process.env.PAYOS_CLIENT_ID;
   const apiKey = process.env.PAYOS_API_KEY;
   const checksumKey = process.env.PAYOS_CHECKSUM_KEY;
@@ -107,4 +105,4 @@ export default async (req: Request) => {
     console.error('PayOS webhook verify failed:', err);
     return new Response('Invalid signature', { status: 400 });
   }
-};
+}

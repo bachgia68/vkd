@@ -57,11 +57,11 @@ async function recordOrder(params: {
   }
 }
 
-export default async (req: Request) => {
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
-  }
-
+// Vercel Node functions expect named HTTP-method exports (GET/POST/...) that
+// take a Web `Request` and return a `Response` - a bare `export default (req) => Response`
+// is treated as the legacy `(req, res) => void` signature, its return value is
+// silently ignored, and the request hangs until Vercel's function timeout (504).
+export async function POST(req: Request) {
   const clientId = process.env.PAYOS_CLIENT_ID;
   const apiKey = process.env.PAYOS_API_KEY;
   const checksumKey = process.env.PAYOS_CHECKSUM_KEY;
@@ -129,4 +129,4 @@ export default async (req: Request) => {
       { status: 500, headers: { 'content-type': 'application/json' } },
     );
   }
-};
+}
