@@ -8,7 +8,6 @@ import About from './components/About';
 import FounderStory from './components/FounderStory';
 import Heritage from './components/Heritage';
 import Products from './components/Products';
-import Showrooms from './components/Showrooms';
 import Traceability from './components/Traceability';
 import B2B from './components/B2B';
 import Certifications from './components/Certifications';
@@ -100,7 +99,6 @@ function App() {
               <Heritage lang={lang} />
               <Products lang={lang} onNavigate={navigate} />
               <OmniChannel lang={lang} onNavigate={navigate} />
-              <Showrooms lang={lang} />
               <Traceability lang={lang} />
               <B2B lang={lang} />
               <Certifications lang={lang} />

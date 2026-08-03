@@ -98,35 +98,6 @@ export default function B2B({ lang }: B2BProps) {
           })}
         </div>
 
-        {/* International Markets */}
-        <div className="bg-gradient-to-br from-forest-900 to-forest-950 rounded-3xl p-8 md:p-12 text-white">
-          <div className="text-center mb-10">
-            <h3 className="font-display text-2xl md:text-3xl mb-3">
-              {t.international.title}
-            </h3>
-            <p className="text-white/70">{t.international.subtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { name: t.international.marketCn, flag: 'CN' },
-              { name: t.international.marketEu, flag: 'EU' },
-              { name: t.international.marketMe, flag: 'ME' },
-              { name: t.international.marketSea, flag: 'SEA' },
-            ].map((market, i) => (
-              <div
-                key={i}
-                className="text-center p-6 bg-white/10 backdrop-blur rounded-xl hover:bg-white/20 transition-colors"
-              >
-                <div className="text-3xl font-display font-bold text-gold-400 mb-2">
-                  {market.flag}
-                </div>
-                <p className="text-white text-sm font-medium">{market.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* CTA */}
         <div className="mt-12 text-center">
           <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 bg-white rounded-2xl shadow-elegant">

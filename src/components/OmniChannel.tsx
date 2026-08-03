@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingBag, Tv2, CheckCircle, Crown, ArrowRight, Zap, Gift, Users } from 'lucide-react';
+import { Crown, Zap, Gift } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import TaWordmark from './TaWordmark';
 
@@ -8,39 +8,6 @@ interface OmniChannelProps {
   onNavigate?: (page: string) => void;
 }
 
-const stores = [
-  {
-    name: 'Shopee Premium Mall',
-    name_vi: 'Shopee Premium Mall',
-    desc: 'Official flagship store — anti-counterfeit guarantee',
-    desc_vi: 'Gian hàng flagship chính hãng — bảo đảm chống hàng giả',
-    badge: 'Verified Premium',
-    color: 'from-orange-500 to-orange-600',
-    icon: ShoppingBag,
-    url: '#',
-  },
-  {
-    name: 'TikTok Shop TA',
-    name_vi: 'TikTok Shop TA',
-    desc: 'Live commerce & exclusive flash deals',
-    desc_vi: 'Live thương mại & flash deals độc quyền',
-    badge: 'Live Now',
-    color: 'from-gray-900 to-gray-700',
-    icon: Tv2,
-    url: '#',
-  },
-  {
-    name: 'Users Commerce',
-    name_vi: 'Users Thương Mại',
-    desc: 'Community-verified marketplace store',
-    desc_vi: 'Cửa hàng xác minh bởi cộng đồng',
-    badge: 'Trusted Seller',
-    color: 'from-blue-600 to-blue-700',
-    icon: Users,
-    url: '#',
-  },
-];
-
 export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
   const isVi = lang === 'vi';
   const isRTL = lang === 'ar';
@@ -48,55 +15,6 @@ export default function OmniChannel({ lang, onNavigate }: OmniChannelProps) {
 
   return (
     <section id="omnichannel" className="bg-cream-50" dir={isRTL ? 'rtl' : 'ltr'}>
-
-      {/* ── OFFICIAL STORES ── */}
-      <div className="section-padding border-b border-cream-200">
-        <div className="container-wide">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-100 rounded-full mb-6">
-              <CheckCircle className="w-3.5 h-3.5 text-forest-600" />
-              <span className="text-xs font-semibold tracking-wider uppercase text-forest-700">
-                {isVi ? 'Kênh Mua Sắm Chính Hãng' : 'Official Retail Channels'}
-              </span>
-            </div>
-            <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-4">
-              {isVi ? 'Chuẩn Sâm Ngọc Linh — Vẹn Danh Quốc Bảo' : 'Buy Authentic — Zero Counterfeits Guaranteed'}
-            </h2>
-            <p className="text-forest-600">
-              {isVi
-                ? 'TA chỉ phân phối qua các kênh được xác minh. Mua từ bất kỳ cửa hàng nào dưới đây để đảm bảo tính xác thực và được bảo hành 200%.'
-                : 'TA distributes exclusively through verified channels. Purchase from any store below for a 200% authenticity guarantee.'}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            {stores.map((store) => {
-              const Icon = store.icon;
-              return (
-                <a
-                  key={store.name}
-                  href={store.url}
-                  className="group relative bg-white rounded-2xl p-8 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1 overflow-hidden"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${store.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${store.color} flex items-center justify-center mb-5 shadow-md`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-display font-semibold text-forest-900 text-lg">{isVi ? store.name_vi : store.name}</h3>
-                    <span className="px-2 py-0.5 rounded-full bg-gold-100 text-gold-700 text-xs font-bold">{store.badge}</span>
-                  </div>
-                  <p className="text-forest-500 text-sm mb-4">{isVi ? store.desc_vi : store.desc}</p>
-                  <div className="flex items-center gap-1.5 text-sm font-semibold text-forest-700 group-hover:text-gold-600 transition-colors">
-                    {isVi ? 'Đến Cửa Hàng' : 'Shop Now'}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      </div>
 
       {/* ── TA ELITE CLUB BANNER ── */}
       <div className="section-padding-sm bg-gradient-to-r from-gold-700 via-gold-500 to-gold-600 relative overflow-hidden">
