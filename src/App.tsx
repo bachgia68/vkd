@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Stats from './components/Stats';
 import About from './components/About';
+import FounderStory from './components/FounderStory';
 import Heritage from './components/Heritage';
 import Products from './components/Products';
 import Showrooms from './components/Showrooms';
@@ -95,7 +96,7 @@ function App() {
               <Hero lang={lang} onNavigate={navigate} />
               <Stats lang={lang} />
               <ProductAdvisor lang={lang} onNavigate={navigate} />
-              <About lang={lang} />
+              <About lang={lang} onNavigate={navigate} />
               <Heritage lang={lang} />
               <Products lang={lang} onNavigate={navigate} />
               <OmniChannel lang={lang} onNavigate={navigate} />
@@ -117,6 +118,10 @@ function App() {
 
           {currentPage === 'research' && (
             <ResearchHub lang={lang} />
+          )}
+
+          {currentPage === 'about-story' && (
+            <FounderStory lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'checkout' && (

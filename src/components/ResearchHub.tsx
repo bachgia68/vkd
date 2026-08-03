@@ -213,8 +213,13 @@ export default function ResearchHub({ lang }: ResearchHubProps) {
                   className="bg-cream-50 rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 group cursor-pointer"
                 >
                   {/* Image */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-forest-900 to-forest-700 flex items-center justify-center">
-                    <BookOpen className="w-12 h-12 text-white/20 group-hover:scale-110 transition-transform duration-700" />
+                  <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-forest-900 to-forest-700">
+                    <img
+                      src={guide.image}
+                      alt={isVi ? guide.titleVi : guide.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-forest-950/50 to-transparent" />
                     <div className="absolute top-3 left-3">
                       <span className="px-3 py-1 rounded-full bg-gold-400 text-forest-900 text-xs font-semibold">
                         {guide.category}

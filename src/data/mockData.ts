@@ -44,86 +44,12 @@ export const audienceLabels: Record<TargetAudience, { en: string; vi: string }> 
 // thật, đồng bộ từ samngoclinhvkdgroup.com). Interface Product ở trên chỉ còn giữ
 // lại để làm kiểu dữ liệu dùng chung cho giỏ hàng (xem CartContext.tsx + toCartProduct()).
 
-export interface NewsArticle {
-  id: string;
-  title: string;
-  titleVi: string;
-  excerpt: string;
-  excerptVi: string;
-  category: string;
-  categoryVi: string;
-  date: string;
-  readTime: string;
-  image: string;
-  featured?: boolean;
-}
-
-// Tin tức thật, lấy nguyên gốc (tiêu đề/ngày đăng/ảnh đại diện) từ samngoclinhvkdgroup.com ngày 2026-07-18.
-// Đã bỏ toàn bộ 6 bài tin cũ (giải thưởng/nghiên cứu/mở rộng thị trường bịa đặt, ảnh Unsplash không liên quan).
-export const newsArticles: NewsArticle[] = [
-  {
-    id: 'news-001',
-    title: 'VKD Group Honored with "Trusted Vietnamese Brand 2026" Award',
-    titleVi: 'Sâm Ngọc Linh VKD Khẳng Định Vị Thế Với Danh Hiệu "Thương Hiệu Việt Nam Ưu Tiên Tin Dùng 2026"',
-    excerpt: 'At a ceremony held on April 12, 2026 at the Army Theatre in Hanoi, VKD Group was named a "Trusted Vietnamese Brand" — recognition for a decade of pursuing transparent sourcing and standardized quality for Ngoc Linh ginseng.',
-    excerptVi: 'Tại lễ công bố "Thương hiệu Việt Nam ưu tiên tin dùng" tổ chức ngày 12/04/2026 tại Nhà hát Quân đội, Hà Nội, Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam (VKD Group) đã được xướng tên vinh danh — kết quả của hành trình minh bạch hóa nguồn gốc và chuẩn hóa chất lượng sản phẩm.',
-    category: 'Awards',
-    categoryVi: 'Giải Thưởng',
-    date: '2026-04-13',
-    readTime: '4 min',
-    image: '/assets/news/news-thuong-hieu-tin-dung-2026.jpg',
-    featured: true,
-  },
-  {
-    id: 'news-002',
-    title: 'VKD Group Officially Enters the Indonesian Market',
-    titleVi: 'Sâm Ngọc Linh VKD Chính Thức "Tiến Quân" Sang Thị Trường Indonesia',
-    excerpt: 'On January 29, 2026, VKD Group signed a commercial partnership agreement with Indonesian distributor P.T. Linkup Wang Ekonomi (LWE), marking Ngoc Linh ginseng\'s entry into Southeast Asia\'s largest herbal-beverage market.',
-    excerptVi: 'Chiều 29/01/2026, Tập đoàn Y Dược Sâm Ngọc Linh VKD đã chính thức ký kết Hợp đồng thương mại với đối tác P.T Linkup Wang Ekonomi (LWE), đưa Sâm Ngọc Linh bước chân vào thị trường Indonesia gần 280 triệu dân.',
-    category: 'Expansion',
-    categoryVi: 'Mở Rộng',
-    date: '2026-01-30',
-    readTime: '5 min',
-    image: '/assets/news/news-indonesia-2026.jpg',
-    featured: true,
-  },
-  {
-    id: 'news-003',
-    title: 'VKD Group at CAEXPO 2025: Vietnamese Herbal Brand on the International Stage',
-    titleVi: 'Sâm Ngọc Linh VKD Tại CAEXPO 2025: Khẳng Định Thương Hiệu Dược Liệu Việt Trên Trường Quốc Tế',
-    excerpt: 'From September 17–21, 2025, VKD Group exhibited at the 22nd China-ASEAN Expo (CAEXPO) in Nanning, Guangxi — one of the region\'s largest trade fairs with over 3,200 exhibitors from 60 countries — showcasing Ngoc Linh ginseng to international partners.',
-    excerptVi: 'Từ 17–21/9/2025, Hội chợ Trung Quốc – ASEAN (CAEXPO) lần thứ 22 tổ chức tại Nam Ninh, Quảng Tây quy tụ hơn 3.200 doanh nghiệp từ 60 quốc gia. VKD Group mang gian hàng trưng bày Sâm Ngọc Linh đến sự kiện, thu hút sự chú ý của đông đảo quan khách và đối tác quốc tế.',
-    category: 'Trade Fair',
-    categoryVi: 'Hội Chợ',
-    date: '2025-09-23',
-    readTime: '4 min',
-    image: '/assets/news/news-caexpo-2025.jpg',
-  },
-  {
-    id: 'news-004',
-    title: 'VKD Products Presented at VUSTA\'s 40th Anniversary Ceremony',
-    titleVi: 'Giới Thiệu Sản Phẩm Tại Lễ Kỷ Niệm 40 Năm Thành Lập VUSTA',
-    excerpt: 'At the ceremony marking 60 years since President Ho Chi Minh\'s meeting with Vietnamese intellectuals and the 40th founding anniversary of VUSTA, the Vietnam Ngoc Linh Ginseng Institute and VKD Group introduced products extracted from Ngoc Linh ginseng — the result of nearly a decade of conservation and R&D.',
-    excerptVi: 'Tại Lễ kỷ niệm 60 năm ngày Chủ tịch Hồ Chí Minh gặp gỡ đội ngũ trí thức và 40 năm ngày thành lập VUSTA (24/3), Viện Bảo tồn và Phát triển sâm Ngọc Linh Việt Nam cùng Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam đã ra mắt các sản phẩm chiết xuất từ Sâm Ngọc Linh — thành quả gần 10 năm nghiên cứu, bảo tồn và phát triển.',
-    category: 'Company',
-    categoryVi: 'Nội Bộ',
-    date: '2023-04-04',
-    readTime: '4 min',
-    image: '/assets/images/gian-hang.jpg',
-  },
-  {
-    id: 'news-005',
-    title: '1st Anniversary of the Southern Ha Tinh Entrepreneurs Club — VKD as Diamond Sponsor',
-    titleVi: 'Kỷ Niệm 1 Năm Thành Lập CLB Doanh Nhân Hà Tĩnh Phía Nam — VKD Là Nhà Tài Trợ Kim Cương',
-    excerpt: 'On May 13, 2023 in Ho Chi Minh City, the Southern Ha Tinh Entrepreneurs Club (HTEC) marked its first anniversary under the theme "Brand Positioning — Future Direction." VKD Group took part as Diamond Sponsor, and the two organizations signed a strategic cooperation agreement.',
-    excerptVi: 'Chiều 13/5/2023 tại TP Hồ Chí Minh, Câu lạc bộ Doanh nhân Hà Tĩnh phía Nam (HTEC) tổ chức chương trình kỷ niệm 1 năm thành lập với chủ đề "Định vị thương hiệu – định hướng tương lai". Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam vinh dự là nhà tài trợ Kim Cương và đã ký kết hợp đồng hợp tác chiến lược với CLB.',
-    category: 'Company',
-    categoryVi: 'Nội Bộ',
-    date: '2023-05-13',
-    readTime: '3 min',
-    image: '/assets/news/news-htec-1nam.webp',
-  },
-];
+// `NewsArticle`/`newsArticles` (5 bài tin về VKD Group — giải thưởng, CAEXPO,
+// VUSTA, HTEC) đã bị xoá khỏi đây cùng `NewsFeed.tsx` (component không được
+// render ở bất kỳ đâu trong App.tsx — code chết). Không đổi tên "VKD" thành
+// "TA" trong các bài đó vì đây là sự kiện lịch sử THẬT của VKD Group — đổi tên
+// sẽ tạo lịch sử giả cho TA. Nếu cần mục tin tức trên site, viết bài mới đúng
+// sự kiện của TA, không tái dùng nội dung này.
 
 export interface EducationGuide {
   id: string;
@@ -133,6 +59,7 @@ export interface EducationGuide {
   excerptVi: string;
   category: string;
   readTime: string;
+  image: string;
 }
 
 export const educationGuides: EducationGuide[] = [
@@ -144,6 +71,7 @@ export const educationGuides: EducationGuide[] = [
     excerptVi: '5 dấu hiệu nhận biết sâm thật: vân củ đặc trưng, bề mặt da sâm, hương thơm, tinh thể saponin, và mã QR chứng nhận nguồn gốc.',
     category: 'Authentication',
     readTime: '8 min',
+    image: '/assets/images/sam-ngoc-linh-plant.png',
   },
   {
     id: 'guide-002',
@@ -153,6 +81,7 @@ export const educationGuides: EducationGuide[] = [
     excerptVi: 'Bảng liều dùng lâm sàng theo độ tuổi và mục tiêu sức khỏe, từ trẻ em đến người cao tuổi.',
     category: 'Dosage',
     readTime: '6 min',
+    image: '/assets/images/product-1.jpg',
   },
   {
     id: 'guide-003',
@@ -162,6 +91,7 @@ export const educationGuides: EducationGuide[] = [
     excerptVi: 'Ba phương pháp pha sâm: sắc chậm bằng ấm đất, ngâm lạnh, và chiết xuất siêu âm — ảnh hưởng đến sinh khả dụng MR2.',
     category: 'Preparation',
     readTime: '10 min',
+    image: '/assets/images/nature-forest.jpg',
   },
 ];
 

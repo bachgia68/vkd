@@ -217,6 +217,55 @@ export default function ProductCatalog({
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [selectedSkus, setSelectedSkus] = useState<Set<string>>(new Set());
+  const { addToCart } = useCart();
+
+  const toggleSelect = (sku: string) => {
+    setSelectedSkus((prev) => {
+      const next = new Set(prev);
+      if (next.has(sku)) next.delete(sku);
+      else next.add(sku);
+      return next;
+    });
+  };
+
+  const selectedProducts = useMemo(
+    () => products.filter((p) => selectedSkus.has(p.sku)),
+    [selectedSkus]
+  );
+
+  const buildOwnGiftSet = () => {
+    if (selectedProducts.length < 2) return;
+    const cartProducts = selectedProducts.map(toCartProduct);
+    const priceVND = cartProducts.reduce((sum, p) => sum + p.priceVND, 0);
+    const priceUSD = cartProducts.reduce((sum, p) => sum + p.priceUSD, 0);
+    const priceJPY = cartProducts.reduce((sum, p) => sum + p.priceJPY, 0);
+    const priceCNY = cartProducts.reduce((sum, p) => sum + p.priceCNY, 0);
+    const priceEUR = cartProducts.reduce((sum, p) => sum + p.priceEUR, 0);
+    const names = cartProducts.map((p) => p.nameVi).join(', ');
+    addToCart({
+      id: `giftset-custom-${selectedProducts.map((p) => p.sku).sort().join('-')}`,
+      name: `Set Quà Tặng Tự Chọn (${cartProducts.length} sản phẩm)`,
+      nameVi: `Set Quà Tặng Tự Chọn (${cartProducts.length} sản phẩm)`,
+      category: 'set-qua-tang',
+      healthGoal: 'immunity',
+      audiences: ['family'],
+      priceUSD,
+      priceVND,
+      priceJPY,
+      priceCNY,
+      priceEUR,
+      activeIngredient: `Gồm: ${names}`,
+      description: `Gồm: ${names}`,
+      descriptionVi: `Gồm: ${names}`,
+      image: cartProducts[0].image,
+      badge: 'Set Tự Chọn',
+      rating: 0,
+      reviews: 0,
+      familySafe: true,
+    });
+    setSelectedSkus(new Set());
+  };
 
   const TRENDING_QUERIES = ['ngâm mật ong', 'nước cốt sâm', 'set quà', 'kem dưỡng', 'rượu sâm'];
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -431,13 +480,49 @@ export default function ProductCatalog({
             ) : (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filtered.map((product) => (
-                  <ProductCard key={product.sku} product={product} ui={ui} onNavigate={onNavigate} />
+                  <ProductCard
+                    key={product.sku}
+                    product={product}
+                    ui={ui}
+                    onNavigate={onNavigate}
+                    selected={selectedSkus.has(product.sku)}
+                    onToggleSelect={
+                      product.price != null && !product.displayOnly18Plus
+                        ? () => toggleSelect(product.sku)
+                        : undefined
+                    }
+                  />
                 ))}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Thanh hành động: đóng nhiều sản phẩm đã chọn thành 1 set quà tặng tự chọn */}
+      {selectedSkus.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-forest-950 text-cream-50 rounded-full shadow-elegant-lg pl-6 pr-2 py-2 flex items-center gap-4 animate-fade-in-up">
+          <span className="text-sm font-medium">
+            {selectedSkus.size} {lang === 'vi' ? 'sản phẩm đã chọn' : 'products selected'}
+          </span>
+          <button
+            onClick={buildOwnGiftSet}
+            disabled={selectedSkus.size < 2}
+            className="btn-gold py-2 px-5 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {lang === 'vi'
+              ? `Đóng Thành Set Quà Tặng (${selectedProducts.reduce((s, p) => s + (p.price ?? 0), 0).toLocaleString('vi-VN')}₫)`
+              : 'Combine into Gift Set'}
+          </button>
+          <button
+            onClick={() => setSelectedSkus(new Set())}
+            className="w-8 h-8 rounded-full hover:bg-forest-800 flex items-center justify-center transition-colors"
+            aria-label={lang === 'vi' ? 'Bỏ chọn' : 'Clear selection'}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -479,16 +564,24 @@ function ProductCard({
   product,
   ui,
   onNavigate,
+  selected,
+  onToggleSelect,
 }: {
   product: Product;
   ui: CatalogUiStrings;
   onNavigate: (page: string, slug?: string) => void;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 }) {
   const { addToCart } = useCart();
   const canOrder = product.price != null && !product.displayOnly18Plus;
 
   return (
-    <div className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-cream-200 hover:border-gold-300 transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1">
+    <div
+      className={`group flex flex-col bg-white rounded-2xl overflow-hidden border transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1 ${
+        selected ? 'border-gold-500 ring-2 ring-gold-300' : 'border-cream-200 hover:border-gold-300'
+      }`}
+    >
       {/* Image */}
       <button
         onClick={() => onNavigate('product-detail', product.slug)}
@@ -504,6 +597,23 @@ function ProductCard({
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-forest-950/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {onToggleSelect && (
+          <span
+            role="checkbox"
+            aria-checked={!!selected}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleSelect();
+            }}
+            className={`absolute bottom-3 right-3 w-7 h-7 rounded-md border-2 flex items-center justify-center transition-colors ${
+              selected ? 'bg-gold-500 border-gold-500' : 'bg-white/90 border-white'
+            }`}
+          >
+            {selected && <Check className="w-4 h-4 text-forest-900" />}
+          </span>
+        )}
 
         {product.badge && (
           <div className="absolute top-3 left-3">

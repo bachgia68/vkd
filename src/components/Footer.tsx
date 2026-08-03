@@ -118,8 +118,14 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
               ))}
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
-                <a href="mailto:lienhe@samngoclinh-ta.vn" className="text-forest-300 hover:text-white transition-colors">
-                  {t.footer.email}
+                <a href="mailto:khanh@tasamngoclinh.com" className="text-forest-300 hover:text-white transition-colors">
+                  khanh@tasamngoclinh.com
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
+                <a href="mailto:duyenmoc08@gmail.com" className="text-forest-300 hover:text-white transition-colors">
+                  duyenmoc08@gmail.com
                 </a>
               </li>
             </ul>

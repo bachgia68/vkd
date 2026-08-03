@@ -65,7 +65,7 @@ const detailUi: Record<Language, DetailUiStrings> = {
     restrictedText:
       'Sản phẩm có cồn hiện chỉ trưng bày, đang chờ xác nhận của Bộ Công Thương. TA cam kết không bán rượu cho người chưa đủ 18 tuổi. Vui lòng liên hệ TA để được tư vấn khi sản phẩm được cấp phép.',
     contactText: 'Sản phẩm tươi theo thời giá — vui lòng liên hệ TA để được báo giá và tư vấn.',
-    contactCta: 'Liên hệ TA: 0235 3.555.999',
+    contactCta: 'Liên hệ TA: 0984 999 309',
     ctaTitle: 'Khám phá toàn bộ hệ sinh thái TA',
     ctaText:
       'Sâm Ngọc Linh và đặc sản vùng miền — cùng quy về một nơi đặt hàng, một giỏ hàng, một lần thanh toán.',
@@ -89,7 +89,7 @@ const detailUi: Record<Language, DetailUiStrings> = {
     restrictedText:
       'This alcoholic product is currently display-only, pending approval from the Ministry of Industry and Trade. TA is committed to not selling alcohol to anyone under 18. Please contact TA for advice once the product is licensed for sale.',
     contactText: 'This is a fresh product priced by market rate — please contact TA for a quote and advice.',
-    contactCta: 'Contact TA: 0235 3.555.999',
+    contactCta: 'Contact TA: 0984 999 309',
     ctaTitle: 'Explore the full TA ecosystem',
     ctaText:
       'Ngoc Linh ginseng and regional specialties — all in one place to order, one cart, one checkout.',
@@ -112,7 +112,7 @@ const detailUi: Record<Language, DetailUiStrings> = {
     restrictedText:
       '该含酒精产品目前仅作展示，正等待工贸部批准。TA承诺不向未满18岁人士销售酒类产品。产品获批销售后，请联系TA咨询。',
     contactText: '该产品为鲜品，价格随行就市 — 请联系TA获取报价与咨询。',
-    contactCta: '联系TA：0235 3.555.999',
+    contactCta: '联系TA：0984 999 309',
     ctaTitle: '探索TA完整生态系统',
     ctaText: '土莫隆参与各地特产——汇聚于同一下单平台，一个购物车，一次结账。',
     ctaButton: '查看更多产品',
@@ -136,7 +136,7 @@ const detailUi: Record<Language, DetailUiStrings> = {
       "Ce produit alcoolisé est actuellement en exposition uniquement, en attente d'approbation du Ministère de l'Industrie et du Commerce. TA s'engage à ne pas vendre d'alcool aux personnes de moins de 18 ans. Veuillez contacter TA pour obtenir des conseils une fois le produit autorisé à la vente.",
     contactText:
       'Produit frais au prix du marché — veuillez contacter TA pour un devis et des conseils.',
-    contactCta: 'Contactez TA : 0235 3.555.999',
+    contactCta: 'Contactez TA : 0984 999 309',
     ctaTitle: "Découvrez tout l'écosystème TA",
     ctaText:
       'Sâm Ngọc Linh et spécialités régionales — réunis en un seul endroit pour commander, un seul panier, un seul paiement.',
@@ -159,7 +159,7 @@ const detailUi: Record<Language, DetailUiStrings> = {
     restrictedText:
       'هذا المنتج الكحولي مخصص للعرض فقط حاليًا، بانتظار موافقة وزارة الصناعة والتجارة. تلتزم TA بعدم بيع الكحول لمن هم دون سن 18 عامًا. يرجى التواصل مع TA للحصول على استشارة عند اعتماد المنتج للبيع.',
     contactText: 'هذا منتج طازج يُسعَّر حسب السوق — يرجى التواصل مع TA للحصول على عرض سعر واستشارة.',
-    contactCta: 'تواصل مع TA: 0235 3.555.999',
+    contactCta: 'تواصل مع TA: 0984 999 309',
     ctaTitle: 'استكشف منظومة TA بالكامل',
     ctaText: 'سام نغوك لينه والمنتجات الإقليمية المميزة — كلها في مكان واحد للطلب، سلة واحدة، دفع واحد.',
     ctaButton: 'عرض المزيد من المنتجات',
@@ -382,7 +382,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
               </div>
             ) : (
               <a
-                href="tel:02353555999"
+                href="tel:0984999309"
                 className="inline-flex items-center justify-center gap-2 bg-forest-900 hover:bg-forest-800 text-cream-50 text-sm font-bold py-4 px-6 rounded-full uppercase tracking-wider transition-all w-full sm:w-auto mb-4"
               >
                 <Phone className="w-4 h-4" />

@@ -100,7 +100,8 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
                     <ChevronDown className="w-3.5 h-3.5" />
                   </button>
                   {isProductMenuOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-72 bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3 z-50">
+                    <div className="absolute top-full left-0 pt-2 w-72 z-50">
+                      <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3">
                       {productTypes
                         .filter((pt) => pt.id !== 'set-qua-tang')
                         .map((pt) => (
@@ -115,6 +116,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
                             {lang === 'vi' ? pt.labelVi : pt.labelEn}
                           </button>
                         ))}
+                      </div>
                     </div>
                   )}
                 </div>

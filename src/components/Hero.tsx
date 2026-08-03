@@ -113,7 +113,9 @@ export default function Hero({ lang, onNavigate }: HeroProps) {
             <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'} transition-transform`} />
           </a>
           <a
-            href="#traceability"
+            href="https://zalo.me/0984999309"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-secondary bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50"
           >
             {t.hero.ctaSecondary}
