@@ -56,7 +56,7 @@ export default function LoyaltyDashboard({ lang, onNavigate }: LoyaltyProps) {
                     <Crown className="w-5 h-5 text-gold-400" />
                     <span className="text-gold-400 font-semibold text-sm">{isVi ? loyaltyTiers[currentTierIdx].nameVi : loyaltyTiers[currentTierIdx].name} Member</span>
                   </div>
-                  <img src="/assets/images/logo-sam-ngoc-linh.png" alt="TA Logo" className="h-8 opacity-80" />
+                  <img src="/assets/images/TA_logo_header.png" alt="TA Logo" className="h-8 opacity-80" />
                 </div>
                 <p className="text-white/60 text-xs uppercase tracking-wider mb-1">
                   {isVi ? 'Điểm Tích Lũy' : 'Total Points'}

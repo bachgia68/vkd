@@ -50,7 +50,7 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
           <div className="lg:col-span-1">
             <div className="mb-6">
               <img
-                src="/assets/images/logo-sam-ngoc-linh.png"
+                src="/assets/images/TA_logo_clean.png"
                 alt="TA — Sàn giao dịch Sâm Ngọc Linh"
                 className="h-16 w-auto object-contain"
               />

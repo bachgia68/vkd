@@ -11,6 +11,7 @@ import AgentsPage from './pages/AgentsPage';
 import ShowroomsPage from './pages/ShowroomsPage';
 import RevenuePage from './pages/RevenuePage';
 import SettingsPage from './pages/SettingsPage';
+import CatalogExportPage from './pages/CatalogExportPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -30,6 +31,7 @@ export default function AdminApp() {
           <Route path="crm-erp" element={<CrmErpPage />} />
           <Route path="inventory-qr" element={<InventoryQrPage />} />
           <Route path="products" element={<ProductsPage />} />
+          <Route path="catalog-export" element={<CatalogExportPage />} />
           <Route path="agents" element={<AgentsPage />} />
           <Route path="showrooms" element={<ShowroomsPage />} />
           <Route path="revenue" element={<RevenuePage />} />

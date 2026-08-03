@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings } from 'lucide-react';
+import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 
 const NAV = [
   { to: '/gate-vkd-control-2026', end: true, label: 'Tổng quan', icon: LayoutGrid },
   { to: '/gate-vkd-control-2026/products', end: false, label: 'Sản phẩm & Kho', icon: Package },
+  { to: '/gate-vkd-control-2026/catalog-export', end: false, label: 'Catalog & Xuất File', icon: FileSpreadsheet },
   { to: '/gate-vkd-control-2026/agents', end: false, label: 'Đại lý & Affiliate', icon: Handshake },
   { to: '/gate-vkd-control-2026/showrooms', end: false, label: 'Showroom O2O', icon: Store },
   { to: '/gate-vkd-control-2026/revenue', end: false, label: 'Doanh thu đa kênh', icon: BarChart3 },

@@ -70,7 +70,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
           {/* Logo */}
           <button onClick={() => handleNav('home')} className="flex items-center gap-3 group">
             <img
-              src="/assets/images/logo-sam-ngoc-linh.png"
+              src="/assets/images/TA_logo_header.png"
               alt="TA — Sàn Giao Dịch Sâm Ngọc Linh Logo"
               className="h-12 md:h-14 w-auto object-contain transform group-hover:scale-105 transition-transform duration-300"
             />

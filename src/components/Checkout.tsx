@@ -53,7 +53,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
     setPaymentState('processing');
     try {
       const origin = window.location.origin;
-      const res = await fetch('/.netlify/functions/create-payos-payment', {
+      const res = await fetch('/api/create-payos-payment', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
