@@ -117,6 +117,11 @@ export default function ProductsPage() {
       <div>
         <p className="text-xs uppercase tracking-widest text-forest-500 mb-1">Vận hành / Sản phẩm &amp; Kho hàng</p>
         <h1 className="font-display text-3xl text-forest-900">Quản lý sản phẩm</h1>
+        <p className="text-sm text-forest-500 mt-1">
+          Đổi giá hoặc ẩn/hiện (Đã bán/Đã ẩn) một SKU đã có sẵn trên site sẽ áp dụng ngay cho khách hàng. Thêm SKU hoàn
+          toàn mới ở đây chưa hiện trên trang catalog khách hàng — cần bổ sung nội dung (ảnh, mô tả, thành phần...) vào
+          <code className="mx-1 px-1.5 py-0.5 rounded bg-cream-200 text-xs">src/data/products.ts</code> trước.
+        </p>
       </div>
 
       <div className="flex justify-between items-center">

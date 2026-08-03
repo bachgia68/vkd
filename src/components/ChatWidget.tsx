@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import TaWordmark from './TaWordmark';
-import { products } from '../data/products';
+import { products as staticProducts } from '../data/products';
+import { useLiveProducts } from '../hooks/useLiveProducts';
 import { productTypes, type ProductTypeId } from '../data/productTypes';
 import { submitCustomerLead } from '../lib/siteContentApi';
 
@@ -80,6 +81,7 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
   const [leadDone, setLeadDone] = useState(false);
   const [leadError, setLeadError] = useState('');
   const l = lang === 'en' ? 'en' : 'vi';
+  const products = useLiveProducts(staticProducts);
 
   const t = {
     title: 'TA Trợ lý',

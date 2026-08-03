@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RefreshCw, CheckCircle, Info, Calendar, Pause, X, Plus } from 'lucide-react';
-import { products as unifiedProducts, toCartProduct } from '../data/products';
+import { products as staticProducts, toCartProduct } from '../data/products';
+import { useLiveProducts } from '../hooks/useLiveProducts';
 import type { Language } from '../i18n/translations';
 
 interface AutoshipProps {
@@ -20,9 +21,6 @@ const frequencies = [
 // 'supplements' cũ (VKD-002, 003, 004, 009, 010, 011) đã được phân loại vào
 // productType 'tra-nuoc-uong-sam' (Trà & Nước Uống Sâm) — nhóm sản phẩm tiêu
 // thụ định kỳ/hàng ngày, phù hợp nhất với mô hình autoship.
-const products = unifiedProducts.filter(p => p.productType === 'tra-nuoc-uong-sam').map(toCartProduct);
-const subscriptionProducts = products;
-
 interface MockSubscription {
   productId: string;
   frequencyDays: number;
@@ -32,6 +30,9 @@ interface MockSubscription {
 
 export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) {
   const isVi = lang === 'vi';
+  const liveProducts = useLiveProducts(staticProducts);
+  const products = liveProducts.filter((p) => p.productType === 'tra-nuoc-uong-sam').map(toCartProduct);
+  const subscriptionProducts = products;
   const [subscriptions, setSubscriptions] = useState<MockSubscription[]>([
     { productId: 'VKD-010', frequencyDays: 30, nextDate: '2026-08-10', status: 'active' },
     { productId: 'VKD-003', frequencyDays: 30, nextDate: '2026-08-10', status: 'active' },

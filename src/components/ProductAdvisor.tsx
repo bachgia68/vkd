@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { ArrowRight, RotateCcw, ShoppingBag, Sparkles } from 'lucide-react';
 import type { HealthGoal, TargetAudience } from '../data/mockData';
 import { healthGoalLabels, audienceLabels } from '../data/mockData';
-import { products, toCartProduct } from '../data/products';
+import { products as staticProducts, toCartProduct } from '../data/products';
+import { useLiveProducts } from '../hooks/useLiveProducts';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
 
@@ -46,12 +47,13 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
   const goals = Object.keys(healthGoalLabels) as HealthGoal[];
   const audiences = Object.keys(audienceLabels) as TargetAudience[];
 
+  const products = useLiveProducts(staticProducts);
   const pool = useMemo(
     () =>
       products
         .filter((p) => p.price != null && !p.displayOnly18Plus)
         .map(toCartProduct),
-    []
+    [products]
   );
 
   const match = useMemo(() => {

@@ -13,7 +13,8 @@ import {
   ShieldAlert,
   Phone,
 } from 'lucide-react';
-import { products, toCartProduct, type Product } from '../data/products';
+import { products as staticProducts, toCartProduct, type Product } from '../data/products';
+import { useLiveProducts } from '../hooks/useLiveProducts';
 import { productTypes } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
@@ -179,6 +180,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
   const ui = detailUi[lang];
   const isRTL = lang === 'ar';
 
+  const products = useLiveProducts(staticProducts);
   const product: Product | undefined = products.find((p) => p.slug === slug);
 
   if (!product) {

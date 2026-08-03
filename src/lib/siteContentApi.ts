@@ -99,3 +99,26 @@ export async function submitB2BLead(input: {
   });
   if (error) throw new Error(error.message);
 }
+
+// Live price/stock/visibility overrides from the admin "Sản phẩm & Kho" page.
+// The static catalog in ../data/products.ts stays the source of truth for
+// content (name, description, images, taxonomy) — a full CMS migration is a
+// separate, much larger project. This overlay is the surgical fix for the
+// concrete gap: editing price/stock/hide-product in admin previously had zero
+// effect on what customers saw. Goes through get_product_overrides() (a
+// SECURITY DEFINER RPC) rather than a plain table read because RLS on
+// products only exposes active=true rows — a plain SELECT can't distinguish
+// "SKU not tracked in Supabase yet" from "admin explicitly hid this SKU",
+// and only the RPC path lets us tell those apart correctly.
+export interface ProductOverride {
+  sku: string;
+  price_vnd: number | null;
+  active: boolean;
+  stock_qty: number;
+}
+
+export async function fetchProductOverrides(): Promise<ProductOverride[]> {
+  const { data, error } = await supabase.rpc('get_product_overrides');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}

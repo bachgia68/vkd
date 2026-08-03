@@ -13,7 +13,8 @@ import {
   ChevronRight,
   ShoppingBag,
 } from 'lucide-react';
-import { products, toCartProduct, type Product } from '../data/products';
+import { products as staticProducts, toCartProduct, type Product } from '../data/products';
+import { useLiveProducts } from '../hooks/useLiveProducts';
 import { productTypes, type ProductTypeId } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
@@ -200,6 +201,7 @@ export default function ProductCatalog({
   onNavigate: (page: string, slug?: string) => void;
   initialType?: string;
 }) {
+  const products = useLiveProducts(staticProducts);
   const isValidProductType = (id?: string): id is ProductTypeId =>
     !!id && productTypes.some((t) => t.id === id);
 
