@@ -644,3 +644,34 @@ export async function deleteCustomerLead(id: string) {
   const { error } = await supabase.from('customer_leads').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+// ---------- Dashboard KPIs (Tổng quan) ----------
+
+export interface DashboardKpis {
+  revenueThisMonth: number;
+  paidOrdersThisMonth: number;
+  totalCustomers: number;
+  suspectScans: number;
+}
+
+export async function fetchDashboardKpis(): Promise<DashboardKpis> {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+  const [ordersRes, customersRes, scansRes] = await Promise.all([
+    supabase.from('orders').select('total, created_at').eq('status', 'paid').gte('created_at', monthStart),
+    supabase.from('customers').select('id', { count: 'exact', head: true }),
+    supabase.from('qr_scan_events').select('id', { count: 'exact', head: true }).eq('suspect', true),
+  ]);
+  if (ordersRes.error) throw new Error(ordersRes.error.message);
+  if (customersRes.error) throw new Error(customersRes.error.message);
+  if (scansRes.error) throw new Error(scansRes.error.message);
+
+  const orders = (ordersRes.data ?? []) as { total: number }[];
+  return {
+    revenueThisMonth: orders.reduce((sum, o) => sum + Number(o.total), 0),
+    paidOrdersThisMonth: orders.length,
+    totalCustomers: customersRes.count ?? 0,
+    suspectScans: scansRes.count ?? 0,
+  };
+}

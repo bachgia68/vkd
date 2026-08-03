@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FileText,
@@ -13,13 +14,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { fmt } from './adminMockData';
-
-const KPIS = [
-  { label: 'Doanh thu tháng', value: '1,320,000,000đ', delta: '▲ 12.4% so với tháng trước', icon: TrendingUp, tone: 'up' },
-  { label: 'Đơn hàng', value: fmt(486), delta: '▲ 8 đơn hôm nay', icon: ShoppingBag, tone: 'up' },
-  { label: 'Khách Elite mới', value: fmt(37), delta: '▲ 5 tuần này', icon: Users, tone: 'up' },
-  { label: 'Cảnh báo nghi hàng giả', value: '2', delta: 'Cần xác minh', icon: ShieldAlert, tone: 'down' },
-];
+import { fetchDashboardKpis, type DashboardKpis } from './adminApi';
 
 const SECTIONS = [
   {
@@ -67,6 +62,32 @@ const SECTIONS = [
 ];
 
 export default function AdminHome() {
+  const [kpis, setKpis] = useState<DashboardKpis | null>(null);
+  const [kpiError, setKpiError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardKpis()
+      .then(setKpis)
+      .catch((e) => setKpiError(e instanceof Error ? e.message : 'Lỗi tải số liệu'));
+  }, []);
+
+  const monthLabel = new Date().toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
+
+  const KPIS = kpis
+    ? [
+        { label: `Doanh thu ${monthLabel}`, value: `${fmt(kpis.revenueThisMonth)}đ`, note: 'Đơn PayOS đã thanh toán trong tháng', icon: TrendingUp, tone: 'neutral' as const },
+        { label: `Đơn hàng ${monthLabel}`, value: fmt(kpis.paidOrdersThisMonth), note: 'Đã thanh toán qua PayOS', icon: ShoppingBag, tone: 'neutral' as const },
+        { label: 'Khách hàng', value: fmt(kpis.totalCustomers), note: 'Tổng số trong CRM', icon: Users, tone: 'neutral' as const },
+        {
+          label: 'Cảnh báo nghi hàng giả',
+          value: fmt(kpis.suspectScans),
+          note: kpis.suspectScans > 0 ? 'Cần xác minh — xem Kho hàng & Truy xuất QR' : 'Chưa ghi nhận quét QR bất thường',
+          icon: ShieldAlert,
+          tone: kpis.suspectScans > 0 ? ('alert' as const) : ('neutral' as const),
+        },
+      ]
+    : [];
+
   return (
     <div className="space-y-8">
       <div>
@@ -74,18 +95,24 @@ export default function AdminHome() {
         <h1 className="font-display text-3xl text-forest-900">Tổng quan kinh doanh</h1>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {KPIS.map((k) => (
-          <div key={k.label} className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
-            <div className="flex items-center justify-between text-xs uppercase tracking-wide text-forest-500">
-              {k.label}
-              <k.icon className="w-4 h-4 text-gold-500" />
+      {kpiError ? (
+        <p className="text-sm text-red-600 bg-white rounded-2xl border border-forest-100 p-5">Lỗi tải số liệu: {kpiError}</p>
+      ) : !kpis ? (
+        <p className="text-sm text-forest-500">Đang tải số liệu…</p>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {KPIS.map((k) => (
+            <div key={k.label} className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
+              <div className="flex items-center justify-between text-xs uppercase tracking-wide text-forest-500">
+                {k.label}
+                <k.icon className="w-4 h-4 text-gold-500" />
+              </div>
+              <p className="font-display text-2xl text-forest-900 mt-3">{k.value}</p>
+              <p className={`text-xs mt-1 ${k.tone === 'alert' ? 'text-red-600' : 'text-forest-500'}`}>{k.note}</p>
             </div>
-            <p className="font-display text-2xl text-forest-900 mt-3">{k.value}</p>
-            <p className={`text-xs mt-1 ${k.tone === 'up' ? 'text-forest-600' : 'text-red-600'}`}>{k.delta}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div>
         <h2 className="font-display text-xl text-forest-900 mb-4">Phân hệ vận hành</h2>
