@@ -79,7 +79,7 @@ async function markOrderPaid(orderCode: string, paymentRef: string) {
       },
       body: JSON.stringify({ p_order_code: orderCode, p_payment_ref: paymentRef }),
     });
-    const data = await res.json();
+    const data = (await res.json()) as { success?: boolean };
     if (!data?.success) {
       console.error('mark_payos_order_paid: order not found or already processed', orderCode);
     }
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
   const payos = new PayOS({ clientId, apiKey, checksumKey });
 
   try {
-    const body = await req.json();
+    const body = (await req.json()) as Parameters<typeof payos.webhooks.verify>[0];
     const webhookData = await payos.webhooks.verify(body);
 
     // Dữ liệu test mẫu mà payOS gửi khi bấm "Xác nhận Webhook URL" trên my.payos.vn
