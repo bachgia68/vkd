@@ -34,6 +34,8 @@ function App() {
   const [selectedSlug, setSelectedSlug] = useState('');
   const [traceQr, setTraceQr] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
+  // TODO: Replace with real auth context when user sign-in is implemented
+  const [userEmail, _setUserEmail] = useState<string | undefined>(undefined);
 
   // Xử lý khi trình duyệt quay lại từ trang thanh toán PayOS (VietQR).
   useEffect(() => {
@@ -139,7 +141,7 @@ function App() {
           )}
 
           {currentPage === 'loyalty' && (
-            <LoyaltyDashboard lang={lang} onNavigate={navigate} />
+            <LoyaltyDashboard lang={lang} onNavigate={navigate} userEmail={userEmail} />
           )}
 
           {currentPage === 'autoship' && (
