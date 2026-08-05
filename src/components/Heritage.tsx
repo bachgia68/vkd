@@ -127,6 +127,33 @@ export default function Heritage({ lang }: HeritageProps) {
           </div>
         </div>
 
+        {/* Photo gallery */}
+        <div className="mb-16">
+          <h3 className="font-display text-2xl md:text-3xl text-forest-900 mb-6 text-center">
+            {t.heritage.galleryLabel}
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { src: '/assets/images/heritage-cay-sam.jpg', alt: t.heritage.altCaySam },
+              { src: '/assets/images/heritage-cu-sam.jpg', alt: t.heritage.altCuSam },
+              { src: '/assets/images/heritage-vuon-sam-1.jpg', alt: t.heritage.altVuonSam1 },
+              { src: '/assets/images/heritage-vuon-sam-2.webp', alt: t.heritage.altVuonSam2 },
+            ].map((photo, index) => (
+              <div
+                key={index}
+                className="aspect-square overflow-hidden rounded-2xl shadow-elegant"
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Three pillars grid */}
         <div className="grid md:grid-cols-3 gap-6">
           {pillars.map((pillar, index) => {

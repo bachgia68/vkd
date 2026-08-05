@@ -58,6 +58,11 @@ export interface Translation {
     saponinDesc: string;
     saponinCount: string;
     saponinTypes: string;
+    galleryLabel: string;
+    altCaySam: string;
+    altCuSam: string;
+    altVuonSam1: string;
+    altVuonSam2: string;
   };
   products: {
     label: string;
@@ -191,6 +196,11 @@ export const translations: Record<Language, Translation> = {
       saponinDesc: 'Sâm Ngọc Linh chứa hơn 52 loại saponin — cao nhất trong tất cả các loài sâm trên thế giới, mang lại giá trị dược lý vượt trội.',
       saponinCount: '52+',
       saponinTypes: 'Loại Saponin',
+      galleryLabel: 'Vườn Sâm Nguyên Sinh',
+      altCaySam: 'Cây sâm Ngọc Linh trong tự nhiên',
+      altCuSam: 'Củ sâm Ngọc Linh',
+      altVuonSam1: 'Vườn trồng sâm Ngọc Linh dưới tán rừng',
+      altVuonSam2: 'Vườn sâm Ngọc Linh nhìn từ góc khác',
     },
     products: {
       label: 'Hệ Sinh Thái',
@@ -327,6 +337,11 @@ export const translations: Record<Language, Translation> = {
       saponinDesc: 'Ngoc Linh Ginseng contains over 52 saponin types — the highest among all ginseng species worldwide — delivering exceptional pharmacological value.',
       saponinCount: '52+',
       saponinTypes: 'Saponin Types',
+      galleryLabel: 'Native Ginseng Garden',
+      altCaySam: 'Ngoc Linh ginseng plant in its natural habitat',
+      altCuSam: 'Ngoc Linh ginseng root close-up',
+      altVuonSam1: 'Ngoc Linh ginseng cultivation under the forest canopy',
+      altVuonSam2: 'Ngoc Linh ginseng plantation, alternate view',
     },
     products: {
       label: 'Ecosystem',
@@ -463,6 +478,11 @@ export const translations: Record<Language, Translation> = {
       saponinDesc: '玉灵参含有超过52种皂苷 — 在所有人参品种中含量最高 — 带来卓越的药理价值。',
       saponinCount: '52+',
       saponinTypes: '种皂苷',
+      galleryLabel: '原生玉灵参园',
+      altCaySam: '生长在自然环境中的玉灵参植株',
+      altCuSam: '玉灵参根部特写',
+      altVuonSam1: '林下种植的玉灵参园',
+      altVuonSam2: '玉灵参种植园（另一视角）',
     },
     products: {
       label: '产品生态',
@@ -599,6 +619,11 @@ export const translations: Record<Language, Translation> = {
       saponinDesc: 'Le Ginseng Ngoc Linh contient plus de 52 types de saponines — le plus élevé parmi toutes les espèces de ginseng — offrant une valeur pharmacologique exceptionnelle.',
       saponinCount: '52+',
       saponinTypes: 'Types de Saponines',
+      galleryLabel: 'Jardin Natif de Ginseng',
+      altCaySam: 'Plant de ginseng Ngoc Linh à l’état naturel',
+      altCuSam: 'Gros plan sur une racine de ginseng Ngoc Linh',
+      altVuonSam1: 'Culture de ginseng Ngoc Linh sous la canopée forestière',
+      altVuonSam2: 'Plantation de ginseng Ngoc Linh, vue alternative',
     },
     products: {
       label: 'Écosystème',
@@ -735,6 +760,11 @@ export const translations: Record<Language, Translation> = {
       saponinDesc: 'يحتوي جينسنغ نغوك لينه على أكثر من 52 نوعاً من الصابونين — الأعلى بين جميع أنواع الجينسنغ — مما يوفر قيمة دوائية استثنائية.',
       saponinCount: '+52',
       saponinTypes: 'نوع صابونين',
+      galleryLabel: 'حديقة الجينسنغ الأصلية',
+      altCaySam: 'نبتة جينسنغ نغوك لينه في بيئتها الطبيعية',
+      altCuSam: 'لقطة مقربة لجذر جينسنغ نغوك لينه',
+      altVuonSam1: 'مزرعة جينسنغ نغوك لينه تحت مظلة الغابة',
+      altVuonSam2: 'مزرعة جينسنغ نغوك لينه، منظر آخر',
     },
     products: {
       label: 'النظام البيئي',
