@@ -54,13 +54,15 @@ export interface BlogPost {
   title: string;
   excerpt: string;
   body: string;
+  featured_image_url: string | null;
+  featured_image_alt: string | null;
   created_at: string;
 }
 
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, title, excerpt, body, created_at')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at')
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];

@@ -571,11 +571,17 @@ export async function deleteSocialLink(id: string) {
   if (error) throw new Error(error.message);
 }
 
-export async function createBlogPost(input: { title: string; excerpt: string; body: string }): Promise<BlogPost> {
+export async function createBlogPost(input: {
+  title: string;
+  excerpt: string;
+  body: string;
+  featured_image_url?: string | null;
+  featured_image_alt?: string | null;
+}): Promise<BlogPost> {
   const res = await supabase
     .from('blog_posts')
     .insert(input)
-    .select('id, title, excerpt, body, created_at')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at')
     .single();
   return throwIfError(res);
 }
@@ -583,6 +589,168 @@ export async function createBlogPost(input: { title: string; excerpt: string; bo
 export async function deleteBlogPost(id: string) {
   const { error } = await supabase.from('blog_posts').delete().eq('id', id);
   if (error) throw new Error(error.message);
+}
+
+// Uploads a featured image to the public `blog-images` storage bucket and
+// returns its public URL. Admin-only (RLS on storage.objects gates the insert).
+export async function uploadBlogImage(file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('blog-images').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('blog-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ---------- Channels (kênh phân phối: Facebook, TikTok, YouTube, Zalo, ...) ----------
+
+export interface Channel {
+  id: string;
+  channel_name: string;
+  platform_type: 'facebook' | 'tiktok' | 'youtube' | 'zalo' | 'instagram' | 'linkedin' | 'other';
+  channel_url: string | null;
+  webhook_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  notes: string | null;
+}
+
+export async function fetchChannels(): Promise<Channel[]> {
+  return throwIfError(
+    await supabase
+      .from('channels')
+      .select('id, channel_name, platform_type, channel_url, webhook_url, is_active, sort_order, notes')
+      .order('sort_order')
+  );
+}
+
+export async function createChannel(input: {
+  channel_name: string;
+  platform_type: Channel['platform_type'];
+  channel_url?: string;
+  webhook_url?: string;
+  notes?: string;
+}): Promise<Channel> {
+  const res = await supabase
+    .from('channels')
+    .insert(input)
+    .select('id, channel_name, platform_type, channel_url, webhook_url, is_active, sort_order, notes')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateChannel(
+  id: string,
+  patch: Partial<Pick<Channel, 'channel_name' | 'channel_url' | 'webhook_url' | 'is_active' | 'notes'>>
+) {
+  const { error } = await supabase.from('channels').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteChannel(id: string) {
+  const { error } = await supabase.from('channels').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Post captions (1 caption/kênh cho mỗi bài viết) ----------
+
+export interface PostCaption {
+  id: string;
+  post_id: string;
+  channel_id: string;
+  caption_text: string;
+  video_url: string | null;
+  is_published: boolean;
+  published_at: string | null;
+}
+
+export async function fetchPostCaptions(postId: string): Promise<PostCaption[]> {
+  return throwIfError(
+    await supabase
+      .from('post_captions')
+      .select('id, post_id, channel_id, caption_text, video_url, is_published, published_at')
+      .eq('post_id', postId)
+  );
+}
+
+export async function saveCaption(postId: string, channelId: string, captionText: string): Promise<PostCaption> {
+  const res = await supabase
+    .from('post_captions')
+    .upsert(
+      { post_id: postId, channel_id: channelId, caption_text: captionText, updated_at: new Date().toISOString() },
+      { onConflict: 'post_id,channel_id' }
+    )
+    .select('id, post_id, channel_id, caption_text, video_url, is_published, published_at')
+    .single();
+  return throwIfError(res);
+}
+
+// Uploads a video for one (post, channel) caption to the public `blog-videos`
+// bucket (200MB cap, video mime allow-list — enforced server-side by the
+// bucket config, not just this client check). Admin-only.
+export async function uploadCaptionVideo(captionId: string, file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'mp4';
+  const path = `${captionId}-${Date.now()}.${ext}`;
+  const { error: uploadError } = await supabase.storage.from('blog-videos').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (uploadError) throw new Error(uploadError.message);
+  const { data } = supabase.storage.from('blog-videos').getPublicUrl(path);
+  const { error } = await supabase
+    .from('post_captions')
+    .update({ video_url: data.publicUrl, video_uploaded_at: new Date().toISOString() })
+    .eq('id', captionId);
+  if (error) throw new Error(error.message);
+  return data.publicUrl;
+}
+
+// Removes the stored video for a caption once it's already been posted to the
+// real platform (via webhook) — the copy in our own Supabase Storage is no
+// longer needed after that and just costs storage space, so this deletes the
+// object AND clears video_url. Does not touch caption_text/is_published.
+export async function deleteCaptionVideo(caption: PostCaption) {
+  if (caption.video_url) {
+    const path = caption.video_url.split('/blog-videos/')[1];
+    if (path) {
+      const { error: removeError } = await supabase.storage.from('blog-videos').remove([path]);
+      if (removeError) throw new Error(removeError.message);
+    }
+  }
+  const { error } = await supabase.from('post_captions').update({ video_url: null }).eq('id', caption.id);
+  if (error) throw new Error(error.message);
+}
+
+// Marks a caption as published/approved and (if the channel has a webhook
+// configured) fires it so an external automation (n8n/Zapier/Make ...) the
+// admin owns can pick it up and actually post to that platform. This code
+// never calls Facebook/TikTok/YouTube/Zalo's own APIs directly — no such
+// credentials exist in this project. Without a webhook_url configured for the
+// channel, this only marks the caption approved for manual copy-paste.
+export async function publishCaption(caption: PostCaption, webhookUrl: string | null, payload: unknown) {
+  const { error } = await supabase
+    .from('post_captions')
+    .update({ is_published: true, published_at: new Date().toISOString() })
+    .eq('id', caption.id);
+  if (error) throw new Error(error.message);
+
+  if (webhookUrl) {
+    try {
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      // Webhook delivery failure shouldn't roll back the "approved" state —
+      // the admin can retry the webhook independently. Surfaced as a toast
+      // by the caller.
+      throw new Error('Đã lưu duyệt, nhưng gọi webhook kênh thất bại (kiểm tra lại URL webhook).');
+    }
+  }
 }
 
 export interface B2BLead {

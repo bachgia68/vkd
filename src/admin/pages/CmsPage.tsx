@@ -1,8 +1,72 @@
 import { useEffect, useState } from 'react';
-import { Search, CheckCircle2, AlertTriangle, Info, Plus, Save, Trash2, Globe } from 'lucide-react';
+import {
+  Search,
+  CheckCircle2,
+  AlertTriangle,
+  Info,
+  Plus,
+  Save,
+  Trash2,
+  Globe,
+  ImagePlus,
+  Send,
+  Loader2,
+  Video,
+  VideoOff,
+  HelpCircle,
+} from 'lucide-react';
 import { BANNED_KEYWORDS, MANDATORY_DISCLAIMER, ADMIN_IMAGES } from '../adminMockData';
-import { fetchArticles, createArticle, updateArticle, createBlogPost, deleteBlogPost, type CmsArticle, type BlogPost } from '../adminApi';
+import {
+  fetchArticles,
+  createArticle,
+  updateArticle,
+  createBlogPost,
+  deleteBlogPost,
+  uploadBlogImage,
+  fetchChannels,
+  fetchPostCaptions,
+  saveCaption,
+  publishCaption,
+  uploadCaptionVideo,
+  deleteCaptionVideo,
+  type CmsArticle,
+  type BlogPost,
+  type Channel,
+  type PostCaption,
+} from '../adminApi';
 import { fetchBlogPosts } from '../../lib/siteContentApi';
+
+const PLATFORM_LABELS: Record<Channel['platform_type'], string> = {
+  facebook: 'Facebook',
+  tiktok: 'TikTok',
+  youtube: 'YouTube',
+  zalo: 'Zalo OA',
+  instagram: 'Instagram',
+  linkedin: 'LinkedIn',
+  other: 'Khác',
+};
+
+// Bản nháp caption theo từng nền tảng — chỉ là điểm khởi đầu, admin sửa trực
+// tiếp trong ô textarea trước khi duyệt đăng.
+function draftCaption(platform: Channel['platform_type'], post: { title: string; excerpt: string }): string {
+  const link = 'tasamngoclinh.com/bai-viet';
+  switch (platform) {
+    case 'tiktok':
+      return `${post.title}\n\n${post.excerpt}\n\n#samngoclinh #TA #khoahocsam`;
+    case 'facebook':
+      return `${post.title}\n\n${post.excerpt}\n\nĐọc đầy đủ tại: ${link}`;
+    case 'zalo':
+      return `${post.title}\n\n${post.excerpt}\n\nXem tại: ${link}`;
+    case 'instagram':
+      return `${post.title}\n\n${post.excerpt}\n\n#samngoclinh #TA`;
+    case 'youtube':
+      return `${post.title}\n\n${post.excerpt}`;
+    case 'linkedin':
+      return `${post.title}\n\n${post.excerpt}\n\n${link}`;
+    default:
+      return `${post.title}\n\n${post.excerpt}`;
+  }
+}
 
 const STAGE_LABELS = ['Bản nháp', 'Chờ Hội đồng Y khoa', 'Đã xuất bản'];
 
@@ -37,6 +101,16 @@ export default function CmsPage() {
   const [newTitle, setNewTitle] = useState('');
   const [newExcerpt, setNewExcerpt] = useState('');
   const [newBody, setNewBody] = useState('');
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
+  const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [captionPostId, setCaptionPostId] = useState<string | null>(null);
+  const [captionDrafts, setCaptionDrafts] = useState<Record<string, string>>({});
+  const [existingCaptions, setExistingCaptions] = useState<Record<string, PostCaption>>({});
+  const [captionBusy, setCaptionBusy] = useState<string | null>(null);
+  const [selectedChannelIds, setSelectedChannelIds] = useState<Set<string>>(new Set());
 
   const loadPosts = () => {
     fetchBlogPosts()
@@ -44,19 +118,47 @@ export default function CmsPage() {
       .catch((e) => showToast(e instanceof Error ? e.message : 'Lỗi tải bài viết SEO'));
   };
 
+  const loadChannels = async (): Promise<Channel[]> => {
+    try {
+      const rows = (await fetchChannels()).filter((c) => c.is_active);
+      setChannels(rows);
+      return rows;
+    } catch {
+      setChannels([]);
+      return [];
+    }
+  };
+
+  const onPickImage = (file: File | null) => {
+    setNewImageFile(file);
+    if (newImagePreview) URL.revokeObjectURL(newImagePreview);
+    setNewImagePreview(file ? URL.createObjectURL(file) : null);
+  };
+
   const publishPost = async () => {
     if (!newTitle.trim() || !newBody.trim()) return;
     try {
-      await createBlogPost({
+      let featured_image_url: string | null = null;
+      if (newImageFile) {
+        setUploadingImage(true);
+        featured_image_url = await uploadBlogImage(newImageFile);
+        setUploadingImage(false);
+      }
+      const created = await createBlogPost({
         title: newTitle.trim(),
         excerpt: newExcerpt.trim() || newBody.trim().slice(0, 140),
         body: newBody.trim(),
+        featured_image_url,
+        featured_image_alt: newTitle.trim(),
       });
       setNewTitle('');
       setNewExcerpt('');
       setNewBody('');
+      onPickImage(null);
       loadPosts();
+      openCaptions(created);
     } catch (e) {
+      setUploadingImage(false);
       showToast(e instanceof Error ? e.message : 'Lỗi đăng bài viết');
     }
   };
@@ -64,9 +166,111 @@ export default function CmsPage() {
   const deletePost = async (id: string) => {
     try {
       await deleteBlogPost(id);
+      if (captionPostId === id) setCaptionPostId(null);
       loadPosts();
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Lỗi xoá bài viết');
+    }
+  };
+
+  const openCaptions = async (post: BlogPost) => {
+    setCaptionPostId(post.id);
+    setSelectedChannelIds(new Set());
+    try {
+      const activeChannels = channels.length > 0 ? channels : await loadChannels();
+      const rows = await fetchPostCaptions(post.id);
+      const byChannel: Record<string, PostCaption> = {};
+      const drafts: Record<string, string> = {};
+      rows.forEach((r) => {
+        byChannel[r.channel_id] = r;
+        drafts[r.channel_id] = r.caption_text;
+      });
+      activeChannels.forEach((c) => {
+        if (!(c.id in drafts)) drafts[c.id] = draftCaption(c.platform_type, post);
+      });
+      setExistingCaptions(byChannel);
+      setCaptionDrafts(drafts);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi tải caption');
+    }
+  };
+
+  const approveAndPublish = async (post: BlogPost, channel: Channel) => {
+    const text = captionDrafts[channel.id] ?? draftCaption(channel.platform_type, post);
+    const existingVideo = existingCaptions[channel.id]?.video_url ?? null;
+    setCaptionBusy(channel.id);
+    try {
+      const saved = await saveCaption(post.id, channel.id, text);
+      await publishCaption(saved, channel.webhook_url, {
+        post_id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        featured_image_url: post.featured_image_url,
+        caption: text,
+        video_url: existingVideo,
+        channel: channel.platform_type,
+        channel_url: channel.channel_url,
+      });
+      setExistingCaptions((prev) => ({ ...prev, [channel.id]: { ...saved, video_url: existingVideo, is_published: true } }));
+      showToast(
+        channel.webhook_url
+          ? `Đã duyệt & gửi webhook kênh ${PLATFORM_LABELS[channel.platform_type]}`
+          : `Đã duyệt caption kênh ${PLATFORM_LABELS[channel.platform_type]} — chưa gắn webhook, tự copy để đăng thủ công`
+      );
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi duyệt caption');
+    } finally {
+      setCaptionBusy(null);
+    }
+  };
+
+  const approveAndPublishSelected = async (post: BlogPost) => {
+    const targets = channels.filter((c) => selectedChannelIds.has(c.id));
+    for (const c of targets) {
+      await approveAndPublish(post, c);
+    }
+    showToast(`Đã duyệt & đăng ${targets.length} kênh đã chọn`);
+  };
+
+  const toggleChannelSelected = (channelId: string) => {
+    setSelectedChannelIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(channelId)) next.delete(channelId);
+      else next.add(channelId);
+      return next;
+    });
+  };
+
+  const uploadVideoForChannel = async (channel: Channel, file: File) => {
+    const existing = existingCaptions[channel.id];
+    const captionId = existing?.id ?? (await saveCaption(captionPostId as string, channel.id, captionDrafts[channel.id] ?? '')).id;
+    setCaptionBusy(channel.id);
+    try {
+      const url = await uploadCaptionVideo(captionId, file);
+      setExistingCaptions((prev) => ({
+        ...prev,
+        [channel.id]: { ...(prev[channel.id] ?? existing), id: captionId, video_url: url } as PostCaption,
+      }));
+      showToast(`Đã tải video lên cho kênh ${PLATFORM_LABELS[channel.platform_type]}`);
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi tải video lên');
+    } finally {
+      setCaptionBusy(null);
+    }
+  };
+
+  const removeVideoForChannel = async (channel: Channel) => {
+    const existing = existingCaptions[channel.id];
+    if (!existing) return;
+    setCaptionBusy(channel.id);
+    try {
+      await deleteCaptionVideo(existing);
+      setExistingCaptions((prev) => ({ ...prev, [channel.id]: { ...prev[channel.id], video_url: null } }));
+      showToast('Đã xoá video khỏi kho lưu trữ (đã đăng xong, không cần giữ bản sao)');
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi xoá video');
+    } finally {
+      setCaptionBusy(null);
     }
   };
 
@@ -84,6 +288,9 @@ export default function CmsPage() {
 
   useEffect(load, []);
   useEffect(loadPosts, []);
+  useEffect(() => {
+    loadChannels();
+  }, []);
 
   const selected = articles.find((a) => a.id === selectedId) ?? null;
 
@@ -128,12 +335,31 @@ export default function CmsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="relative rounded-2xl overflow-hidden h-36">
+      <div className="flex flex-wrap gap-2 text-xs">
+        <a
+          href="#blog-seo-section"
+          className="px-3 py-1.5 rounded-full bg-gold-400/15 text-gold-700 font-medium hover:bg-gold-400/25"
+        >
+          📝 Đăng bài SEO + Caption đa kênh
+        </a>
+        <a
+          href="#medical-review-section"
+          className="px-3 py-1.5 rounded-full bg-forest-100 text-forest-700 font-medium hover:bg-forest-200"
+        >
+          🩺 Duyệt bài y khoa
+        </a>
+      </div>
+
+      <div id="medical-review-section" className="relative rounded-2xl overflow-hidden h-36 scroll-mt-6">
         <img src={ADMIN_IMAGES.cmsHero} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-forest-950/60" />
         <div className="relative h-full flex flex-col justify-center px-8">
           <p className="text-xs uppercase tracking-widest text-gold-300">Nội dung / CMS Y khoa</p>
           <h1 className="font-display text-2xl text-cream-50 mt-1">Duyệt bài viết chuẩn y khoa</h1>
+          <p className="text-xs text-cream-200/80 mt-1">
+            Luồng duyệt nội bộ 3 giai đoạn — không có caption đa kênh. Muốn đăng bài SEO + tạo caption 6 kênh, xem mục
+            "📝 Đăng bài SEO + Caption đa kênh" bên trên.
+          </p>
         </div>
       </div>
 
@@ -249,14 +475,15 @@ export default function CmsPage() {
       )}
 
       {/* Blog SEO công khai — hiện thẳng lên trang chủ, không qua quy trình duyệt y khoa */}
-      <div className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant">
+      <div id="blog-seo-section" className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant scroll-mt-6">
         <div className="flex items-center gap-2 mb-1">
           <Globe className="w-4 h-4 text-gold-600" />
           <h3 className="font-display text-lg text-forest-900">Bài viết SEO công khai (hiển thị ngay trên trang chủ)</h3>
         </div>
         <p className="text-xs text-forest-500 mb-5">
-          Khác với quy trình duyệt y khoa ở trên — bài viết ở đây xuất bản ngay lập tức lên mục "Bài Viết Từ TA" trên
-          trang chủ khách hàng.
+          Khác với mục duyệt y khoa — bài viết ở đây xuất bản ngay lập tức lên mục "Bài Viết Từ TA" trên trang chủ
+          khách hàng. <strong>Bấm vào 1 bài trong danh sách bên phải để mở caption 6 kênh (Facebook/TikTok/YouTube/
+          Zalo/Instagram/LinkedIn) và duyệt đăng riêng từng kênh.</strong>
         </p>
 
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6">
@@ -288,8 +515,25 @@ export default function CmsPage() {
                 placeholder="Nội dung đầy đủ bài viết..."
               />
             </div>
-            <button onClick={publishPost} className="btn-gold text-xs">
-              <Plus className="w-4 h-4" /> Đăng bài lên trang chủ
+            <div>
+              <label className="text-[11px] uppercase tracking-wide text-forest-400">Ảnh nổi bật</label>
+              <label className="mt-1 flex items-center gap-3 border border-dashed border-forest-200 rounded-lg px-3 py-2.5 text-sm text-forest-500 cursor-pointer hover:border-gold-400 hover:text-forest-700">
+                <ImagePlus className="w-4 h-4 flex-shrink-0" />
+                {newImageFile ? newImageFile.name : 'Chọn ảnh (jpg/png) — hiện trên thẻ bài viết & trang chủ'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onPickImage(e.target.files?.[0] ?? null)}
+                />
+              </label>
+              {newImagePreview && (
+                <img src={newImagePreview} alt="Xem trước ảnh" className="mt-2 w-full h-32 object-cover rounded-lg" />
+              )}
+            </div>
+            <button onClick={publishPost} disabled={uploadingImage} className="btn-gold text-xs disabled:opacity-50">
+              {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              {uploadingImage ? 'Đang tải ảnh lên...' : 'Đăng bài lên trang chủ'}
             </button>
           </div>
 
@@ -298,23 +542,59 @@ export default function CmsPage() {
               <p className="text-sm text-forest-400">Chưa có bài viết SEO nào được đăng.</p>
             ) : (
               posts.map((p) => (
-                <div key={p.id} className="flex items-start justify-between gap-3 bg-cream-50 rounded-xl p-3.5">
-                  <div>
-                    <p className="text-sm font-medium text-forest-900">{p.title}</p>
-                    <p className="text-xs text-forest-500 mt-0.5">{new Date(p.created_at).toLocaleDateString('vi-VN')}</p>
+                <button
+                  key={p.id}
+                  onClick={() => openCaptions(p)}
+                  className={`w-full flex items-center justify-between gap-3 rounded-xl p-3.5 text-left transition-colors ${
+                    captionPostId === p.id ? 'bg-gold-50 border border-gold-300' : 'bg-cream-50 border border-transparent hover:border-forest-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {p.featured_image_url ? (
+                      <img src={p.featured_image_url} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-forest-100 flex-shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-forest-900 truncate">{p.title}</p>
+                      <p className="text-xs text-forest-500 mt-0.5">{new Date(p.created_at).toLocaleDateString('vi-VN')}</p>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => deletePost(p.id)}
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deletePost(p.id);
+                    }}
                     aria-label="Xoá bài viết"
                     className="text-forest-400 hover:text-red-600 flex-shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                  </span>
+                </button>
               ))
             )}
           </div>
         </div>
+
+        {captionPostId && (
+          <CaptionPanel
+            post={posts.find((p) => p.id === captionPostId) ?? null}
+            channels={channels}
+            drafts={captionDrafts}
+            existing={existingCaptions}
+            busy={captionBusy}
+            selected={selectedChannelIds}
+            onChangeDraft={(channelId, text) => setCaptionDrafts((prev) => ({ ...prev, [channelId]: text }))}
+            onApprove={approveAndPublish}
+            onApproveSelected={approveAndPublishSelected}
+            onToggleSelected={toggleChannelSelected}
+            onUploadVideo={uploadVideoForChannel}
+            onRemoveVideo={removeVideoForChannel}
+            onClose={() => setCaptionPostId(null)}
+          />
+        )}
       </div>
 
       {showNewModal && (
@@ -337,6 +617,190 @@ export default function CmsPage() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-forest-950 text-cream-50 px-5 py-3 rounded-xl text-sm shadow-elegant-lg z-50 border border-gold-400/30">
           {toast}
         </div>
+      )}
+    </div>
+  );
+}
+
+function CaptionPanel({
+  post,
+  channels,
+  drafts,
+  existing,
+  busy,
+  selected,
+  onChangeDraft,
+  onApprove,
+  onApproveSelected,
+  onToggleSelected,
+  onUploadVideo,
+  onRemoveVideo,
+  onClose,
+}: {
+  post: BlogPost | null;
+  channels: Channel[];
+  drafts: Record<string, string>;
+  existing: Record<string, PostCaption>;
+  busy: string | null;
+  selected: Set<string>;
+  onChangeDraft: (channelId: string, text: string) => void;
+  onApprove: (post: BlogPost, channel: Channel) => void;
+  onApproveSelected: (post: BlogPost) => void;
+  onToggleSelected: (channelId: string) => void;
+  onUploadVideo: (channel: Channel, file: File) => void;
+  onRemoveVideo: (channel: Channel) => void;
+  onClose: () => void;
+}) {
+  const [showWebhookHelp, setShowWebhookHelp] = useState(false);
+  if (!post) return null;
+
+  return (
+    <div className="mt-6 pt-6 border-t border-forest-100">
+      <div className="flex items-center justify-between mb-1">
+        <h4 className="font-display text-base text-forest-900">
+          Caption đa kênh — <span className="text-gold-600">{post.title}</span>
+        </h4>
+        <button onClick={onClose} className="text-xs text-forest-400 hover:text-forest-700">
+          Đóng
+        </button>
+      </div>
+      <p className="text-xs text-forest-500 mb-1">
+        Sửa nội dung/ảnh/video từng kênh nếu cần, tick chọn nhiều kênh rồi bấm 1 nút để đăng đồng loạt. Chưa cấu hình
+        kênh nào (kể cả nhiều fanpage/trang cá nhân cùng nền tảng) thì vào mục <strong>Kênh phân phối</strong> ở menu
+        bên trên để thêm — không giới hạn số lượng.
+      </p>
+      <button
+        onClick={() => setShowWebhookHelp((v) => !v)}
+        className="flex items-center gap-1.5 text-xs text-gold-700 hover:text-gold-800 mb-4"
+      >
+        <HelpCircle className="w-3.5 h-3.5" /> {showWebhookHelp ? 'Ẩn hướng dẫn gắn webhook' : 'Xem hướng dẫn gắn webhook để đăng tự động'}
+      </button>
+
+      {showWebhookHelp && (
+        <div className="bg-cream-200/60 border-l-2 border-gold-400 rounded-lg p-4 text-xs text-forest-700 leading-relaxed mb-4 space-y-2">
+          <p>
+            <strong>Webhook</strong> là 1 URL do bạn tự tạo (qua n8n, Zapier, hoặc Make.com — đều có gói miễn phí) để
+            nhận dữ liệu bài viết (tiêu đề, caption, ảnh, video) từ đây rồi tự đăng lên Facebook/TikTok/YouTube/Zalo
+            thật. 4 bước:
+          </p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>
+              Tạo tài khoản <strong>n8n.io</strong> (hoặc Zapier/Make) — dùng bản miễn phí là đủ để bắt đầu.
+            </li>
+            <li>
+              Tạo workflow mới, node đầu tiên là <strong>Webhook (nhận POST request)</strong> — copy URL webhook đó.
+            </li>
+            <li>
+              Dán URL đó vào ô <strong>Webhook URL</strong> của kênh tương ứng trong mục <strong>Kênh phân phối</strong>.
+            </li>
+            <li>
+              Nối thêm node đăng bài của từng nền tảng (Facebook Graph API / TikTok / YouTube / Zalo OA — n8n có sẵn
+              node cho Facebook, các kênh khác dùng node HTTP Request gọi API riêng của nền tảng đó) — dùng đúng field{' '}
+              <code className="bg-white px-1 rounded">caption</code>, <code className="bg-white px-1 rounded">featured_image_url</code>,{' '}
+              <code className="bg-white px-1 rounded">video_url</code> từ dữ liệu webhook nhận được.
+            </li>
+          </ol>
+          <p>
+            Kênh chưa gắn webhook thì nút vẫn dùng được — chỉ đánh dấu "đã duyệt" để bạn tự copy caption + tải ảnh/video
+            về đăng tay.
+          </p>
+        </div>
+      )}
+
+      {channels.length === 0 ? (
+        <p className="text-sm text-forest-400 bg-cream-50 rounded-xl p-4">
+          Chưa có kênh nào đang bật. Vào <strong>Kênh phân phối</strong> để thêm Facebook/TikTok/YouTube/Zalo...
+        </p>
+      ) : (
+        <>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-forest-500">{selected.size} kênh đã chọn</p>
+            <button
+              onClick={() => onApproveSelected(post)}
+              disabled={selected.size === 0 || busy !== null}
+              className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+            >
+              <Send className="w-4 h-4" /> Duyệt & Đăng {selected.size > 0 ? `${selected.size} kênh đã chọn` : 'đã chọn'}
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {channels.map((c) => {
+              const cap = existing[c.id];
+              const isPublished = cap?.is_published;
+              const videoUrl = cap?.video_url;
+              return (
+                <div key={c.id} className="bg-cream-50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selected.has(c.id)}
+                        onChange={() => onToggleSelected(c.id)}
+                        className="rounded border-forest-300"
+                      />
+                      <span className="text-xs uppercase tracking-wide text-gold-600 font-medium">
+                        {PLATFORM_LABELS[c.platform_type]} — {c.channel_name}
+                      </span>
+                    </label>
+                    {isPublished && (
+                      <span className="flex items-center gap-1 text-[11px] text-forest-600">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Đã duyệt
+                      </span>
+                    )}
+                  </div>
+                  <textarea
+                    value={drafts[c.id] ?? ''}
+                    onChange={(e) => onChangeDraft(c.id, e.target.value)}
+                    className="w-full min-h-28 border border-forest-100 rounded-lg p-3 text-sm bg-white focus:outline-none focus:border-gold-400"
+                  />
+
+                  <div className="mt-2">
+                    {videoUrl ? (
+                      <div className="flex items-center gap-2">
+                        <video src={videoUrl} controls className="w-24 h-16 rounded-lg object-cover bg-black" />
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[11px] text-forest-500">Đã gắn video</span>
+                          {isPublished && (
+                            <button
+                              onClick={() => onRemoveVideo(c)}
+                              disabled={busy === c.id}
+                              className="flex items-center gap-1 text-[11px] text-forest-500 hover:text-red-600"
+                            >
+                              <VideoOff className="w-3.5 h-3.5" /> Xoá video (đã đăng xong, khỏi tốn dung lượng)
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="flex items-center gap-2 text-xs text-forest-500 border border-dashed border-forest-200 rounded-lg px-3 py-2 cursor-pointer hover:border-gold-400 hover:text-forest-700 w-fit">
+                        <Video className="w-3.5 h-3.5" /> Thêm video cho kênh này
+                        <input
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) onUploadVideo(c, file);
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => onApprove(post, c)}
+                    disabled={busy === c.id}
+                    className="mt-2 btn-primary text-xs disabled:opacity-50"
+                  >
+                    {busy === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {c.webhook_url ? 'Duyệt & Đăng' : 'Duyệt (chưa gắn webhook)'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

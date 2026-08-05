@@ -6,8 +6,9 @@ description: Use when starting ANY work on the VKD Group website project (this r
 # VKD Group Website - skill tong
 
 ## Du an nay la gi
-- Nen tang thuong mai dien tu cua VKD Group (Sam Ngoc Linh Viet Nam): React 19 + TypeScript + Vite + Tailwind, thanh toan qua PayOS (VietQR), trien khai tren Netlify.
-- Repo: `bachgia68/vkd` (remote `origin`, nhanh `main`). Site song: `https://vkd-nature-storefront.netlify.app`.
+- Nen tang thuong mai dien tu cua VKD Group (Sam Ngoc Linh Viet Nam): React 19 + TypeScript + Vite + Tailwind, thanh toan qua PayOS (VietQR), trien khai tren Vercel.
+- Repo: `bachgia68/vkd` (remote `origin`, nhanh `main`). Site song (that): `https://tasamngoclinh.com` (Vercel project `ta`, team `bachgia68-1157s-projects`) - chi tiet deploy xem skill `deploy-vkd-site`.
+- Netlify (`old-site-nature.netlify.app`, doi ten tu `vkd-nature-storefront` ngay 2026-08-04 de tranh nham) la site cu/backup, KHONG con dung - dung dan link nay cho khach hang hay bao cao trang thai site.
 - Trang khach hang: `src/App.tsx` + `src/components/*`. Cong quan tri noi bo: `src/admin/*` (mat khau demo - xem `manage-admin-mockdata`).
 - CHUA co database that (xem `vkd-feature-audit`) - moi thu ngoai `src/data/vkdProducts.ts` (san pham that) deu la state/mock trong trinh duyet, mat khi tai lai trang.
 
@@ -15,7 +16,7 @@ description: Use when starting ANY work on the VKD Group website project (this r
 - Them/sua/xoa san pham that (dong bo tu samngoclinhvkdgroup.com) -> `update-vkd-products`
 - Debug/kiem tra luong thanh toan PayOS (VietQR), webhook, form checkout -> `manage-payos-checkout`
 - Sua noi dung/so lieu mau trong cong quan tri (7 phan he) -> `manage-admin-mockdata`
-- Build, kiem tra, commit, push de Netlify tu deploy -> `deploy-vkd-site`
+- Build, kiem tra, commit, push de Vercel tu deploy -> `deploy-vkd-site`
 - Can bao cao tinh nang nao da xong/dang do (vd. cho chu shop) truoc khi khang dinh mot tinh nang "da xong" -> `vkd-feature-audit`
 
 ## Moi truong (doc truoc khi dung vao repo - do mat thoi gian debug lai)

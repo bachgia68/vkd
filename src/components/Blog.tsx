@@ -33,16 +33,28 @@ export default function Blog() {
           {posts.map((post) => (
             <article
               key={post.id}
-              className="bg-white rounded-2xl p-8 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1"
+              className="bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-forest-100 flex items-center justify-center mb-6">
-                <Newspaper className="w-6 h-6 text-forest-700" />
-              </div>
+              {post.featured_image_url ? (
+                <img
+                  src={post.featured_image_url}
+                  alt={post.featured_image_alt || post.title}
+                  className="w-full h-48 object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-48 bg-forest-100 flex items-center justify-center">
+                  <Newspaper className="w-10 h-10 text-forest-400" />
+                </div>
+              )}
+
+              <div className="p-8">
               <p className="text-xs text-forest-400 mb-2">{formatDate(post.created_at)}</p>
               <h3 className="font-display text-xl font-semibold text-forest-900 mb-3">{post.title}</h3>
               <p className="text-forest-600 leading-relaxed line-clamp-3">{post.excerpt}</p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium text-forest-600">
                 Đọc tiếp <ArrowRight className="w-4 h-4" />
+              </div>
               </div>
             </article>
           ))}

@@ -12,6 +12,7 @@ import ShowroomsPage from './pages/ShowroomsPage';
 import RevenuePage from './pages/RevenuePage';
 import SettingsPage from './pages/SettingsPage';
 import CatalogExportPage from './pages/CatalogExportPage';
+import ChannelsPage from './pages/ChannelsPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -35,6 +36,7 @@ export default function AdminApp() {
           <Route path="agents" element={<AgentsPage />} />
           <Route path="showrooms" element={<ShowroomsPage />} />
           <Route path="revenue" element={<RevenuePage />} />
+          <Route path="channels" element={<ChannelsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

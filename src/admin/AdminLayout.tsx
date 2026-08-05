@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet } from 'lucide-react';
+import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2 } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/showrooms', end: false, label: 'Showroom O2O', icon: Store },
   { to: '/gate-vkd-control-2026/revenue', end: false, label: 'Doanh thu đa kênh', icon: BarChart3 },
   { to: '/gate-vkd-control-2026/cms', end: false, label: 'Duyệt Bài CMS', icon: FileText },
+  { to: '/gate-vkd-control-2026/channels', end: false, label: 'Kênh phân phối', icon: Share2 },
   { to: '/gate-vkd-control-2026/crm-erp', end: false, label: 'CRM & ERP', icon: Users },
   { to: '/gate-vkd-control-2026/inventory-qr', end: false, label: 'Kho hàng & QR', icon: Warehouse },
   { to: '/gate-vkd-control-2026/settings', end: false, label: 'Địa chỉ & Liên hệ', icon: Settings },
