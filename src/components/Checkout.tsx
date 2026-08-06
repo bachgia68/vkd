@@ -33,7 +33,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   const { items, subtotalVND } = useCart();
   const isVi = lang === 'vi';
 
-  const [region, setRegion] = useState<Region>('vn');
+  const [region, setRegion] = useState<Region>(isVi ? 'vn' : 'us');
   const [paymentMethod] = useState<PaymentMethod>('payos');
   const [paymentState, setPaymentState] = useState<PaymentState>('idle');
 

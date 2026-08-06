@@ -107,12 +107,15 @@ export default function CartDrawer({ lang, onCheckout }: CartDrawerProps) {
 
                     {/* Price */}
                     <div className="text-right">
-                      <div className="text-sm font-bold text-forest-900">
-                        ${(item.priceUSD * item.quantity).toFixed(2)}
-                      </div>
-                      <div className="text-xs text-forest-400">
-                        {(item.priceVND * item.quantity).toLocaleString('vi-VN')}₫
-                      </div>
+                      {isVi ? (
+                        <div className="text-sm font-bold text-forest-900">
+                          {(item.priceVND * item.quantity).toLocaleString('vi-VN')}₫
+                        </div>
+                      ) : (
+                        <div className="text-sm font-bold text-forest-900">
+                          ${(item.priceUSD * item.quantity).toFixed(2)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -139,10 +142,7 @@ export default function CartDrawer({ lang, onCheckout }: CartDrawerProps) {
               </span>
               <div className="text-right">
                 <div className="text-xl font-display font-bold text-forest-900">
-                  ${subtotalUSD.toFixed(2)}
-                </div>
-                <div className="text-xs text-forest-400">
-                  {subtotalVND.toLocaleString('vi-VN')}₫
+                  {isVi ? `${subtotalVND.toLocaleString('vi-VN')}₫` : `$${subtotalUSD.toFixed(2)}`}
                 </div>
               </div>
             </div>

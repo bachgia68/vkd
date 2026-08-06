@@ -135,8 +135,17 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
                     </div>
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <div className="text-right mb-1">
-                        <p className="font-bold text-forest-900 text-sm">${(product.priceUSD * 0.9).toFixed(2)}</p>
-                        <p className="text-xs text-forest-400 line-through">${product.priceUSD.toFixed(2)}</p>
+                        {isVi ? (
+                          <>
+                            <p className="font-bold text-forest-900 text-sm">{Math.round(product.priceVND * 0.9).toLocaleString('vi-VN')}₫</p>
+                            <p className="text-xs text-forest-400 line-through">{product.priceVND.toLocaleString('vi-VN')}₫</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="font-bold text-forest-900 text-sm">${(product.priceUSD * 0.9).toFixed(2)}</p>
+                            <p className="text-xs text-forest-400 line-through">${product.priceUSD.toFixed(2)}</p>
+                          </>
+                        )}
                       </div>
                       <button onClick={() => togglePause(sub.productId)} className="inline-flex items-center gap-1 text-xs text-forest-500 hover:text-forest-700 transition-colors">
                         <Pause className="w-3 h-3" />
@@ -194,8 +203,17 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
                       <p className="text-xs text-forest-400 mt-0.5">{product.activeIngredient}</p>
                       <div className="flex items-center justify-between mt-2">
                         <div>
-                          <span className="font-bold text-forest-900 text-sm">${(product.priceUSD * 0.9).toFixed(2)}</span>
-                          <span className="text-xs text-forest-400 line-through ml-1">${product.priceUSD.toFixed(2)}</span>
+                          {isVi ? (
+                            <>
+                              <span className="font-bold text-forest-900 text-sm">{Math.round(product.priceVND * 0.9).toLocaleString('vi-VN')}₫</span>
+                              <span className="text-xs text-forest-400 line-through ml-1">{product.priceVND.toLocaleString('vi-VN')}₫</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-bold text-forest-900 text-sm">${(product.priceUSD * 0.9).toFixed(2)}</span>
+                              <span className="text-xs text-forest-400 line-through ml-1">${product.priceUSD.toFixed(2)}</span>
+                            </>
+                          )}
                         </div>
                         {alreadyAdded ? (
                           <span className="flex items-center gap-1 text-xs text-forest-600 font-semibold">

@@ -24,6 +24,15 @@ function formatVND(n: number | null): string {
   return n.toLocaleString('vi-VN') + '₫';
 }
 
+const VND_PER_USD = 25000;
+
+function formatPrice(vndPrice: number | null, lang: Language): string {
+  if (vndPrice === null) return lang === 'vi' ? 'Liên hệ' : 'Contact us';
+  if (lang === 'vi') return formatVND(vndPrice);
+  const usd = Math.round((vndPrice / VND_PER_USD) * 100) / 100;
+  return `$${usd.toFixed(2)}`;
+}
+
 /**
  * ProductCatalog
  * -----------------------------------------------------------------------------
@@ -486,6 +495,7 @@ export default function ProductCatalog({
                     key={product.sku}
                     product={product}
                     ui={ui}
+                    lang={lang}
                     onNavigate={onNavigate}
                     selected={selectedSkus.has(product.sku)}
                     onToggleSelect={
@@ -565,12 +575,14 @@ function CategoryButton({
 function ProductCard({
   product,
   ui,
+  lang,
   onNavigate,
   selected,
   onToggleSelect,
 }: {
   product: Product;
   ui: CatalogUiStrings;
+  lang: Language;
   onNavigate: (page: string, slug?: string) => void;
   selected?: boolean;
   onToggleSelect?: () => void;
@@ -655,7 +667,7 @@ function ProductCard({
         {/* Price + CTA */}
         <div className="mt-auto pt-4 border-t border-cream-200 flex items-center justify-between gap-3">
           <div>
-            <div className="text-lg font-display font-bold text-forest-900">{formatVND(product.price)}</div>
+            <div className="text-lg font-display font-bold text-forest-900">{formatPrice(product.price, lang)}</div>
             <div className="text-[11px] text-forest-400">{ui.retailPriceLabel}</div>
           </div>
           {canOrder ? (

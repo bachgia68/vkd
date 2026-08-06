@@ -172,6 +172,15 @@ function formatVND(price: number | null): string {
   return price.toLocaleString('vi-VN') + '₫';
 }
 
+const VND_PER_USD = 25000;
+
+function formatPrice(price: number | null, lang: Language): string {
+  if (lang === 'vi') return formatVND(price);
+  if (price == null) return 'Contact us';
+  const usd = Math.round((price / VND_PER_USD) * 100) / 100;
+  return `$${usd.toFixed(2)}`;
+}
+
 export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailProps) {
   const [qty, setQty] = useState(1);
   const [liked, setLiked] = useState(false);
@@ -287,7 +296,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
             </h1>
 
             <div className="text-3xl font-display font-bold text-forest-900 mb-6 pb-6 border-b border-cream-200">
-              {formatVND(product.price)}
+              {formatPrice(product.price, lang)}
               {product.volume && (
                 <span className="text-sm font-normal text-forest-400 ml-2">· {product.volume}</span>
               )}
