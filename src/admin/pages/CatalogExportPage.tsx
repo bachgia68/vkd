@@ -6,6 +6,7 @@ import { vkdProducts } from '../../data/vkdProducts';
 import { trimicoProducts } from '../../data/trimicoProducts';
 
 const CONTACT_PHONE = '0984 999 309';
+const ZALO_URL = 'https://zalo.me/84984999309';
 const LOGO_URL = '/assets/images/TA_logo_clean.png';
 
 // Bảng màu brand TA (đồng bộ tailwind.config.js) — hex thật vì jsPDF không đọc class Tailwind.
@@ -16,9 +17,46 @@ const BRAND = {
   cream200: '#f4f0e6',
 };
 
-function money(v: number | null) {
+const VND_PER_USD = 25000;
+
+function money(v: number | null, pdfLang: 'vi' | 'en' = 'vi') {
+  if (pdfLang === 'en') {
+    if (v === null) return 'Contact us';
+    return `$${(Math.round((v / VND_PER_USD) * 100) / 100).toFixed(2)}`;
+  }
   if (v === null) return 'Liên hệ';
   return v.toLocaleString('vi-VN') + ' đ';
+}
+
+let interFontsPromise: Promise<{ regular: string; bold: string } | null> | null = null;
+
+// jsPDF font "helvetica" mac dinh khong co dau tieng Viet — nap Inter (co du dau)
+// vao VFS cua jsPDF mot lan, dung chung cho moi lan xuat PDF.
+function loadInterFonts(): Promise<{ regular: string; bold: string } | null> {
+  if (!interFontsPromise) {
+    interFontsPromise = (async () => {
+      try {
+        const toBase64 = async (url: string) => {
+          const res = await fetch(url);
+          if (!res.ok) return null;
+          const buf = await res.arrayBuffer();
+          let binary = '';
+          const bytes = new Uint8Array(buf);
+          for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+          return btoa(binary);
+        };
+        const [regular, bold] = await Promise.all([
+          toBase64('/fonts/Inter-Regular.ttf'),
+          toBase64('/fonts/Inter-Bold.ttf'),
+        ]);
+        if (!regular || !bold) return null;
+        return { regular, bold };
+      } catch {
+        return null;
+      }
+    })();
+  }
+  return interFontsPromise;
 }
 
 async function loadImageAsDataUrl(url: string): Promise<{ dataUrl: string; width: number; height: number } | null> {
@@ -47,6 +85,7 @@ async function loadImageAsDataUrl(url: string): Promise<{ dataUrl: string; width
 export default function CatalogExportPage() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Set<string>>(() => new Set(products.map((p) => p.sku)));
+  const [pdfLang, setPdfLang] = useState<'vi' | 'en'>('vi');
   const [exportingExcel, setExportingExcel] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [pdfProgress, setPdfProgress] = useState('');
@@ -148,13 +187,116 @@ export default function CatalogExportPage() {
     setExportingPdf(true);
     try {
       const { jsPDF } = await import('jspdf');
+      const QRCode = (await import('qrcode')).default;
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
       const margin = 14;
 
-      const logo = await loadImageAsDataUrl(LOGO_URL);
+      const interFonts = await loadInterFonts();
+      const fontName = interFonts ? 'Inter' : 'helvetica';
+      if (interFonts) {
+        doc.addFileToVFS('Inter-Regular.ttf', interFonts.regular);
+        doc.addFont('Inter-Regular.ttf', 'Inter', 'normal');
+        doc.addFileToVFS('Inter-Bold.ttf', interFonts.bold);
+        doc.addFont('Inter-Bold.ttf', 'Inter', 'bold');
+      }
 
+      const logo = await loadImageAsDataUrl(LOGO_URL);
+      const qrDataUrl = await QRCode.toDataURL(ZALO_URL, {
+        margin: 0,
+        color: { dark: '#0B2F1D', light: '#00000000' },
+      });
+      const goldDark = '#a07d24';
+
+      const L = pdfLang === 'en'
+        ? {
+            headerTitle: 'TA — Product Catalog',
+            coverKicker: 'PANAX VIETNAMENSIS · NGOC LINH GINSEING',
+            coverTitle: 'TA Ginseng Catalogue',
+            coverSubtitle: 'Wholesale Product Catalog',
+            saponinCount: '52+',
+            saponinLabel: 'TYPES OF SAPONIN',
+            saponinDesc: 'Ngoc Linh Ginseng contains the richest saponin profile among all ginseng species worldwide.',
+            qrLabel: 'Scan to chat on Zalo',
+            footerContact: `Wholesale inquiries: ${CONTACT_PHONE} (Zalo)`,
+            ingLabel: 'Ingredients',
+            pageOf: (n: number, total: number) => `${n} / ${total}`,
+          }
+        : {
+            headerTitle: 'TA — Catalog Sản Phẩm',
+            coverKicker: 'PANAX VIETNAMENSIS · SÂM NGỌC LINH',
+            coverTitle: 'TA Catalogue Sản Phẩm',
+            coverSubtitle: 'Bảng Catalog Dành Cho Khách Sỉ',
+            saponinCount: '52+',
+            saponinLabel: 'LOẠI SAPONIN',
+            saponinDesc: 'Sâm Ngọc Linh chứa hàm lượng saponin cao nhất trong tất cả các loài sâm trên thế giới.',
+            qrLabel: 'Quét mã kết bạn Zalo',
+            footerContact: `Liên hệ tư vấn / đặt hàng sỉ: ${CONTACT_PHONE} (Zalo)`,
+            ingLabel: 'Thành phần',
+            pageOf: (n: number, total: number) => `${n} / ${total}`,
+          };
+
+      // ---------- Trang bìa ----------
+      doc.setFillColor(BRAND.forest900);
+      doc.rect(0, 0, pageW, pageH, 'F');
+      // dải gold mỏng viền trong tạo cảm giác cao cấp
+      doc.setDrawColor(BRAND.gold400);
+      doc.setLineWidth(0.4);
+      doc.rect(6, 6, pageW - 12, pageH - 12);
+
+      if (logo) {
+        const h = 26;
+        const w = (logo.width / logo.height) * h;
+        doc.addImage(logo.dataUrl, 'PNG', (pageW - w) / 2, 26, w, h);
+      }
+
+      doc.setTextColor(BRAND.gold400);
+      doc.setFont(fontName, 'bold');
+      doc.setFontSize(9);
+      doc.text(L.coverKicker, pageW / 2, 62, { align: 'center' });
+
+      doc.setTextColor(BRAND.cream50);
+      doc.setFont(fontName, 'bold');
+      doc.setFontSize(30);
+      doc.text(L.coverTitle, pageW / 2, 78, { align: 'center' });
+
+      doc.setTextColor(BRAND.gold400);
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(13);
+      doc.text(L.coverSubtitle, pageW / 2, 88, { align: 'center' });
+
+      // Khối thống kê saponin
+      const statY = 118;
+      doc.setTextColor(BRAND.gold400);
+      doc.setFont(fontName, 'bold');
+      doc.setFontSize(46);
+      doc.text(L.saponinCount, pageW / 2, statY, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setFont(fontName, 'bold');
+      doc.text(L.saponinLabel, pageW / 2, statY + 8, { align: 'center' });
+      doc.setTextColor('#cfd9d1');
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(9.5);
+      const descLines = doc.splitTextToSize(L.saponinDesc, 130);
+      doc.text(descLines, pageW / 2, statY + 17, { align: 'center' });
+
+      // QR + liên hệ, đáy trang bìa
+      const qrSize = 26;
+      const qrX = (pageW - qrSize) / 2;
+      const qrY = pageH - 62;
+      doc.setFillColor(BRAND.cream50);
+      doc.roundedRect(qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 2, 2, 'F');
+      doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+      doc.setTextColor(BRAND.cream50);
+      doc.setFont(fontName, 'normal');
+      doc.setFontSize(9);
+      doc.text(L.qrLabel, pageW / 2, qrY + qrSize + 8, { align: 'center' });
+      doc.setTextColor(BRAND.gold400);
+      doc.setFont(fontName, 'bold');
+      doc.text(CONTACT_PHONE, pageW / 2, qrY + qrSize + 14, { align: 'center' });
+
+      // ---------- Header/footer trang sản phẩm ----------
       const drawHeader = () => {
         doc.setFillColor(BRAND.forest900);
         doc.rect(0, 0, pageW, 22, 'F');
@@ -164,85 +306,116 @@ export default function CatalogExportPage() {
           doc.addImage(logo.dataUrl, 'PNG', margin, 5, w, h);
         }
         doc.setTextColor(BRAND.gold400);
-        doc.setFont('helvetica', 'bold');
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(13);
-        doc.text('TA — Catalog Sản Phẩm', pageW - margin, 13, { align: 'right' });
+        doc.text(L.headerTitle, pageW - margin, 13, { align: 'right' });
       };
 
-      const drawFooter = (pageNum: number) => {
+      const drawFooter = (pageNum: number, totalPages: number) => {
         doc.setFillColor(BRAND.cream200);
-        doc.rect(0, pageH - 14, pageW, 14, 'F');
+        doc.rect(0, pageH - 16, pageW, 16, 'F');
+        doc.setDrawColor(BRAND.gold400);
+        doc.setLineWidth(0.3);
+        doc.line(0, pageH - 16, pageW, pageH - 16);
+        const qrFootSize = 10;
+        doc.addImage(qrDataUrl, 'PNG', margin, pageH - 13, qrFootSize, qrFootSize);
         doc.setTextColor(BRAND.forest900);
-        doc.setFont('helvetica', 'normal');
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(9);
-        doc.text(`Liên hệ tư vấn / đặt hàng sỉ: ${CONTACT_PHONE} (Zalo)`, margin, pageH - 6);
-        doc.text(String(pageNum), pageW - margin, pageH - 6, { align: 'right' });
+        doc.text(L.footerContact, margin + qrFootSize + 3, pageH - 7);
+        doc.text(L.pageOf(pageNum, totalPages), pageW - margin, pageH - 7, { align: 'right' });
       };
+
+      // ---------- Lưới sản phẩm 2 cột ----------
+      const cols = 2;
+      const gutter = 8;
+      const colW = (pageW - margin * 2 - gutter * (cols - 1)) / cols;
+      const cardH = 76;
+      const rowGap = 6;
+      const gridTop = 30;
+
+      // total trang được tính trước để in "x/y" chính xác — ước lượng bằng số ô mỗi trang
+      const rowsPerPage = Math.floor((pageH - 16 - gridTop) / (cardH + rowGap));
+      const itemsPerPage = Math.max(1, rowsPerPage * cols);
+      const totalProductPages = Math.max(1, Math.ceil(chosen.length / itemsPerPage));
 
       let pageNum = 1;
       drawHeader();
-      drawFooter(pageNum);
-      let y = 30;
+      drawFooter(pageNum, totalProductPages);
+      let col = 0;
+      let row = 0;
 
       for (let i = 0; i < chosen.length; i++) {
         const p = chosen[i];
         setPdfProgress(`Đang xử lý ${i + 1}/${chosen.length}: ${p.name}`);
 
-        const blockH = 62;
-        if (y + blockH > pageH - 16) {
+        if (row >= rowsPerPage) {
           doc.addPage();
           pageNum += 1;
           drawHeader();
-          drawFooter(pageNum);
-          y = 30;
+          drawFooter(pageNum, totalProductPages);
+          row = 0;
+          col = 0;
         }
 
-        const imgW = 34;
-        const imgH = 34;
+        const cx = margin + col * (colW + gutter);
+        const cy = gridTop + row * (cardH + rowGap);
+
+        // khung thẻ sản phẩm
+        doc.setFillColor(BRAND.cream50);
+        doc.setDrawColor('#e4dcc4');
+        doc.setLineWidth(0.25);
+        doc.roundedRect(cx, cy, colW, cardH, 2.5, 2.5, 'FD');
+
+        const imgSize = colW - 10;
         const img = await loadImageAsDataUrl(p.image);
         if (img) {
           try {
-            doc.addImage(img.dataUrl, margin, y, imgW, imgH, undefined, 'FAST');
+            doc.addImage(img.dataUrl, 'PNG', cx + 5, cy + 5, imgSize, 30, undefined, 'FAST');
           } catch {
             // ảnh lỗi định dạng (vd. SVG) — bỏ qua, vẫn in đủ text
           }
         }
 
-        const textX = margin + imgW + 6;
-        const textW = pageW - margin - textX;
-        let ty = y + 4;
+        const textX = cx + 5;
+        const textW = colW - 10;
+        let ty = cy + 40;
 
         doc.setTextColor(BRAND.forest900);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        const nameLines = doc.splitTextToSize(`${p.name}  (${p.sku})`, textW);
+        doc.setFont(fontName, 'bold');
+        doc.setFontSize(9.5);
+        const nameLines = doc.splitTextToSize(p.name, textW).slice(0, 2);
         doc.text(nameLines, textX, ty);
-        ty += nameLines.length * 5;
+        ty += nameLines.length * 4.2;
 
-        doc.setTextColor(BRAND.gold400 === '#D4AF37' ? '#a07d24' : BRAND.gold400);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.text(money(p.price), textX, ty);
-        ty += 5;
+        doc.setTextColor('#9a8f6f');
+        doc.setFont(fontName, 'normal');
+        doc.setFontSize(7);
+        doc.text(p.sku, textX, ty);
+        ty += 4.2;
 
-        doc.setTextColor('#3a3a3a');
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
-        const descLines = doc.splitTextToSize(p.description, textW).slice(0, 3);
-        doc.text(descLines, textX, ty);
-        ty += descLines.length * 3.8 + 1;
+        doc.setTextColor(goldDark);
+        doc.setFont(fontName, 'bold');
+        doc.setFontSize(9.5);
+        doc.text(money(p.price, pdfLang), textX, ty);
+        ty += 4.6;
 
-        if (p.ingredients) {
-          const ingLines = doc.splitTextToSize(`Thành phần: ${p.ingredients}`, textW).slice(0, 2);
-          doc.text(ingLines, textX, ty);
-          ty += ingLines.length * 3.8;
+        doc.setTextColor('#4a4a4a');
+        doc.setFont(fontName, 'normal');
+        doc.setFontSize(7.3);
+        const bodyLines = doc.splitTextToSize(p.description, textW).slice(0, 2);
+        doc.text(bodyLines, textX, ty);
+
+        col += 1;
+        if (col >= cols) {
+          col = 0;
+          row += 1;
         }
-
-        y += blockH;
       }
 
       const stamp = new Date().toISOString().slice(0, 10);
-      doc.save(`TA-catalog-khach-si-${stamp}.pdf`);
+      const fileSuffix = pdfLang === 'en' ? 'en' : 'vi';
+      doc.save(`TA-catalog-khach-si-${fileSuffix}-${stamp}.pdf`);
       showToast(`Đã xuất PDF catalog — ${chosen.length} sản phẩm.`);
     } catch (e) {
       showToast(`Lỗi xuất PDF: ${e instanceof Error ? e.message : String(e)}`);
@@ -303,6 +476,27 @@ export default function CatalogExportPage() {
           </div>
         </div>
 
+        <div className="flex items-center gap-2 mb-4 p-1 bg-cream-100 rounded-lg w-fit">
+          <button
+            onClick={() => setPdfLang('vi')}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${pdfLang === 'vi' ? 'bg-white text-forest-900 shadow-sm' : 'text-forest-700/60'}`}
+          >
+            🇻🇳 Tiếng Việt
+          </button>
+          <button
+            onClick={() => setPdfLang('en')}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${pdfLang === 'en' ? 'bg-white text-forest-900 shadow-sm' : 'text-forest-700/60'}`}
+          >
+            🇬🇧 English (USD)
+          </button>
+        </div>
+        {pdfLang === 'en' && (
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
+            Nhãn, tiêu đề và giá đã chuyển sang tiếng Anh / USD. Tên và mô tả sản phẩm vẫn giữ nguyên tiếng Việt
+            vì kho dữ liệu sản phẩm hiện chưa có bản dịch tiếng Anh.
+          </p>
+        )}
+
         <div className="flex items-center gap-3 mb-3 flex-wrap">
           <div className="relative flex-1 min-w-[220px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cream-600" />
@@ -332,7 +526,7 @@ export default function CatalogExportPage() {
               />
               <span className="text-forest-500/70 w-20 shrink-0">{p.sku}</span>
               <span className="flex-1 text-forest-900">{p.name}</span>
-              <span className="text-forest-700/70">{money(p.price)}</span>
+              <span className="text-forest-700/70">{money(p.price, pdfLang)}</span>
             </label>
           ))}
           {filtered.length === 0 && (
