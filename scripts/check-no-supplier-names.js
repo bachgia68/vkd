@@ -3,8 +3,11 @@
  * Brand Guard: chặn tên Nhà Cung Cấp (VKD, TRIMICO, Triết Minh...) lộ ra
  * bất kỳ file UI nào (components/pages/i18n). Chạy trước mỗi build.
  *
- * Chỉ quét những nơi khách hàng nhìn thấy — KHÔNG quét src/data (nơi cần
- * giữ tên NCC thật để backend/admin phân loại đơn hàng, vận đơn, tồn kho).
+ * Quét components/pages/i18n (storefront) VÀ các field text hiển thị trong
+ * src/data/*.ts (products.ts, vkdProducts.ts, trimicoProducts.ts...) — những file
+ * này feed thẳng vào UI khách hàng nên field name/description/... phải tuân thủ
+ * Branded House. Field định danh nội bộ (sku/supplierId/sourceUrl/image/slug) vẫn
+ * được PHÉP giữ tên NCC thật để backend/admin phân loại đơn hàng, vận đơn, tồn kho.
  *
  * Chạy: node scripts/check-no-supplier-names.js
  * Thêm vào CI/pre-build: "prebuild": "node scripts/check-no-supplier-names.js"
@@ -18,9 +21,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const root = path.join(__dirname, '..');
 
-// Thư mục quét: chỉ UI khách hàng nhìn thấy (storefront). KHÔNG quét src/data hay
-// src/admin — đó là backend/admin nội bộ, được PHÉP biết tên NCC thật để phân loại
-// đơn hàng, kho, vận đơn (đúng kiến trúc Branded House: frontend = TA, backend = đa NCC).
+// Thư mục quét dòng-theo-dòng (toàn dòng): UI khách hàng nhìn thấy (storefront).
+// src/admin KHÔNG quét ở đây — đó là backend nội bộ, được PHÉP biết tên NCC thật để
+// phân loại đơn hàng, kho, vận đơn. src/data ĐƯỢC quét riêng bên dưới (không ở
+// SCAN_DIRS này) vì các file trong đó trộn lẫn field định danh nội bộ hợp lệ
+// (sku/supplierId) với field text hiển thị khách hàng (name/description) — cần quét
+// theo field, không phải toàn dòng, nên có khối riêng ở dưới thay vì gộp vào đây.
 const SCAN_DIRS = ['src/components', 'src/pages', 'index.html'];
 
 // File i18n: quét nhưng chỉ dòng là NHÃN HIỂN THỊ thật (value sau dấu ':'), bỏ qua
@@ -28,9 +34,15 @@ const SCAN_DIRS = ['src/components', 'src/pages', 'index.html'];
 const I18N_FILES = ['src/i18n/translations.ts'];
 
 // src/data/products.ts là data khách hàng nhìn thấy (catalog/detail đọc trực tiếp từ
-// đây) — KHÔNG giống vkdProducts.ts/trimicoProducts.ts (backend/reference-only). Quét
-// dòng-theo-dòng, nhưng loại trừ các field định danh nội bộ (sku/supplierId/sourceUrl)
-// vốn hợp lệ chứa "VKD"/"trimico" như identifier, không phải text hiển thị.
+// đây). LƯU Ý: vkdProducts.ts/trimicoProducts.ts KHÔNG phải backend/reference-only —
+// cả hai file này feed thẳng vào src/data/products.ts (nguồn dữ liệu VẬN HÀNH mà UI
+// khách hàng đọc từ đó), nên các field text hiển thị (name/description/...) của chúng
+// CŨNG là customer-facing và phải tuân thủ Branded House. Đó là lý do khối quét riêng
+// bên dưới (DATA_FIELD_PATTERN trên toàn bộ src/data/*.ts) tồn tại — nó bắt các field
+// hiển thị trong vkdProducts.ts/trimicoProducts.ts mà khối quét products.ts ở trên
+// không chạm tới. Quét dòng-theo-dòng cho products.ts, nhưng loại trừ các field định
+// danh nội bộ (sku/supplierId/sourceUrl) vốn hợp lệ chứa "VKD"/"trimico" như
+// identifier, không phải text hiển thị.
 const PRODUCTS_DATA_FILES = ['src/data/products.ts'];
 
 // Chuỗi cấm xuất hiện trong UI-facing text (case-insensitive), trừ khi trong EXCEPTIONS.
@@ -124,6 +136,41 @@ for (const file of allFiles) {
   });
 }
 
+// Quét thêm src/data/*.ts (vd: vkdProducts.ts, vkdProductTranslations.ts, trimicoProducts.ts)
+// cho các field TEXT khách hàng thực sự đọc trên trang chi tiết sản phẩm (description,
+// name, ingredients, usage, warnings, targetUsers...) — dù các file này giữ tên NCC thật
+// ở field định danh nội bộ (sku/supplierId/sourceUrl/image/slug), các field văn bản hiển
+// thị vẫn phải tuân thủ Branded House (chỉ nói "TA", không nói tên NCC). Match theo
+// key: 'value' (kể cả value nhiều dòng không cần vì mô tả là 1 dòng) — chỉ kiểm tra
+// GIÁ TRỊ, không phải cả dòng, để "sku: 'VKD-001'" không bao giờ bị báo nhầm.
+const DATA_DIR = path.join(root, 'src/data');
+const DATA_FIELD_PATTERN = /(?:description|name|ingredients|usage|warnings|targetUsers):\s*'((?:[^'\\]|\\.)*)'/g;
+
+let dataFiles = [];
+if (fs.existsSync(DATA_DIR)) {
+  for (const entry of fs.readdirSync(DATA_DIR)) {
+    if (/\.ts$/.test(entry)) dataFiles.push(path.join(DATA_DIR, entry));
+  }
+}
+
+for (const file of dataFiles) {
+  const lines = fs.readFileSync(file, 'utf-8').split('\n');
+  lines.forEach((line, i) => {
+    if (EXCEPTION_MARKERS.some((m) => line.includes(m))) return;
+    DATA_FIELD_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = DATA_FIELD_PATTERN.exec(line)) !== null) {
+      const value = match[1];
+      for (const pattern of BANNED_PATTERNS) {
+        if (pattern.test(value)) {
+          violations.push({ file: path.relative(root, file), lineNo: i + 1, text: line.trim(), pattern: pattern.source });
+          break;
+        }
+      }
+    }
+  });
+}
+
 if (violations.length) {
   console.error(`\n❌ Brand Guard: phát hiện ${violations.length} chỗ lộ tên NCC trong UI:\n`);
   for (const v of violations) {
@@ -133,5 +180,5 @@ if (violations.length) {
   console.error('  Nếu là dòng hợp lệ (VD: comment kỹ thuật), thêm "supplier-guard-allow" vào cuối dòng.\n');
   process.exit(1);
 } else {
-  console.log(`✅ Brand Guard: không tìm thấy tên NCC nào trong ${allFiles.length} file UI đã quét.`);
+  console.log(`✅ Brand Guard: không tìm thấy tên NCC nào trong ${allFiles.length + dataFiles.length} file UI đã quét.`);
 }

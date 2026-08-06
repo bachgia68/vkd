@@ -104,7 +104,7 @@ export const productTranslations: Record<NonViLanguage, Record<string, ProductTr
     'tra-sam-ngoc-linh': {
       name: 'Ngoc Linh Ginseng Tea',
       activeIngredient: 'Dried sliced Ngoc Linh ginseng',
-      description: 'Tea bags made from dried sliced Ngoc Linh ginseng — a product of VKD Group\'s nearly decade-long research and development journey, on a mission to bring Ngoc Linh ginseng to every home.',
+      description: 'Tea bags made from dried sliced Ngoc Linh ginseng — a product of TA\'s nearly decade-long research and development journey, on a mission to bring Ngoc Linh ginseng to every home.',
     },
     'ruou-ngoc-de-thien-huong-750ml': {
       name: 'Ngoc De Wine – Thien Huong 750ml',
@@ -368,7 +368,7 @@ export const productTranslations: Record<NonViLanguage, Record<string, ProductTr
     'tra-sam-ngoc-linh': {
       name: '玉琳参茶',
       activeIngredient: '玉琳参干燥切片',
-      description: '以玉琳参干燥切片制成的袋泡茶——凝聚VKD Group近十年研发心血,致力于"让玉琳参走进千家万户"。',
+      description: '以玉琳参干燥切片制成的袋泡茶——凝聚TA近十年研发心血,致力于"让玉琳参走进千家万户"。',
     },
     'ruou-ngoc-de-thien-huong-750ml': {
       name: '玉帝酒·天香 750毫升',
@@ -632,7 +632,7 @@ export const productTranslations: Record<NonViLanguage, Record<string, ProductTr
     'tra-sam-ngoc-linh': {
       name: 'Thé au Ginseng Ngoc Linh',
       activeIngredient: 'Tranches de ginseng Ngoc Linh séchées',
-      description: 'Thé en sachets élaboré à partir de tranches de ginseng Ngoc Linh séchées — fruit de près de 10 ans de recherche et développement chez VKD Group, avec pour mission d\'« apporter le ginseng Ngoc Linh dans tous les foyers ».',
+      description: 'Thé en sachets élaboré à partir de tranches de ginseng Ngoc Linh séchées — fruit de près de 10 ans de recherche et développement chez TA, avec pour mission d\'« apporter le ginseng Ngoc Linh dans tous les foyers ».',
     },
     'ruou-ngoc-de-thien-huong-750ml': {
       name: 'Vin Ngoc De - Thien Huong 750ml',
@@ -896,7 +896,7 @@ export const productTranslations: Record<NonViLanguage, Record<string, ProductTr
     'tra-sam-ngoc-linh': {
       name: 'شاي جينسنغ نوك لين',
       activeIngredient: 'شرائح جينسنغ نوك لين المجففة',
-      description: 'شاي أكياس مصنوع من شرائح جينسنغ نوك لين المجففة — ثمرة رحلة بحث وتطوير امتدت قرابة عشر سنوات لدى VKD Group، انطلاقًا من رسالتها في «إيصال جينسنغ نوك لين إلى كل بيت».',
+      description: 'شاي أكياس مصنوع من شرائح جينسنغ نوك لين المجففة — ثمرة رحلة بحث وتطوير امتدت قرابة عشر سنوات لدى TA، انطلاقًا من رسالتها في «إيصال جينسنغ نوك لين إلى كل بيت».',
     },
     'ruou-ngoc-de-thien-huong-750ml': {
       name: 'نبيذ نوك دي - ثيان هوونغ 750 مل',

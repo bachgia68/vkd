@@ -78,7 +78,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-002',
     slug: 'tra-sam-ngoc-linh-thuong-hang',
-    name: 'Trà Sâm Ngọc Linh Thượng Hạng TRIMICO - MITRI TEA',
+    name: 'Trà Sâm Ngọc Linh Thượng Hạng TA - MITRI TEA',
     price: 690000,
     image: `${IMG}02-tra-sam-ngoc-linh-thuong-hang.png`,
     category: 'sam-ngoc-linh',
@@ -96,7 +96,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-003',
     slug: 'tra-sam-ngoc-linh-trimico',
-    name: 'Trà Sâm Ngọc Linh TRIMICO Túi Lọc',
+    name: 'Trà Sâm Ngọc Linh TA Túi Lọc',
     price: 290000,
     image: `${IMG}03-tra-sam-ngoc-linh-trimico.png`,
     category: 'sam-ngoc-linh',
@@ -114,7 +114,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-004',
     slug: 'sam-ngoc-linh-ngam-mat-ong-trimico-90ml',
-    name: 'Sâm Ngọc Linh Ngâm Mật Ong TRIMICO 90ml',
+    name: 'Sâm Ngọc Linh Ngâm Mật Ong TA 90ml',
     price: 450000,
     image: `${IMG}04-sam-mat-ong-90ml.png`,
     category: 'sam-ngoc-linh',
@@ -131,7 +131,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-005',
     slug: 'sam-ngoc-linh-ngam-mat-ong-trimico-175ml',
-    name: 'Sâm Ngọc Linh Ngâm Mật Ong TRIMICO 175ml',
+    name: 'Sâm Ngọc Linh Ngâm Mật Ong TA 175ml',
     price: 1250000,
     image: `${IMG}05-sam-mat-ong-175ml.png`,
     category: 'sam-ngoc-linh',
@@ -148,7 +148,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-006',
     slug: 'thach-sam-ngoc-linh-trimico',
-    name: 'Thạch Sâm Ngọc Linh TRIMICO',
+    name: 'Thạch Sâm Ngọc Linh TA',
     price: 250000,
     image: `${IMG}06-thach-sam-ngoc-linh.png`,
     category: 'sam-ngoc-linh',
@@ -165,7 +165,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-007',
     slug: 'sam-ngoc-linh-ngam-mat-ong-trimico-lo-30ml',
-    name: 'Sâm Ngọc Linh Ngâm Mật Ong TRIMICO Lọ 30ml',
+    name: 'Sâm Ngọc Linh Ngâm Mật Ong TA Lọ 30ml',
     price: 150000,
     image: `${IMG}07-sam-mat-ong-30ml.png`,
     category: 'sam-ngoc-linh',
@@ -218,7 +218,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-010',
     slug: 'sam-ngoc-linh-ngam-mat-ong-500ml',
-    name: 'Sâm Ngọc Linh Ngâm Mật Ong 500ml của TRIMICO',
+    name: 'Sâm Ngọc Linh Ngâm Mật Ong 500ml của TA',
     price: 4000000,
     image: `${IMG}10-sam-mat-ong-500ml.png`,
     category: 'sam-ngoc-linh',
@@ -274,7 +274,7 @@ export const trimicoProducts: TrimicoProduct[] = [
     price: 5000000,
     image: `${IMG}13-hoa-sam-kho-50g.png`,
     category: 'sam-ngoc-linh',
-    description: 'Hoa sâm khô thu hoạch từ hoa sâm Ngọc Linh quý hiếm, ra hoa một lần mỗi năm. TRIMICO vận hành mô hình khép kín trên 30 hecta trồng, thu hoạch, sản xuất, phân phối.',
+    description: 'Hoa sâm khô thu hoạch từ hoa sâm Ngọc Linh quý hiếm, ra hoa một lần mỗi năm. TA vận hành mô hình khép kín trên 30 hecta trồng, thu hoạch, sản xuất, phân phối.',
     targetUsers: 'Người dùng bổ sung sức khỏe phổ thông.',
     warnings: 'Không dùng cho phụ nữ mang thai và cho con bú. Bảo quản nơi khô ráo, thoáng mát.',
     volume: '50g',
@@ -291,7 +291,7 @@ export const trimicoProducts: TrimicoProduct[] = [
     image: `${IMG}14-la-sam-tuoi.png`,
     category: 'sam-ngoc-linh',
     badge: 'Theo Thời Giá',
-    description: 'Lá sâm tươi thu hoạch từ cây trồng trên 1.500m tại núi Ngọc Linh (Quảng Nam). TRIMICO vận hành mô hình khép kín, 30 hecta rừng trồng, nguồn cung trực tiếp không qua trung gian.',
+    description: 'Lá sâm tươi thu hoạch từ cây trồng trên 1.500m tại núi Ngọc Linh (Quảng Nam). TA vận hành mô hình khép kín, 30 hecta rừng trồng, nguồn cung trực tiếp không qua trung gian.',
     ingredients: 'Ginsenoside (nhóm saponin, hoạt chất chính); Panaxolide (sesquiterpene lactone).',
     usage: 'Hãm trà: 5g lá với 500ml nước sôi, hãm 5-10 phút. Ngâm rượu: 350g lá với 18 lít rượu 30-35 độ, ngâm 90 ngày.',
     targetUsers: 'Người tiêu dùng phổ thông; không phù hợp phụ nữ mang thai/cho con bú.',
@@ -320,7 +320,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-016',
     slug: 'tra-nam-lim-xanh',
-    name: 'Trà Nấm Lim Xanh TRIMICO',
+    name: 'Trà Nấm Lim Xanh TA',
     price: 105000,
     image: `${IMG}16-tra-nam-lim-xanh.png`,
     category: 'nam-lim-xanh',
@@ -390,7 +390,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-020',
     slug: 'ruou-sam-ngoc-linh-500ml',
-    name: 'Rượu Sâm Ngọc Linh TRIMICO 500ml',
+    name: 'Rượu Sâm Ngọc Linh TA 500ml',
     price: 550000,
     image: `${IMG}20-ruou-sam-500ml.png`,
     category: 'ruou',
@@ -445,7 +445,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-023',
     slug: 'ruou-sam-ngoc-linh-thuong-hang',
-    name: 'Rượu Sâm Ngọc Linh Thượng Hạng 500ml của TRIMICO',
+    name: 'Rượu Sâm Ngọc Linh Thượng Hạng 500ml của TA',
     price: 2300000,
     image: `${IMG}23-ruou-sam-thuong-hang.png`,
     category: 'ruou',
@@ -603,7 +603,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-032',
     slug: 'ruou-hoa-sam-ngoc-linh-100g',
-    name: 'Rượu Hoa Sâm Ngọc Linh 3 Lít của TRIMICO',
+    name: 'Rượu Hoa Sâm Ngọc Linh 3 Lít của TA',
     price: 3150000,
     image: `${IMG}32-ruou-hoa-sam-3l.png`,
     category: 'ruou',
@@ -691,7 +691,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-037',
     slug: 'tra-thanh-nhiet-giai-doc-gan',
-    name: 'Trà Thanh Nhiệt TRIMICO',
+    name: 'Trà Thanh Nhiệt TA',
     price: 80000,
     image: `${IMG}37-tra-thanh-nhiet.png`,
     category: 'khac',
@@ -737,7 +737,7 @@ export const trimicoProducts: TrimicoProduct[] = [
   {
     sku: 'TRM-040',
     slug: 'hong-dang-sam',
-    name: 'Hồng Đẳng Sâm TRIMICO',
+    name: 'Hồng Đẳng Sâm TA',
     price: 500000,
     image: `${IMG}40-hong-dang-sam.png`,
     category: 'khac',
@@ -874,7 +874,7 @@ export const trimicoProducts: TrimicoProduct[] = [
     price: 100000,
     image: `${IMG}49-chuoi-hot-rung.png`,
     category: 'khac',
-    description: 'Hạt chuối hột rừng sấy khô của TRIMICO, ứng dụng nhiều trong y học cổ truyền — hình dạng góc cạnh, hạt lớn cứng, vỏ dày bền.',
+    description: 'Hạt chuối hột rừng sấy khô của TA, ứng dụng nhiều trong y học cổ truyền — hình dạng góc cạnh, hạt lớn cứng, vỏ dày bền.',
     usage: 'Ngâm rượu: trộn hạt khô với rượu gạo (40-50 độ) tỷ lệ 1:4, bình thủy tinh/gốm, đậy kín, bảo quản nơi mát tối 3-4 tháng.',
     warnings: 'Là thực phẩm tốt cho sức khỏe nhưng không nên sử dụng bừa bãi hay lạm dụng lâu dài.',
     healthGoal: 'energy',
