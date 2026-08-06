@@ -738,8 +738,9 @@ export async function publishCaption(caption: PostCaption, webhookUrl: string | 
   if (error) throw new Error(error.message);
 
   if (webhookUrl) {
+    let res: Response;
     try {
-      await fetch(webhookUrl, {
+      res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -749,6 +750,9 @@ export async function publishCaption(caption: PostCaption, webhookUrl: string | 
       // the admin can retry the webhook independently. Surfaced as a toast
       // by the caller.
       throw new Error('Đã lưu duyệt, nhưng gọi webhook kênh thất bại (kiểm tra lại URL webhook).');
+    }
+    if (!res.ok) {
+      throw new Error(`Đã lưu duyệt, nhưng n8n phản hồi lỗi (HTTP ${res.status}) — kiểm tra workflow.`);
     }
   }
 }

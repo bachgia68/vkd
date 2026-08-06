@@ -202,13 +202,21 @@ export default function CmsPage() {
     try {
       const saved = await saveCaption(post.id, channel.id, text);
       await publishCaption(saved, channel.webhook_url, {
+        action: 'publish',
         post_id: post.id,
         title: post.title,
-        excerpt: post.excerpt,
-        featured_image_url: post.featured_image_url,
+        // "content" / "image_url" — tên field mà workflow n8n phía TA đang đọc
+        // (payload.body.content / payload.body.image_url); "caption" và
+        // "featured_image_url" giữ lại song song để không phá các webhook cũ
+        // đang đọc theo tên field trước đó.
+        content: text,
         caption: text,
+        excerpt: post.excerpt,
+        image_url: post.featured_image_url,
+        featured_image_url: post.featured_image_url,
         video_url: existingVideo,
         channel: channel.platform_type,
+        channels: [channel.platform_type],
         channel_url: channel.channel_url,
       });
       setExistingCaptions((prev) => ({ ...prev, [channel.id]: { ...saved, video_url: existingVideo, is_published: true } }));
