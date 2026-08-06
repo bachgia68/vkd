@@ -1,6 +1,10 @@
 import { FlaskConical, Building2, Microscope } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { products } from '../data/products';
+
+const strip = products.filter((p) => p.price !== null).slice(0, 10);
+const stripLoop = [...strip, ...strip];
 
 interface HeritageProps {
   lang: Language;
@@ -50,79 +54,52 @@ export default function Heritage({ lang }: HeritageProps) {
           </p>
         </div>
 
-        {/* Saponin highlight banner */}
-        <div className="relative mb-16 overflow-hidden rounded-3xl bg-gradient-to-br from-forest-900 to-forest-700 p-10 md:p-16">
+        {/* Saponin highlight + running product strip */}
+        <div className="relative mb-16 overflow-hidden rounded-3xl bg-gradient-to-br from-forest-900 to-forest-700">
           {/* Decorative glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/10 rounded-full blur-[120px]" />
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-forest-400/15 rounded-full blur-[100px]" />
 
-          <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+          <div className="relative z-10 px-8 md:px-16 pt-10 md:pt-14 pb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <span className="text-gold-400 text-sm font-semibold tracking-wider uppercase mb-4 block">
+              <span className="text-gold-400 text-sm font-semibold tracking-wider uppercase mb-3 block">
                 {t.heritage.saponinTypes}
               </span>
-              <h3 className="font-display text-5xl md:text-6xl text-white mb-4">
+              <h3 className="font-display text-4xl md:text-5xl text-white leading-none">
                 {t.heritage.saponinCount}
+                <span className="text-white/60 text-lg md:text-xl font-sans font-normal ml-3 align-middle">
+                  {t.heritage.saponinDesc}
+                </span>
               </h3>
-              <p className="text-white/70 leading-relaxed max-w-md">
-                {t.heritage.saponinDesc}
-              </p>
             </div>
+          </div>
 
-            {/* Saponin visual */}
-            <div className="flex justify-center md:justify-end">
-              <div className="relative">
-                <svg viewBox="0 0 200 200" className="w-56 h-56 md:w-72 md:h-72">
-                  {/* Concentric circles */}
-                  <circle cx="100" cy="100" r="90" fill="none" stroke="#D4AF37" strokeWidth="1" opacity="0.2" />
-                  <circle cx="100" cy="100" r="70" fill="none" stroke="#D4AF37" strokeWidth="1" opacity="0.3" />
-                  <circle cx="100" cy="100" r="50" fill="none" stroke="#D4AF37" strokeWidth="1" opacity="0.4" />
-                  <circle cx="100" cy="100" r="30" fill="none" stroke="#D4AF37" strokeWidth="1" opacity="0.6" />
-
-                  {/* Molecular dots */}
-                  {Array.from({ length: 12 }).map((_, i) => {
-                    const angle = (i / 12) * Math.PI * 2;
-                    const r = 90;
-                    const x = 100 + Math.cos(angle) * r;
-                    const y = 100 + Math.sin(angle) * r;
-                    return (
-                      <circle
-                        key={i}
-                        cx={x}
-                        cy={y}
-                        r="4"
-                        fill="#D4AF37"
-                        opacity="0.8"
-                        className="animate-pulse-slow"
-                        style={{ animationDelay: `${i * 200}ms` }}
-                      />
-                    );
-                  })}
-
-                  {/* Center molecule */}
-                  <circle cx="100" cy="100" r="12" fill="#D4AF37" />
-                  <circle cx="100" cy="100" r="6" fill="#0B2F1D" />
-
-                  {/* Connecting lines */}
-                  {Array.from({ length: 6 }).map((_, i) => {
-                    const angle = (i / 6) * Math.PI * 2;
-                    const x = 100 + Math.cos(angle) * 30;
-                    const y = 100 + Math.sin(angle) * 30;
-                    return (
-                      <line
-                        key={i}
-                        x1="100"
-                        y1="100"
-                        x2={x}
-                        y2={y}
-                        stroke="#D4AF37"
-                        strokeWidth="1.5"
-                        opacity="0.5"
-                      />
-                    );
-                  })}
-                </svg>
-              </div>
+          {/* Running product strip */}
+          <div className="relative z-10 marquee-mask pb-10 md:pb-14">
+            <div className="flex w-max gap-5 px-8 marquee-track">
+              {stripLoop.map((p, i) => (
+                <div
+                  key={`${p.sku}-${i}`}
+                  className="w-52 md:w-60 shrink-0 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden hover:bg-white/10 transition-colors duration-300"
+                >
+                  <div className="aspect-square overflow-hidden bg-white/5">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-white text-sm font-medium line-clamp-2 leading-snug mb-1.5">
+                      {p.name}
+                    </p>
+                    <p className="text-gold-400 text-sm font-semibold">
+                      {p.price ? `${p.price.toLocaleString('vi-VN')} ₫` : ''}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
