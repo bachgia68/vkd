@@ -1,7 +1,48 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 8). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-07 (cập nhật lần 9). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -8. TA Elite Club thật sự "bật" (accrual + redeem + admin) — ĐÃ XONG, PUSHED
+
+Bắt đầu từ yêu cầu "TA Elite Club đang bị ẩn, tái cấu trúc, đừng ẩn nữa, đặc
+biệt trong admin" — điều tra ra phát hiện lớn hơn nhiều so với "chỉ là ẩn":
+
+- **`accrue_loyalty_points()` đã tồn tại sẵn trong DB nhưng CHƯA BAO GIỜ được
+  gọi** ở đâu trong luồng thanh toán thật (`mark_payos_order_paid()` trước
+  đây chỉ đổi `status` đơn hàng). Không có cơ chế tự động enroll khách vào
+  `elite_club_members`. Kết quả: `elite_club_members` và `loyalty_transactions`
+  đều **0 dòng** trong production dù `LoyaltyDashboard`/`EliteTeaser` đã hiện
+  đầy đủ trên site khách từ trước (không phải bị ẩn — đơn giản là chưa từng
+  có dữ liệu thật để hiện).
+- Migration `wire_loyalty_accrual_and_redemption` (đã apply qua Supabase MCP):
+  sửa `mark_payos_order_paid()` để tự enroll khách (nếu chưa có) + gọi
+  `accrue_loyalty_points()` mỗi khi đơn PayOS thanh toán thành công.
+- **Thêm tính năng đổi điểm lấy giảm giá khi checkout** (theo yêu cầu Joe:
+  giữ nguyên 3 hạng cashback % hiện có, KHÔNG đổi sang mô hình JKJ, chỉ thêm
+  redeem). Tỷ lệ **1 điểm = 100đ**, giới hạn tối đa **30% giá trị đơn hàng**
+  — 2 con số này là quyết định tự đưa ra khi Joe bảo "tự chạy, không cần
+  hỏi", CHƯA được Joe xác nhận, có thể cần điều chỉnh. Điểm chỉ thực sự bị
+  trừ lúc đơn hàng thanh toán thành công (trong `mark_payos_order_paid`),
+  không trừ lúc tạo link thanh toán — huỷ/bỏ giữa chừng không mất điểm. UI ở
+  `Checkout.tsx` (tra điểm khi rời ô email, thanh trượt chọn số điểm dùng).
+- **Trang admin mới `/gate-vkd-control-2026/loyalty`** ("TA Elite Club" trong
+  nav) — chỉ xem (read-only theo yêu cầu Joe để làm nhanh): danh sách hội
+  viên, hạng CRM, điểm hiện có/trọn đời, ngày tham gia. Trước đây admin
+  **không có trang này** — đây là gap admin thật sự Joe đang nói tới.
+- **Chưa verify UI thật** (phiên non-interactive, không có đơn PayOS thật
+  nào chạy qua để xác nhận accrual/redeem hoạt động đúng end-to-end) — phiên
+  sau nên đặt 1 đơn test thật (số tiền nhỏ) và kiểm tra: đơn paid → có row
+  mới trong `elite_club_members`/`loyalty_transactions` → trang admin Loyalty
+  hiện đúng → nếu dùng redeem, điểm bị trừ đúng số.
+- Tỷ lệ đổi điểm (100đ/điểm) và trần 30%/đơn là giả định hợp lý nhưng **cần
+  Joe xác nhận** — dễ sửa (2 hằng số đầu `Checkout.tsx`:
+  `REDEMPTION_VND_PER_POINT`, `MAX_REDEEM_RATIO`).
+- Đồng thời sửa 3 lỗi SEO kỹ thuật phát hiện khi audit: `canonical`/`og:url`
+  trong `index.html` từng trỏ sai domain (`samngoclinh-ta.vn` thay vì
+  `tasamngoclinh.com`), thiếu hẳn `robots.txt` và `sitemap.xml` (đã thêm cả
+  hai vào `public/`). Audit đầy đủ (bảng từ khoá, technical checklist) chỉ
+  có trong chat phiên này, chưa lưu thành file riêng.
 
 ## -7. Track A — bài viết thật đầu tiên — ĐÃ XONG, LIVE, đọc được trọn vẹn
 
