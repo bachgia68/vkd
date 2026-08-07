@@ -24,6 +24,11 @@ import ChatWidget from './components/ChatWidget';
 import EliteTeaser from './components/EliteTeaser';
 import TrustProof from './components/TrustProof';
 import ComboOfTheMonth from './components/ComboOfTheMonth';
+import About from './components/About';
+import Blog from './components/Blog';
+import OmniChannel from './components/OmniChannel';
+import Showrooms from './components/Showrooms';
+import { fetchVisibleSections } from './lib/siteContentApi';
 import type { Language } from './i18n/translations';
 
 function App() {
@@ -35,6 +40,13 @@ function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   // TODO: Replace with real auth context when user sign-in is implemented
   const [userEmail, _setUserEmail] = useState<string | undefined>(undefined);
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetchVisibleSections()
+      .then((rows) => setVisibleSections(new Set(rows.map((r) => r.key))))
+      .catch(() => setVisibleSections(new Set()));
+  }, []);
 
   // Đồng bộ điều hướng trong app với lịch sử trình duyệt, để nút Back của
   // trình duyệt quay về trang trước đó trong app thay vì thoát hẳn ra khỏi
@@ -101,6 +113,7 @@ function App() {
 
   const [basePage, queryString] = currentPage.split('?');
   const catalogType = new URLSearchParams(queryString).get('type') ?? undefined;
+  const catalogGoal = new URLSearchParams(queryString).get('goal') ?? undefined;
 
   return (
     <CartProvider>
@@ -110,6 +123,7 @@ function App() {
           onLangChange={setLang}
           onNavigate={navigate}
           currentPage={currentPage}
+          visibleSections={visibleSections}
         />
 
         <main>
@@ -124,6 +138,7 @@ function App() {
               <Certifications lang={lang} />
               <TrustProof lang={lang} />
               <B2B lang={lang} />
+              {visibleSections.has('omnichannel') && <OmniChannel lang={lang} onNavigate={navigate} />}
             </>
           )}
 
@@ -131,8 +146,20 @@ function App() {
             <Traceability lang={lang} />
           )}
 
+          {currentPage === 'about' && visibleSections.has('about') && (
+            <About lang={lang} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'blog' && visibleSections.has('blog') && (
+            <Blog />
+          )}
+
+          {currentPage === 'showrooms' && visibleSections.has('showrooms') && (
+            <Showrooms lang={lang} />
+          )}
+
           {basePage === 'catalog' && (
-            <ProductCatalog lang={lang} onNavigate={navigate} initialType={catalogType} />
+            <ProductCatalog lang={lang} onNavigate={navigate} initialType={catalogType} initialGoal={catalogGoal} />
           )}
 
           {basePage === 'product-detail' && (
