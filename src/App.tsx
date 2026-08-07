@@ -37,6 +37,27 @@ function App() {
   // TODO: Replace with real auth context when user sign-in is implemented
   const [userEmail, _setUserEmail] = useState<string | undefined>(undefined);
 
+  // Đồng bộ điều hướng trong app với lịch sử trình duyệt, để nút Back của
+  // trình duyệt quay về trang trước đó trong app thay vì thoát hẳn ra khỏi
+  // site (bug do trước đây currentPage chỉ là state nội bộ, không gắn với
+  // history entry nào).
+  useEffect(() => {
+    window.history.replaceState({ page: 'home' }, '', window.location.pathname + window.location.search);
+
+    const onPopState = (event: PopStateEvent) => {
+      const state = event.state as { page?: string; slug?: string } | null;
+      if (state?.page) {
+        setCurrentPage(state.page);
+        if (state.slug) setSelectedSlug(state.slug);
+      } else {
+        setCurrentPage('home');
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Xử lý khi trình duyệt quay lại từ trang thanh toán PayOS (VietQR).
   useEffect(() => {
     if (searchParams.get('payos_return') === '1') {
@@ -71,6 +92,7 @@ function App() {
   const navigate = (page: string, slug?: string) => {
     if (slug) setSelectedSlug(slug);
     setCurrentPage(page);
+    window.history.pushState({ page, slug: slug ?? selectedSlug }, '', window.location.pathname + window.location.search);
   };
 
   const handleOrderSuccess = (id: string) => {
