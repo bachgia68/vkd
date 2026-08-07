@@ -19,7 +19,7 @@ const SOCIAL_ICONS: Record<string, typeof Share2> = {
   WhatsApp: Share2,
 };
 
-export default function Footer({ lang, onLangChange }: FooterProps) {
+export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
   const [phones, setPhones] = useState<ContactPhone[]>([]);
@@ -30,14 +30,27 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
     fetchSocialLinks().then(setSocialLinks).catch(() => setSocialLinks([]));
   }, []);
 
+  // "traceability" và "contact" trỏ tới trang/khối còn tồn tại thật;
+  // "about" đi tới trang FounderStory chuẩn (không phải anchor #about đã bị
+  // gỡ khỏi trang chủ ở bản nâng cấp Phase 1); "b2b" cuộn tới khối B2B vẫn
+  // còn trên trang chủ.
   const navItems = [
-    { key: 'home', href: '#home' },
-    { key: 'about', href: '#about' },
-    { key: 'products', href: '#products' },
-    { key: 'traceability', href: '#traceability' },
-    { key: 'b2b', href: '#b2b' },
-    { key: 'contact', href: '#contact' },
+    { key: 'home', page: 'home' },
+    { key: 'about', page: 'about-story' },
+    { key: 'products', page: 'catalog' },
+    { key: 'traceability', page: 'traceability' },
+    { key: 'b2b', page: 'home', anchor: 'b2b' },
+    { key: 'contact', page: 'home', anchor: 'contact' },
   ];
+
+  const handleFooterNav = (page: string, anchor?: string) => {
+    onNavigate?.(page);
+    if (anchor) {
+      setTimeout(() => {
+        document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   const languages: Language[] = ['vi', 'en', 'zh', 'fr', 'ar'];
 
@@ -86,12 +99,12 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
             <ul className="space-y-3">
               {navItems.map((item) => (
                 <li key={item.key}>
-                  <a
-                    href={item.href}
-                    className="text-forest-300 hover:text-white transition-colors"
+                  <button
+                    onClick={() => handleFooterNav(item.page, item.anchor)}
+                    className="text-forest-300 hover:text-white transition-colors text-left"
                   >
                     {t.nav[item.key as keyof typeof t.nav]}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -160,9 +173,12 @@ export default function Footer({ lang, onLangChange }: FooterProps) {
             </p>
 
             <div className="flex items-center gap-6 text-forest-400 text-sm">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+              {/* Chưa có trang Chính sách/Điều khoản thật — text tĩnh thay vì href="#"
+                  giả (từng gây nhảy lên đầu trang khi bấm). Cần Joe cung cấp nội dung
+                  thật trước khi đây là link thật. */}
+              <span className="text-forest-500 cursor-default">Privacy Policy</span>
+              <span className="text-forest-500 cursor-default">Terms of Service</span>
+              <span className="text-forest-500 cursor-default">Cookie Policy</span>
             </div>
           </div>
         </div>
