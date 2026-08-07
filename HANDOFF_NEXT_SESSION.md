@@ -1,7 +1,56 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 5). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-07 (cập nhật lần 6). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -5. Sub-project E (đồng bộ admin Sản phẩm & Kho) — ĐÃ XONG (đợt đầu)
+
+- Đã chạy sync một chiều thật: từ `src/data/products.ts` (90 SKU) GHI vào
+  bảng Supabase `products` (project `xcwirgrlnibnjmseglee`, "Vkd web
+  Project") — `name_vi`/`category_id`/`price_vnd`/`image_url` cập nhật
+  theo catalog thật, **`active`/`stock_qty` của các SKU đã có KHÔNG bị
+  đụng tới** (verify trước khi chạy: toàn bộ 31 dòng cũ có `stock_qty=0`,
+  nên không có dữ liệu tồn kho thật nào bị mất). Kết quả: 99 dòng (90 SKU
+  thật + 9 SKU cũ định dạng khác không còn trong catalog, giữ nguyên
+  không xoá), `active_count=93`. Đã verify bằng SELECT sau khi chạy.
+- Mapping category (3 bucket admin thô `nuoc-sam`/`tpbs`/`mypham`, không
+  khớp 1-1 với 7 `ProductTypeId` chi tiết trong `productTypes.ts`) — quyết
+  định hợp lý khi thiếu category tương ứng, ghi rõ trong skill
+  `update-vkd-products` (mục "Đồng bộ Supabase admin") để lần sau không
+  phải đoán lại.
+- **Đây KHÔNG phải đồng bộ 2 chiều tự động** — mỗi lần `products.ts` đổi
+  (thêm NCC mới, sửa giá, v.v.) phải chạy lại sync tay theo đúng quy trình
+  đã ghi trong skill `update-vkd-products`. Đã cập nhật skill đó để bước
+  này thành 1 bước bắt buộc trong quy trình thêm/sửa sản phẩm, và
+  frontmatter description để tự trigger khi cần.
+- **Chưa làm** (ngoài phạm vi đợt này, để dành nếu Joe muốn sâu hơn): thật
+  sự hợp nhất 2 mô hình dữ liệu (vd. admin sửa `active`/`stock_qty` phản
+  ánh ngược lại lên site khách — hiện KHÔNG có, trang khách không đọc
+  `stock_qty`/`active` từ Supabase `products` chút nào, chỉ admin panel tự
+  dùng nội bộ). Nếu Joe muốn "hết hàng" trên site khách phản ánh đúng tồn
+  kho admin nhập, đó là việc lớn hơn nhiều, cần spec riêng.
+
+## -4. Sub-project D (Products section động hơn) — ĐÃ XONG, LIVE (code) —
+CẦN VERIFY THỊ GIÁC PHIÊN SAU
+
+- Thẻ sản phẩm trang chủ (`Products.tsx`) giờ fade/slide-in so le
+  (120ms/thẻ) khi cuộn tới, dùng `IntersectionObserver` + animation
+  `animate-fade-in-up` có sẵn trong `index.css` (đã dùng ở Hero/
+  ProductDetail, không thêm thư viện animation mới, không xung đột với
+  transition hover sẵn có của `.product-card`).
+- Icon overlay + link "Xem tất cả" giờ phản ứng cả khi TAP trên mobile
+  (`group-active`), không chỉ hover chuột — trước đây trên mobile không
+  có gì hiện ra cả vì không có hover.
+- Có fallback: nếu trình duyệt không hỗ trợ `IntersectionObserver`, thẻ
+  hiện ngay lập tức, không bao giờ bị kẹt ẩn.
+- **CHƯA verify được bằng mắt phiên này** — pane trình duyệt trong phiên
+  non-interactive không compositing frame (`screenshot`/
+  `IntersectionObserver` đều không hoạt động dù code đúng, xác nhận qua
+  test thủ công tách biệt). Build/tsc sạch, logic đã soát kỹ (đặc biệt
+  tránh xung đột `transition` shorthand giữa CSS gốc và Tailwind
+  utilities). Phiên sau nên mở `tasamngoclinh.com`, cuộn tới phần "Sản
+  phẩm" trên trang chủ, xác nhận hiệu ứng mượt trước khi coi là xong
+  100%.
 
 ## -3. Sub-project C (combo auto-fill) — ĐÃ XONG, LIVE
 
@@ -140,22 +189,10 @@ mục "Sub-project B/C/D" — mỗi cái cần 1 spec/plan riêng trước khi c
 
 - **Sub-project B — ĐÃ XONG, xem mục -2 đầu file.**
 - **Sub-project C — ĐÃ XONG, xem mục -3 đầu file.**
-- **Sub-project D — Products section động/hấp dẫn hơn kiểu KGC**: Joe chê
-  "phần sản phẩm chạy từ từ không hấp dẫn". Hiện tại chỉ có hover-reveal.
-  Cần xem code `src/components/Products.tsx` + tham khảo lại
-  `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md` trước
-  khi đề xuất animation cụ thể.
-- **Sub-project E (mới phát hiện) — Đồng bộ admin "Sản phẩm & Kho" với
-  catalog thật**: `src/admin/pages/ProductsPage.tsx` đọc từ bảng Supabase
-  mock riêng (`fetchProducts()`/`fetchProductCategories()` trong
-  `adminApi.ts`) — HOÀN TOÀN tách biệt khỏi `src/data/products.ts` (catalog
-  thật khách hàng thấy, hiện 90 sản phẩm). Nghĩa là bất kỳ sản phẩm nào
-  thêm vào `products.ts` (như 6 sản phẩm samk5 vừa thêm) sẽ KHÔNG hiện
-  trong trang quản trị kho, và ngược lại sửa/ẩn sản phẩm trong trang quản
-  trị kho KHÔNG ảnh hưởng gì tới catalog thật khách hàng thấy. Đây là gap
-  kiến trúc có sẵn từ trước (không phải lỗi tôi gây ra), nhưng giờ đã rõ
-  ràng gây nhầm lẫn thật cho Joe. Cần 1 spec riêng trước khi động vào —
-  không sửa vội vì đụng tới cả luồng quản lý kho/tồn kho admin đang dùng.
+- **Sub-project D — ĐÃ XONG (code), cần verify thị giác, xem mục -4 đầu
+  file.**
+- **Sub-project E — ĐÃ XONG (đợt đầu, sync một chiều), xem mục -5 đầu
+  file.**
 
 ## 3. Việc MỚI Joe vừa giao cuối phiên — CHƯA làm gì cả, chỉ ghi lại
 
