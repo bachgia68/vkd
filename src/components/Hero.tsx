@@ -1,4 +1,4 @@
-import { ArrowRight, Shield, Award, Leaf } from 'lucide-react';
+import { ArrowRight, Leaf } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 
@@ -7,7 +7,7 @@ interface HeroProps {
   onNavigate?: (page: string) => void;
 }
 
-export default function Hero({ lang, onNavigate }: HeroProps) {
+export default function Hero({ lang }: HeroProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
 
@@ -90,25 +90,22 @@ export default function Hero({ lang, onNavigate }: HeroProps) {
           {t.hero.subtitle}
         </p>
 
-        {/* Trust Badges */}
-        <div className="flex flex-wrap justify-center gap-4 mb-10 animate-fade-in-up animation-delay-400">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-            <Shield className="w-4 h-4 text-forest-300" />
-            <span className="text-xs font-medium">cGMP Certified</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-            <Award className="w-4 h-4 text-gold-400" />
-            <span className="text-xs font-medium">ISO 9001/22000</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-            <Leaf className="w-4 h-4 text-forest-300" />
-            <span className="text-xs font-medium">HACCP</span>
-          </div>
+        {/* Saponin claim */}
+        <div className="inline-flex items-center gap-3 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 mb-10 animate-fade-in-up animation-delay-400">
+          <span className="font-display text-3xl text-gold-400">{t.heritage.saponinCount}</span>
+          <span className="text-sm text-white/80 text-left leading-snug">{t.heritage.saponinTypes}</span>
         </div>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-600">
-          <a href="#catalog" onClick={(e) => { e.preventDefault(); onNavigate?.('catalog'); }} className="btn-gold group">
+          <a
+            href="#products"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="btn-gold group"
+          >
             {t.hero.cta}
             <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'} transition-transform`} />
           </a>
