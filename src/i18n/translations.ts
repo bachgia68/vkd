@@ -11,6 +11,8 @@ export interface Translation {
     b2b: string;
     autoship: string;
     contact: string;
+    blog: string;
+    showrooms: string;
   };
   hero: {
     badge: string;
@@ -149,6 +151,8 @@ export const translations: Record<Language, Translation> = {
       b2b: 'Hợp tác',
       autoship: 'Mua Định Kỳ',
       contact: 'Liên hệ',
+      blog: 'Blog',
+      showrooms: 'Showroom',
     },
     hero: {
       badge: 'Bảo Tồn Nguyên Bản – Tuyển Chọn Tinh Hoa',
@@ -290,6 +294,8 @@ export const translations: Record<Language, Translation> = {
       b2b: 'Partners',
       autoship: 'Subscribe',
       contact: 'Contact',
+      blog: 'Blog',
+      showrooms: 'Showrooms',
     },
     hero: {
       badge: 'Preserving the Original – Curating the Finest',
@@ -431,6 +437,8 @@ export const translations: Record<Language, Translation> = {
       b2b: '合作',
       autoship: '订阅',
       contact: '联系我们',
+      blog: '博客',
+      showrooms: '展厅',
     },
     hero: {
       badge: '保留本源 · 甄选精粹',
@@ -572,6 +580,8 @@ export const translations: Record<Language, Translation> = {
       b2b: 'Partenariats',
       autoship: 'Abonnement',
       contact: 'Contact',
+      blog: 'Blog',
+      showrooms: 'Salles d\'exposition',
     },
     hero: {
       badge: 'Préserver l’Authentique – Sélectionner l’Excellence',
@@ -713,6 +723,8 @@ export const translations: Record<Language, Translation> = {
       b2b: 'الشراكات',
       autoship: 'اشتراك',
       contact: 'اتصل بنا',
+      blog: 'المدونة',
+      showrooms: 'صالات العرض',
     },
     hero: {
       badge: 'الحفاظ على الأصالة – اختيار النخبة',
