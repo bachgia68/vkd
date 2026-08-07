@@ -172,13 +172,31 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
               {t.footer.copyright}
             </p>
 
-            <div className="flex items-center gap-6 text-forest-400 text-sm">
-              {/* Chưa có trang Chính sách/Điều khoản thật — text tĩnh thay vì href="#"
-                  giả (từng gây nhảy lên đầu trang khi bấm). Cần Joe cung cấp nội dung
-                  thật trước khi đây là link thật. */}
-              <span className="text-forest-500 cursor-default">Privacy Policy</span>
-              <span className="text-forest-500 cursor-default">Terms of Service</span>
-              <span className="text-forest-500 cursor-default">Cookie Policy</span>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-forest-400 text-sm">
+              <button
+                onClick={() => handleFooterNav('policy-privacy')}
+                className="hover:text-white transition-colors"
+              >
+                {t.policies.privacy}
+              </button>
+              <button
+                onClick={() => handleFooterNav('policy-terms')}
+                className="hover:text-white transition-colors"
+              >
+                {t.policies.terms}
+              </button>
+              <button
+                onClick={() => handleFooterNav('policy-shipping')}
+                className="hover:text-white transition-colors"
+              >
+                {t.policies.shipping}
+              </button>
+              <button
+                onClick={() => handleFooterNav('policy-refund')}
+                className="hover:text-white transition-colors"
+              >
+                {t.policies.refund}
+              </button>
             </div>
           </div>
         </div>

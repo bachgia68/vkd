@@ -28,6 +28,7 @@ import About from './components/About';
 import Blog from './components/Blog';
 import OmniChannel from './components/OmniChannel';
 import Showrooms from './components/Showrooms';
+import PolicyPage from './components/PolicyPage';
 import { fetchVisibleSections } from './lib/siteContentApi';
 import type { Language } from './i18n/translations';
 
@@ -200,6 +201,22 @@ function App() {
 
           {currentPage === 'trace' && (
             <BatchTraceabilityLookup lang={lang} qrHash={traceQr} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'policy-privacy' && (
+            <PolicyPage policyKey="privacy" lang={lang} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'policy-terms' && (
+            <PolicyPage policyKey="terms" lang={lang} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'policy-shipping' && (
+            <PolicyPage policyKey="shipping" lang={lang} onNavigate={navigate} />
+          )}
+
+          {currentPage === 'policy-refund' && (
+            <PolicyPage policyKey="refund" lang={lang} onNavigate={navigate} />
           )}
         </main>
 

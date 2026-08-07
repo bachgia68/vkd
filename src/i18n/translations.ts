@@ -137,6 +137,12 @@ export interface Translation {
     email: string;
     copyright: string;
   };
+  policies: {
+    privacy: string;
+    terms: string;
+    shipping: string;
+    refund: string;
+  };
 }
 
 export const translations: Record<Language, Translation> = {
@@ -282,6 +288,12 @@ export const translations: Record<Language, Translation> = {
       email: 'khanh@tasamngoclinh.com',
       copyright: '© 2026 TA — Sàn Giao Dịch Sâm Ngọc Linh Việt Nam. Bảo lưu mọi quyền.',
     },
+    policies: {
+      privacy: 'Chính Sách Bảo Mật',
+      terms: 'Điều Khoản Dịch Vụ',
+      shipping: 'Chính Sách Vận Chuyển',
+      refund: 'Chính Sách Đổi Trả & Hoàn Tiền',
+    },
   },
   en: {
     nav: {
@@ -424,6 +436,12 @@ export const translations: Record<Language, Translation> = {
       phone: 'Zalo / WhatsApp: (84) 984 999 309',
       email: 'khanh@tasamngoclinh.com',
       copyright: '© 2026 TA — Ngoc Linh Ginseng Trading Marketplace. All rights reserved.',
+    },
+    policies: {
+      privacy: 'Privacy Policy',
+      terms: 'Terms of Service',
+      shipping: 'Shipping Policy',
+      refund: 'Refund & Return Policy',
     },
   },
   zh: {
@@ -568,6 +586,12 @@ export const translations: Record<Language, Translation> = {
       email: 'khanh@tasamngoclinh.com',
       copyright: '© 2026 TA。保留所有权利。',
     },
+    policies: {
+      privacy: '隐私政策',
+      terms: '服务条款',
+      shipping: '配送政策',
+      refund: '退换货政策',
+    },
   },
   fr: {
     nav: {
@@ -711,6 +735,12 @@ export const translations: Record<Language, Translation> = {
       email: 'khanh@tasamngoclinh.com',
       copyright: '© 2026 TA — Place de marché du Ginseng Ngoc Linh. Tous droits réservés.',
     },
+    policies: {
+      privacy: 'Politique de Confidentialité',
+      terms: 'Conditions Générales',
+      shipping: 'Politique de Livraison',
+      refund: 'Politique de Retour & Remboursement',
+    },
   },
   ar: {
     nav: {
@@ -853,6 +883,12 @@ export const translations: Record<Language, Translation> = {
       phone: 'Zalo / WhatsApp: (84) 984 999 309',
       email: 'khanh@tasamngoclinh.com',
       copyright: '© 2026 TA. جميع الحقوق محفوظة.',
+    },
+    policies: {
+      privacy: 'سياسة الخصوصية',
+      terms: 'شروط الخدمة',
+      shipping: 'سياسة الشحن',
+      refund: 'سياسة الإرجاع واسترداد الأموال',
     },
   },
 };
