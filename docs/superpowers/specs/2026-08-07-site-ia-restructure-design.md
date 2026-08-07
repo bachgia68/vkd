@@ -105,16 +105,56 @@ UI pattern invented. Nav entry "Quản lý Trang" added to `AdminLayout.tsx`'s
 Joe controls visibility himself from `/gate-vkd-control-2026/site-sections` —
 no code change needed to turn a page on once it has real content.
 
-### 2. Second navigation axis: "Mục tiêu sức khỏe" (health goal)
+### 2. Third product-type group: "Đặc Sản Việt Nam" (future-proofing)
+
+Joe wants a designated, ready-to-use slot for future non-ginseng Vietnamese
+specialty products (regional foods, other herbal goods) without another
+structural rework when that day comes. `ProductTypeMeta`
+(`src/data/productTypes.ts`) gets one new field: `group: 'sam' | 'dac-san'`.
+6 of the 7 existing categories are `'sam'`; `nam-lim-duoc-lieu` (Nấm Lim
+Xanh & Dược Liệu) — already conceptually a non-ginseng forest specialty —
+is reclassified to `'dac-san'`, becoming the first real entry in that group
+rather than an empty placeholder.
+
+The "Sản phẩm" mega-menu (§2 below) renders a 3rd column, "Đặc Sản Việt
+Nam", generated from `productTypes.filter(t => t.group === 'dac-san')` —
+data-driven, not hardcoded. When Joe later adds a genuinely new specialty
+category, adding one entry to `productTypes.ts` with `group: 'dac-san'`
+is the entire change; `Header.tsx`/`ProductCatalog.tsx` need no edits.
+
+**Homepage `Products.tsx`'s 4-card layout is explicitly NOT touched by
+this** — it stays sâm-focused until the `dac-san` group has ≥2-3 real
+products, at which point a 5th card or a dedicated section is a natural,
+separate follow-up. Not built now: an empty/placeholder card for a
+category with one product would look unfinished, not premium.
+
+**Ingredient axis (JKJ's 3rd axis) — explicitly deferred, not built now.**
+JKJ browses by Ingredient (Ginseng, Deer Antler, Collagen, Honey...)
+because their catalog data is clean, curated ingredient tags. TA's
+equivalent fields (`Product.activeIngredient`, `Product.ingredients`) are
+free-text strings written per-product by whoever entered that product —
+inconsistent, not a controlled vocabulary (e.g. "MR2 Saponin 52+" vs
+"Chiết xuất sâm" vs blank). Auto-classifying 84 products into ingredient
+groups from that text would mean guessing/misclassifying real products,
+which is the same category of mistake as fabricating data — not
+acceptable here. Building this properly needs either (a) an admin field to
+tag each product with 1+ standardized ingredient values as products are
+added/edited, or (b) Joe manually curating a mapping — both are real work
+requiring Joe's input, not something to auto-build today. Logged as a
+Phase 2 candidate; do not attempt automatic classification.
+
+### 3. Second navigation axis: "Mục tiêu sức khỏe" (health goal)
 
 Uses the existing `HealthGoal` type (`'energy' | 'stress' | 'immunity' |
 'youth'`, `src/data/mockData.ts`) already present on every `Product` row —
 no new data, just a new way to browse data that already exists.
 
-- **Header.tsx**: "Sản phẩm" becomes a two-column mega-menu. Left column:
-  existing 6 product-type groups (unchanged). Right column: 4 health-goal
-  entries (Tăng lực / Giảm stress / Tăng miễn dịch / Trẻ hoá), each
-  navigating to `catalog?goal=<value>` instead of `catalog?type=<value>`.
+- **Header.tsx**: "Sản phẩm" becomes a three-column mega-menu. Column 1:
+  the 6 `group: 'sam'` product-type categories. Column 2: the
+  `group: 'dac-san'` categories (§2 — just 1 entry today, grows over time).
+  Column 3: 4 health-goal entries (Tăng lực / Giảm stress / Tăng miễn dịch /
+  Trẻ hoá), each navigating to `catalog?goal=<value>` instead of
+  `catalog?type=<value>`.
 - **ProductCatalog.tsx**: add a second filter group "MỤC TIÊU SỨC KHỎE" in
   the sidebar, parallel to the existing "NHÓM DANH MỤC" product-type filter.
   Reads a new `goal` query param the same way `type` is read today
@@ -123,7 +163,7 @@ no new data, just a new way to browse data that already exists.
   selecting a health goal does not clear an active product-type filter, and
   vice versa (both narrow the same `filtered` list via `&&`).
 
-### 3. Reconnecting orphaned pages — placement per page
+### 4. Reconnecting orphaned pages — placement per page
 
 Each orphaned page gets the destination that fits its content, not a single
 dumping-ground menu item:
@@ -146,7 +186,7 @@ dumping-ground menu item:
   group). New `currentPage === 'showrooms'` branch. Gated on
   `showrooms.visible`.
 
-### 4. Data flow
+### 5. Data flow
 
 `App.tsx` fetches `fetchVisibleSections()` once on mount into
 `visibleSections: Set<string>` state (keyed by `site_sections.key`). The 3
