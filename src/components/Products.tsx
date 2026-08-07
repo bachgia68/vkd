@@ -48,7 +48,7 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
         </div>
 
         {/* Product Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {productCategories.map((category, index) => {
             const Icon = category.icon;
             const product = t.products.categories[category.key as keyof typeof t.products.categories];

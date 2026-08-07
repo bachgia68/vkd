@@ -276,13 +276,16 @@
   }
 
   .product-card {
-    background-color: white;
+    background-color: var(--color-cream-50);
+    border: 1px solid var(--color-cream-200);
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: 0 2px 20px rgba(11, 47, 29, 0.06);
     transition: all 0.5s;
   }
   .product-card:hover {
+    background-color: var(--color-cream-50);
+    border-color: var(--color-gold-400);
     box-shadow: 0 10px 50px rgba(11, 47, 29, 0.12);
     transform: translateY(-4px);
   }
