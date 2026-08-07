@@ -25,6 +25,7 @@ import LoyaltyDashboard from './components/LoyaltyDashboard';
 import AutoshipPage from './components/AutoshipPage';
 import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
 import ChatWidget from './components/ChatWidget';
+import EliteTeaser from './components/EliteTeaser';
 import type { Language } from './i18n/translations';
 
 function App() {
@@ -118,6 +119,7 @@ function App() {
             <>
               <Hero lang={lang} onNavigate={navigate} />
               <Stats lang={lang} />
+              <EliteTeaser lang={lang} onNavigate={navigate} />
               <ProductAdvisor lang={lang} onNavigate={navigate} />
               <About lang={lang} onNavigate={navigate} />
               <Heritage lang={lang} />
