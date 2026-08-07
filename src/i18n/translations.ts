@@ -212,7 +212,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: 'Dòng sản phẩm premium được chiết xuất từ Sâm Ngọc Linh thật 100%, kết hợp khoa học hiện đại và công nghệ sản xuất tiên tiến.',
       viewAll: 'Xem Tất Cả',
       categories: {
-        beverages: { name: 'Nước Tăng Lực', desc: 'Nước uống bổ sung năng lượng và tăng lực từ sâm Ngọc Linh' },
+        beverages: { name: 'Nước Giải Khát', desc: 'Nước uống dưỡng da, tăng lực và bù khoáng từ sâm Ngọc Linh' },
         supplements: { name: 'Thực Phẩm Bổ Sung', desc: 'Viên nang, cao, trà sâm bổ sung sức khỏe' },
         cosmetics: { name: "Mỹ Phẩm Pn's", desc: 'Dòng dược mỹ phẩm cao cấp từ chiết xuất sâm' },
         specialty: { name: 'Sâm Tươi & Khô', desc: 'Sâm nguyên củ, sâm khô, rượu sâm đặc biệt' },
@@ -355,7 +355,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: 'Premium products extracted from 100% authentic Panax Vietnamensis, combining modern science with advanced manufacturing technology.',
       viewAll: 'View All',
       categories: {
-        beverages: { name: 'Energy Drinks', desc: 'Energy and vitality boosters from Panax Vietnamensis' },
+        beverages: { name: 'Beverages', desc: 'Skin-care, energy, and mineral drinks from Panax Vietnamensis' },
         supplements: { name: 'Supplements', desc: 'Capsules, extracts, ginseng tea for health' },
         cosmetics: { name: "Pn's Cosmetics", desc: 'Premium cosmeceuticals from ginseng extract' },
         specialty: { name: 'Fresh & Dried Ginseng', desc: 'Whole root, dried ginseng, specialty ginseng wine' },
@@ -498,7 +498,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: '从100%玉灵参提取的高端产品，融合现代科学与先进制造技术。',
       viewAll: '查看全部',
       categories: {
-        beverages: { name: '能量饮料', desc: '来自玉灵参的能量和活力补充饮品' },
+        beverages: { name: '饮料', desc: '来自玉灵参的护肤、能量和矿物质饮品' },
         supplements: { name: '保健品', desc: '胶囊、提取物、人参茶补充健康' },
         cosmetics: { name: "Pn's化妆品", desc: '来自人参提取物的高端药妆' },
         specialty: { name: '鲜参和干参', desc: '整根人参、干参、特色人参酒' },
@@ -641,7 +641,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: 'Produits premium extraits de Panax Vietnamensis 100% authentique, alliant science moderne et technologie de fabrication avancée.',
       viewAll: 'Voir Tout',
       categories: {
-        beverages: { name: 'Boissons Énergisantes', desc: "Boosters d'énergie et de vitalité" },
+        beverages: { name: 'Boissons', desc: "Soin de la peau, énergie et boissons minérales au ginseng" },
         supplements: { name: 'Compléments', desc: 'Gélules, extraits, thé au ginseng' },
         cosmetics: { name: "Cosmétiques Pn's", desc: 'Cosmétique haut de gamme' },
         specialty: { name: 'Ginseng Frais & Séché', desc: 'Racine entière, ginseng séché, vin spécial' },
@@ -784,7 +784,7 @@ export const translations: Record<Language, Translation> = {
       subtitle: 'منتجات فاخرة مستخلصة من باناكس فيتنامensis 100% أصلي.',
       viewAll: 'عرض الكل',
       categories: {
-        beverages: { name: 'مشروبات الطاقة', desc: 'معززات الطاقة والحيوية' },
+        beverages: { name: 'المشروبات', desc: 'مشروبات العناية بالبشرة والطاقة والمعادن من الجينسنغ' },
         supplements: { name: 'المكملات', desc: 'كبسولات ومستخلصات وشاي الجينسينج' },
         cosmetics: { name: "مستحضرات Pn's", desc: 'مستحضرات تجميلية فاخرة' },
         specialty: { name: 'جينسينج طازج ومجفف', desc: 'جذور كاملة وجينسينج مجفف' },

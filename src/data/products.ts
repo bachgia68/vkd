@@ -7,7 +7,7 @@
 import type { HealthGoal, TargetAudience } from './mockData';
 import type { ProductTypeId } from './productTypes';
 
-export type SupplierId = 'vkd' | 'trimico';
+export type SupplierId = 'vkd' | 'trimico' | 'samk5';
 
 export interface Product {
   sku: string;
@@ -1846,6 +1846,124 @@ export const products: Product[] = [
     "volume": "Rượu 300ml, Thạch 100g, Trà nấm Lim Xanh 10g; hộp quà bìa cứng cao cấp",
     "warnings": "Thành phần rượu trong set chỉ trưng bày và đang chờ phê duyệt của Bộ Công Thương. Cam kết không bán rượu cho người dưới 18 tuổi.",
     "sourceUrl": "https://trimico.vn/set-qua-dai-cat-dai-loi"
+  },
+  {
+    "sku": "SK5-001",
+    "supplierId": "samk5",
+    "slug": "nuoc-uong-duong-da-sam-ngoc-linh-collagen-noliko",
+    "name": "Nước Uống Dưỡng Da Sâm Ngọc Linh Collagen Noliko",
+    "price": 20000,
+    "image": "/products/samk5/01-nuoc-uong-duong-da-collagen.png",
+    "productType": "tra-nuoc-uong-sam",
+    "healthGoal": "youth",
+    "audiences": [
+      "women",
+      "seniors"
+    ],
+    "familySafe": true,
+    "giftEligible": false,
+    "description": "Bổ sung collagen giúp da sáng đẹp, ngăn ngừa lão hoá, cung cấp vitamin cần thiết tốt cho sức khoẻ.",
+    "volume": "240ml/lon",
+    "sourceUrl": "https://samk5.vn/san-pham/thuc-pham-bo-sung-nuoc-uong-duong-da-sam-ngoc-linh-collagen-noliko-240mllon"
+  },
+  {
+    "sku": "SK5-002",
+    "supplierId": "samk5",
+    "slug": "nuoc-tang-luc-sam-ngoc-linh-dau-tay-do",
+    "name": "Nước Tăng Lực Sâm Ngọc Linh Dâu Tây Đỏ",
+    "price": 252000,
+    "image": "/products/samk5/02-nuoc-tang-luc-dau-tay-do.png",
+    "productType": "tra-nuoc-uong-sam",
+    "healthGoal": "energy",
+    "audiences": [
+      "men",
+      "executives"
+    ],
+    "familySafe": false,
+    "giftEligible": false,
+    "description": "Nước giải khát bổ sung dâu tây đỏ và chiết xuất Sâm Ngọc Linh, hương thơm dịu ngọt, vị gas nhẹ, mang đến thức uống giàu năng lượng.",
+    "ingredients": "Nước bão hòa CO2, đường mía, Dextrose, Taurine, nước ép dâu tây đỏ (1,5g/l), Caffein, cao Sâm Ngọc Linh (40mg/l), Vitamin B3, B5, B6, Kẽm.",
+    "volume": "Lon 320ml",
+    "warnings": "Chứa caffein — không khuyến khích dùng cho trẻ em.",
+    "sourceUrl": "https://samk5.vn/san-pham/thuc-pham-bo-sung-nuoc-tang-luc-sam-ngoc-linh-k5-dau-tay-do"
+  },
+  {
+    "sku": "SK5-003",
+    "supplierId": "samk5",
+    "slug": "chanh-khoang-sam-ngoc-linh",
+    "name": "Chanh Khoáng Sâm Ngọc Linh",
+    "price": 252000,
+    "image": "/products/samk5/03-chanh-khoang.png",
+    "productType": "tra-nuoc-uong-sam",
+    "healthGoal": "energy",
+    "audiences": [
+      "men",
+      "women",
+      "executives"
+    ],
+    "familySafe": true,
+    "giftEligible": false,
+    "description": "Kết hợp vị chanh tươi mát cùng tinh chất Sâm Ngọc Linh và khoáng chất — giải nhiệt, bù nước, bù khoáng, tăng cường sức khỏe.",
+    "sourceUrl": "https://samk5.vn/san-pham/thuc-pham-bo-sung-k5-chanh-khoang-sam-ngoc-linh"
+  },
+  {
+    "sku": "SK5-004",
+    "supplierId": "samk5",
+    "slug": "to-yen-sam-ngoc-linh-100ml-5-hu-hop",
+    "name": "Tổ Yến Sâm Ngọc Linh 100ml – 5 Hủ/Hộp",
+    "price": 525000,
+    "image": "/products/samk5/04-to-yen-sam-100ml-5hu.png",
+    "productType": "tra-nuoc-uong-sam",
+    "healthGoal": "immunity",
+    "audiences": [
+      "seniors",
+      "women",
+      "men"
+    ],
+    "familySafe": true,
+    "giftEligible": true,
+    "description": "Tổ Yến Sâm Ngọc Linh tinh chế từ cây Sâm Ngọc Linh trên 10 năm tuổi trồng tự nhiên, kết hợp Tổ Yến tươi nuôi tự nhiên tại Việt Nam.",
+    "ingredients": "Nước, đường phèn, Tổ Yến chưng (10%), Cao Sâm Ngọc Linh (125mg/l), Canxi lactate, chất ổn định, chất bảo quản, hương tổng hợp yến sâm.",
+    "volume": "Hộp 5 chai 100ml",
+    "sourceUrl": "https://samk5.vn/san-pham/to-yen-sam-ngoc-linh-100ml-5-huhop"
+  },
+  {
+    "sku": "SK5-005",
+    "supplierId": "samk5",
+    "slug": "to-yen-sam-ngoc-linh-kids",
+    "name": "Tổ Yến Sâm Ngọc Linh Kids",
+    "price": 225000,
+    "image": "/products/samk5/05-to-yen-sam-kids.png",
+    "productType": "tra-nuoc-uong-sam",
+    "healthGoal": "immunity",
+    "audiences": [
+      "family"
+    ],
+    "familySafe": true,
+    "giftEligible": false,
+    "description": "Tổ Yến Sâm Ngọc Linh đặc chế dành riêng cho trẻ em, kết hợp Tổ Yến nguyên chất, DHA, Omega, Taurine và các dưỡng chất hỗ trợ phát triển toàn diện.",
+    "ingredients": "Nước, đường phèn, Tổ Yến chưng (10%), Cao Sâm Ngọc Linh (0,25g/l), chất xơ, Lysine, Taurine, Omega 3-6, DHA, Kẽm Gluconate, Vitamin D3.",
+    "volume": "Lốc 5 hũ 100ml",
+    "sourceUrl": "https://samk5.vn/san-pham/to-yen-sam-ngoc-linh-k5-kids"
+  },
+  {
+    "sku": "SK5-006",
+    "supplierId": "samk5",
+    "slug": "collagen-sam-ngoc-linh-to-yen-noliko-plus",
+    "name": "Collagen Sâm Ngọc Linh Tổ Yến Noliko+",
+    "price": 500000,
+    "image": "/products/samk5/06-collagen-to-yen-noliko-plus.png",
+    "productType": "tra-nuoc-uong-sam",
+    "healthGoal": "youth",
+    "audiences": [
+      "women"
+    ],
+    "familySafe": true,
+    "giftEligible": true,
+    "description": "Kết hợp Sâm Ngọc Linh, Đông Trùng Hạ Thảo, Đương Quy, Tổ Yến tươi cùng collagen và vitamin C/B3/B5/B6 — hỗ trợ làn da tươi trẻ, mịn màng.",
+    "ingredients": "Nước, đường Isomalt, Tổ Yến (8%), Collagen Peptide (2400-2800mg), chiết xuất táo, chiết xuất Sâm Ngọc Linh (2%), chiết xuất Đông Trùng Hạ Thảo, chiết xuất Đương Quy, vitamin C/B3/B5/B6.",
+    "volume": "Hộp",
+    "sourceUrl": "https://samk5.vn/san-pham/tpbs-collagen-sam-ngoc-linh-to-yen-noliko"
   }
 ];
 

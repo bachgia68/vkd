@@ -52,6 +52,9 @@ const BANNED_PATTERNS = [
   /Tri[eế]t\s*Minh/i,
   /V[oõ]\s*Kim\s*Đư[oờ]ng/i,
   /T[aậ]p\s*Đo[aà]n\s*Y\s*Dư[oợ]c\s*S[aâ]m\s*Ng[oọ]c\s*Linh/i,
+  /\bK5\b/i,
+  /samk5/i,
+  /X[oơ]\s*Đ[aă]ng/i,
 ];
 
 // Dòng chứa các chuỗi này được phép (dùng cho comment giải thích rule, tên biến kỹ thuật, v.v.)

@@ -9,7 +9,7 @@ interface ProductsProps {
 }
 
 const productImages = [
-  '/assets/images/banner-snl.png',
+  '/products/samk5/02-nuoc-tang-luc-dau-tay-do.png', // supplier-guard-allow — internal asset path, not customer-visible text
   '/assets/images/product-1.jpg',
   '/assets/images/product-2.jpg',
   '/assets/images/cay-sam-vkd.png',
