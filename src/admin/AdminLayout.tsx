@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye } from 'lucide-react';
+import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye, Crown } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 
 const NAV = [
@@ -16,6 +16,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/trust-proof', end: false, label: 'Uy tín & Bằng chứng', icon: Quote },
   { to: '/gate-vkd-control-2026/site-sections', end: false, label: 'Quản lý Trang', icon: Eye },
   { to: '/gate-vkd-control-2026/crm-erp', end: false, label: 'CRM & ERP', icon: Users },
+  { to: '/gate-vkd-control-2026/loyalty', end: false, label: 'TA Elite Club', icon: Crown },
   { to: '/gate-vkd-control-2026/inventory-qr', end: false, label: 'Kho hàng & QR', icon: Warehouse },
   { to: '/gate-vkd-control-2026/settings', end: false, label: 'Địa chỉ & Liên hệ', icon: Settings },
 ];

@@ -16,6 +16,7 @@ import ChannelsPage from './pages/ChannelsPage';
 import TrustProofPage from './pages/TrustProofPage';
 import CombosPage from './pages/CombosPage';
 import SiteSectionsPage from './pages/SiteSectionsPage';
+import LoyaltyPage from './pages/LoyaltyPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -33,6 +34,7 @@ export default function AdminApp() {
           <Route index element={<AdminHome />} />
           <Route path="cms" element={<CmsPage />} />
           <Route path="crm-erp" element={<CrmErpPage />} />
+          <Route path="loyalty" element={<LoyaltyPage />} />
           <Route path="inventory-qr" element={<InventoryQrPage />} />
           <Route path="products" element={<ProductsPage />} />
           <Route path="catalog-export" element={<CatalogExportPage />} />

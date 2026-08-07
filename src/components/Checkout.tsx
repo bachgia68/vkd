@@ -1,7 +1,15 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, CreditCard, Truck, ShieldCheck, CheckCircle, Loader, AlertCircle, DollarSign } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CreditCard, Truck, ShieldCheck, CheckCircle, Loader, AlertCircle, DollarSign, Crown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
+import { useLoyaltyData } from '../hooks/useLoyaltyData';
+
+// TA Elite Club redemption: 1 điểm = 100đ giảm giá, tối đa 30% giá trị đơn hàng
+// mỗi lần thanh toán (bảo vệ biên lợi nhuận). Điểm chỉ thực sự bị trừ khi đơn
+// hàng thanh toán thành công (xem mark_payos_order_paid trong migration
+// wire_loyalty_accrual_and_redemption) — huỷ/bỏ giữa chừng không mất điểm.
+const REDEMPTION_VND_PER_POINT = 100;
+const MAX_REDEEM_RATIO = 0.3;
 
 interface CheckoutProps {
   lang: Language;
@@ -40,6 +48,13 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', country: 'Vietnam' });
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Chỉ tra điểm khi email hợp lệ và đã rời khỏi ô nhập (blur) — tránh gọi
+  // RPC theo từng phím gõ.
+  const [lookupEmail, setLookupEmail] = useState<string | null>(null);
+  const { data: loyaltyData } = useLoyaltyData(lookupEmail);
+  const pointsBalance = loyaltyData?.totalPoints ?? 0;
+  const [pointsToRedeem, setPointsToRedeem] = useState(0);
+
   const rc = regionConfig[region];
   const subtotal = region === 'vn' ? subtotalVND : items.reduce((s, item) => s + (item[rc.priceKey] as number) * item.quantity, 0);
   const tax = subtotal * rc.taxRate;
@@ -47,7 +62,14 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
 
   // PayOS chỉ hỗ trợ VND — tính riêng theo tổng VN, không phụ thuộc khu vực đang chọn.
   // Phí vận chuyển KHÔNG tính ở bước đặt hàng — nhân viên TA liên hệ xác nhận sau khi nhận đơn.
-  const payosTotal = Math.round(subtotalVND + subtotalVND * regionConfig.vn.taxRate);
+  const payosSubtotal = Math.round(subtotalVND + subtotalVND * regionConfig.vn.taxRate);
+  const maxRedeemablePoints = Math.max(
+    0,
+    Math.min(pointsBalance, Math.floor((payosSubtotal * MAX_REDEEM_RATIO) / REDEMPTION_VND_PER_POINT))
+  );
+  const appliedPoints = Math.min(pointsToRedeem, maxRedeemablePoints);
+  const redemptionDiscount = appliedPoints * REDEMPTION_VND_PER_POINT;
+  const payosTotal = Math.max(0, payosSubtotal - redemptionDiscount);
 
   const handlePayOSCheckout = async () => {
     setPaymentState('processing');
@@ -64,6 +86,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
           buyerPhone: form.phone,
           returnUrl: `${origin}/?payos_return=1`,
           cancelUrl: `${origin}/?payos_cancel=1`,
+          pointsRedeemed: appliedPoints,
         }),
       });
       const data = await res.json();
@@ -187,6 +210,10 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                     <input
                       value={form[key as keyof typeof form]}
                       onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                      onBlur={key === 'email' ? (e) => {
+                        const v = e.target.value.trim();
+                        setLookupEmail(v.includes('@') ? v : null);
+                      } : undefined}
                       placeholder={placeholder}
                       className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-100 outline-none text-forest-900 text-sm bg-cream-50 transition-all"
                     />
@@ -296,11 +323,58 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                     <span>{isVi ? 'Phí vận chuyển' : 'Shipping fee'}</span>
                     <span>{isVi ? 'Xác nhận sau' : 'Confirmed later'}</span>
                   </div>
+                  {redemptionDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-gold-600 font-medium">
+                      <span>{isVi ? `Đổi ${appliedPoints.toLocaleString()} điểm TA Elite Club` : `Redeem ${appliedPoints.toLocaleString()} TA Elite Club points`}</span>
+                      <span>−{fmtPrice(redemptionDiscount, 'vn')}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between pt-3 border-t border-cream-200">
                     <span className="font-bold text-forest-900">{isVi ? 'Tổng Cộng' : 'Total'}</span>
                     <span className="font-display font-bold text-forest-900 text-xl">{fmtPrice(total, region)}</span>
                   </div>
+                  {redemptionDiscount > 0 && (
+                    <p className="text-forest-400 text-xs text-right">
+                      {isVi ? `Thanh toán qua PayOS (VND): ${fmtPrice(payosTotal, 'vn')}` : `PayOS charge (VND): ${fmtPrice(payosTotal, 'vn')}`}
+                    </p>
+                  )}
                 </div>
+
+                {maxRedeemablePoints > 0 && (
+                  <div className="mt-4 p-4 rounded-xl bg-forest-50 border border-forest-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="w-4 h-4 text-gold-500" />
+                      <p className="text-forest-900 text-sm font-semibold">
+                        {isVi
+                          ? `Bạn có ${pointsBalance.toLocaleString()} điểm TA Elite Club`
+                          : `You have ${pointsBalance.toLocaleString()} TA Elite Club points`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min={0}
+                        max={maxRedeemablePoints}
+                        step={1}
+                        value={appliedPoints}
+                        onChange={(e) => setPointsToRedeem(Number(e.target.value))}
+                        className="flex-1 accent-gold-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setPointsToRedeem(maxRedeemablePoints)}
+                        className="text-xs font-semibold text-forest-600 hover:text-forest-900 whitespace-nowrap"
+                      >
+                        {isVi ? 'Dùng tối đa' : 'Max'}
+                      </button>
+                    </div>
+                    <p className="text-forest-400 text-xs mt-1.5">
+                      {isVi
+                        ? `Dùng ${appliedPoints.toLocaleString()} điểm = giảm ${fmtPrice(redemptionDiscount, 'vn')} (tối đa ${Math.round(MAX_REDEEM_RATIO * 100)}% giá trị đơn).`
+                        : `Using ${appliedPoints.toLocaleString()} points = ${fmtPrice(redemptionDiscount, 'vn')} off (capped at ${Math.round(MAX_REDEEM_RATIO * 100)}% of order value).`}
+                    </p>
+                  </div>
+                )}
 
                 <button
                   onClick={handlePlaceOrder}

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /gate-vkd-control-2026
+
+Sitemap: https://tasamngoclinh.com/sitemap.xml

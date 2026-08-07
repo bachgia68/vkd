@@ -129,6 +129,44 @@ export async function fetchConsentLog(customerId: string): Promise<ConsentLogRow
   );
 }
 
+// ---------- TA Elite Club (loyalty) ----------
+
+export interface LoyaltyMember {
+  id: string;
+  member_code: string;
+  tier: string;
+  points_balance: number;
+  lifetime_points: number;
+  joined_at: string;
+  customer_full_name: string | null;
+  customer_email: string | null;
+}
+
+export async function fetchLoyaltyMembers(): Promise<LoyaltyMember[]> {
+  const members = throwIfError(
+    await supabase
+      .from('elite_club_members')
+      .select('id, member_code, tier, points_balance, lifetime_points, joined_at, customer_id')
+      .order('lifetime_points', { ascending: false })
+  );
+  const ids = (members as { customer_id: string | null }[]).map((m) => m.customer_id).filter(Boolean);
+  const customers = ids.length
+    ? throwIfError(await supabase.from('customers').select('id, full_name, email').in('id', ids))
+    : [];
+  const byId = new Map((customers as { id: string; full_name: string | null; email: string | null }[]).map((c) => [c.id, c]));
+
+  return (members as { id: string; member_code: string; tier: string; points_balance: number; lifetime_points: number; joined_at: string; customer_id: string | null }[]).map((m) => ({
+    id: m.id,
+    member_code: m.member_code,
+    tier: m.tier,
+    points_balance: m.points_balance,
+    lifetime_points: m.lifetime_points,
+    joined_at: m.joined_at,
+    customer_full_name: (m.customer_id && byId.get(m.customer_id)?.full_name) ?? null,
+    customer_email: (m.customer_id && byId.get(m.customer_id)?.email) ?? null,
+  }));
+}
+
 export async function purgeSensitiveData(customerId: string) {
   const { error } = await supabase.from('customers').update({ sensitive_data_purged: true }).eq('id', customerId);
   if (error) throw new Error(error.message);
