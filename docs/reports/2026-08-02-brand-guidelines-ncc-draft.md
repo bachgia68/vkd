@@ -8,8 +8,9 @@ Trạng thái: **DRAFT** — chưa gửi NCC, cần chủ shop duyệt nội dun
 Sàn TA vận hành theo mô hình **Branded House** (giống Amazon Basics, Sephora,
 Shopee Mall): khách hàng mua vì tin tưởng thương hiệu TA, không phải vì biết
 "sản phẩm này của công ty nào". Toàn bộ sản phẩm từ nhiều NCC (VKD, TRIMICO,
-và các NCC tương lai) được trình bày thống nhất dưới một giao diện, một giỏ
-hàng, một lần thanh toán, một đầu mối chăm sóc khách hàng (TA).
+**samk5.vn/"Sâm Ngọc Linh K5"** — onboard 2026-08-07, xem §7 — và các NCC
+tương lai) được trình bày thống nhất dưới một giao diện, một giỏ hàng, một
+lần thanh toán, một đầu mối chăm sóc khách hàng (TA).
 
 Việc phân loại theo NCC vẫn tồn tại **ở backend** (SKU, kho, vận đơn, đối soát
 công nợ) — NCC không biến mất khỏi hệ thống, chỉ ẩn khỏi những gì khách hàng
@@ -59,10 +60,40 @@ Không xoá thông tin NCC khỏi:
 
 ## 6. Việc cần làm tiếp (chưa nằm trong bản draft này)
 
-- Hợp nhất toàn bộ danh mục (43 sản phẩm dòng chính + 50 sản phẩm TRIMICO)
-  vào một cấu trúc phân loại theo nhu cầu/dạng sản phẩm duy nhất, thay vì hai
-  danh mục tách biệt như hiện tại (`vkdProducts.ts` / `trimicoProducts.ts`,
-  hai trang catalog riêng). Đây là việc kiến trúc dữ liệu + UI lớn, nên tách
-  thành phiên làm việc riêng có kế hoạch rõ ràng trước khi code.
+- ~~Hợp nhất toàn bộ danh mục vào một cấu trúc phân loại duy nhất~~ — **ĐÃ
+  XONG** (`src/data/products.ts`, hợp nhất từ `vkdProducts.ts` +
+  `trimicoProducts.ts`, giờ có thêm `samk5Products.ts` — xem §7). Một trang
+  catalog duy nhất khách hàng dùng, không còn tách riêng theo NCC.
 - Thay ảnh gốc cho các sản phẩm có logo NCC in trực tiếp trên bao bì/túi quà
   (không crop được) khi có lô hàng đóng gói mới hoặc ảnh chụp lại.
+- Đồng bộ trang admin "Sản phẩm & Kho" (`ProductsPage.tsx`) với
+  `src/data/products.ts` — hiện 2 nguồn dữ liệu tách biệt hoàn toàn (xem
+  `HANDOFF_NEXT_SESSION.md` §2 "Sub-project E"), nghĩa là sản phẩm mới thêm
+  vào catalog thật không tự hiện trong trang quản lý kho admin.
+
+## 7. Quy trình onboard 1 NCC mới — đã kiểm chứng thật với samk5.vn (2026-08-07)
+
+NCC thứ 3 samk5.vn ("Sâm Ngọc Linh K5", Công ty TNHH MTV Đầu Tư Phát Triển
+Du Lịch Xơ Đăng, Kon Tum) đã được onboard theo đúng quy tắc trên — quy trình
+cụ thể, lặp lại được cho NCC tiếp theo:
+
+1. **Xác nhận với chủ shop trước khi thêm bất kỳ dữ liệu nào** — hỏi rõ đây
+   có phải NCC mới không (không tự suy đoán). samk5.vn đã được xác nhận là
+   NCC độc lập, không phải kênh bán của VKD.
+2. Thêm tên NCC/tên công ty thật vào `BANNED_PATTERNS` trong
+   `scripts/check-no-supplier-names.js` — với samk5 là `/\bK5\b/i`,
+   `/samk5/i`, `/X[oơ]\s*Đ[aă]ng/i` (tên công ty đứng sau). Guard tự động
+   fail build nếu tên này lộ ra bất kỳ đâu khách hàng nhìn thấy.
+3. Tạo file dữ liệu riêng `src/data/<tenNCC>Products.ts` theo đúng pattern
+   `trimicoProducts.ts` — `supplierId` là identifier nội bộ (vd `'samk5'`),
+   không bao giờ hiển thị cho khách; field text hiển thị (`name`,
+   `description`...) tuyệt đối không chứa tên NCC.
+4. Thêm entry tương ứng thủ công vào `src/data/products.ts` (file catalog
+   thật) — SKU tiền tố riêng (`SK5-0xx`), cùng shape `Product` interface.
+   `sku`/`supplierId`/`sourceUrl`/`image`/`slug` là field định danh nội bộ,
+   được phép chứa tên NCC (không bị guard chặn) vì khách hàng không đọc
+   những field này dưới dạng text.
+5. Tải ảnh sản phẩm thật về `public/products/<tenNCC>/` — không dùng ảnh
+   stock, không giữ nguyên watermark/banner NCC nếu ảnh gốc có (xem §2).
+6. `npm run check:brand && npx tsc -b && npm run build` phải sạch trước khi
+   commit — đây là bước bắt buộc, không bỏ qua dù chỉ thêm dữ liệu.

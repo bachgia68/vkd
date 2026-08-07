@@ -1,9 +1,29 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 2, cuối phiên). Phiên trước dừng ở đây — đọc
+Ngày: 2026-08-07 (cập nhật lần 3, cuối phiên). Phiên trước dừng ở đây — đọc
 file này trước khi làm gì tiếp.
 
-## 0. Cập nhật mới nhất (sau lần viết handoff đầu) — ĐÃ XONG
+## -1. Verify cuối phiên — ĐÃ XÁC NHẬN
+
+- **Live site `tasamngoclinh.com` đã lên bản mới nhất** — verify trực tiếp
+  (cả Joe tự kiểm tra và tôi mở lại site): hero hiện "52+ Loại Saponin",
+  card trang chủ hiện "Nước Giải Khát" (không còn "Nước Tăng Lực") — đúng 2
+  thay đổi mới nhất đã push. Vercel auto-deploy hoạt động bình thường, mọi
+  commit trong phiên này đã lên production, không có commit local nào treo.
+- **Bug nghiêm trọng vừa fix**: nút "Nhắn tin qua Messenger" trong chatbot
+  (`ChatWidget.tsx`, node `human` → "Gặp nhân viên tư vấn") trỏ về
+  `m.me/tapdoanyduocsamngoclinhvn` — **fanpage VKD Group cũ**, mọi tin nhắn
+  khách gửi qua nút này bị lạc vào inbox công ty khác. Đã sửa thành
+  `m.me/61592621322828` (page "Vườn Sâm Ngọc Linh nhà Khánh" — trang thật
+  của TA). Đã verify bằng cách bấm thật qua UI (chat → Gặp nhân viên tư vấn
+  → xác nhận href đúng), đã build sạch, đã push
+  (`fix: chatbot Messenger link pointed to old VKD fanpage, not TA's`).
+  Đã kiểm tra `social_links` (Supabase, Footer đọc từ đây) — không có entry
+  Facebook nào khác cần sửa, chỉ có Zalo/WhatsApp.
+- Giá 3 sản phẩm Tổ Yến (525k/225k/500k) — Joe đã xác nhận đúng, không cần
+  sửa gì thêm.
+
+## 0. Cập nhật trước đó trong phiên — ĐÃ XONG
 
 - **NCC thứ 3 samk5.vn đã onboard xong** (Joe xác nhận là NCC mới, ẩn tên
   giống TRIMICO). Đã thêm 6 sản phẩm thật vào `src/data/products.ts` (SK5-001
