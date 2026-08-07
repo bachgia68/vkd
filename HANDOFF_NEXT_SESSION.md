@@ -1,7 +1,29 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 3, cuối phiên). Phiên trước dừng ở đây — đọc
-file này trước khi làm gì tiếp.
+Ngày: 2026-08-07 (cập nhật lần 4). Phiên trước dừng ở đây — đọc file này
+trước khi làm gì tiếp.
+
+## -2. Sub-project B (trang pháp lý thật) — ĐÃ XONG, LIVE
+
+- 4 trang thật đã lên site: Chính Sách Bảo Mật, Điều Khoản Dịch Vụ, Chính
+  Sách Vận Chuyển, Chính Sách Đổi Trả & Hoàn Tiền — route `policy-privacy`
+  / `policy-terms` / `policy-shipping` / `policy-refund` trong `App.tsx`,
+  nội dung ở `src/data/policyContent.ts`, hiển thị qua
+  `src/components/PolicyPage.tsx`. Footer link thật thay cho text tĩnh.
+- Sự thật nghiệp vụ dùng trong nội dung (Joe xác nhận 2026-08-07): đổi/trả
+  7 ngày kể từ ngày nhận hàng, CHỈ khi lỗi sản xuất/vận chuyển; vận chuyển
+  tự giao khu vực gần vùng trồng + đối tác vận chuyển cho tỉnh/thành khác.
+- **Thông tin đăng ký kinh doanh (MST/GPKD) trong Điều Khoản Dịch Vụ đang
+  để TRỐNG có ghi chú rõ** ("đang cập nhật") — Joe xác nhận chưa có, KHÔNG
+  bịa số. Cần điền thật khi Joe có giấy phép chính thức (sửa mục "2. Thông
+  tin đơn vị vận hành" trong `policyContent.ts`, cả bản vi và en).
+- Chỉ có bản Việt + Anh đầy đủ; zh/fr/ar tạm dùng bản Anh (nội dung pháp lý
+  cần độ chính xác cao, không dịch máy chưa kiểm chứng) — xem comment đầu
+  file `policyContent.ts`.
+- Đã verify qua browser preview (bấm link Footer → trang mở đúng nội dung
+  → nút "Về trang chủ" quay lại đúng), build sạch, đã push + xác nhận
+  deployment Vercel `dpl_AvBBfinNGMjsFveEpVuggaywTKUx` READY, alias
+  `tasamngoclinh.com` đã trỏ đúng.
 
 ## -1. Verify cuối phiên — ĐÃ XÁC NHẬN
 
@@ -94,10 +116,7 @@ mới để chắc chắn Vercel build không lỗi (xem `deploy-vkd-site` skill
 Xem `docs/superpowers/specs/2026-08-07-site-ia-restructure-design.md`,
 mục "Sub-project B/C/D" — mỗi cái cần 1 spec/plan riêng trước khi code:
 
-- **Sub-project B — Trang pháp lý thật**: TA chưa có `/policies/*` (Privacy,
-  Terms, Shipping, Refund) — hiện Footer chỉ có text tĩnh không link (đã
-  sửa từ `href="#"` giả sang text tĩnh, KHÔNG phải trang thật). JKJ có đầy
-  đủ. Ưu tiên cao vì PayOS đang thanh toán thật mà chưa có chính sách nào.
+- **Sub-project B — ĐÃ XONG, xem mục -2 đầu file.**
 - **Sub-project C — Combo auto-fill nâng cao** (Joe yêu cầu, CHƯA làm):
   - Giá combo tự động = tổng giá các sản phẩm thành phần lấy từ hệ thống
     (hiện tại admin tự gõ tay giá combo — Task này làm nó tự tính tổng, admin
