@@ -33,7 +33,7 @@ interface ChatWidgetProps {
 
 type NodeId = 'menu' | 'product_advice' | 'order_status' | 'shipping_policy' | 'b2b' | 'human';
 
-const FB_MESSENGER_URL = 'https://m.me/tapdoanyduocsamngoclinhvn';
+const FB_MESSENGER_URL = 'https://m.me/61592621322828';
 const HOTLINE_TEL = 'tel:+84984999309';
 const HOTLINE_DISPLAY = '(84) 984 999 309';
 const SUPPORT_EMAIL = 'lienhe@samngoclinh-ta.vn';
