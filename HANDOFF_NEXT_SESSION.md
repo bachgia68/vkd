@@ -23,12 +23,15 @@ trước. Tóm tắt phần đụng tới repo site này:
 - `site_sections.visible = true` cho `key='blog'` — mục Blog giờ hiện trong
   menu chính, đã verify bằng cách bấm qua UI thật (menu → Blog → card → Đọc
   tiếp → đọc trọn bài, layout đúng, không lỗi).
-- **Hạn chế còn lại, chưa làm**: chưa có URL/slug riêng cho từng bài viết
-  (điều hướng dùng React state nội bộ qua `navigate()`, không phải route
-  thật trong address bar) — không gửi được link trực tiếp vào 1 bài cụ thể,
-  chỉ dẫn được về trang chủ rồi hướng dẫn bấm menu Blog. Nếu Joe cần link
-  chia sẻ trực tiếp (quảng cáo, fanpage), cần thêm route theo id — việc
-  riêng, chưa làm.
+- **Route theo id — ĐÃ XONG cùng ngày**: `/blog/<id>` giờ mở thẳng đúng bài
+  khi tải trang mới (không cần đi qua danh sách Blog trước), verify bằng
+  `navigate` thẳng vào URL đó trên site thật. Link bài mẫu:
+  `https://tasamngoclinh.com/blog/44379659-9839-45c4-a543-cb283a46338a`.
+  Cách làm: effect khởi tạo trong `App.tsx` parse `window.location.pathname`
+  khớp `/blog/([^/]+)/?` → set `currentPage='blog-post'` +
+  `selectedSlug=<id>` trước khi làm gì khác; `navigate()` cập nhật
+  `pathname` thành `/blog/<id>` khi vào trang này, reset về `/` khi rời đi.
+  Mọi trang khác trong app vẫn dùng state nội bộ như trước, không đổi.
 - Ảnh cover: chưa có, `featured_image_url` đang NULL. Nếu Joe muốn thêm,
   phải `UPDATE blog_posts SET featured_image_url = '...' WHERE id =
   '44379659-9839-45c4-a543-cb283a46338a'` qua Supabase — **KHÔNG** phải
