@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Sparkles, Droplets, Palette, Wine } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
@@ -27,6 +27,33 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
   const isRTL = lang === 'ar';
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
 
+  // Joe: "phần sản phẩm chạy từ từ không hấp dẫn" — thẻ cũ chỉ có
+  // hover-reveal (im lìm cho tới khi rê chuột, và không có gì xảy ra trên
+  // mobile vì không có hover). Thêm hiệu ứng xuất hiện so le khi cuộn tới —
+  // dùng IntersectionObserver thuần, không thêm thư viện animation mới.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="products" className="section-padding bg-cream-100" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
@@ -48,7 +75,7 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
         </div>
 
         {/* Product Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {productCategories.map((category, index) => {
             const Icon = category.icon;
             const product = t.products.categories[category.key as keyof typeof t.products.categories];
@@ -58,7 +85,8 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
             return (
               <div
                 key={index}
-                className="product-card group cursor-pointer"
+                className={`product-card group cursor-pointer ${inView ? 'animate-fade-in-up' : 'opacity-0'}`}
+                style={inView ? { animationDelay: `${index * 120}ms` } : undefined}
                 onMouseEnter={() => setHoveredProduct(index)}
                 onMouseLeave={() => setHoveredProduct(null)}
                 onClick={() => onNavigate?.(`catalog?type=${category.catalogType}`)}
@@ -73,22 +101,23 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
                   <img
                     src={category.image}
                     alt={product.name}
-                    className={`w-full h-full object-cover transition-transform duration-700 ${
+                    className={`w-full h-full object-cover transition-transform duration-500 ease-out ${
                       isHovered ? 'scale-110' : 'scale-100'
                     }`}
                   />
                   <div className="product-card-overlay" />
 
-                  {/* Icon overlay */}
+                  {/* Icon overlay — cũng hiện khi tap trên mobile (group-active),
+                      không chỉ hover chuột trên desktop */}
                   <div
-                    className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
-                      isHovered ? 'opacity-100' : 'opacity-0'
+                    className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+                      isHovered ? 'opacity-100' : 'opacity-0 group-active:opacity-100'
                     }`}
                   >
                     <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                        isGold ? 'bg-gold-400' : 'bg-forest-700'
-                      }`}
+                      className={`w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 ${
+                        isHovered ? 'scale-100' : 'scale-90'
+                      } ${isGold ? 'bg-gold-400' : 'bg-forest-700'}`}
                     >
                       <Icon className="w-8 h-8 text-white" />
                     </div>
@@ -113,12 +142,13 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
                   </h3>
                   <p className="text-forest-500 text-sm line-clamp-3">{product.desc}</p>
 
-                  {/* Hover link */}
+                  {/* Hover link — luôn hiện sẵn mờ, không chỉ bật/tắt đột
+                      ngột, để card không "im lìm" khi chưa rê chuột tới */}
                   <div
                     className={`mt-4 flex items-center gap-2 text-sm font-medium transition-all duration-300 ${
                       isHovered
-                        ? 'opacity-100 translate-y-0'
-                        : 'opacity-0 translate-y-2'
+                        ? 'opacity-100 translate-x-1'
+                        : 'opacity-60 translate-x-0'
                     } ${isGold ? 'text-gold-600' : 'text-forest-600'}`}
                   >
                     <span>{t.products.viewAll}</span>
