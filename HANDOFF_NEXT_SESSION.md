@@ -1,7 +1,29 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 4). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-07 (cập nhật lần 5). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -3. Sub-project C (combo auto-fill) — ĐÃ XONG, LIVE
+
+- 3 helper mới trong `src/data/combos.ts`: `getComboSuggestedPrice` (tổng
+  giá lẻ các SKU đã chọn), `getComboPosterImage` (poster đã upload, nếu
+  không có thì dùng ảnh sản phẩm đầu tiên trong combo — áp dụng NGAY cho cả
+  combo cũ vì tính ở thời điểm hiển thị, không cần migrate), `getComboAutoDescription`
+  (auto-fill "Gồm: Tên (giá), ..." — Joe xác nhận muốn tên+giá, không phải
+  chỉ tên hay danh sách card riêng).
+- Admin `CombosPage.tsx`: giá tự auto-fill = tổng giá lẻ khi chọn SP, admin
+  gõ tay thì tôn trọng giá đó (nút "Dùng giá này" để áp lại gợi ý); preview
+  ảnh fallback hiện ngay trong form nếu chưa upload poster.
+- Áp `getComboPosterImage` vào cả 3 nơi hiển thị combo: `ComboOfTheMonth.tsx`,
+  `ProductCatalog.tsx` (ComboCard), và danh sách combo trong admin.
+- Đã verify logic 3 helper bằng script `tsx` throwaway chạy trực tiếp trên
+  dữ liệu sản phẩm thật (không verify được UI tương tác vì admin dùng
+  Supabase auth thật, không có tài khoản demo để đăng nhập trong phiên
+  non-interactive này) — build sạch, tsc sạch, đã push, deployment Vercel
+  `dpl_GFB3mjEp819DBcptjMn5JTebQhp2` READY, alias `tasamngoclinh.com` đúng.
+- **Chưa verify UI thật với tài khoản admin** — phiên sau nếu có quyền
+  đăng nhập admin nên bấm thử tạo 1 combo để xác nhận UX (gợi ý giá, ảnh
+  fallback, mô tả auto-fill) đúng như mong đợi trước khi Joe dùng thật.
 
 ## -2. Sub-project B (trang pháp lý thật) — ĐÃ XONG, LIVE
 
@@ -117,15 +139,7 @@ Xem `docs/superpowers/specs/2026-08-07-site-ia-restructure-design.md`,
 mục "Sub-project B/C/D" — mỗi cái cần 1 spec/plan riêng trước khi code:
 
 - **Sub-project B — ĐÃ XONG, xem mục -2 đầu file.**
-- **Sub-project C — Combo auto-fill nâng cao** (Joe yêu cầu, CHƯA làm):
-  - Giá combo tự động = tổng giá các sản phẩm thành phần lấy từ hệ thống
-    (hiện tại admin tự gõ tay giá combo — Task này làm nó tự tính tổng, admin
-    có thể sửa lại nếu muốn giảm giá combo so với mua lẻ).
-  - Ảnh đại diện combo tự lấy ảnh sản phẩm đầu tiên trong combo nếu admin
-    chưa upload ảnh poster riêng (hiện đang fallback về logo TA — cần đổi
-    sang lấy `products.find(sku).image`).
-  - Mô tả ngắn từng sản phẩm trong combo lấy từ hệ thống (câu hỏi mở: hiển
-    thị full mô tả từng SP hay chỉ tên? cần hỏi Joe khi làm task này).
+- **Sub-project C — ĐÃ XONG, xem mục -3 đầu file.**
 - **Sub-project D — Products section động/hấp dẫn hơn kiểu KGC**: Joe chê
   "phần sản phẩm chạy từ từ không hấp dẫn". Hiện tại chỉ có hover-reveal.
   Cần xem code `src/components/Products.tsx` + tham khảo lại
