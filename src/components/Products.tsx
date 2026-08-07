@@ -16,10 +16,10 @@ const productImages = [
 ];
 
 const productCategories = [
-  { key: 'beverages', icon: Droplets, image: productImages[0], color: 'forest' },
-  { key: 'supplements', icon: Sparkles, image: productImages[1], color: 'gold' },
-  { key: 'cosmetics', icon: Palette, image: productImages[2], color: 'forest' },
-  { key: 'specialty', icon: Wine, image: productImages[3], color: 'gold' },
+  { key: 'beverages', icon: Droplets, image: productImages[0], color: 'forest', catalogType: 'tra-nuoc-uong-sam' },
+  { key: 'supplements', icon: Sparkles, image: productImages[1], color: 'gold', catalogType: 'sam-ngam-mat-ong' },
+  { key: 'cosmetics', icon: Palette, image: productImages[2], color: 'forest', catalogType: 'my-pham-sam' },
+  { key: 'specialty', icon: Wine, image: productImages[3], color: 'gold', catalogType: 'sam-cu-tuoi-kho' },
 ];
 
 export default function Products({ lang, onNavigate }: ProductsProps) {
@@ -61,6 +61,12 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
                 className="product-card group cursor-pointer"
                 onMouseEnter={() => setHoveredProduct(index)}
                 onMouseLeave={() => setHoveredProduct(null)}
+                onClick={() => onNavigate?.(`catalog?type=${category.catalogType}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') onNavigate?.(`catalog?type=${category.catalogType}`);
+                }}
               >
                 {/* Image */}
                 <div className="relative aspect-ginseng overflow-hidden">
