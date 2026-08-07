@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection } from '../lib/siteContentApi';
 
-export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet };
+export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
 // the Supabase client with the signed-in admin's session — RLS policies
@@ -708,6 +708,22 @@ export async function uploadComboImage(file: File): Promise<string> {
   if (error) throw new Error(error.message);
   const { data } = supabase.storage.from('combo-images').getPublicUrl(path);
   return data.publicUrl;
+}
+
+// ---------- Site Sections (admin-controlled visibility for orphaned pages) ----------
+
+export async function fetchAllSiteSections(): Promise<(SiteSection & { visible: boolean })[]> {
+  return throwIfError(
+    await supabase
+      .from('site_sections')
+      .select('id, key, label_vi, nav_group, path, sort_order, visible')
+      .order('sort_order')
+  );
+}
+
+export async function updateSiteSectionVisibility(id: string, visible: boolean) {
+  const { error } = await supabase.from('site_sections').update({ visible, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
 }
 
 // ---------- Channels (kênh phân phối: Facebook, TikTok, YouTube, Zalo, ...) ----------
