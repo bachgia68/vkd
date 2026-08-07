@@ -96,8 +96,8 @@ export default function CombosPage() {
   };
 
   const handleCreate = async () => {
-    if (!name.trim() || selectedSkus.size === 0 || !price) {
-      showToast('Cần nhập tên, chọn ít nhất 1 sản phẩm, và nhập giá.');
+    if (!name.trim() || selectedSkus.size === 0 || !price || Number(price) <= 0) {
+      showToast('Cần nhập tên, chọn ít nhất 1 sản phẩm, và giá lớn hơn 0.');
       return;
     }
     setSaving(true);
