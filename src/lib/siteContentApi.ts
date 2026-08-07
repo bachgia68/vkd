@@ -68,6 +68,16 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
   return data ?? [];
 }
 
+export async function fetchBlogPost(id: string): Promise<BlogPost | null> {
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export interface TrustProofItem {
   id: string;
   kind: 'testimonial' | 'press' | 'photo';

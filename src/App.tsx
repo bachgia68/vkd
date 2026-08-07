@@ -26,6 +26,7 @@ import TrustProof from './components/TrustProof';
 import ComboOfTheMonth from './components/ComboOfTheMonth';
 import About from './components/About';
 import Blog from './components/Blog';
+import BlogPostDetail from './components/BlogPostDetail';
 import OmniChannel from './components/OmniChannel';
 import Showrooms from './components/Showrooms';
 import PolicyPage from './components/PolicyPage';
@@ -152,7 +153,11 @@ function App() {
           )}
 
           {currentPage === 'blog' && visibleSections.has('blog') && (
-            <Blog />
+            <Blog onNavigate={navigate} />
+          )}
+
+          {currentPage === 'blog-post' && visibleSections.has('blog') && (
+            <BlogPostDetail postId={selectedSlug} lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'showrooms' && visibleSections.has('showrooms') && (

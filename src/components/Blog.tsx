@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import { Newspaper, ArrowRight } from 'lucide-react';
 import { fetchBlogPosts, type BlogPost } from '../lib/siteContentApi';
 
+interface BlogProps {
+  onNavigate?: (page: string, slug?: string) => void;
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('vi-VN');
 }
 
-export default function Blog() {
+export default function Blog({ onNavigate }: BlogProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
@@ -33,7 +37,8 @@ export default function Blog() {
           {posts.map((post) => (
             <article
               key={post.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1"
+              onClick={() => onNavigate?.('blog-post', post.id)}
+              className="bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1 cursor-pointer"
             >
               {post.featured_image_url ? (
                 <img
