@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { fetchActiveComboSets, type ComboSet } from '../lib/siteContentApi';
-import { comboToCartProduct } from '../data/combos';
+import { comboToCartProduct, getComboPosterImage } from '../data/combos';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
 
@@ -36,7 +36,7 @@ export default function ComboOfTheMonth({ lang }: { lang: Language }) {
         {combos.map((combo) => (
           <div key={combo.id} className="product-card">
             <div className="relative aspect-square overflow-hidden">
-              <img src={combo.poster_image_url ?? '/assets/images/TA_logo_clean.png'} alt={combo.name_vi} className="w-full h-full object-cover" />
+              <img src={getComboPosterImage(combo)} alt={combo.name_vi} className="w-full h-full object-cover" />
               {combo.theme && (
                 <span className="absolute top-4 left-4 px-3 py-1 text-xs font-semibold rounded-full bg-gold-400 text-forest-900">
                   {combo.theme}

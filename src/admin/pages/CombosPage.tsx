@@ -9,6 +9,7 @@ import {
   type ComboSet,
 } from '../adminApi';
 import { products } from '../../data/products';
+import { getComboPosterImage, getComboSuggestedPrice, getComboAutoDescription } from '../../data/combos';
 
 type EditableCombo = ComboSet & { active: boolean };
 
@@ -34,11 +35,26 @@ export default function CombosPage() {
   const [months, setMonths] = useState<Set<number>>(new Set());
   const [selectedSkus, setSelectedSkus] = useState<Set<string>>(new Set());
   const [price, setPrice] = useState('');
+  const [priceTouched, setPriceTouched] = useState(false);
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [search, setSearch] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const skuList = Array.from(selectedSkus);
+  const suggestedPrice = getComboSuggestedPrice(skuList);
+  const firstComponentImage = skuList.length > 0 ? products.find((p) => p.sku === skuList[0])?.image : undefined;
+
+  // Giá combo tự động = tổng giá các sản phẩm đã chọn, cho tới khi admin tự
+  // gõ tay (priceTouched) — lúc đó tôn trọng giá admin đã nhập, chỉ hiện gợi
+  // ý bên dưới để admin có thể áp lại nếu muốn.
+  useEffect(() => {
+    if (!priceTouched && skuList.length > 0) {
+      setPrice(suggestedPrice > 0 ? String(suggestedPrice) : '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSkus.size, suggestedPrice, priceTouched]);
 
   const load = () => {
     setLoading(true);
@@ -91,6 +107,7 @@ export default function CombosPage() {
     setMonths(new Set());
     setSelectedSkus(new Set());
     setPrice('');
+    setPriceTouched(false);
     setDescription('');
     setImageUrl('');
   };
@@ -102,7 +119,6 @@ export default function CombosPage() {
     }
     setSaving(true);
     try {
-      const selectedNames = products.filter((p) => selectedSkus.has(p.sku)).map((p) => p.name);
       await createComboSet({
         slug: `${slugify(name)}-${Date.now().toString(36)}`,
         name_vi: name.trim(),
@@ -111,7 +127,7 @@ export default function CombosPage() {
         component_skus: Array.from(selectedSkus),
         price_vnd: Number(price),
         poster_image_url: imageUrl || null,
-        description_vi: description.trim() || `Gồm: ${selectedNames.join(', ')}`,
+        description_vi: description.trim() || getComboAutoDescription(Array.from(selectedSkus)),
       });
       showToast('Đã tạo combo — đang ở trạng thái nháp, bấm "Kích hoạt" để hiện lên site.');
       resetForm();
@@ -211,6 +227,14 @@ export default function CombosPage() {
               />
             </label>
             {imageUrl && <img src={imageUrl} alt="" className="w-16 h-16 object-cover rounded-lg" />}
+            {!imageUrl && firstComponentImage && (
+              <div className="flex items-center gap-2">
+                <img src={firstComponentImage} alt="" className="w-16 h-16 object-cover rounded-lg opacity-70" />
+                <span className="text-xs text-forest-700/60 max-w-[14rem]">
+                  Chưa tải ảnh riêng — sẽ tự dùng ảnh sản phẩm đầu tiên trong combo
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -244,17 +268,40 @@ export default function CombosPage() {
             <input
               type="number"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {
+                setPrice(e.target.value);
+                setPriceTouched(true);
+              }}
               placeholder="1430000"
               className="w-full px-3 py-2.5 rounded-lg border border-cream-300 text-sm focus:outline-none focus:border-gold-400"
             />
+            {suggestedPrice > 0 && (
+              <p className="text-xs text-forest-700/60 mt-1.5">
+                Tổng giá lẻ: {suggestedPrice.toLocaleString('vi-VN')}đ
+                {priceTouched && Number(price) !== suggestedPrice && (
+                  <>
+                    {' — '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPrice(String(suggestedPrice));
+                        setPriceTouched(false);
+                      }}
+                      className="text-gold-600 underline underline-offset-2 hover:text-gold-700"
+                    >
+                      Dùng giá này
+                    </button>
+                  </>
+                )}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-xs text-forest-700/70 mb-1.5 uppercase tracking-wide">Mô tả ngắn</label>
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Để trống sẽ tự điền: Gồm: <tên các sản phẩm đã chọn>"
+              placeholder="Để trống sẽ tự điền: Gồm: <tên (giá)> từng sản phẩm đã chọn"
               className="w-full px-3 py-2.5 rounded-lg border border-cream-300 text-sm focus:outline-none focus:border-gold-400"
             />
           </div>
@@ -276,7 +323,7 @@ export default function CombosPage() {
           <div className="space-y-3">
             {combos.map((c) => (
               <div key={c.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-xl border border-cream-200">
-                {c.poster_image_url && <img src={c.poster_image_url} alt="" className="w-14 h-14 object-cover rounded-lg shrink-0" />}
+                <img src={getComboPosterImage(c)} alt="" className="w-14 h-14 object-cover rounded-lg shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-forest-900 truncate">{c.name_vi}</p>
                   <p className="text-xs text-forest-700/60">

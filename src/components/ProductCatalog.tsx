@@ -20,7 +20,7 @@ import { productTypes, type ProductTypeId } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
 import { fetchActiveComboSets, type ComboSet } from '../lib/siteContentApi';
-import { comboToCartProduct } from '../data/combos';
+import { comboToCartProduct, getComboPosterImage } from '../data/combos';
 
 function formatVND(n: number | null): string {
   if (n === null) return 'Liên hệ';
@@ -671,7 +671,7 @@ function ComboCard({ combo }: { combo: ComboSet }) {
     <div className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-cream-200 hover:border-gold-300 transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1">
       <div className="relative aspect-[4/5] overflow-hidden bg-cream-100">
         <img
-          src={combo.poster_image_url ?? '/assets/images/TA_logo_clean.png'}
+          src={getComboPosterImage(combo)}
           alt={combo.name_vi}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
