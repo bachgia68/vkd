@@ -3,16 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import Stats from './components/Stats';
-import About from './components/About';
 import FounderStory from './components/FounderStory';
 import Heritage from './components/Heritage';
 import Products from './components/Products';
 import Traceability from './components/Traceability';
 import B2B from './components/B2B';
 import Certifications from './components/Certifications';
-import Blog from './components/Blog';
-import OmniChannel from './components/OmniChannel';
 import Footer from './components/Footer';
 import ProductCatalog from './components/ProductCatalog';
 import ProductDetail from './components/ProductDetail';
@@ -26,6 +22,7 @@ import AutoshipPage from './components/AutoshipPage';
 import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
 import ChatWidget from './components/ChatWidget';
 import EliteTeaser from './components/EliteTeaser';
+import TrustProof from './components/TrustProof';
 import type { Language } from './i18n/translations';
 
 function App() {
@@ -118,18 +115,18 @@ function App() {
           {currentPage === 'home' && (
             <>
               <Hero lang={lang} onNavigate={navigate} />
-              <Stats lang={lang} />
+              <Products lang={lang} onNavigate={navigate} />
+              <Heritage lang={lang} />
               <EliteTeaser lang={lang} onNavigate={navigate} />
               <ProductAdvisor lang={lang} onNavigate={navigate} />
-              <About lang={lang} onNavigate={navigate} />
-              <Heritage lang={lang} />
-              <Products lang={lang} onNavigate={navigate} />
-              <OmniChannel lang={lang} onNavigate={navigate} />
-              <Traceability lang={lang} />
-              <B2B lang={lang} />
               <Certifications lang={lang} />
-              <Blog />
+              <TrustProof lang={lang} />
+              <B2B lang={lang} />
             </>
+          )}
+
+          {currentPage === 'traceability' && (
+            <Traceability lang={lang} />
           )}
 
           {basePage === 'catalog' && (

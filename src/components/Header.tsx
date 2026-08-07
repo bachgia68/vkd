@@ -42,7 +42,11 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
   const languages: Language[] = ['vi', 'en', 'zh', 'fr', 'ar'];
 
   const handleNav = (href: string) => {
-    if (href === 'about' || href === 'traceability' || href === 'b2b') {
+    if (href === 'about') {
+      onNavigate('about-story');
+    } else if (href === 'traceability') {
+      onNavigate('traceability');
+    } else if (href === 'b2b') {
       onNavigate('home');
       setTimeout(() => {
         const el = document.getElementById(href);
@@ -125,7 +129,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
                   key={item.key}
                   onClick={() => handleNav(item.href)}
                   className={`nav-link text-sm font-medium tracking-wide ${
-                    currentPage === item.href
+                    currentPage === (item.href === 'about' ? 'about-story' : item.href)
                       ? 'text-gold-600'
                       : useLightText
                       ? 'text-white/90 hover:text-white'
