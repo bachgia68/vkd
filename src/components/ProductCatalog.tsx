@@ -14,6 +14,7 @@ import {
   ShoppingBag,
 } from 'lucide-react';
 import { products as staticProducts, toCartProduct, type Product } from '../data/products';
+import { healthGoalLabels, type HealthGoal } from '../data/mockData';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { productTypes, type ProductTypeId } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
@@ -207,10 +208,12 @@ export default function ProductCatalog({
   lang,
   onNavigate,
   initialType,
+  initialGoal,
 }: {
   lang: Language;
   onNavigate: (page: string, slug?: string) => void;
   initialType?: string;
+  initialGoal?: string;
 }) {
   const products = useLiveProducts(staticProducts);
   const [combos, setCombos] = useState<ComboSet[]>([]);
@@ -237,6 +240,19 @@ export default function ProductCatalog({
     setActiveType(isValidProductType(initialType) ? initialType : 'all');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialType]);
+
+  const isValidHealthGoal = (id?: string): id is HealthGoal =>
+    !!id && Object.keys(healthGoalLabels).includes(id);
+
+  const [activeGoal, setActiveGoal] = useState<HealthGoal | 'all'>(
+    isValidHealthGoal(initialGoal) ? initialGoal : 'all'
+  );
+
+  useEffect(() => {
+    setActiveGoal(isValidHealthGoal(initialGoal) ? initialGoal : 'all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialGoal]);
+
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -303,6 +319,7 @@ export default function ProductCatalog({
   const filtered = useMemo(() => {
     let list = products.filter((p) => {
       if (activeType !== 'all' && p.productType !== activeType) return false;
+      if (activeGoal !== 'all' && p.healthGoal !== activeGoal) return false;
       if (query.trim() && !p.name.toLowerCase().includes(query.trim().toLowerCase())) return false;
       return true;
     });
@@ -313,7 +330,7 @@ export default function ProductCatalog({
       list = [...list].sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
     }
     return list;
-  }, [activeType, query, sortBy]);
+  }, [activeType, activeGoal, query, sortBy]);
 
   const visibleCombos = useMemo(() => {
     if (activeType !== 'all' && activeType !== 'set-qua-tang') return [];
@@ -468,6 +485,34 @@ export default function ProductCatalog({
                       </li>
                     );
                   })}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-forest-500 mb-4 px-1">
+                  {lang === 'vi' ? 'Mục Tiêu Sức Khỏe' : 'Health Goal'}
+                </h3>
+                <ul className="space-y-1.5">
+                  <li>
+                    <CategoryButton
+                      active={activeGoal === 'all'}
+                      onClick={() => setActiveGoal('all')}
+                      icon={null}
+                      label={lang === 'vi' ? 'Tất cả mục tiêu' : 'All goals'}
+                      count={products.length}
+                    />
+                  </li>
+                  {(Object.keys(healthGoalLabels) as HealthGoal[]).map((g) => (
+                    <li key={g}>
+                      <CategoryButton
+                        active={activeGoal === g}
+                        onClick={() => setActiveGoal(g)}
+                        icon={null}
+                        label={lang === 'vi' ? healthGoalLabels[g].vi : healthGoalLabels[g].en}
+                        count={products.filter((p) => p.healthGoal === g).length}
+                      />
+                    </li>
+                  ))}
                 </ul>
               </div>
 
