@@ -111,6 +111,25 @@ export async function fetchActiveComboSets(): Promise<ComboSet[]> {
   return data ?? [];
 }
 
+export interface SiteSection {
+  id: string;
+  key: string;
+  label_vi: string;
+  nav_group: string;
+  path: string;
+  sort_order: number;
+}
+
+export async function fetchVisibleSections(): Promise<SiteSection[]> {
+  const { data, error } = await supabase
+    .from('site_sections')
+    .select('id, key, label_vi, nav_group, path, sort_order')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function submitCustomerLead(input: {
   name: string;
   phone: string;
