@@ -102,6 +102,7 @@ export default function CombosPage() {
     }
     setSaving(true);
     try {
+      const selectedNames = products.filter((p) => selectedSkus.has(p.sku)).map((p) => p.name);
       await createComboSet({
         slug: `${slugify(name)}-${Date.now().toString(36)}`,
         name_vi: name.trim(),
@@ -110,7 +111,7 @@ export default function CombosPage() {
         component_skus: Array.from(selectedSkus),
         price_vnd: Number(price),
         poster_image_url: imageUrl || null,
-        description_vi: description.trim(),
+        description_vi: description.trim() || `Gồm: ${selectedNames.join(', ')}`,
       });
       showToast('Đã tạo combo — đang ở trạng thái nháp, bấm "Kích hoạt" để hiện lên site.');
       resetForm();
@@ -253,7 +254,7 @@ export default function CombosPage() {
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="VD: 2 hộp bánh sâm + 2 gói kẹo sâm + 1 hộp trà + 1 chai rượu 10 năm"
+              placeholder="Để trống sẽ tự điền: Gồm: <tên các sản phẩm đã chọn>"
               className="w-full px-3 py-2.5 rounded-lg border border-cream-300 text-sm focus:outline-none focus:border-gold-400"
             />
           </div>
