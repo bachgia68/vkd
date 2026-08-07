@@ -55,7 +55,17 @@ function App() {
   // site (bug do trước đây currentPage chỉ là state nội bộ, không gắn với
   // history entry nào).
   useEffect(() => {
-    window.history.replaceState({ page: 'home' }, '', window.location.pathname + window.location.search);
+    // Link chia sẻ trực tiếp một bài viết (vd. đăng fanpage) trỏ vào
+    // /blog/<id> — nếu trang vừa tải thẳng vào đường dẫn này (không phải
+    // điều hướng nội bộ), mở đúng bài đó ngay từ đầu thay vì rơi về trang chủ.
+    const blogMatch = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
+    if (blogMatch) {
+      setSelectedSlug(blogMatch[1]);
+      setCurrentPage('blog-post');
+      window.history.replaceState({ page: 'blog-post', slug: blogMatch[1] }, '', window.location.pathname);
+    } else {
+      window.history.replaceState({ page: 'home' }, '', window.location.pathname + window.location.search);
+    }
 
     const onPopState = (event: PopStateEvent) => {
       const state = event.state as { page?: string; slug?: string } | null;
@@ -63,7 +73,13 @@ function App() {
         setCurrentPage(state.page);
         if (state.slug) setSelectedSlug(state.slug);
       } else {
-        setCurrentPage('home');
+        const match = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
+        if (match) {
+          setSelectedSlug(match[1]);
+          setCurrentPage('blog-post');
+        } else {
+          setCurrentPage('home');
+        }
       }
     };
     window.addEventListener('popstate', onPopState);
@@ -105,7 +121,11 @@ function App() {
   const navigate = (page: string, slug?: string) => {
     if (slug) setSelectedSlug(slug);
     setCurrentPage(page);
-    window.history.pushState({ page, slug: slug ?? selectedSlug }, '', window.location.pathname + window.location.search);
+    // Chỉ bài viết Blog có route thật (/blog/<id>) để chia sẻ link trực
+    // tiếp được — mọi trang khác trong app dùng state nội bộ như trước,
+    // pathname reset về '/' khi rời khỏi bài viết.
+    const pathname = page === 'blog-post' && slug ? `/blog/${slug}` : '/';
+    window.history.pushState({ page, slug: slug ?? selectedSlug }, '', pathname + window.location.search);
   };
 
   const handleOrderSuccess = (id: string) => {
