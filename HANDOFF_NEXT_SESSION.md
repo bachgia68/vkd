@@ -1,7 +1,41 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 7). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-07 (cập nhật lần 8). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -7. Track A — bài viết thật đầu tiên — ĐÃ XONG, LIVE, đọc được trọn vẹn
+
+Chi tiết đầy đủ (n8n prompt fix, lỗi bịa sản phẩm, cách sửa) nằm ở
+`D:\TA page\video-pipeline\HANDOFF_NEXT_SESSION.md` mục -1 — đọc file đó
+trước. Tóm tắt phần đụng tới repo site này:
+
+- Bài thật đã `INSERT` vào Supabase `blog_posts` (id
+  `44379659-9839-45c4-a543-cb283a46338a`, `published=true`) — KHÔNG qua
+  Strapi (Strapi hoàn toàn tách biệt khỏi site, xem file trên).
+- **Thêm trang đọc bài chi tiết** (trước đây không có): route mới
+  `blog-post` trong `App.tsx` (dùng lại state `selectedSlug` sẵn có, giờ
+  chứa `post.id`), component mới `src/components/BlogPostDetail.tsx` —
+  parser markdown tự viết (không thêm thư viện) chỉ hỗ trợ đúng tập cú pháp
+  cố định mà prompt Gemini luôn sinh ra (H2 `##`, H3 `###`, bullet `* `/`- `,
+  bold `**...**`, đoạn văn). `fetchBlogPost(id)` mới trong
+  `siteContentApi.ts`. `Blog.tsx` card giờ có `onClick` thật thay vì nút
+  "Đọc tiếp" trang trí vô dụng như trước.
+- `site_sections.visible = true` cho `key='blog'` — mục Blog giờ hiện trong
+  menu chính, đã verify bằng cách bấm qua UI thật (menu → Blog → card → Đọc
+  tiếp → đọc trọn bài, layout đúng, không lỗi).
+- **Hạn chế còn lại, chưa làm**: chưa có URL/slug riêng cho từng bài viết
+  (điều hướng dùng React state nội bộ qua `navigate()`, không phải route
+  thật trong address bar) — không gửi được link trực tiếp vào 1 bài cụ thể,
+  chỉ dẫn được về trang chủ rồi hướng dẫn bấm menu Blog. Nếu Joe cần link
+  chia sẻ trực tiếp (quảng cáo, fanpage), cần thêm route theo id — việc
+  riêng, chưa làm.
+- Ảnh cover: chưa có, `featured_image_url` đang NULL. Nếu Joe muốn thêm,
+  phải `UPDATE blog_posts SET featured_image_url = '...' WHERE id =
+  '44379659-9839-45c4-a543-cb283a46338a'` qua Supabase — **KHÔNG** phải
+  upload qua Strapi admin (không có tác dụng, xem lý do ở file trên).
+- Caption đăng fanpage đã soạn sẵn 3 kênh (Facebook/TikTok/Zalo) tại
+  `D:\AI_Skills\ai-marketing-skills\outputs_Claude_mark_sam\drafts\
+  captions_2026-08-07.md` — Joe tự đăng tay, chưa đăng đâu cả.
 
 ## -6. Combo Tháng Này thật + Lịch 14 combo dịp lễ — ĐÃ XONG, LIVE (1/15)
 
@@ -221,6 +255,8 @@ mới để chắc chắn Vercel build không lỗi (xem `deploy-vkd-site` skill
 8. Fix dead link: Footer "Quick Links" (`href="#about"` không có onClick) —
    đã nối vào điều hướng thật.
 9. Combo Tháng Này thật + 14 combo dịp lễ nháp — xem mục -6 đầu file.
+10. Track A — bài viết thật đầu tiên, trang đọc chi tiết Blog — xem mục -7
+    đầu file.
 
 ## 2. Việc CHƯA làm (đã brainstorm nhưng chưa code) — Sub-project B/C/D
 
@@ -268,38 +304,13 @@ run build` trước khi commit.
   vào đó: 1 combo thật đã lên site (`duong-nhan-sam-yen`) + 14 combo dịp lễ
   khác đã nháp sẵn trong `combo_sets`, chờ kích hoạt.
 
-### 3c. Track A — bài viết thật đầu tiên lên Blog — CHƯA XONG, việc tiếp theo
+### 3c. Track A — bài viết thật đầu tiên lên Blog — ĐÃ XONG, xem mục -7
 
-Mục tiêu gốc của phiên trước (`marketing-sam` skill, flow AUTO_POST_CMS qua
-n8n): viết + đăng 1 bài viết THẬT đầu tiên (không phải bài test), theo trục
-nội dung mới **Curation/Trust + Ritual/Occasion** (không lặp lại góc MR2 —
-Joe đã từ chối bản nháp MR2 lần 3: "nói chung chung mr2 mãi rồi ko có gì đặc
-sắc cả"). Việc này **CHƯA làm gì trong phiên hiện tại** — bị chuyển hướng
-sang làm combo trước. Trạng thái pipeline (container `n8n_automation` +
-`strapi_cms`, webhook, credentials) — xem
-`D:\TA page\video-pipeline\HANDOFF_NEXT_SESSION.md` và memory
-`project_n8n_vkd_pipeline_status`.
-
-Gợi ý chủ đề bám sát việc vừa làm: bài viết có thể ăn theo combo
-`duong-nhan-sam-yen` vừa lên (Tổ Yến + Collagen Tổ Yến) với góc "vì sao TA
-chọn ghép đúng 2 sản phẩm này, không phải vì đẹp hộp" (Curation/Trust) — vẫn
-cần Joe xác nhận trước khi chạy webhook thật.
-
-Việc còn lại theo đúng thứ tự:
-1. Chốt chủ đề + góc content với Joe (Curation/Trust hoặc Ritual/Occasion).
-2. Gọi webhook production `POST http://localhost:5678/webhook/sam-ngoc-linh-publish`
-   với topic thật (chưa từng chạy với topic thật, chỉ test trước đó).
-3. Chấm bài Gemini sinh ra theo checklist Quiet Luxury trong skill
-   `marketing-sam` (tránh sáo ngữ wellness, nhấn định lượng/MR2 chỉ khi liên
-   quan, không lặp giọng cũ).
-4. Upload ảnh cover thật qua Strapi admin (`localhost:1337/admin`,
-   field `coverImage`) — ảnh sinh tự động qua node OpenAI đang lỗi ("Bad
-   request"), không tự động được, phải làm tay.
-5. Bật Blog (`site_sections.hidden=false` cho mục Blog trong "Quản lý
-   Trang") — hiện vẫn ẨN, bài viết CMS tạo ra không hiện ở đâu nếu chưa bật.
-6. Verify trên `tasamngoclinh.com` (dấu tiếng Việt, markdown render, SEO
-   meta).
-7. Soạn caption + link để Joe tự đăng fanpage tay (không tự động đăng).
+(Mục này ban đầu ghi lại yêu cầu chưa làm; đã hoàn thành cuối phiên sau —
+chi tiết đầy đủ ở mục -7 đầu file và
+`D:\TA page\video-pipeline\HANDOFF_NEXT_SESSION.md` mục -1. Việc còn treo
+lại: route URL/slug riêng cho từng bài để chia sẻ link trực tiếp được, và
+Joe cần tự đăng caption đã soạn sẵn lên fanpage.)
 
 ## 4. Việc vặt còn treo lại (mức độ thấp, không chặn)
 
