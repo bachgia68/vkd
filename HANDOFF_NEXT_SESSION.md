@@ -1,7 +1,46 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 6). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-07 (cập nhật lần 7). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -6. Combo Tháng Này thật + Lịch 14 combo dịp lễ — ĐÃ XONG, LIVE (1/15)
+
+- **`duong-nhan-sam-yen` ("Dưỡng Nhan Sâm Yến") — combo THẬT, `active=true`,
+  đã lên `tasamngoclinh.com` (verify bằng `read_page` trực tiếp trên site,
+  thấy đúng ảnh + giá).** Gồm Tổ Yến Sâm Ngọc Linh 100ml-5 Hủ (SK5-004) +
+  Collagen Sâm Ngọc Linh Tổ Yến Noliko+ (SK5-006), giá 899.000đ (tổng lẻ
+  1.025.000đ). **4 ảnh gốc ở `combo SP/` (combo1/2/3.jfif, thang7.jfif) bị
+  BỎ HẲN** — hoá ra là ảnh "Combo Dâng Lễ Vu Lan" của một brand khác ("NGỌC
+  LINH EST 1994" in ngay trên hộp, không phải logo góc dễ xoá), sản phẩm
+  trong đó (PanaxX Cookie/HausnX Candy dạng bánh/kẹo/rượu sâm) hoàn toàn
+  không có trong catalog thật — Joe đã xác nhận bỏ, làm combo mới từ SKU
+  thật thay vào đó.
+- Ảnh poster combo dựng bằng Python Pillow (không phải browser screenshot —
+  sandbox chặn `file://` cross-directory), composite từ đúng ảnh sản phẩm
+  thật trong `public/products/samk5/`, **font bắt buộc dùng Times New Roman**
+  (`C:/Windows/Fonts/times.ttf`/`timesbd.ttf`) — Georgia thiếu glyph dấu
+  tiếng Việt, chữ ra ô vuông (đã tự phát hiện + fix trong phiên, kiểm bằng
+  `fontTools.ttLib.TTFont(...).getBestCmap()` trước khi chọn font). File lưu
+  `public/products/combo/<slug>.png`, đã commit + push riêng (không đụng
+  `src/components/Products.tsx` — file đó có diff dở dang **KHÔNG PHẢI CỦA
+  PHIÊN NÀY**, xem cảnh báo ở cuối mục này).
+- **14 combo dịp lễ Việt Nam khác đã tạo sẵn dạng NHÁP** (`active=false`)
+  trong `combo_sets` — Tết Dương Lịch, Valentine, Ông Táo, Tết Nguyên Đán,
+  Rằm Tháng Giêng, 8/3, Giỗ Tổ Hùng Vương, 30/4-1/5, Đoan Ngọ, Vu Lan, Trung
+  Thu, 20/10, 20/11, Giáng Sinh — SKU thật, **giá = đúng tổng SKU thành
+  phần, không tự giảm giá** (yêu cầu tường minh của Joe). **CHƯA có ảnh** —
+  cần dựng ảnh (đúng quy trình Pillow ở trên) trước khi bấm "Kích hoạt".
+  Bảng đầy đủ (slug/SKU/giá/ngày dương lịch 2026) + quy trình kích hoạt ở
+  `D:\AI_Skills\ai-marketing-skills\outputs_Claude_mark_sam\references\seasonal_combo_calendar.md`
+  — đọc file đó, không phải tóm tắt này, trước khi kích hoạt bất kỳ combo
+  nào. Ngày âm→dương chỉ đúng cho năm 2026.
+- **⚠️ Phát hiện giữa phiên, KHÔNG PHẢI VIỆC CỦA PHIÊN NÀY**: `git status`
+  đầu phiên đã thấy `src/components/Products.tsx` có diff chưa commit (41
+  dòng thêm/13 xoá) + `.claude/worktrees/` — có vẻ một phiên/worktree khác
+  đang dở dang animation Products section. **Đã cố tình KHÔNG đụng, KHÔNG
+  commit file đó** khi push ảnh combo. Phiên sau nếu thấy file này vẫn còn
+  diff treo, hỏi Joe trước khi commit hay discard — có thể là việc dở dang
+  của một agent khác.
 
 ## -5. Sub-project E (đồng bộ admin Sản phẩm & Kho) — ĐÃ XONG (đợt đầu)
 
@@ -181,6 +220,7 @@ mới để chắc chắn Vercel build không lỗi (xem `deploy-vkd-site` skill
    vào catalog filter thật.
 8. Fix dead link: Footer "Quick Links" (`href="#about"` không có onClick) —
    đã nối vào điều hướng thật.
+9. Combo Tháng Này thật + 14 combo dịp lễ nháp — xem mục -6 đầu file.
 
 ## 2. Việc CHƯA làm (đã brainstorm nhưng chưa code) — Sub-project B/C/D
 
@@ -222,12 +262,44 @@ run build` trước khi commit.
   Blog ẩn/hiện. Nhưng caption đang trỏ `tasamngoclinh.com/bai-viet` — link
   chết khi Blog tắt. **Cần bật Blog trong "Quản lý Trang" ngay khi có bài
   đầu tiên.**
-- **3 combo tháng 7 để đâu để hút khách?** → Đã có sẵn 2 chỗ (làm xong
-  trong phiên trước): homepage "Combo Tháng Này" (ngay dưới Products) +
-  trang "Set Quà Tặng". Chỉ cần Joe tạo combo trong admin với "Tháng áp
-  dụng = Tháng 7", giá thật, ảnh thật (`combo SP/` đã có sẵn ảnh thiết kế:
-  combo1.jfif, combo2.jfif, combo3.jfif, thang7.jfif), bấm Kích hoạt — không
-  cần code thêm gì.
+- **3 combo tháng 7 để đâu để hút khách?** → ĐÃ XONG theo cách khác — xem
+  mục -6 đầu file. 4 ảnh `combo SP/` (combo1/2/3.jfif, thang7.jfif) nhắc ở
+  đây **đã bị bỏ hẳn**, hoá ra không phải sản phẩm/thương hiệu của TA. Thay
+  vào đó: 1 combo thật đã lên site (`duong-nhan-sam-yen`) + 14 combo dịp lễ
+  khác đã nháp sẵn trong `combo_sets`, chờ kích hoạt.
+
+### 3c. Track A — bài viết thật đầu tiên lên Blog — CHƯA XONG, việc tiếp theo
+
+Mục tiêu gốc của phiên trước (`marketing-sam` skill, flow AUTO_POST_CMS qua
+n8n): viết + đăng 1 bài viết THẬT đầu tiên (không phải bài test), theo trục
+nội dung mới **Curation/Trust + Ritual/Occasion** (không lặp lại góc MR2 —
+Joe đã từ chối bản nháp MR2 lần 3: "nói chung chung mr2 mãi rồi ko có gì đặc
+sắc cả"). Việc này **CHƯA làm gì trong phiên hiện tại** — bị chuyển hướng
+sang làm combo trước. Trạng thái pipeline (container `n8n_automation` +
+`strapi_cms`, webhook, credentials) — xem
+`D:\TA page\video-pipeline\HANDOFF_NEXT_SESSION.md` và memory
+`project_n8n_vkd_pipeline_status`.
+
+Gợi ý chủ đề bám sát việc vừa làm: bài viết có thể ăn theo combo
+`duong-nhan-sam-yen` vừa lên (Tổ Yến + Collagen Tổ Yến) với góc "vì sao TA
+chọn ghép đúng 2 sản phẩm này, không phải vì đẹp hộp" (Curation/Trust) — vẫn
+cần Joe xác nhận trước khi chạy webhook thật.
+
+Việc còn lại theo đúng thứ tự:
+1. Chốt chủ đề + góc content với Joe (Curation/Trust hoặc Ritual/Occasion).
+2. Gọi webhook production `POST http://localhost:5678/webhook/sam-ngoc-linh-publish`
+   với topic thật (chưa từng chạy với topic thật, chỉ test trước đó).
+3. Chấm bài Gemini sinh ra theo checklist Quiet Luxury trong skill
+   `marketing-sam` (tránh sáo ngữ wellness, nhấn định lượng/MR2 chỉ khi liên
+   quan, không lặp giọng cũ).
+4. Upload ảnh cover thật qua Strapi admin (`localhost:1337/admin`,
+   field `coverImage`) — ảnh sinh tự động qua node OpenAI đang lỗi ("Bad
+   request"), không tự động được, phải làm tay.
+5. Bật Blog (`site_sections.hidden=false` cho mục Blog trong "Quản lý
+   Trang") — hiện vẫn ẨN, bài viết CMS tạo ra không hiện ở đâu nếu chưa bật.
+6. Verify trên `tasamngoclinh.com` (dấu tiếng Việt, markdown render, SEO
+   meta).
+7. Soạn caption + link để Joe tự đăng fanpage tay (không tự động đăng).
 
 ## 4. Việc vặt còn treo lại (mức độ thấp, không chặn)
 
