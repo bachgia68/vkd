@@ -23,6 +23,7 @@ import BatchTraceabilityLookup from './components/BatchTraceabilityLookup';
 import ChatWidget from './components/ChatWidget';
 import EliteTeaser from './components/EliteTeaser';
 import TrustProof from './components/TrustProof';
+import ComboOfTheMonth from './components/ComboOfTheMonth';
 import type { Language } from './i18n/translations';
 
 function App() {
@@ -116,6 +117,7 @@ function App() {
             <>
               <Hero lang={lang} onNavigate={navigate} />
               <Products lang={lang} onNavigate={navigate} />
+              <ComboOfTheMonth lang={lang} />
               <Heritage lang={lang} />
               <EliteTeaser lang={lang} onNavigate={navigate} />
               <ProductAdvisor lang={lang} onNavigate={navigate} />

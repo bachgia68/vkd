@@ -18,6 +18,8 @@ import { useLiveProducts } from '../hooks/useLiveProducts';
 import { productTypes, type ProductTypeId } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
+import { fetchActiveComboSets, type ComboSet } from '../lib/siteContentApi';
+import { comboToCartProduct } from '../data/combos';
 
 function formatVND(n: number | null): string {
   if (n === null) return 'Liên hệ';
@@ -211,6 +213,16 @@ export default function ProductCatalog({
   initialType?: string;
 }) {
   const products = useLiveProducts(staticProducts);
+  const [combos, setCombos] = useState<ComboSet[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchActiveComboSets()
+      .then((all) => { if (!cancelled) setCombos(all); })
+      .catch(() => { if (!cancelled) setCombos([]); });
+    return () => { cancelled = true; };
+  }, []);
+
   const isValidProductType = (id?: string): id is ProductTypeId =>
     !!id && productTypes.some((t) => t.id === id);
 
@@ -302,6 +314,20 @@ export default function ProductCatalog({
     }
     return list;
   }, [activeType, query, sortBy]);
+
+  const visibleCombos = useMemo(() => {
+    if (activeType !== 'all' && activeType !== 'set-qua-tang') return [];
+    const currentMonth = new Date().getMonth() + 1;
+    const q = query.trim().toLowerCase();
+    return [...combos]
+      .filter((c) => !q || c.name_vi.toLowerCase().includes(q))
+      .sort((a, b) => {
+        const aCurrent = a.month_tags.length === 0 || a.month_tags.includes(currentMonth);
+        const bCurrent = b.month_tags.length === 0 || b.month_tags.includes(currentMonth);
+        if (aCurrent !== bCurrent) return aCurrent ? -1 : 1;
+        return a.sort_order - b.sort_order;
+      });
+  }, [combos, activeType, query]);
 
   const countByType = (id: ProductTypeId) => products.filter((p) => p.productType === id).length;
 
@@ -460,6 +486,27 @@ export default function ProductCatalog({
 
           {/* Product Grid */}
           <div>
+            {visibleCombos.length > 0 && (
+              <div className="mb-10">
+                {Object.entries(
+                  visibleCombos.reduce<Record<string, ComboSet[]>>((groups, combo) => {
+                    const key = combo.theme || (lang === 'en' ? 'Gift Sets' : 'Set Quà Tặng');
+                    (groups[key] ??= []).push(combo);
+                    return groups;
+                  }, {})
+                ).map(([theme, themeCombos]) => (
+                  <div key={theme} className="mb-8">
+                    <h3 className="font-display text-lg text-forest-900 mb-4">{theme}</h3>
+                    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {themeCombos.map((combo) => (
+                        <ComboCard key={combo.id} combo={combo} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="mb-5 flex items-center justify-between">
               <p className="text-sm text-forest-500">
                 <span className="font-semibold text-forest-800">{filtered.length}</span>{' '}
@@ -569,6 +616,46 @@ function CategoryButton({
       <span className="flex-1 text-sm font-medium leading-tight">{label}</span>
       <span className={`text-xs font-semibold ${active ? 'text-gold-300' : 'text-forest-400'}`}>{count}</span>
     </button>
+  );
+}
+
+function ComboCard({ combo }: { combo: ComboSet }) {
+  const { addToCart } = useCart();
+
+  return (
+    <div className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-cream-200 hover:border-gold-300 transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1">
+      <div className="relative aspect-[4/5] overflow-hidden bg-cream-100">
+        <img
+          src={combo.poster_image_url ?? '/assets/images/TA_logo_clean.png'}
+          alt={combo.name_vi}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        {combo.theme && (
+          <div className="absolute top-3 left-3">
+            <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-gold-400 text-forest-900 shadow-sm">
+              {combo.theme}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="font-display text-base font-semibold text-forest-900 mb-2 leading-snug line-clamp-2">
+          {combo.name_vi}
+        </h3>
+        <p className="text-xs text-forest-600 leading-relaxed line-clamp-2 mb-3">{combo.description_vi}</p>
+        <div className="mt-auto pt-4 border-t border-cream-200 flex items-center justify-between gap-3">
+          <div className="text-lg font-display font-bold text-forest-900">{formatVND(combo.price_vnd)}</div>
+          <button
+            onClick={() => addToCart(comboToCartProduct(combo))}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-forest-900 text-cream-50 text-xs font-semibold hover:bg-forest-800 transition-colors active:scale-95"
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            Thêm vào giỏ
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
