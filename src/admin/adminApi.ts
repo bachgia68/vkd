@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem } from '../lib/siteContentApi';
 
-export type { SiteAddress, ContactPhone, SocialLink, BlogPost };
+export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
 // the Supabase client with the signed-in admin's session — RLS policies
@@ -602,6 +602,57 @@ export async function uploadBlogImage(file: File): Promise<string> {
   });
   if (error) throw new Error(error.message);
   const { data } = supabase.storage.from('blog-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ---------- Trust & Proof (testimonials/press/photos, published-gated) ----------
+
+export async function fetchAllTrustProofItems(): Promise<(TrustProofItem & { published: boolean })[]> {
+  return throwIfError(
+    await supabase
+      .from('trust_proof_items')
+      .select('id, kind, quote_text, source_name, source_url, image_url, sort_order, published')
+      .order('sort_order')
+  );
+}
+
+export async function createTrustProofItem(input: {
+  kind: TrustProofItem['kind'];
+  quote_text: string;
+  source_name: string;
+  source_url?: string | null;
+  image_url?: string | null;
+}) {
+  const res = await supabase
+    .from('trust_proof_items')
+    .insert({ ...input, published: false })
+    .select('id, kind, quote_text, source_name, source_url, image_url, sort_order, published')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateTrustProofItem(
+  id: string,
+  patch: Partial<Pick<TrustProofItem, 'quote_text' | 'source_name' | 'source_url' | 'sort_order'> & { published: boolean }>
+) {
+  const { error } = await supabase.from('trust_proof_items').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteTrustProofItem(id: string) {
+  const { error } = await supabase.from('trust_proof_items').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function uploadTrustProofImage(file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('trust-proof-images').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('trust-proof-images').getPublicUrl(path);
   return data.publicUrl;
 }
 

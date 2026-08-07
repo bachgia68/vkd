@@ -68,6 +68,26 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
   return data ?? [];
 }
 
+export interface TrustProofItem {
+  id: string;
+  kind: 'testimonial' | 'press' | 'photo';
+  quote_text: string;
+  source_name: string;
+  source_url: string | null;
+  image_url: string | null;
+  sort_order: number;
+}
+
+export async function fetchTrustProofItems(): Promise<TrustProofItem[]> {
+  const { data, error } = await supabase
+    .from('trust_proof_items')
+    .select('id, kind, quote_text, source_name, source_url, image_url, sort_order')
+    .eq('published', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function submitCustomerLead(input: {
   name: string;
   phone: string;

@@ -13,6 +13,7 @@ import RevenuePage from './pages/RevenuePage';
 import SettingsPage from './pages/SettingsPage';
 import CatalogExportPage from './pages/CatalogExportPage';
 import ChannelsPage from './pages/ChannelsPage';
+import TrustProofPage from './pages/TrustProofPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -37,6 +38,7 @@ export default function AdminApp() {
           <Route path="showrooms" element={<ShowroomsPage />} />
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="channels" element={<ChannelsPage />} />
+          <Route path="trust-proof" element={<TrustProofPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
