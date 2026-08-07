@@ -4,21 +4,25 @@ import type { Language } from '../i18n/translations';
 import { translations, languageNames } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
 import { productTypes } from '../data/productTypes';
+import { healthGoalLabels } from '../data/mockData';
+import type { HealthGoal } from '../data/mockData';
 
 interface HeaderProps {
   lang: Language;
   onLangChange: (lang: Language) => void;
   onNavigate: (page: string) => void;
   currentPage: string;
+  visibleSections: Set<string>;
 }
 
-export default function Header({ lang, onLangChange, onNavigate, currentPage }: HeaderProps) {
+export default function Header({ lang, onLangChange, onNavigate, currentPage, visibleSections }: HeaderProps) {
   const t = translations[lang];
   const { totalItems, toggleCart } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
+  const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,16 +39,20 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
     { key: 'giftSets', href: 'catalog?type=set-qua-tang' },
     { key: 'research', href: 'research' },
     { key: 'traceability', href: 'traceability' },
+    ...(visibleSections.has('showrooms') ? [{ key: 'showrooms', href: 'showrooms' }] : []),
+    ...(visibleSections.has('blog') ? [{ key: 'blog', href: 'blog' }] : []),
     { key: 'b2b', href: 'b2b' },
     { key: 'autoship', href: 'autoship' },
   ];
 
+  const samProductTypes = productTypes.filter((pt) => pt.group === 'sam' && pt.id !== 'set-qua-tang');
+  const dacSanProductTypes = productTypes.filter((pt) => pt.group === 'dac-san');
+  const healthGoals = Object.keys(healthGoalLabels) as HealthGoal[];
+
   const languages: Language[] = ['vi', 'en', 'zh', 'fr', 'ar'];
 
   const handleNav = (href: string) => {
-    if (href === 'about') {
-      onNavigate('about-story');
-    } else if (href === 'traceability') {
+    if (href === 'traceability') {
       onNavigate('traceability');
     } else if (href === 'b2b') {
       onNavigate('home');
@@ -82,54 +90,139 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            {navItems.map((item) =>
-              item.key === 'products' ? (
-                <div
-                  key={item.key}
-                  className="relative"
-                  onMouseEnter={() => setIsProductMenuOpen(true)}
-                  onMouseLeave={() => setIsProductMenuOpen(false)}
-                >
-                  <button
-                    onClick={() => handleNav('catalog')}
-                    className={`nav-link text-sm font-medium tracking-wide flex items-center gap-1 ${
-                      currentPage === item.href
-                        ? 'text-gold-600'
-                        : useLightText
-                        ? 'text-white/90 hover:text-white'
-                        : 'text-forest-700 hover:text-forest-900'
-                    }`}
+            {navItems.map((item) => {
+              if (item.key === 'products') {
+                return (
+                  <div
+                    key={item.key}
+                    className="relative"
+                    onMouseEnter={() => setIsProductMenuOpen(true)}
+                    onMouseLeave={() => setIsProductMenuOpen(false)}
                   >
-                    {t.nav.products}
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                  {isProductMenuOpen && (
-                    <div className="absolute top-full left-0 pt-2 w-72 z-50">
-                      <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3">
-                      {productTypes
-                        .filter((pt) => pt.id !== 'set-qua-tang')
-                        .map((pt) => (
+                    <button
+                      onClick={() => handleNav('catalog')}
+                      className={`nav-link text-sm font-medium tracking-wide flex items-center gap-1 ${
+                        currentPage === item.href
+                          ? 'text-gold-600'
+                          : useLightText
+                          ? 'text-white/90 hover:text-white'
+                          : 'text-forest-700 hover:text-forest-900'
+                      }`}
+                    >
+                      {t.nav.products}
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                    {isProductMenuOpen && (
+                      <div className="absolute top-full left-0 pt-2 w-[640px] z-50">
+                        <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-5 px-2 grid grid-cols-3 gap-2">
+                          <div>
+                            <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                              {lang === 'vi' ? 'Theo loại sản phẩm' : 'By product type'}
+                            </p>
+                            {samProductTypes.map((pt) => (
+                              <button
+                                key={pt.id}
+                                onClick={() => {
+                                  setIsProductMenuOpen(false);
+                                  onNavigate(`catalog?type=${pt.id}`);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                              >
+                                {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                              </button>
+                            ))}
+                          </div>
+                          <div>
+                            <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                              {lang === 'vi' ? 'Đặc Sản Việt Nam' : 'Vietnamese Specialties'}
+                            </p>
+                            {dacSanProductTypes.map((pt) => (
+                              <button
+                                key={pt.id}
+                                onClick={() => {
+                                  setIsProductMenuOpen(false);
+                                  onNavigate(`catalog?type=${pt.id}`);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                              >
+                                {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                              </button>
+                            ))}
+                          </div>
+                          <div>
+                            <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                              {lang === 'vi' ? 'Theo mục tiêu' : 'By goal'}
+                            </p>
+                            {healthGoals.map((g) => (
+                              <button
+                                key={g}
+                                onClick={() => {
+                                  setIsProductMenuOpen(false);
+                                  onNavigate(`catalog?goal=${g}`);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                              >
+                                {lang === 'vi' ? healthGoalLabels[g].vi : healthGoalLabels[g].en}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              if (item.key === 'about') {
+                return (
+                  <div
+                    key={item.key}
+                    className="relative"
+                    onMouseEnter={() => setIsAboutMenuOpen(true)}
+                    onMouseLeave={() => setIsAboutMenuOpen(false)}
+                  >
+                    <button
+                      className={`nav-link text-sm font-medium tracking-wide flex items-center gap-1 ${
+                        currentPage === 'about' || currentPage === 'about-story'
+                          ? 'text-gold-600'
+                          : useLightText
+                          ? 'text-white/90 hover:text-white'
+                          : 'text-forest-700 hover:text-forest-900'
+                      }`}
+                    >
+                      {t.nav.about}
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                    {isAboutMenuOpen && (
+                      <div className="absolute top-full left-0 pt-2 w-64 z-50">
+                        <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3">
                           <button
-                            key={pt.id}
-                            onClick={() => {
-                              setIsProductMenuOpen(false);
-                              onNavigate(`catalog?type=${pt.id}`);
-                            }}
+                            onClick={() => { setIsAboutMenuOpen(false); onNavigate('about-story'); }}
                             className="w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
                           >
-                            {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                            {lang === 'vi' ? 'Câu chuyện người sáng lập' : "Founder's Story"}
                           </button>
-                        ))}
+                          {visibleSections.has('about') && (
+                            <button
+                              onClick={() => { setIsAboutMenuOpen(false); onNavigate('about'); }}
+                              className="w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                            >
+                              {lang === 'vi' ? 'Về TA' : 'About TA'}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
+                    )}
+                  </div>
+                );
+              }
+
+              return (
                 <button
                   key={item.key}
                   onClick={() => handleNav(item.href)}
                   className={`nav-link text-sm font-medium tracking-wide ${
-                    currentPage === (item.href === 'about' ? 'about-story' : item.href)
+                    currentPage === item.href
                       ? 'text-gold-600'
                       : useLightText
                       ? 'text-white/90 hover:text-white'
@@ -138,8 +231,8 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
                 >
                   {t.nav[item.key as keyof typeof t.nav] || item.key}
                 </button>
-              )
-            )}
+              );
+            })}
           </div>
 
           {/* Right Actions */}
@@ -223,15 +316,34 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage }: 
         {isMobileMenuOpen && (
           <div className="lg:hidden absolute top-full left-0 right-0 bg-cream-50 shadow-elegant-lg animate-fade-in-down rounded-b-2xl">
             <div className="container-wide py-4 space-y-2">
-              {navItems.map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => handleNav(item.href)}
-                  className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
-                >
-                  {t.nav[item.key as keyof typeof t.nav] || item.key}
-                </button>
-              ))}
+              {navItems.map((item) =>
+                item.key === 'about' ? (
+                  <div key={item.key} className="space-y-1">
+                    <button
+                      onClick={() => handleNav('about-story')}
+                      className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                    >
+                      {lang === 'vi' ? 'Câu chuyện người sáng lập' : "Founder's Story"}
+                    </button>
+                    {visibleSections.has('about') && (
+                      <button
+                        onClick={() => handleNav('about')}
+                        className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                      >
+                        {lang === 'vi' ? 'Về TA' : 'About TA'}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    key={item.key}
+                    onClick={() => handleNav(item.href)}
+                    className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                  >
+                    {t.nav[item.key as keyof typeof t.nav] || item.key}
+                  </button>
+                )
+              )}
               <div className="pt-4 border-t border-cream-200">
                 <div className="flex flex-wrap gap-2 px-4">
                   {languages.map((l) => (
