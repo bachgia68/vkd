@@ -1,6 +1,33 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07. Phiên trước dừng ở đây — đọc file này trước khi làm gì tiếp.
+Ngày: 2026-08-07 (cập nhật lần 2, cuối phiên). Phiên trước dừng ở đây — đọc
+file này trước khi làm gì tiếp.
+
+## 0. Cập nhật mới nhất (sau lần viết handoff đầu) — ĐÃ XONG
+
+- **NCC thứ 3 samk5.vn đã onboard xong** (Joe xác nhận là NCC mới, ẩn tên
+  giống TRIMICO). Đã thêm 6 sản phẩm thật vào `src/data/products.ts` (SK5-001
+  → SK5-006): Nước Uống Dưỡng Da Collagen Noliko (20k), Nước Tăng Lực Dâu Tây
+  Đỏ (252k), Chanh Khoáng (252k), Tổ Yến 100ml-5 Hủ (525k), Tổ Yến Kids
+  (225k), Collagen Tổ Yến Noliko+ (500k). File backend riêng
+  `src/data/samk5Products.ts` (giống pattern `trimicoProducts.ts`). Ảnh thật
+  đã tải về `public/products/samk5/`. `scripts/check-no-supplier-names.js`
+  đã thêm pattern chặn "K5"/"samk5"/"Xơ Đăng" — guard tự động fail nếu lộ.
+  **Lưu ý giá chưa chắc chắn 100%**: 2 sản phẩm Tổ Yến có giá KHÁC NHAU giữa
+  trang danh mục và trang chi tiết trên chính samk5.vn (site gốc không nhất
+  quán) — đã dùng giá trang danh mục, note rõ trong `samk5Products.ts`, Joe
+  nên xác nhận lại.
+- **Đổi tên "Nước Tăng Lực" → "Nước Giải Khát"** trên card trang chủ (5
+  ngôn ngữ) theo đúng yêu cầu, ảnh card cũng đổi sang ảnh sản phẩm thật.
+- **Phát hiện gap kiến trúc quan trọng**: trang admin
+  `/gate-vkd-control-2026/products` ("Sản phẩm & Kho") đọc dữ liệu từ MỘT
+  BẢNG SUPABASE MOCK RIÊNG (`fetchProducts()` trong `adminApi.ts`), HOÀN
+  TOÀN KHÔNG liên quan tới `src/data/products.ts` (file catalog thật mà
+  khách hàng nhìn thấy). Đây là lý do trang admin đó mãi chỉ hiện "31 sản
+  phẩm cũ" dù tôi vừa thêm 6 sản phẩm mới vào catalog thật — 6 sản phẩm mới
+  **CÓ hiển thị đúng trên site khách hàng** (đã verify), nhưng **KHÔNG hiện
+  trong trang quản lý kho admin**. Đồng bộ 2 nguồn dữ liệu này là việc LỚN,
+  chưa làm — xem mục 2 bên dưới.
 
 ## 1. Trạng thái hiện tại
 
@@ -65,48 +92,38 @@ mục "Sub-project B/C/D" — mỗi cái cần 1 spec/plan riêng trước khi c
   Cần xem code `src/components/Products.tsx` + tham khảo lại
   `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md` trước
   khi đề xuất animation cụ thể.
+- **Sub-project E (mới phát hiện) — Đồng bộ admin "Sản phẩm & Kho" với
+  catalog thật**: `src/admin/pages/ProductsPage.tsx` đọc từ bảng Supabase
+  mock riêng (`fetchProducts()`/`fetchProductCategories()` trong
+  `adminApi.ts`) — HOÀN TOÀN tách biệt khỏi `src/data/products.ts` (catalog
+  thật khách hàng thấy, hiện 90 sản phẩm). Nghĩa là bất kỳ sản phẩm nào
+  thêm vào `products.ts` (như 6 sản phẩm samk5 vừa thêm) sẽ KHÔNG hiện
+  trong trang quản trị kho, và ngược lại sửa/ẩn sản phẩm trong trang quản
+  trị kho KHÔNG ảnh hưởng gì tới catalog thật khách hàng thấy. Đây là gap
+  kiến trúc có sẵn từ trước (không phải lỗi tôi gây ra), nhưng giờ đã rõ
+  ràng gây nhầm lẫn thật cho Joe. Cần 1 spec riêng trước khi động vào —
+  không sửa vội vì đụng tới cả luồng quản lý kho/tồn kho admin đang dùng.
 
 ## 3. Việc MỚI Joe vừa giao cuối phiên — CHƯA làm gì cả, chỉ ghi lại
 
-### 3a. Thêm sản phẩm mới từ samk5.vn
+### 3a. Thêm sản phẩm mới từ samk5.vn — ĐÃ XONG, xem §0
 
-Joe muốn lấy sản phẩm tại
-`https://samk5.vn/san-pham/to-yen-sam-ngoc-linh-100ml-5-huhop` ("Tổ Yến Sâm
-Ngọc Linh 100ml x5 hũ") thêm vào catalog. **QUAN TRỌNG: `samk5.vn` KHÔNG
-phải site chính thức của VKD** (`samngoclinhvkdgroup.com`) — skill
-`update-vkd-products` hiện tại CHỈ viết vào `src/data/vkdProducts.ts` và
-giả định nguồn là site VKD gốc. `samk5.vn` là nguồn MỚI, nhiều khả năng là
-NCC khác (giống việc TRIMICO từng được thêm) — nghĩa là:
+(Mục này ban đầu ghi lại yêu cầu chưa làm; đã hoàn thành cuối phiên — chi
+tiết đầy đủ ở mục 0 đầu file. Còn lại: đồng bộ admin "Sản phẩm & Kho" xem
+mục 2 bên dưới, và Joe cần xác nhận lại giá 2 sản phẩm Tổ Yến bị lệch giữa
+trang danh mục/chi tiết trên samk5.vn.)
 
-1. **Trước khi thêm**, xác nhận với Joe: `samk5.vn` là ai (VKD tự bán qua
-   kênh này, hay 1 NCC/đối tác khác)? Nếu là NCC khác → áp dụng ĐÚNG quy
-   tắc Branded House (`brand-ta-guard` skill) — không được lộ tên
-   "samk5"/tên công ty đứng sau site đó ở bất kỳ đâu khách nhìn thấy.
-2. `src/data/products.ts` (file catalog thật app đang đọc) được sinh tự
-   động từ `vkdProducts.ts` + `trimicoProducts.ts` qua
-   `scripts/migrate-to-unified-products.mjs` — KHÔNG sửa tay
-   `products.ts` cho SKU mới trừ khi script đã chạy lại. Nếu `samk5.vn` là
-   NCC thứ 3, cân nhắc có cần 1 file `<tenNCC>Products.ts` + hàm
-   `toCartProduct` riêng (đúng pattern `trimicoProducts.ts` đã có) rồi thêm
-   vào script migrate.
-3. **Lệnh chuẩn để lấy dữ liệu** (áp dụng đúng quy trình `update-vkd-products`
-   skill, chỉ đổi nguồn):
-   ```
-   WebFetch https://samk5.vn/san-pham/to-yen-sam-ngoc-linh-100ml-5-huhop
-   để lấy NGUYÊN VĂN: tên, giá, thành phần, mô tả, hướng dẫn dùng, cảnh báo,
-   xuất xứ, ảnh sản phẩm thật (không dùng ảnh stock). Không tự bịa
-   rating/reviews (set 0). Xác nhận với Joe đây là NCC nào trước khi quyết
-   định ghi vào file NCC có sẵn hay tạo file NCC mới. Tải ảnh thật về
-   public/products/. Set category — "Tổ Yến Sâm Ngọc Linh" là sản phẩm kết
-   hợp tổ yến (không phải sâm thuần) nên rất có thể nên xếp vào
-   productType nam-lim-duoc-lieu (group: 'dac-san') thay vì các nhóm sâm
-   thuần — đây chính là mục đầu tiên thật sự kiểm chứng thiết kế nhóm
-   "dac-san" vừa xây ở Sub-project A. Sau khi sửa xong: npm run check:brand
-   && npx tsc -b && npm run build, kiểm tra trên Browser pane, rồi mới
-   commit + push.
-   ```
-4. Đừng vội thêm ngay — hỏi lại Joe câu hỏi (1) trước, vì trả lời sai ảnh
-   hưởng tới việc có phải ẩn tên nguồn hay không.
+**Còn NCC khác chưa thêm** — nếu Joe có thêm sản phẩm từ NCC mới khác sau
+này, lặp lại đúng quy trình đã dùng cho samk5: (1) hỏi Joe xác nhận đây có
+phải NCC mới không, (2) nếu có → thêm pattern cấm tên NCC đó vào
+`BANNED_PATTERNS` trong `scripts/check-no-supplier-names.js`, (3) tạo file
+`<tenNCC>Products.ts` theo pattern `samk5Products.ts`/`trimicoProducts.ts`,
+(4) thêm entry tương ứng thủ công vào `src/data/products.ts` (không cần
+chạy `migrate-to-unified-products.mjs` — script đó chỉ đọc `vkdProducts.ts`
++ `trimicoProducts.ts`, KHÔNG tự động đọc file NCC thứ 3/4; thêm tay vào
+`products.ts` là cách đã dùng và đúng), (5) tải ảnh thật về
+`public/products/<tenNCC>/`, (6) `npm run check:brand && npx tsc -b && npm
+run build` trước khi commit.
 
 ### 3b. Câu hỏi Joe hỏi cuối phiên (đã trả lời trong chat, ghi lại để nhớ)
 
