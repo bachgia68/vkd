@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet } from '../lib/siteContentApi';
 
-export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem };
+export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
 // the Supabase client with the signed-in admin's session — RLS policies
@@ -653,6 +653,60 @@ export async function uploadTrustProofImage(file: File): Promise<string> {
   });
   if (error) throw new Error(error.message);
   const { data } = supabase.storage.from('trust-proof-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ---------- Combo/Gift Sets (seasonal bundles assembled from existing SKUs) ----------
+
+export async function fetchAllComboSets(): Promise<(ComboSet & { active: boolean })[]> {
+  return throwIfError(
+    await supabase
+      .from('combo_sets')
+      .select('id, slug, name_vi, theme, month_tags, component_skus, price_vnd, poster_image_url, description_vi, sort_order, active')
+      .order('sort_order')
+  );
+}
+
+export async function createComboSet(input: {
+  slug: string;
+  name_vi: string;
+  theme: string;
+  month_tags: number[];
+  component_skus: string[];
+  price_vnd: number;
+  poster_image_url?: string | null;
+  description_vi: string;
+}) {
+  const res = await supabase
+    .from('combo_sets')
+    .insert({ ...input, active: false })
+    .select('id, slug, name_vi, theme, month_tags, component_skus, price_vnd, poster_image_url, description_vi, sort_order, active')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateComboSet(
+  id: string,
+  patch: Partial<Pick<ComboSet, 'name_vi' | 'theme' | 'month_tags' | 'component_skus' | 'price_vnd' | 'poster_image_url' | 'description_vi' | 'sort_order'> & { active: boolean }>
+) {
+  const { error } = await supabase.from('combo_sets').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteComboSet(id: string) {
+  const { error } = await supabase.from('combo_sets').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function uploadComboImage(file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('combo-images').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('combo-images').getPublicUrl(path);
   return data.publicUrl;
 }
 

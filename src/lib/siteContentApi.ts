@@ -88,6 +88,29 @@ export async function fetchTrustProofItems(): Promise<TrustProofItem[]> {
   return data ?? [];
 }
 
+export interface ComboSet {
+  id: string;
+  slug: string;
+  name_vi: string;
+  theme: string;
+  month_tags: number[];
+  component_skus: string[];
+  price_vnd: number;
+  poster_image_url: string | null;
+  description_vi: string;
+  sort_order: number;
+}
+
+export async function fetchActiveComboSets(): Promise<ComboSet[]> {
+  const { data, error } = await supabase
+    .from('combo_sets')
+    .select('id, slug, name_vi, theme, month_tags, component_skus, price_vnd, poster_image_url, description_vi, sort_order')
+    .eq('active', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function submitCustomerLead(input: {
   name: string;
   phone: string;
