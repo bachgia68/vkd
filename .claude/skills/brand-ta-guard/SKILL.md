@@ -32,3 +32,9 @@ description: Use before touching any customer-facing text (components, pages, i1
 2. Neu can id/route/slug ky thuat co chua tu "trimico"/"vkd" -> OK giu nguyen,
    guard se tu bo qua (kebab-case adjacency).
 3. Sau khi sua, chay `npm run check:brand` truoc khi build/commit.
+
+## Fact thuong bi nham khi viet content (khong phai brand, nhung hay sai)
+- **Dinh nui Ngoc Linh cao 2.598m** (diem cao nhat) - khac voi **do cao vuon
+  Tra Linh la 1.800m** (noi TA thuc su trong sam). Bai viet hay nham thanh
+  "dinh nui 1.800m" hoac "vuon 2.598m" - phat hien loi nay 2026-08-08, kiem
+  tra ky truoc khi publish bat ky bai nao nhac do cao.
