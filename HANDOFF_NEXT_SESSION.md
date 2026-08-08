@@ -1,7 +1,17 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-07 (cập nhật lần 9). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-08 (cập nhật lần 10). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -9. Track A tiếp tục: 3 bài thật đã live + webhook duyệt kênh CMS — ĐÃ XONG
+
+Chi tiết đầy đủ nằm ở `D:\TA page\video-pipeline\HANDOFF_NEXT_SESSION.md`
+mục -6 — đọc file đó. Tóm tắt nhanh: blog giờ có 3 bài thật (2 trục
+Curation/Trust + 1 trục Ritual/Occasion mới), pipeline n8n ghi thẳng
+Supabase `blog_posts` (không qua Strapi/copy tay nữa), và nút "Duyệt &
+Đăng" trong `/gate-vkd-control-2026/channels`+CMS giờ có nơi nhận thật
+(webhook n8n forward qua Telegram — chưa đăng thẳng lên Facebook/TikTok/
+Zalo vì chưa có OAuth/API credential nào cho 3 nền tảng đó).
 
 ## -8. TA Elite Club thật sự "bật" (accrual + redeem + admin) — ĐÃ XONG, PUSHED
 
