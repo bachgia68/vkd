@@ -161,7 +161,7 @@ export const translations: Record<Language, Translation> = {
       showrooms: 'Showroom',
     },
     hero: {
-      badge: 'Bảo Tồn Nguyên Bản – Tuyển Chọn Tinh Hoa',
+      badge: 'Bảo Tồn Nguyên Bản - Chọn Lọc Tinh Hoa',
       titleLine1: 'Kho Báu Triệu Năm',
       titleLine2: 'Từ Rừng Sâu Việt Nam',
       subtitle: 'TA cung cấp Sâm Ngọc Linh chuẩn nguồn gốc từ vườn gốc Trà Linh và các dòng sản phẩm chế biến sâu đạt chuẩn kiểm định, rõ ràng pháp lý 100%.',

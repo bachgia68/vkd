@@ -1,12 +1,16 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { ArrowLeft, Newspaper } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { fetchBlogPost, type BlogPost } from '../lib/siteContentApi';
+import { products as staticProducts } from '../data/products';
+import { useLiveProducts } from '../hooks/useLiveProducts';
+import { getFeaturedProducts } from '../data/featuredProducts';
+import ProductCarousel from './ProductCarousel';
 
 interface BlogPostDetailProps {
   postId: string;
   lang: Language;
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, slug?: string) => void;
 }
 
 function formatDate(iso: string) {
@@ -98,6 +102,9 @@ function renderMarkdown(body: string) {
 
 export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDetailProps) {
   const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
+  const liveProducts = useLiveProducts(staticProducts);
+  const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
+  const featuredTitle = lang === 'vi' ? 'Sản Phẩm Nổi Bật' : 'Featured Products';
   const backLabel = lang === 'vi' ? 'Về Bài Viết' : 'Back to articles';
 
   useEffect(() => {
@@ -142,6 +149,15 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
 
             <div>{renderMarkdown(post.body)}</div>
           </article>
+        )}
+
+        {post && featured.length > 0 && (
+          <div className="mt-16 pt-12 border-t border-forest-100">
+            <h2 className="font-display text-xl font-semibold text-forest-900 mb-6">
+              {featuredTitle}
+            </h2>
+            <ProductCarousel products={featured} lang={lang} onNavigate={onNavigate} />
+          </div>
         )}
       </div>
     </section>
