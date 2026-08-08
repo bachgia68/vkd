@@ -72,7 +72,10 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') onNavigate?.('product-detail', product.slug);
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onNavigate?.('product-detail', product.slug);
+              }
             }}
           >
             <div className="relative aspect-ginseng overflow-hidden">

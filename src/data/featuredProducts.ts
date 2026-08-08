@@ -9,7 +9,7 @@ import { productTypes } from './productTypes';
  * fills remaining slots with any other badged product.
  */
 export function getFeaturedProducts(products: Product[], max = 12): Product[] {
-  const badged = products.filter((p) => !!p.badge);
+  const badged = products.filter((p) => !!p.badge && !p.displayOnly18Plus);
 
   const picked: Product[] = [];
   const pickedSkus = new Set<string>();

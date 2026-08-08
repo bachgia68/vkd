@@ -1,4 +1,5 @@
 // src/components/Products.tsx
+import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
@@ -9,14 +10,16 @@ import ProductCarousel from './ProductCarousel';
 
 interface ProductsProps {
   lang: Language;
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, slug?: string) => void;
 }
 
 export default function Products({ lang, onNavigate }: ProductsProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
   const liveProducts = useLiveProducts(staticProducts);
-  const featured = getFeaturedProducts(liveProducts);
+  const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
+
+  if (featured.length === 0) return null;
 
   return (
     <section id="products" className="section-padding bg-cream-100" dir={isRTL ? 'rtl' : 'ltr'}>

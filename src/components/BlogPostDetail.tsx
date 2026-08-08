@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { ArrowLeft, Newspaper } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { fetchBlogPost, type BlogPost } from '../lib/siteContentApi';
@@ -10,7 +10,7 @@ import ProductCarousel from './ProductCarousel';
 interface BlogPostDetailProps {
   postId: string;
   lang: Language;
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, slug?: string) => void;
 }
 
 function formatDate(iso: string) {
@@ -103,7 +103,7 @@ function renderMarkdown(body: string) {
 export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDetailProps) {
   const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
   const liveProducts = useLiveProducts(staticProducts);
-  const featured = getFeaturedProducts(liveProducts);
+  const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
   const featuredTitle = lang === 'vi' ? 'Sản Phẩm Nổi Bật' : 'Featured Products';
   const backLabel = lang === 'vi' ? 'Về Bài Viết' : 'Back to articles';
 
