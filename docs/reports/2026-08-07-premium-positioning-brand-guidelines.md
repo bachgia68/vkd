@@ -85,6 +85,34 @@ subscription có ý nghĩa không, cần Joe xác nhận trước khi build).
 - Không thêm badge "bestseller"/"sale" giả — chỉ khi có dữ liệu đơn hàng
   thật hậu thuẫn (đã ghi trong spec Phase 1 §3).
 
+## 7.7 Cập nhật 2026-08-08 — deep crawl mục Learn (2 trang blog thật của KGC)
+
+Crawl trực tiếp `jungkwanjang.us/blogs/ginseng-101` và `/blogs/press-room`
+(trước đó §7.2 mới liệt kê 2 URL này trong sitemap, chưa crawl nội dung).
+
+- KGC tách **2 luồng nội dung riêng biệt trong nav "Learn"**: Ginseng 101
+  (bài khoa học/giáo dục, vd. "Ginseng vs. Caffeine", "Why Water Extraction
+  Makes Korean Red Ginseng Truly Powerful") và Press Room (tin PR/tài trợ vận
+  động viên/sự kiện thương hiệu, vd. tài trợ golfer LPGA, ra mắt sản phẩm mới
+  tại hội chợ). TA hiện chỉ có 1 luồng "Blog" chung, mới có đúng 1 bài thật —
+  **chưa đến lúc tách 2 luồng** (không đủ nội dung để 2 luồng có ý nghĩa),
+  ghi nhận làm Phase 2 khi có >5-10 bài thật.
+- Mỗi bài có: tác giả, ngày đăng, category tag, phân trang (list dài nhiều
+  trang) — TA hiện không có tác giả/category/pagination trong
+  `blog_posts`/`Blog.tsx`. Cũng là việc hoãn tới khi có nhiều bài hơn.
+- **Phát hiện quan trọng nhất, đã áp dụng ngay** (xem spec
+  `docs/superpowers/specs/2026-08-08-product-carousel-and-blog-crosssell-design.md`):
+  mỗi bài có khối sidebar "Featured Products" — verify bằng cách so 2 trang
+  khác nhau (Ginseng 101 vs Press Room) thì **danh sách sản phẩm giống hệt
+  nhau** → đây là widget cross-sell chung, KHÔNG phải gợi ý theo nội dung
+  từng bài. TA có thể áp dụng ngay pattern này (cross-sell sản phẩm nổi bật
+  trong `BlogPostDetail.tsx`) mà không cần xây cơ chế gán sản phẩm liên quan
+  theo từng bài trong CMS.
+- Không thấy carousel "gạt ngang" trong chính mục Learn của KGC (chỉ là list
+  dọc + sidebar) — swipe ngang mà Joe nhắc tới thực ra là ở khu vực trưng bày
+  sản phẩm (Trending Now/Featured Products) và kiểu duyệt danh mục Shopee,
+  không phải điều đã thấy trong Learn/blog list của KGC.
+
 ## 6. Khi nào cập nhật tài liệu này
 
 Cập nhật khi: (a) Joe cung cấp thêm dữ kiện thật (số năm, số khách hàng,
