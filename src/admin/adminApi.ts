@@ -1,7 +1,9 @@
 import { supabase } from '../lib/supabaseClient';
+import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection } from '../lib/siteContentApi';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection };
+export { fetchAllBlogPostsForAdmin };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
 // the Supabase client with the signed-in admin's session — RLS policies
@@ -619,13 +621,20 @@ export async function createBlogPost(input: {
   const res = await supabase
     .from('blog_posts')
     .insert(input)
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .single();
   return throwIfError(res);
 }
 
 export async function deleteBlogPost(id: string) {
   const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// Flips a draft (published=false, e.g. from the unattended daily content
+// routine) live on the public site, or unpublishes a live post.
+export async function setBlogPostPublished(id: string, published: boolean) {
+  const { error } = await supabase.from('blog_posts').update({ published }).eq('id', id);
   if (error) throw new Error(error.message);
 }
 

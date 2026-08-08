@@ -22,6 +22,8 @@ import {
   updateArticle,
   createBlogPost,
   deleteBlogPost,
+  setBlogPostPublished,
+  fetchAllBlogPostsForAdmin,
   uploadBlogImage,
   fetchChannels,
   fetchPostCaptions,
@@ -34,7 +36,6 @@ import {
   type Channel,
   type PostCaption,
 } from '../adminApi';
-import { fetchBlogPosts } from '../../lib/siteContentApi';
 
 const PLATFORM_LABELS: Record<Channel['platform_type'], string> = {
   facebook: 'Facebook',
@@ -113,9 +114,19 @@ export default function CmsPage() {
   const [selectedChannelIds, setSelectedChannelIds] = useState<Set<string>>(new Set());
 
   const loadPosts = () => {
-    fetchBlogPosts()
+    fetchAllBlogPostsForAdmin()
       .then(setPosts)
       .catch((e) => showToast(e instanceof Error ? e.message : 'Lỗi tải bài viết SEO'));
+  };
+
+  const togglePostPublished = async (post: BlogPost) => {
+    try {
+      await setBlogPostPublished(post.id, !post.published);
+      showToast(!post.published ? 'Đã công khai bài viết' : 'Đã gỡ khỏi site (chuyển về nháp)');
+      loadPosts();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi đổi trạng thái công khai');
+    }
   };
 
   const loadChannels = async (): Promise<Channel[]> => {
@@ -566,20 +577,40 @@ export default function CmsPage() {
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-forest-900 truncate">{p.title}</p>
                       <p className="text-xs text-forest-500 mt-0.5">{new Date(p.created_at).toLocaleDateString('vi-VN')}</p>
+                      {!p.published && (
+                        <span className="inline-block mt-1 text-[10px] uppercase tracking-wide font-medium text-gold-700 bg-gold-100 px-1.5 py-0.5 rounded">
+                          Nháp — chưa công khai
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deletePost(p.id);
-                    }}
-                    aria-label="Xoá bài viết"
-                    className="text-forest-400 hover:text-red-600 flex-shrink-0"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </span>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePostPublished(p);
+                      }}
+                      aria-label={p.published ? 'Gỡ khỏi site' : 'Duyệt & công khai'}
+                      title={p.published ? 'Đang công khai — bấm để gỡ' : 'Duyệt & công khai lên site'}
+                      className={p.published ? 'text-forest-400 hover:text-forest-700' : 'text-gold-600 hover:text-gold-800'}
+                    >
+                      {p.published ? <Globe className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePost(p.id);
+                      }}
+                      aria-label="Xoá bài viết"
+                      className="text-forest-400 hover:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </span>
+                  </div>
                 </button>
               ))
             )}

@@ -57,12 +57,25 @@ export interface BlogPost {
   featured_image_url: string | null;
   featured_image_alt: string | null;
   created_at: string;
+  published: boolean;
 }
 
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .eq('published', true)
+    .order('created_at', { ascending: false });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// Admin-only: includes unpublished drafts (e.g. from the unattended daily
+// content routine) so they can be reviewed before going live.
+export async function fetchAllBlogPostsForAdmin(): Promise<BlogPost[]> {
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -71,8 +84,9 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
 export async function fetchBlogPost(id: string): Promise<BlogPost | null> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at')
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .eq('id', id)
+    .eq('published', true)
     .maybeSingle();
   if (error) throw new Error(error.message);
   return data;

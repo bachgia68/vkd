@@ -10,8 +10,15 @@ mục -6 — đọc file đó. Tóm tắt nhanh: blog giờ có 3 bài thật (2
 Curation/Trust + 1 trục Ritual/Occasion mới), pipeline n8n ghi thẳng
 Supabase `blog_posts` (không qua Strapi/copy tay nữa), và nút "Duyệt &
 Đăng" trong `/gate-vkd-control-2026/channels`+CMS giờ có nơi nhận thật
-(webhook n8n forward qua Telegram — chưa đăng thẳng lên Facebook/TikTok/
-Zalo vì chưa có OAuth/API credential nào cho 3 nền tảng đó).
+(webhook n8n forward qua Telegram — chưa đăng thẳng lên TikTok/Zalo vì
+chưa có OAuth/API credential cho 2 nền tảng đó).
+
+**Cập nhật 2026-08-08**: Facebook giờ đăng THẬT tự động (không còn chỉ báo
+Telegram để copy tay) — đã test end-to-end, bài lên fanpage thật qua Graph
+API. Chi tiết đầy đủ (2 bug đã gặp, quy trình lấy long-lived token khi hết
+hạn 2026-10-07) nằm ở
+`D:\AI_Skills\ai-marketing-skills\outputs_Claude_mark_sam\references\HOAN_THIEN_KENH_PHAN_PHOI.md`
+mục 1.
 
 ## -8. TA Elite Club thật sự "bật" (accrual + redeem + admin) — ĐÃ XONG, PUSHED
 
