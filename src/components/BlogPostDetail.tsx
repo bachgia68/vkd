@@ -29,13 +29,26 @@ function renderMarkdown(body: string) {
   let key = 0;
 
   const renderInline = (text: string) =>
-    text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-      part.startsWith('**') && part.endsWith('**') ? (
-        <strong key={i}>{part.slice(2, -2)}</strong>
-      ) : (
-        part
-      )
-    );
+    text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <em key={i}>{part.slice(1, -1)}</em>;
+      }
+      return part;
+    });
+
+  const parseTableRow = (line: string) =>
+    line
+      .trim()
+      .replace(/^\|/, '')
+      .replace(/\|$/, '')
+      .split('|')
+      .map((cell) => cell.trim());
+
+  const isTableRow = (line: string) => line.trim().startsWith('|') && line.trim().endsWith('|');
+  const isTableSeparator = (line: string) => /^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?$/.test(line.trim());
 
   const flushList = () => {
     if (listItems.length) {
@@ -61,11 +74,50 @@ function renderMarkdown(body: string) {
     }
   };
 
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
+  for (let idx = 0; idx < lines.length; idx++) {
+    const line = lines[idx].trim();
     if (!line || line === '---') {
       flushList();
       flushParagraph();
+      continue;
+    }
+    if (isTableRow(line) && isTableSeparator(lines[idx + 1] || '')) {
+      flushList();
+      flushParagraph();
+      const header = parseTableRow(line);
+      const rows: string[][] = [];
+      let rowIdx = idx + 2;
+      while (rowIdx < lines.length && isTableRow(lines[rowIdx].trim())) {
+        rows.push(parseTableRow(lines[rowIdx]));
+        rowIdx++;
+      }
+      idx = rowIdx - 1;
+      blocks.push(
+        <div key={key++} className="overflow-x-auto mb-4">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-forest-200">
+                {header.map((cell, i) => (
+                  <th key={i} className="text-left py-2 pr-4 font-semibold text-forest-900">
+                    {renderInline(cell)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, ri) => (
+                <tr key={ri} className="border-b border-forest-100">
+                  {row.map((cell, ci) => (
+                    <td key={ci} className="py-2 pr-4 text-forest-700 align-top">
+                      {renderInline(cell)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
       continue;
     }
     if (line.startsWith('### ')) {
