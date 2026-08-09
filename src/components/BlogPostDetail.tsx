@@ -258,6 +258,20 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
       : null
   );
 
+  useJsonLd(
+    post
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://tasamngoclinh.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://tasamngoclinh.com/blog' },
+            { '@type': 'ListItem', position: 3, name: post.title, item: `https://tasamngoclinh.com/blog/${postId}` },
+          ],
+        }
+      : null
+  );
+
   const { blocks, toc } = useMemo(() => (post ? renderMarkdown(post.body) : { blocks: [], toc: [] }), [post]);
   const readingMinutes = useMemo(() => (post ? estimateReadingMinutes(post.body) : 0), [post]);
 

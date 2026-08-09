@@ -222,6 +222,25 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
       : null
   );
 
+  useJsonLd(
+    product
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://tasamngoclinh.com/' },
+            { '@type': 'ListItem', position: 2, name: 'Sản phẩm', item: 'https://tasamngoclinh.com/#catalog' },
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: product.name,
+              item: `https://tasamngoclinh.com/product/${product.slug}`,
+            },
+          ],
+        }
+      : null
+  );
+
   if (!product) {
     return (
       <section className="bg-cream-50 min-h-screen flex items-center justify-center" style={{ paddingTop: '6rem' }}>
