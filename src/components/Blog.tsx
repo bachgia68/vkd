@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Newspaper, ArrowRight } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 import { fetchBlogPosts, type BlogPost } from '../lib/siteContentApi';
 
 interface BlogProps {
@@ -8,6 +8,11 @@ interface BlogProps {
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('vi-VN');
+}
+
+function estimateReadingMinutes(body: string) {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
 }
 
 export default function Blog({ onNavigate }: BlogProps) {
@@ -52,13 +57,22 @@ export default function Blog({ onNavigate }: BlogProps) {
                   loading="lazy"
                 />
               ) : (
-                <div className="w-full h-48 bg-forest-100 flex items-center justify-center">
-                  <Newspaper className="w-10 h-10 text-forest-400" />
+                <div className="relative w-full h-48 bg-gradient-to-br from-forest-900 to-forest-950 flex items-end p-6 overflow-hidden">
+                  <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-gold-400/10" />
+                  <p className="relative font-display text-lg text-white leading-snug line-clamp-3">
+                    {post.title}
+                  </p>
                 </div>
               )}
 
               <div className="p-8">
-              <p className="text-xs text-forest-400 mb-2">{formatDate(post.created_at)}</p>
+              <div className="flex items-center gap-3 text-xs text-forest-400 mb-2">
+                <span>{formatDate(post.created_at)}</span>
+                <span className="w-1 h-1 rounded-full bg-forest-300" />
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> {estimateReadingMinutes(post.body)} phút đọc
+                </span>
+              </div>
               <h3 className="font-display text-xl font-semibold text-forest-900 mb-3">{post.title}</h3>
               <p className="text-forest-600 leading-relaxed line-clamp-3">{post.excerpt}</p>
               <div className="mt-6 flex items-center gap-2 text-sm font-medium text-forest-600">

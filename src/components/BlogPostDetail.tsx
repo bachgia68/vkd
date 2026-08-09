@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
-import { ArrowLeft, Newspaper } from 'lucide-react';
+import { ArrowLeft, Newspaper, Clock, UserRound, Quote, List } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { fetchBlogPost, type BlogPost } from '../lib/siteContentApi';
 import { products as staticProducts } from '../data/products';
@@ -18,16 +18,42 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('vi-VN');
 }
 
-// Bài viết được sinh với định dạng markdown cố định (chỉ H2/H3, bullet, bold,
-// đoạn văn — xem prompt trong node "Xay dung Prompt" của n8n) nên một parser
-// nhỏ tự viết là đủ, không cần thêm thư viện markdown cho một tập cú pháp cố
-// định như vậy.
-function renderMarkdown(body: string) {
+function slugifyHeading(text: string, index: number) {
+  const base = text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `${base || 'section'}-${index}`;
+}
+
+// Ước lượng thời gian đọc kiểu tiếng Việt (~200 từ/phút), làm tròn lên phút gần nhất.
+function estimateReadingMinutes(body: string) {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+interface TocEntry {
+  id: string;
+  text: string;
+}
+
+// Bài viết được sinh với định dạng markdown cố định (H2/H3, bullet, bold,
+// đoạn văn, bảng — xem prompt trong node "Xay dung Prompt" của n8n) nên một
+// parser nhỏ tự viết là đủ. Thêm hỗ trợ "> " (blockquote) để tác giả có thể
+// tự đánh dấu khối số liệu/trích dẫn nổi bật (Key Stat / Social Proof) chỉ
+// bằng cú pháp markdown, không cần trường dữ liệu riêng.
+function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[] } {
   const lines = body.split('\n');
   const blocks: ReactElement[] = [];
+  const toc: TocEntry[] = [];
   let listItems: string[] = [];
   let paragraph: string[] = [];
+  let quoteLines: string[] = [];
   let key = 0;
+  let headingIndex = 0;
 
   const renderInline = (text: string) =>
     text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
@@ -75,16 +101,35 @@ function renderMarkdown(body: string) {
     }
   };
 
+  const flushQuote = () => {
+    if (quoteLines.length) {
+      blocks.push(
+        <div
+          key={key++}
+          className="my-6 rounded-2xl bg-gold-50 border-l-4 border-gold-400 px-6 py-5 flex gap-3"
+        >
+          <Quote className="w-5 h-5 text-gold-500 flex-shrink-0 mt-0.5" />
+          <p className="font-display text-lg md:text-xl text-forest-900 leading-snug">
+            {renderInline(quoteLines.join(' '))}
+          </p>
+        </div>
+      );
+      quoteLines = [];
+    }
+  };
+
   for (let idx = 0; idx < lines.length; idx++) {
     const line = lines[idx].trim();
     if (!line || line === '---') {
       flushList();
       flushParagraph();
+      flushQuote();
       continue;
     }
     if (isTableRow(line) && isTableSeparator(lines[idx + 1] || '')) {
       flushList();
       flushParagraph();
+      flushQuote();
       const header = parseTableRow(line);
       const rows: string[][] = [];
       let rowIdx = idx + 2;
@@ -94,12 +139,12 @@ function renderMarkdown(body: string) {
       }
       idx = rowIdx - 1;
       blocks.push(
-        <div key={key++} className="overflow-x-auto mb-4">
+        <div key={key++} className="overflow-x-auto mb-6 rounded-xl border border-forest-100">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-forest-200">
+              <tr className="bg-forest-50 border-b border-forest-200">
                 {header.map((cell, i) => (
-                  <th key={i} className="text-left py-2 pr-4 font-semibold text-forest-900">
+                  <th key={i} className="text-left py-3 px-4 font-semibold text-forest-900">
                     {renderInline(cell)}
                   </th>
                 ))}
@@ -107,9 +152,9 @@ function renderMarkdown(body: string) {
             </thead>
             <tbody>
               {rows.map((row, ri) => (
-                <tr key={ri} className="border-b border-forest-100">
+                <tr key={ri} className="border-b border-forest-100 last:border-0">
                   {row.map((cell, ci) => (
-                    <td key={ci} className="py-2 pr-4 text-forest-700 align-top">
+                    <td key={ci} className="py-3 px-4 text-forest-700 align-top">
                       {renderInline(cell)}
                     </td>
                   ))}
@@ -121,9 +166,16 @@ function renderMarkdown(body: string) {
       );
       continue;
     }
+    if (line.startsWith('> ')) {
+      flushList();
+      flushParagraph();
+      quoteLines.push(line.slice(2));
+      continue;
+    }
     if (line.startsWith('### ')) {
       flushList();
       flushParagraph();
+      flushQuote();
       blocks.push(
         <h3 key={key++} className="font-display text-lg font-semibold text-forest-900 mt-6 mb-2">
           {renderInline(line.slice(4))}
@@ -132,9 +184,17 @@ function renderMarkdown(body: string) {
     } else if (line.startsWith('## ')) {
       flushList();
       flushParagraph();
+      flushQuote();
+      const text = line.slice(3);
+      const id = slugifyHeading(text, headingIndex++);
+      toc.push({ id, text });
       blocks.push(
-        <h2 key={key++} className="font-display text-xl font-semibold text-forest-900 mt-8 mb-3">
-          {renderInline(line.slice(3))}
+        <h2
+          key={key++}
+          id={id}
+          className="font-display text-xl md:text-2xl font-semibold text-forest-900 mt-10 mb-4 scroll-mt-24"
+        >
+          {renderInline(text)}
         </h2>
       );
     } else if (line.startsWith('# ')) {
@@ -142,22 +202,25 @@ function renderMarkdown(body: string) {
       continue;
     } else if (line.startsWith('* ') || line.startsWith('- ')) {
       flushParagraph();
+      flushQuote();
       listItems.push(line.slice(2));
     } else {
       flushList();
+      flushQuote();
       paragraph.push(line);
     }
   }
   flushList();
   flushParagraph();
-  return blocks;
+  flushQuote();
+  return { blocks, toc };
 }
 
 export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDetailProps) {
   const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
   const liveProducts = useLiveProducts(staticProducts);
   const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
-  const featuredTitle = lang === 'vi' ? 'Sản Phẩm Nổi Bật' : 'Featured Products';
+  const featuredTitle = lang === 'vi' ? 'Tiếp Tục Khám Phá' : 'Keep Exploring';
   const backLabel = lang === 'vi' ? 'Về Bài Viết' : 'Back to articles';
 
   useEffect(() => {
@@ -174,52 +237,112 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
     image: post?.featured_image_url ?? undefined,
   });
 
+  const { blocks, toc } = useMemo(() => (post ? renderMarkdown(post.body) : { blocks: [], toc: [] }), [post]);
+  const readingMinutes = useMemo(() => (post ? estimateReadingMinutes(post.body) : 0), [post]);
+
   return (
-    <section className="section-padding bg-cream-50 min-h-screen">
-      <div className="container-wide max-w-3xl">
+    <section className="bg-cream-50 min-h-screen">
+      <div className="container-wide max-w-3xl pt-8">
         <button
           onClick={() => onNavigate?.('blog')}
-          className="inline-flex items-center gap-2 text-sm text-forest-600 hover:text-forest-900 transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-sm text-forest-600 hover:text-forest-900 transition-colors mb-6"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           {backLabel}
         </button>
+      </div>
 
-        {post === undefined && <p className="text-forest-500">Đang tải...</p>}
-        {post === null && <p className="text-forest-500">Không tìm thấy bài viết.</p>}
+      {post === undefined && <p className="text-forest-500 container-wide max-w-3xl">Đang tải...</p>}
+      {post === null && <p className="text-forest-500 container-wide max-w-3xl">Không tìm thấy bài viết.</p>}
 
-        {post && (
-          <article>
+      {post && (
+        <>
+          {/* Hero Banner */}
+          <div className="relative w-full h-72 md:h-[420px] overflow-hidden">
             {post.featured_image_url ? (
               <img
                 src={post.featured_image_url}
                 alt={post.featured_image_alt || post.title}
-                className="w-full h-64 md:h-80 object-cover rounded-2xl mb-8"
+                className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-48 bg-forest-100 rounded-2xl flex items-center justify-center mb-8">
-                <Newspaper className="w-10 h-10 text-forest-400" />
+              <div className="absolute inset-0 bg-forest-900 flex items-center justify-center">
+                <Newspaper className="w-12 h-12 text-forest-400" />
               </div>
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-forest-950/60 to-forest-950/10" />
 
-            <p className="text-xs text-forest-400 mb-2">{formatDate(post.created_at)}</p>
-            <h1 className="font-display text-display-sm md:text-display-md text-forest-900 mb-8">
-              {post.title}
-            </h1>
+            <div className="relative h-full container-wide max-w-3xl flex flex-col justify-end pb-8">
+              <span className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-gold-400/90 text-forest-900 text-xs font-semibold tracking-wider uppercase mb-4">
+                Tin Tức &amp; Kiến Thức
+              </span>
+              <h1 className="font-display text-display-sm md:text-display-md text-white leading-tight mb-4">
+                {post.title}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-cream-200 text-sm">
+                <span className="flex items-center gap-1.5">
+                  <UserRound className="w-3.5 h-3.5" /> Đội Ngũ Nghiên Cứu TA
+                </span>
+                <span className="flex items-center gap-1.5">{formatDate(post.created_at)}</span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" /> {readingMinutes} phút đọc
+                </span>
+              </div>
+            </div>
+          </div>
 
-            <div>{renderMarkdown(post.body)}</div>
-          </article>
-        )}
+          <div className="container-wide max-w-3xl py-10 md:py-14">
+            {/* Hook subtitle */}
+            {post.excerpt && (
+              <p className="font-display text-lg md:text-xl text-forest-700 leading-relaxed italic mb-10 pb-8 border-b border-forest-100">
+                {post.excerpt}
+              </p>
+            )}
 
-        {post && featured.length > 0 && (
-          <div className="mt-16 pt-12 border-t border-forest-100">
-            <h2 className="font-display text-xl font-semibold text-forest-900 mb-6">
-              {featuredTitle}
-            </h2>
+            {/* Interactive TOC */}
+            {toc.length > 1 && (
+              <nav className="mb-10 rounded-2xl bg-white border border-forest-100 p-5 shadow-elegant">
+                <p className="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-forest-500 mb-3">
+                  <List className="w-3.5 h-3.5" /> Mục Lục
+                </p>
+                <ol className="space-y-2">
+                  {toc.map((item, i) => (
+                    <li key={item.id}>
+                      <a
+                        href={`#${item.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="flex gap-2 text-sm text-forest-600 hover:text-gold-700 transition-colors"
+                      >
+                        <span className="text-gold-500 font-medium">{i + 1}.</span>
+                        {item.text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+
+            <article>{blocks}</article>
+          </div>
+        </>
+      )}
+
+      {post && featured.length > 0 && (
+        <div className="bg-forest-950 py-12 md:py-16">
+          <div className="container-wide max-w-5xl">
+            <div className="text-center max-w-xl mx-auto mb-10">
+              <p className="text-xs uppercase tracking-wider font-semibold text-gold-400 mb-2">
+                Từ Bộ Sưu Tập TA
+              </p>
+              <h2 className="font-display text-2xl text-white">{featuredTitle}</h2>
+            </div>
             <ProductCarousel products={featured} lang={lang} onNavigate={onNavigate} />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 }
