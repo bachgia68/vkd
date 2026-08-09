@@ -24,3 +24,4 @@ public/product-slugs.json
 .env
 build-output.txt
 .superpowers/
+__pycache__/

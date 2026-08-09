@@ -1,5 +1,5 @@
 // src/components/ProductCarousel.tsx
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, type PointerEvent, type MouseEvent } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '../data/products';
 import type { Language } from '../i18n/translations';
@@ -24,6 +24,13 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
+  // Native overflow-x scroll only responds to touch drag / trackpad / shift+wheel —
+  // a mouse user (desktop, no touchscreen) has no way to "swipe" it at all without
+  // this. Tracks click-vs-drag via total pointer movement so a drag that ends on
+  // top of a card doesn't also fire its navigation.
+  const dragState = useRef<{ startX: number; startScrollLeft: number; moved: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   const updateArrows = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -41,6 +48,39 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
     const card = el.querySelector('[data-carousel-card]') as HTMLElement | null;
     const amount = (card?.offsetWidth ?? 280) + 24;
     el.scrollBy({ left: direction * amount, behavior: 'smooth' });
+  };
+
+  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse') return;
+    const el = trackRef.current;
+    if (!el) return;
+    dragState.current = { startX: e.clientX, startScrollLeft: el.scrollLeft, moved: 0 };
+    setIsDragging(true);
+    el.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    const el = trackRef.current;
+    const drag = dragState.current;
+    if (!el || !drag) return;
+    const delta = e.clientX - drag.startX;
+    drag.moved = Math.max(drag.moved, Math.abs(delta));
+    el.scrollLeft = drag.startScrollLeft - delta;
+  };
+
+  const endDrag = () => {
+    setIsDragging(false);
+    // Clear on next tick so the click handler on the card (fired right after
+    // pointerup) can still read dragState.current.moved this one last time.
+    setTimeout(() => {
+      dragState.current = null;
+    }, 0);
+  };
+
+  const onCardClick = (e: MouseEvent) => {
+    if ((dragState.current?.moved ?? 0) > 6) {
+      e.preventDefault();
+    }
   };
 
   if (products.length === 0) return null;
@@ -61,7 +101,13 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
       <div
         ref={trackRef}
         onScroll={updateArrows}
-        className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        className={`flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+          isDragging ? 'cursor-grabbing select-none' : 'md:cursor-grab'
+        }`}
       >
         {products.map((product) => (
           <a
@@ -70,6 +116,8 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
             href={`/product/${product.slug}`}
             className="product-card group cursor-pointer flex-shrink-0 w-64 md:w-72 block"
             onClick={(e) => {
+              onCardClick(e);
+              if (e.defaultPrevented) return;
               e.preventDefault();
               onNavigate?.('product-detail', product.slug);
             }}

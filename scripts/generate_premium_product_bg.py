@@ -7,36 +7,27 @@ asked for (KGC reference). Background removal is border-flood-fill based
 elements *inside* the product — labels, gold caps, text — are never touched.
 
 Run: python scripts/generate_premium_product_bg.py
-Reads/writes only the 12 current homepage-featured product images (see
-scripts/_tmp_list_featured.mjs output) — full 90-SKU catalog can reuse this
-same function later, not done in this pass to keep it fast/reviewable.
+Reads every product image referenced in src/data/products.ts (via
+scripts/_product_images.json, regenerate with:
+  npx tsx -e "..." — see git history of this file for the one-liner, or just
+  re-run the extraction: import products from products.ts, dedupe .image).
+Output mirrors the source's subfolder (root / trimico / samk5 / ...) under
+public/products/premium-bg/ so filenames that repeat across suppliers
+(01-*.png, 02-*.png, ...) never collide.
 """
+import json
+import os
+
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 from scipy.ndimage import label
-import os
 
 IVORY = (246, 242, 233)
 IVORY_DIM = (237, 231, 216)
 VIGNETTE = (214, 201, 168)  # muted warm edge tone, brand gold-adjacent
 
-SRC_ROOT = "public/products"
-OUT_ROOT = "public/products/premium-bg"
-
-IMAGES = [
-    "01-sam-ngoc-linh-thai-lat-ngam-mat-ong.png",
-    "02-cao-sam-ngoc-linh-mat-ong.png",
-    "17-ruou-ngoc-de-thien-huong-750ml.png",
-    "29-bo-tre-hoa-combo-big-size.png",
-    "04-giai-doc-gan-panaxx-naturis.png",
-    "18-ruou-ngoc-de-sam-ngoc-linh-12-nam-500ml.png",
-    "19-ruou-ngoc-de-sam-ngoc-linh-10-nam-500ml.png",
-    "25-combo-2-chai-ruou-sam-ngoc-linh-19-5-do.png",
-    "31-nuoc-tre-hoa-da-purely-refreshing.png",
-    "trimico/11-hoa-sam-tuoi.png",
-    "trimico/42-mat-ong-dang-rung-500ml.png",
-    "trimico/02-tra-sam-ngoc-linh-thuong-hang.png",
-]
+PUBLIC_ROOT = "public"
+IMAGE_LIST_PATH = "scripts/_product_images.json"
 
 
 def make_gradient_bg(size):
@@ -67,8 +58,10 @@ def cut_white_background(im: Image.Image) -> Image.Image:
     rgb = arr[:, :, :3].astype(np.int16)
     minc = rgb.min(axis=2)
 
-    # Loose "white-ish" mask (catches anti-aliased edge halo too)
-    whiteish = minc >= 225
+    # Loose "white/light-gray-ish" mask — some source photos use a seamless
+    # light-gray backdrop (~215-225) rather than pure white, so 225 alone
+    # missed most of the background on those and left a visible seam.
+    whiteish = minc >= 205
     labeled, _ = label(whiteish)
     border_labels = set(labeled[0, :]) | set(labeled[-1, :]) | set(labeled[:, 0]) | set(labeled[:, -1])
     border_labels.discard(0)
@@ -108,18 +101,38 @@ def composite_with_shadow(cutout: Image.Image, bg: Image.Image) -> Image.Image:
     return canvas
 
 
+def process_one(rel_url: str) -> str:
+    """rel_url like '/products/trimico/11-hoa-sam-tuoi.png' -> writes
+    public/products/premium-bg/trimico/11-hoa-sam-tuoi.png, returns the new
+    rel_url ('/products/premium-bg/trimico/11-hoa-sam-tuoi.png')."""
+    assert rel_url.startswith("/products/")
+    sub_path = rel_url[len("/products/"):]  # e.g. "trimico/11-hoa-sam-tuoi.png"
+    src_path = os.path.join(PUBLIC_ROOT, "products", sub_path)
+    out_rel = os.path.join("products", "premium-bg", sub_path)
+    out_path = os.path.join(PUBLIC_ROOT, out_rel)
+
+    im = Image.open(src_path)
+    cutout = cut_white_background(im)
+    bg = make_gradient_bg(im.size)
+    result = composite_with_shadow(cutout, bg).convert("RGB")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    result.save(out_path, quality=92)
+    return "/" + out_rel.replace(os.sep, "/")
+
+
 def main():
-    os.makedirs(OUT_ROOT, exist_ok=True)
-    for rel in IMAGES:
-        src_path = os.path.join(SRC_ROOT, rel)
-        im = Image.open(src_path)
-        cutout = cut_white_background(im)
-        bg = make_gradient_bg(im.size)
-        result = composite_with_shadow(cutout, bg).convert("RGB")
-        out_path = os.path.join(OUT_ROOT, os.path.basename(rel))
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
-        result.save(out_path, quality=92)
-        print(f"wrote {out_path}")
+    with open(IMAGE_LIST_PATH, encoding="utf-8") as f:
+        images = json.load(f)
+
+    mapping = {}
+    for rel_url in images:
+        new_url = process_one(rel_url)
+        mapping[rel_url] = new_url
+        print(f"{rel_url} -> {new_url}")
+
+    with open("scripts/_product_image_mapping.json", "w", encoding="utf-8") as f:
+        json.dump(mapping, f, indent=2, ensure_ascii=False)
+    print(f"\nDone: {len(mapping)} images. Mapping written to scripts/_product_image_mapping.json")
 
 
 if __name__ == "__main__":
