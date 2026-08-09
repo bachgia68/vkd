@@ -3,6 +3,11 @@
 Ngày: 2026-08-09 (cập nhật lần 13). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
 
+**Nếu Joe hỏi về "KOL"/tăng follow/tương tác fanpage-TikTok**: đó KHÔNG phải
+việc trong repo web này — xem `D:\TA page\site\docs\kol-sam-ngoc-linh\00-HANDOFF.md`
+mục 0 (phân biệt 2 dự án KOL khác nhau) và file 18 trong cùng thư mục (audit
+số liệu thật + kế hoạch tăng trưởng, làm 2026-08-09).
+
 ## -12. Homepage product carousel + blog cross-sell (spec/plan/SDD) + 2 fix nhỏ
 — ĐÃ XONG, LIVE. Đọc kỹ mục "Lưu ý quan trọng" cuối mục này trước khi làm gì
 tiếp — có 1 phiên khác chạy song song trong CÙNG thư mục repo này.
