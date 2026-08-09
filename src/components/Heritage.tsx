@@ -81,10 +81,10 @@ export default function Heritage({ lang }: HeritageProps) {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { src: '/assets/images/heritage-cay-sam.jpg', alt: t.heritage.altCaySam },
-              { src: '/assets/images/heritage-cu-sam.jpg', alt: t.heritage.altCuSam },
+              { src: '/assets/images/heritage-cay-sam.png', alt: t.heritage.altCaySam },
+              { src: '/assets/images/cusam.jpg', alt: t.heritage.altCuSam },
               { src: '/assets/images/heritage-vuon-sam-1.jpg', alt: t.heritage.altVuonSam1 },
-              { src: '/assets/images/heritage-vuon-sam-2.webp', alt: t.heritage.altVuonSam2 },
+              { src: '/assets/images/heritage-vuon-sam-2.jpg', alt: t.heritage.altVuonSam2 },
             ].map((photo, index) => (
               <div
                 key={index}

@@ -130,7 +130,7 @@ export default function FounderStory({ lang, onNavigate }: FounderStoryProps) {
             {/* Mục thị sở thị — ảnh vườn thật */}
             <div className="not-prose my-10 rounded-2xl overflow-hidden shadow-elegant-lg">
               <img
-                src="/assets/images/vuon-giong-tra-linh.jpg"
+                src="/assets/images/heritage-vuon-sam-1-bo.jpg"
                 alt="Vườn giống Sâm Ngọc Linh tại Trà Linh, Nam Trà My"
                 className="w-full aspect-video object-cover"
               />
