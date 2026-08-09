@@ -4,8 +4,37 @@ Ngày: 2026-08-09 (cập nhật lần 11). Phiên trước dừng ở đây — 
 trước khi làm gì tiếp.
 
 ## -10. Joe giao 4 nhiệm vụ lớn (audit SEO/UX/link, slider Shopee, redesign
-blog theo KGC, admin edit + media) — ĐANG LÀM, 3/4 xong (1 phần), 1/4 CHƯA
-BẮT ĐẦU
+blog theo KGC, admin edit + media) — CẢ 4/4 ĐÃ CÓ BẢN ĐẦU TIÊN LIVE, xem chi
+tiết từng mục bên dưới cho phần còn thiếu/cần verify thêm
+
+**Cập nhật cuối phiên (sau khi Joe phản hồi bực vì chưa thấy vuốt được +
+nền vẫn trắng):**
+- Carousel trước đó chỉ free-scroll được bằng TOUCH (bỏ snap-mandatory) —
+  Joe test bằng chuột trên desktop nên không thấy gì đổi cả, vì mouse không
+  tự kéo được `overflow-x-auto` mặc định. Đã thêm drag-to-scroll bằng con
+  trỏ chuột thật (`pointerdown/move/up` trong `ProductCarousel.tsx`), phân
+  biệt kéo vs bấm (>6px mới tính là kéo) để không bị navigate nhầm khi thả
+  chuột ngay trên thẻ. Đã tự giả lập PointerEvent để verify `scrollLeft`
+  đổi đúng.
+- Nền sản phẩm: mở rộng từ 12 SKU (carousel trang chủ) ra **ĐỦ CẢ 90 SKU**
+  trong catalog — `scripts/generate_premium_product_bg.py` giờ đọc toàn bộ
+  ảnh tham chiếu trong `products.ts` (qua `scripts/_product_images.json`,
+  file tạm, tự xoá sau khi chạy — cần tự sinh lại nếu muốn chạy lại script,
+  xem docstring đầu file). Hạ ngưỡng nhận diện nền từ 225→205 vì phát hiện
+  1 số ảnh gốc dùng phông nền xám nhạt (không phải trắng tuyệt đối), ngưỡng
+  225 bỏ sót gần hết nền loại đó. Output giữ nguyên cấu trúc thư mục NCC
+  (trimico/samk5/gốc) để tránh trùng tên file giữa các NCC.
+- Bài học vận hành: sau 2 commit liền, Vercel KHÔNG tự bắt webhook từ GitHub
+  (build không kích hoạt dù push thành công, `git log`/`origin/main` đều
+  đúng) — đợi ~5 phút không thấy gì, phải tạo 1 commit rỗng
+  (`git commit --allow-empty`) để ép webhook chạy lại, sau đó mới build bình
+  thường (bao gồm luôn cả các commit bị kẹt trước đó vì cùng nằm trên
+  `main`). Nếu gặp lại tình trạng "push xong mà `list_deployments`/
+  `get_deployment` không thấy deployment mới sau vài phút", thử cách này
+  trước khi nghi ngờ code sai.
+- Đã verify trực tiếp trên `tasamngoclinh.com` cả 3 việc trên (drag-scroll
+  qua PointerEvent giả lập, ảnh nền 90/90 không lỗi, blog hero/TOC/reading
+  time hiển thị đúng qua click thật vào 1 bài).
 
 Thứ tự Joe chọn: (1) audit ảnh/link + SEO kỹ thuật → (2) sửa bài trong admin
 → (3) slider Shopee → (4) tái cấu trúc blog theo KGC (jungkwanjang.us).
@@ -108,28 +137,29 @@ trước khi sửa tiếp:**
   chèn giữa bài. Nếu Joe cần, đây là việc tiếp theo trong đúng mục "quản lý
   media bài viết".
 
-**Bước 3 (slider sản phẩm kiểu Shopee) — CHƯA BẮT ĐẦU.** Ghi chú quan trọng
-từ lúc khảo sát: `ProductCarousel.tsx` đã là carousel cuộn ngang
-`snap-x snap-mandatory` (vuốt mượt trên mobile sẵn, không cần thêm
-SwiperJS/Slick — dùng CSS scroll-snap nhẹ hơn cho Core Web Vitals). Còn thiếu
-đúng phần Joe muốn: badge giảm giá, số "Đã bán", xếp hạng sao. **Dữ liệu này
-CHƯA tồn tại** trong `src/data/products.ts` lẫn Supabase `products` — cần
-thêm field (`sold_count`, `rating`, `discount_percent` hoặc tương đương)
-trước khi hiển thị được, không được bịa số bán/rating giả. Nên hỏi Joe lấy
-số liệu thật từ đâu (đơn hàng thật qua PayOS? nhập tay?) trước khi code UI.
+**Bước 3 (slider sản phẩm kiểu Shopee) — ĐÃ XONG phần vuốt/kéo + nền ảnh, xem
+mục -10 đầu file để biết chi tiết drag-to-scroll + 90/90 ảnh.** Còn thiếu
+đúng 1 phần: badge giảm giá, số "Đã bán", xếp hạng sao. **Dữ liệu này CHƯA
+tồn tại** trong `src/data/products.ts` lẫn Supabase `products` — cần thêm
+field (`sold_count`, `rating`, `discount_percent` hoặc tương đương) trước
+khi hiển thị được, không được bịa số bán/rating giả. Joe đã xác nhận
+"k cần có doanh số" ở phiên này nên phần này coi như đã bỏ khỏi scope, chỉ
+làm lại nếu Joe chủ động yêu cầu về sau.
 
-**Bước 4 (tái cấu trúc blog theo KGC) — CHƯA BẮT ĐẦU.** Yêu cầu gốc: nghiên
-cứu https://jungkwanjang.us/blogs/ginseng-101/ginseng-vs-caffeine làm chuẩn
-(Hero Banner, Hook+Subtitle, TOC tương tác, Key Stat Box, Comparison Table,
-Infographic HPLC, Social Proof Box, Product CTA Card). Việc liên quan đã có
-sẵn: `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md`
-(nghiên cứu màu/thiết kế jungkwanjang.us từ phiên trước, có thể tái dùng).
-`BlogPostDetail.tsx` hiện dùng parser markdown tự viết (H2/H3/bullet/bold/
-table) — layout mới nên xây trên top của component này, không thay hẳn
-parser nếu không cần. Đa số bài hiện tại (`blog_posts`) không có
-`featured_image_url` — layout mới cần fallback đẹp cho bài không ảnh, hoặc
-yêu cầu bắt buộc có ảnh khi đăng bài mới (đã có thể sửa qua modal edit vừa
-làm ở bước 2).
+**Bước 4 (tái cấu trúc blog theo KGC) — ĐÃ CÓ BẢN ĐẦU TIÊN LIVE**, xem mục
+-10 đầu file. Đã làm: Hero Banner (ảnh cover + gradient, tiêu đề đè lên),
+meta row (tác giả "Đội Ngũ Nghiên Cứu TA" — cố tình không bịa tên bác sĩ/
+chuyên gia cụ thể, xem lý do trong commit message), thời gian đọc tự tính,
+excerpt hiện thành hook subtitle, Mục Lục tương tác tự sinh từ heading `##`
+(smooth-scroll), cú pháp `> text` giờ render thành khung nổi bật (dùng được
+cho cả Key Stat lẫn Social Proof tuỳ nội dung), bảng so sánh markdown vốn đã
+hỗ trợ sẵn không cần thêm gì. Card danh sách Blog không có ảnh giờ có nền
+gradient + tiêu đề lớn thay vì ô xám + icon.
+**CHƯA làm** (cần dữ liệu/tài sản thật, không phải chỉ code layout):
+Infographic sắc ký đồ HPLC (sẽ phải bịa số liệu nếu làm giờ — cần dữ liệu
+kiểm định thật từ Joe trước). `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md`
+(nghiên cứu màu/thiết kế jungkwanjang.us từ phiên trước) vẫn còn giá trị
+tham khảo nếu làm sâu thêm.
 
 ## -9. Track A tiếp tục: 3 bài thật đã live + webhook duyệt kênh CMS — ĐÃ XONG
 
