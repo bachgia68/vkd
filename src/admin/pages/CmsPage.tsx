@@ -7,6 +7,7 @@ import {
   Plus,
   Save,
   Trash2,
+  Pencil,
   Globe,
   ImagePlus,
   Send,
@@ -21,6 +22,7 @@ import {
   createArticle,
   updateArticle,
   createBlogPost,
+  updateBlogPost,
   deleteBlogPost,
   setBlogPostPublished,
   fetchAllBlogPostsForAdmin,
@@ -106,6 +108,14 @@ export default function CmsPage() {
   const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editExcerpt, setEditExcerpt] = useState('');
+  const [editBody, setEditBody] = useState('');
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+
   const [channels, setChannels] = useState<Channel[]>([]);
   const [captionPostId, setCaptionPostId] = useState<string | null>(null);
   const [captionDrafts, setCaptionDrafts] = useState<Record<string, string>>({});
@@ -181,6 +191,52 @@ export default function CmsPage() {
       loadPosts();
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Lỗi xoá bài viết');
+    }
+  };
+
+  const openEdit = (post: BlogPost) => {
+    setEditingPost(post);
+    setEditTitle(post.title);
+    setEditExcerpt(post.excerpt);
+    setEditBody(post.body);
+    setEditImageFile(null);
+    setEditImagePreview(post.featured_image_url ?? null);
+  };
+
+  const closeEdit = () => {
+    if (editImageFile && editImagePreview) URL.revokeObjectURL(editImagePreview);
+    setEditingPost(null);
+    setEditImageFile(null);
+    setEditImagePreview(null);
+  };
+
+  const onPickEditImage = (file: File | null) => {
+    setEditImageFile(file);
+    if (editImageFile && editImagePreview) URL.revokeObjectURL(editImagePreview);
+    setEditImagePreview(file ? URL.createObjectURL(file) : editingPost?.featured_image_url ?? null);
+  };
+
+  const saveEdit = async () => {
+    if (!editingPost || !editTitle.trim() || !editBody.trim()) return;
+    setSavingEdit(true);
+    try {
+      let featured_image_url = editingPost.featured_image_url;
+      if (editImageFile) {
+        featured_image_url = await uploadBlogImage(editImageFile);
+      }
+      await updateBlogPost(editingPost.id, {
+        title: editTitle.trim(),
+        excerpt: editExcerpt.trim() || editBody.trim().slice(0, 140),
+        body: editBody.trim(),
+        featured_image_url,
+      });
+      showToast('Đã lưu thay đổi — cập nhật ngay trên trang chủ');
+      closeEdit();
+      loadPosts();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi lưu bài viết');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -590,6 +646,19 @@ export default function CmsPage() {
                       tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
+                        openEdit(p);
+                      }}
+                      aria-label="Sửa bài viết"
+                      title="Sửa câu chữ / ảnh"
+                      className="text-forest-400 hover:text-gold-700"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
                         togglePostPublished(p);
                       }}
                       aria-label={p.published ? 'Gỡ khỏi site' : 'Duyệt & công khai'}
@@ -635,6 +704,72 @@ export default function CmsPage() {
           />
         )}
       </div>
+
+      {editingPost && (
+        <div
+          className="fixed inset-0 bg-forest-950/50 z-50 flex items-center justify-center p-5"
+          onClick={(e) => e.target === e.currentTarget && closeEdit()}
+        >
+          <div className="bg-white rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="font-display text-lg text-forest-900 mb-4">Sửa bài viết</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-[11px] uppercase tracking-wide text-forest-400">Tiêu đề</label>
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-wide text-forest-400">Tóm tắt ngắn</label>
+                <input
+                  value={editExcerpt}
+                  onChange={(e) => setEditExcerpt(e.target.value)}
+                  className="w-full border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-wide text-forest-400">Nội dung</label>
+                <textarea
+                  value={editBody}
+                  onChange={(e) => setEditBody(e.target.value)}
+                  className="w-full min-h-48 border border-forest-100 rounded-lg px-3 py-2 text-sm mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-wide text-forest-400">Ảnh nổi bật</label>
+                <label className="mt-1 flex items-center gap-3 border border-dashed border-forest-200 rounded-lg px-3 py-2.5 text-sm text-forest-500 cursor-pointer hover:border-gold-400 hover:text-forest-700">
+                  <ImagePlus className="w-4 h-4 flex-shrink-0" />
+                  {editImageFile ? editImageFile.name : 'Đổi ảnh khác (bỏ trống để giữ ảnh hiện tại)'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => onPickEditImage(e.target.files?.[0] ?? null)}
+                  />
+                </label>
+                {editImagePreview && (
+                  <img src={editImagePreview} alt="Xem trước ảnh" className="mt-2 w-full h-40 object-cover rounded-lg" />
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={closeEdit} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+                Huỷ
+              </button>
+              <button
+                disabled={!editTitle.trim() || !editBody.trim() || savingEdit}
+                onClick={saveEdit}
+                className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+              >
+                {savingEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {savingEdit ? 'Đang lưu...' : 'Lưu thay đổi'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showNewModal && (
         <NewArticleModal

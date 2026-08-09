@@ -626,6 +626,25 @@ export async function createBlogPost(input: {
   return throwIfError(res);
 }
 
+export async function updateBlogPost(
+  id: string,
+  patch: Partial<{
+    title: string;
+    excerpt: string;
+    body: string;
+    featured_image_url: string | null;
+    featured_image_alt: string | null;
+  }>,
+): Promise<BlogPost> {
+  const res = await supabase
+    .from('blog_posts')
+    .update(patch)
+    .eq('id', id)
+    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .single();
+  return throwIfError(res);
+}
+
 export async function deleteBlogPost(id: string) {
   const { error } = await supabase.from('blog_posts').delete().eq('id', id);
   if (error) throw new Error(error.message);
