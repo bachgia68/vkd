@@ -1,10 +1,6 @@
 import { FlaskConical, Building2, Microscope } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
-import { products } from '../data/products';
-
-const strip = products.filter((p) => p.price !== null).slice(0, 10);
-const stripLoop = [...strip, ...strip];
 
 interface HeritageProps {
   lang: Language;
@@ -54,13 +50,16 @@ export default function Heritage({ lang }: HeritageProps) {
           </p>
         </div>
 
-        {/* Saponin highlight + running product strip */}
+        {/* Saponin highlight — the running product strip that used to live here
+            was removed: it duplicated the swipeable Products carousel already
+            shown earlier on the homepage (per Joe's decision), and this page
+            was already flagged for having too many sections. */}
         <div className="relative mb-16 overflow-hidden rounded-3xl bg-gradient-to-br from-forest-900 to-forest-700">
           {/* Decorative glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/10 rounded-full blur-[120px]" />
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-forest-400/15 rounded-full blur-[100px]" />
 
-          <div className="relative z-10 px-8 md:px-16 pt-10 md:pt-14 pb-8 flex flex-wrap items-end justify-between gap-4">
+          <div className="relative z-10 px-8 md:px-16 py-10 md:py-14 flex flex-wrap items-end justify-between gap-4">
             <div>
               <span className="text-gold-400 text-sm font-semibold tracking-wider uppercase mb-3 block">
                 {t.heritage.saponinTypes}
@@ -71,35 +70,6 @@ export default function Heritage({ lang }: HeritageProps) {
                   {t.heritage.saponinDesc}
                 </span>
               </h3>
-            </div>
-          </div>
-
-          {/* Running product strip */}
-          <div className="relative z-10 marquee-mask pb-10 md:pb-14">
-            <div className="flex w-max gap-5 px-8 marquee-track">
-              {stripLoop.map((p, i) => (
-                <div
-                  key={`${p.sku}-${i}`}
-                  className="w-52 md:w-60 shrink-0 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden hover:bg-white/10 transition-colors duration-300"
-                >
-                  <div className="aspect-square overflow-hidden bg-white/5">
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <p className="text-white text-sm font-medium line-clamp-2 leading-snug mb-1.5">
-                      {p.name}
-                    </p>
-                    <p className="text-gold-400 text-sm font-semibold">
-                      {p.price ? `${p.price.toLocaleString('vi-VN')} ₫` : ''}
-                    </p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
