@@ -1,7 +1,90 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-09 (cập nhật lần 12). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-09 (cập nhật lần 13). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -12. Homepage product carousel + blog cross-sell (spec/plan/SDD) + 2 fix nhỏ
+— ĐÃ XONG, LIVE. Đọc kỹ mục "Lưu ý quan trọng" cuối mục này trước khi làm gì
+tiếp — có 1 phiên khác chạy song song trong CÙNG thư mục repo này.
+
+Phiên này (brainstorming → spec → plan → subagent-driven-development đầy đủ,
+worktree riêng, review từng task + review toàn nhánh) đã làm và merge vào
+main:
+- `src/data/featuredProducts.ts` (mới) — chọn tối đa 12 sản phẩm có `badge`
+  thật, phủ đều 7 `productType`, loại hẳn sản phẩm `displayOnly18Plus` (phát
+  hiện qua review toàn nhánh: thuật toán ban đầu suýt đưa 1 set quà 18+ lên
+  carousel công khai không có nhãn cảnh báo — đã sửa trước khi merge).
+- `src/components/ProductCarousel.tsx` (mới) — carousel vuốt ngang dùng
+  chung cho trang chủ và cross-sell trong blog. **Lưu ý: phiên khác chạy
+  song song ngay sau đó đã tiếp tục sửa file này** (bỏ `snap-mandatory` vì
+  Joe chê "chạy từ từ", thêm kéo chuột thật cho desktop, ảnh nền
+  ivory/gold cho 12 SKU) — xem mục -10 để biết chi tiết, không phải việc của
+  phiên này.
+- `src/components/Products.tsx` — bỏ hẳn grid 4 danh mục + hiệu ứng
+  `IntersectionObserver`/fade-in-up so le cũ, thay bằng carousel trên.
+- `src/components/BlogPostDetail.tsx` — thêm khối cross-sell sản phẩm nổi
+  bật dưới mỗi bài (dùng chung `getFeaturedProducts`/`ProductCarousel`,
+  không tailor riêng theo bài — verify bằng crawl trực tiếp
+  jungkwanjang.us/blogs/ginseng-101 + press-room thấy khối "Featured
+  Products" của họ cũng giống hệt nhau giữa các bài).
+- Spec: `docs/superpowers/specs/2026-08-08-product-carousel-and-blog-crosssell-design.md`.
+  Plan: `docs/superpowers/plans/2026-08-08-product-carousel-and-blog-crosssell.md`.
+
+**2 fix nhỏ thêm cuối phiên (Joe báo trực tiếp qua ảnh chụp site thật):**
+- `BlogPostDetail.tsx` — `renderMarkdown()` trước đây chỉ nhận diện bullet
+  (`*`/`-`), dòng đánh số kiểu `1. `/`2. ` bị rơi vào nhánh đoạn văn, mất
+  hết xuống dòng, dính thành 1 đoạn dài. Đã thêm nhận diện danh sách có số
+  thứ tự, render `<ol>` riêng — verify bằng script throwaway mô phỏng logic
+  parser (bài thật hiện có chưa có danh sách số nào để test trực tiếp qua
+  UI, nhưng logic đã trace tay + tsc sạch).
+- `Heritage.tsx` — bỏ hẳn "running product strip" (marquee tự chạy vô hạn,
+  nền xanh đen, 10 SKU) ở section "Di Sản" — đây là ảnh Joe chụp gửi tưởng
+  nhầm là carousel mới chưa vuốt được, thực ra là 1 widget khác, có sẵn từ
+  trước, trùng lặp với carousel "Sản Phẩm" ở đầu trang. Joe chọn phương án
+  bỏ hẳn (thay vì sửa cho vuốt được) vì đã có carousel thật ở trên rồi, và
+  trang chủ từng bị chê "quá nhiều section" (xem report brand guidelines).
+
+**Đã audit lại việc Joe tưởng "SEO/blog Learn KGC chưa làm" — thực ra ĐÃ
+LÀM RỒI, chỉ là ở phiên khác chạy song song, Joe có thể chưa biết:**
+- SEO kỹ thuật: sitemap động, route `/product/<slug>` thật, meta/canonical/OG
+  động per-page, JSON-LD Product/Article/BreadcrumbList thật — xem mục -11
+  và bước 1 trong mục -10. **KHÔNG cần làm lại.**
+- Blog redesign theo tham khảo KGC: Hero Banner, Mục Lục tự sinh, thời gian
+  đọc, khung trích dẫn/số liệu nổi bật — xem "Bước 4" trong mục -10. Đây MỚI
+  là bản đầu tiên (trang chi tiết 1 bài), **CHƯA đụng tới cấu trúc danh
+  sách/điều hướng** — xem mục backlog thật bên dưới, đừng nhầm là đã xong
+  hết.
+
+**Backlog THẬT sự chưa làm (ưu tiên theo mức độ dễ/khó, không cái nào đụng
+tới nếu không đọc lại report gốc trước):**
+1. **Tách Blog thành nhiều luồng theo mẫu KGC** (Ginseng 101 giáo dục vs
+   Press Room tin tức) + category tag + tác giả + phân trang — nghiên cứu
+   đầy đủ đã có ở `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md`
+   §7.7 (crawl trực tiếp 2 trang blog KGC thật). Đọc lại trước khi làm — TA
+   hiện chỉ có 3 bài thật (xem mục -9), có thể vẫn còn hơi sớm để tách luồng
+   nếu chưa lên tới ~5-10 bài, cân nhắc hỏi Joe trước.
+2. **78/90 SKU vẫn chưa có ảnh nền premium ivory/gold** (mới làm 12 SKU ở
+   carousel trang chủ) — xem mục -10 "Bước 3", script
+   `scripts/generate_premium_product_bg.py` tái dùng được.
+3. **Gallery kéo-thả nhiều ảnh giữa bài viết trong admin CMS** — hiện chỉ
+   sửa được 1 ảnh cover, chưa có chèn ảnh giữa bài (mục -10 "Bước 2").
+4. **Infographic sắc ký đồ HPLC** — cần Joe cung cấp số liệu kiểm định thật
+   trước, không được bịa.
+5. **Google Search Console** — cần Joe tự verify DNS/HTML tag, không code
+   được thay.
+6. **`FAQPage` schema** — chỉ làm khi có nội dung hỏi-đáp thật trong blog.
+
+**⚠️ Lưu ý quan trọng — phiên khác đang chạy song song CÙNG thư mục này:**
+Trong lúc làm phiên này, phát hiện `git log` liên tục có thêm commit mới
+không phải do phiên này tạo ra (SEO, redesign blog, drag-scroll carousel —
+xem mục -10/-11), và `git status` luôn có sẵn 1 loạt file
+`public/assets/images/*` bị xoá/đổi tên/thêm mới KHÔNG COMMIT (Joe tự sắp
+xếp lại ảnh trang chủ, xem cuối mục -10). **Phiên này cố tình không đụng,
+không commit, không discard thư mục ảnh đó** — y hệt cách phiên trước đã
+làm. Nếu phiên sau thấy `git status` có nhiều ảnh lạ, đó là việc dở dang
+của Joe, KHÔNG PHẢI lỗi, hỏi Joe trước khi động vào. Luôn `git pull` ngay
+trước khi sửa file — repo này đang có nhiều phiên/agent làm việc gần như
+đồng thời.
 
 ## -11. SEO nâng cao tiếp: JSON-LD thật thay cho block giả — ĐÃ XONG, LIVE
 
