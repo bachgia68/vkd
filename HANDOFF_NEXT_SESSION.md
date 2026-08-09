@@ -1,7 +1,36 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-09 (cập nhật lần 11). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-09 (cập nhật lần 12). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -11. SEO nâng cao tiếp: JSON-LD thật thay cho block giả — ĐÃ XONG, LIVE
+
+Joe yêu cầu "chuyên gia SEO, liên tục cải tiến" — tiếp tục audit, thấy
+`index.html` có 1 block `Product` JSON-LD TĨNH, giả (tên "Ngoc Linh Ginseng
+Root", giá cố định 320 USD) dùng chung cho MỌI trang — nghĩa là Google có
+thể hiện sai tên/giá cho bất kỳ sản phẩm nào trong 90 SKU thật. Đã xoá, thay
+bằng `src/hooks/useJsonLd.ts` (tự chèn/gỡ `<script type="application/ld+json">`
+theo từng trang):
+- `ProductDetail.tsx`: schema `Product` thật (tên, mô tả, ảnh, SKU, giá VND
+  thật, giá `availability: InStock` — hợp lý vì site không track tồn kho
+  hiển thị cho khách, sản phẩm nào cũng đặt được).
+- `BlogPostDetail.tsx`: schema `Article` thật (tiêu đề, ảnh, ngày đăng,
+  publisher).
+- Đã verify trực tiếp trên site thật — mở đúng trang sản phẩm, JSON-LD trả
+  về đúng tên "Sâm Ngọc Linh thái lát ngâm mật ong", giá 2.500.000đ thật.
+
+**Hướng SEO/KOL tiếp theo nếu Joe muốn làm nữa** (chưa làm, ghi lại ý
+tưởng):
+- Breadcrumb structured data (`BreadcrumbList`) cho trang sản phẩm/blog —
+  giúp Google hiện đường dẫn phân cấp trong kết quả tìm kiếm.
+- `FAQPage` schema nếu blog có mục hỏi-đáp thật (không bịa câu hỏi).
+- Nội dung KOL/influencer: đây là việc khác hẳn (outreach, kịch bản review,
+  không phải sửa code site) — nếu Joe muốn làm phần này, dùng skill
+  `marketing-sam` (đã có sẵn, chuyên viết bài SEO + kịch bản video cho sâm
+  VKD/TA) thay vì tiếp tục sửa trong repo site.
+- Google Search Console chưa được xác nhận sở hữu domain (không thể tự làm
+  qua code — cần Joe tự verify DNS/HTML tag), nên chưa có dữ liệu crawl/index
+  thật để đo hiệu quả các thay đổi SEO đã làm.
 
 ## -10. Joe giao 4 nhiệm vụ lớn (audit SEO/UX/link, slider Shopee, redesign
 blog theo KGC, admin edit + media) — CẢ 4/4 ĐÃ CÓ BẢN ĐẦU TIÊN LIVE, xem chi
