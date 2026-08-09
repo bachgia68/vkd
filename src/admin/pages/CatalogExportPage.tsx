@@ -6,7 +6,7 @@ import { vkdProducts } from '../../data/vkdProducts';
 import { trimicoProducts } from '../../data/trimicoProducts';
 
 const CONTACT_PHONE = '0984 999 309';
-const ZALO_URL = 'https://zalo.me/84984999309';
+const ZALO_URL = 'https://zalo.me/0984999309';
 const LOGO_URL = '/assets/images/TA_logo_clean.png';
 
 // Bảng màu brand TA (đồng bộ tailwind.config.js) — hex thật vì jsPDF không đọc class Tailwind.

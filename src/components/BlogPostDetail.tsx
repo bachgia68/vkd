@@ -5,6 +5,7 @@ import { fetchBlogPost, type BlogPost } from '../lib/siteContentApi';
 import { products as staticProducts } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { getFeaturedProducts } from '../data/featuredProducts';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import ProductCarousel from './ProductCarousel';
 
 interface BlogPostDetailProps {
@@ -165,6 +166,13 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
       .then(setPost)
       .catch(() => setPost(null));
   }, [postId]);
+
+  useDocumentMeta({
+    title: post ? `${post.title} — TA Sâm Ngọc Linh` : 'TA Sâm Ngọc Linh',
+    description: post?.excerpt,
+    path: `/blog/${postId}`,
+    image: post?.featured_image_url ?? undefined,
+  });
 
   return (
     <section className="section-padding bg-cream-50 min-h-screen">

@@ -729,9 +729,13 @@ function ProductCard({
       }`}
     >
       {/* Image */}
-      <button
-        onClick={() => onNavigate('product-detail', product.slug)}
-        className="relative aspect-[4/5] overflow-hidden bg-cream-100 text-left w-full"
+      <a
+        href={`/product/${product.slug}`}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate('product-detail', product.slug);
+        }}
+        className="relative aspect-[4/5] overflow-hidden bg-cream-100 text-left w-full block"
       >
         <img
           src={product.image}
@@ -779,15 +783,22 @@ function ProductCard({
         <div className="absolute bottom-0 left-0 right-0 bg-forest-900/95 backdrop-blur text-cream-50 text-xs font-semibold tracking-wider uppercase py-3 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-500">
           {ui.viewDetail}
         </div>
-      </button>
+      </a>
 
       {/* Content */}
       <div className="p-5 flex flex-col flex-1">
-        <button onClick={() => onNavigate('product-detail', product.slug)} className="text-left">
+        <a
+          href={`/product/${product.slug}`}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate('product-detail', product.slug);
+          }}
+          className="text-left"
+        >
           <h3 className="font-display text-base font-semibold text-forest-900 mb-2 leading-snug line-clamp-2 group-hover:text-forest-700 transition-colors">
             {product.name}
           </h3>
-        </button>
+        </a>
 
         <div className="inline-flex items-start gap-1.5 mb-3">
           <Check className="w-3.5 h-3.5 text-gold-500 mt-0.5 shrink-0" />

@@ -64,18 +64,14 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
         className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {products.map((product) => (
-          <div
+          <a
             key={product.sku}
             data-carousel-card
-            className="product-card group cursor-pointer flex-shrink-0 w-64 md:w-72 snap-start"
-            onClick={() => onNavigate?.('product-detail', product.slug)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onNavigate?.('product-detail', product.slug);
-              }
+            href={`/product/${product.slug}`}
+            className="product-card group cursor-pointer flex-shrink-0 w-64 md:w-72 snap-start block"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate?.('product-detail', product.slug);
             }}
           >
             <div className="relative aspect-ginseng overflow-hidden">
@@ -101,7 +97,7 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
                 {formatPrice(product.price, lang)}
               </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
 

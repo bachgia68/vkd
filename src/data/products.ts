@@ -4,8 +4,8 @@
 // Nếu sửa productType/giftEligible thủ công sau khi sinh, sửa TRỰC TIẾP trong
 // file này (không chạy lại script trừ khi 2 file gốc có SKU mới).
 
-import type { HealthGoal, TargetAudience } from './mockData';
-import type { ProductTypeId } from './productTypes';
+import type { HealthGoal, TargetAudience } from './mockData.ts';
+import type { ProductTypeId } from './productTypes.ts';
 
 export type SupplierId = 'vkd' | 'trimico' | 'samk5';
 

@@ -62,9 +62,17 @@ export default function About({ lang, onNavigate }: AboutProps) {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <a href="#heritage" className="btn-primary inline-flex">
+              <button
+                onClick={() => {
+                  onNavigate?.('home');
+                  setTimeout(() => {
+                    document.getElementById('heritage')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="btn-primary inline-flex"
+              >
                 {t.about.cta}
-              </a>
+              </button>
               <button
                 onClick={() => onNavigate?.('about-story')}
                 className="btn-secondary inline-flex"

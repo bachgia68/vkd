@@ -55,17 +55,26 @@ function App() {
   // site (bug do trước đây currentPage chỉ là state nội bộ, không gắn với
   // history entry nào).
   useEffect(() => {
-    // Link chia sẻ trực tiếp một bài viết (vd. đăng fanpage) trỏ vào
-    // /blog/<id> — nếu trang vừa tải thẳng vào đường dẫn này (không phải
-    // điều hướng nội bộ), mở đúng bài đó ngay từ đầu thay vì rơi về trang chủ.
-    const blogMatch = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
-    if (blogMatch) {
-      setSelectedSlug(blogMatch[1]);
-      setCurrentPage('blog-post');
-      window.history.replaceState({ page: 'blog-post', slug: blogMatch[1] }, '', window.location.pathname);
-    } else {
-      window.history.replaceState({ page: 'home' }, '', window.location.pathname + window.location.search);
-    }
+    // Link chia sẻ trực tiếp một bài viết/sản phẩm (vd. đăng fanpage, kết quả
+    // Google) trỏ vào /blog/<id> hoặc /product/<slug> — nếu trang vừa tải
+    // thẳng vào đường dẫn này (không phải điều hướng nội bộ), mở đúng trang
+    // đó ngay từ đầu thay vì rơi về trang chủ.
+    const matchPathname = (pathname: string): { page: string; slug?: string } => {
+      const blogMatch = pathname.match(/^\/blog\/([^/]+)\/?$/);
+      if (blogMatch) return { page: 'blog-post', slug: blogMatch[1] };
+      const productMatch = pathname.match(/^\/product\/([^/]+)\/?$/);
+      if (productMatch) return { page: 'product-detail', slug: productMatch[1] };
+      return { page: 'home' };
+    };
+
+    const initial = matchPathname(window.location.pathname);
+    if (initial.slug) setSelectedSlug(initial.slug);
+    if (initial.page !== 'home') setCurrentPage(initial.page);
+    window.history.replaceState(
+      { page: initial.page, slug: initial.slug },
+      '',
+      initial.page === 'home' ? window.location.pathname + window.location.search : window.location.pathname,
+    );
 
     const onPopState = (event: PopStateEvent) => {
       const state = event.state as { page?: string; slug?: string } | null;
@@ -73,13 +82,9 @@ function App() {
         setCurrentPage(state.page);
         if (state.slug) setSelectedSlug(state.slug);
       } else {
-        const match = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
-        if (match) {
-          setSelectedSlug(match[1]);
-          setCurrentPage('blog-post');
-        } else {
-          setCurrentPage('home');
-        }
+        const match = matchPathname(window.location.pathname);
+        if (match.slug) setSelectedSlug(match.slug);
+        setCurrentPage(match.page);
       }
     };
     window.addEventListener('popstate', onPopState);
@@ -121,10 +126,16 @@ function App() {
   const navigate = (page: string, slug?: string) => {
     if (slug) setSelectedSlug(slug);
     setCurrentPage(page);
-    // Chỉ bài viết Blog có route thật (/blog/<id>) để chia sẻ link trực
-    // tiếp được — mọi trang khác trong app dùng state nội bộ như trước,
-    // pathname reset về '/' khi rời khỏi bài viết.
-    const pathname = page === 'blog-post' && slug ? `/blog/${slug}` : '/';
+    // Bài viết Blog và trang chi tiết sản phẩm có route thật (/blog/<id>,
+    // /product/<slug>) để chia sẻ link trực tiếp và Google index được từng
+    // trang — mọi trang khác trong app dùng state nội bộ như trước, pathname
+    // reset về '/' khi rời khỏi các trang này.
+    const pathname =
+      page === 'blog-post' && slug
+        ? `/blog/${slug}`
+        : page === 'product-detail' && slug
+        ? `/product/${slug}`
+        : '/';
     window.history.pushState({ page, slug: slug ?? selectedSlug }, '', pathname + window.location.search);
   };
 

@@ -35,10 +35,14 @@ export default function Blog({ onNavigate }: BlogProps) {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
-            <article
+            <a
               key={post.id}
-              onClick={() => onNavigate?.('blog-post', post.id)}
-              className="bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1 cursor-pointer"
+              href={`/blog/${post.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate?.('blog-post', post.id);
+              }}
+              className="block bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1 cursor-pointer"
             >
               {post.featured_image_url ? (
                 <img
@@ -61,7 +65,7 @@ export default function Blog({ onNavigate }: BlogProps) {
                 Đọc tiếp <ArrowRight className="w-4 h-4" />
               </div>
               </div>
-            </article>
+            </a>
           ))}
         </div>
       </div>

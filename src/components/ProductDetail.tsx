@@ -18,6 +18,7 @@ import { useLiveProducts } from '../hooks/useLiveProducts';
 import { productTypes } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 interface ProductDetailProps {
   lang: Language;
@@ -191,6 +192,13 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
 
   const products = useLiveProducts(staticProducts);
   const product: Product | undefined = products.find((p) => p.slug === slug);
+
+  useDocumentMeta({
+    title: product ? `${product.name} — TA Sâm Ngọc Linh` : 'TA Sâm Ngọc Linh',
+    description: product?.description,
+    path: `/product/${slug}`,
+    image: product?.image,
+  });
 
   if (!product) {
     return (
