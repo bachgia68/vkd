@@ -19,6 +19,7 @@ import { productTypes } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import { useJsonLd } from '../hooks/useJsonLd';
 
 interface ProductDetailProps {
   lang: Language;
@@ -199,6 +200,27 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
     path: `/product/${slug}`,
     image: product?.image,
   });
+
+  useJsonLd(
+    product && product.price !== null
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: product.description,
+          image: `https://tasamngoclinh.com${product.image}`,
+          sku: product.sku,
+          brand: { '@type': 'Brand', name: 'TA Sâm Ngọc Linh' },
+          offers: {
+            '@type': 'Offer',
+            url: `https://tasamngoclinh.com/product/${product.slug}`,
+            priceCurrency: 'VND',
+            price: product.price,
+            availability: 'https://schema.org/InStock',
+          },
+        }
+      : null
+  );
 
   if (!product) {
     return (

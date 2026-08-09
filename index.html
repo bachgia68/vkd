@@ -53,19 +53,14 @@
     "sameAs": ["https://zalo.me/0984999309", "https://wa.me/84984999309"]
   }
   </script>
-
-  <!-- Structured Data: Product -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": "Ngoc Linh Ginseng Root (6-10 Years)",
-    "description": "Premium fresh Ngoc Linh ginseng root, aged 6-10 years and up, harvested directly from our own garden in Tra Linh, Nam Tra My, Quang Nam at over 1,800m elevation. Contains 52+ saponin types including unique Majonoside R2.",
-    "brand": { "@type": "Brand", "name": "TA Sâm Ngọc Linh" },
-    "category": "Health Supplement",
-    "offers": { "@type": "Offer", "priceCurrency": "USD", "price": "320.00", "availability": "https://schema.org/InStock" }
-  }
-  </script>
+  <!--
+    Structured Data: Product/Article — intentionally NOT a static block here.
+    A single hardcoded Product used to sit in this file (fake SKU, fixed price)
+    representing all 90 real products — misleading, could make Google show the
+    wrong price/name for any product page. Real per-page JSON-LD is injected
+    at runtime instead: see src/hooks/useJsonLd.ts, used by ProductDetail.tsx
+    (real Product schema) and BlogPostDetail.tsx (Article schema).
+  -->
 </head>
 <body>
   <div id="root"></div>

@@ -6,6 +6,7 @@ import { products as staticProducts } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { getFeaturedProducts } from '../data/featuredProducts';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import { useJsonLd } from '../hooks/useJsonLd';
 import ProductCarousel from './ProductCarousel';
 
 interface BlogPostDetailProps {
@@ -236,6 +237,26 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
     path: `/blog/${postId}`,
     image: post?.featured_image_url ?? undefined,
   });
+
+  useJsonLd(
+    post
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: post.title,
+          description: post.excerpt,
+          image: post.featured_image_url ?? undefined,
+          datePublished: post.created_at,
+          author: { '@type': 'Organization', name: 'TA Sâm Ngọc Linh' },
+          publisher: {
+            '@type': 'Organization',
+            name: 'TA Sâm Ngọc Linh',
+            logo: { '@type': 'ImageObject', url: 'https://tasamngoclinh.com/assets/images/TA_logo_clean.png' },
+          },
+          mainEntityOfPage: `https://tasamngoclinh.com/blog/${postId}`,
+        }
+      : null
+  );
 
   const { blocks, toc } = useMemo(() => (post ? renderMarkdown(post.body) : { blocks: [], toc: [] }), [post]);
   const readingMinutes = useMemo(() => (post ? estimateReadingMinutes(post.body) : 0), [post]);
