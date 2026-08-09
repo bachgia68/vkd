@@ -40,7 +40,7 @@ export const products: Product[] = [
     "slug": "sam-ngoc-linh-thai-lat-ngam-mat-ong",
     "name": "Sâm Ngọc Linh thái lát ngâm mật ong",
     "price": 2500000,
-    "image": "/products/01-sam-ngoc-linh-thai-lat-ngam-mat-ong.png",
+    "image": "/products/premium-bg/01-sam-ngoc-linh-thai-lat-ngam-mat-ong.png",
     "productType": "sam-ngam-mat-ong",
     "healthGoal": "immunity",
     "audiences": [
@@ -65,7 +65,7 @@ export const products: Product[] = [
     "slug": "cao-sam-ngoc-linh-mat-ong",
     "name": "Cao Sâm Ngọc Linh Mật Ong",
     "price": 2200000,
-    "image": "/products/02-cao-sam-ngoc-linh-mat-ong.png",
+    "image": "/products/premium-bg/02-cao-sam-ngoc-linh-mat-ong.png",
     "productType": "tra-nuoc-uong-sam",
     "healthGoal": "energy",
     "audiences": [
@@ -112,7 +112,7 @@ export const products: Product[] = [
     "slug": "giai-doc-gan-panaxx-naturis",
     "name": "Giải Độc Gan Panaxx Naturis",
     "price": 440000,
-    "image": "/products/04-giai-doc-gan-panaxx-naturis.png",
+    "image": "/products/premium-bg/04-giai-doc-gan-panaxx-naturis.png",
     "productType": "tra-nuoc-uong-sam",
     "healthGoal": "energy",
     "audiences": [
@@ -201,7 +201,7 @@ export const products: Product[] = [
     "slug": "ruou-ngoc-de-thien-huong-750ml",
     "name": "Rượu Ngọc Đế -Thiên Hương 750ml",
     "price": 1750000,
-    "image": "/products/17-ruou-ngoc-de-thien-huong-750ml.png",
+    "image": "/products/premium-bg/17-ruou-ngoc-de-thien-huong-750ml.png",
     "productType": "ruou-sam",
     "healthGoal": "stress",
     "audiences": [
@@ -223,7 +223,7 @@ export const products: Product[] = [
     "slug": "ruou-ngoc-de-sam-ngoc-linh-12-nam-500ml",
     "name": "Rượu Ngọc Đế Sâm Ngọc Linh 12 năm – 500ml",
     "price": 1118000,
-    "image": "/products/18-ruou-ngoc-de-sam-ngoc-linh-12-nam-500ml.png",
+    "image": "/products/premium-bg/18-ruou-ngoc-de-sam-ngoc-linh-12-nam-500ml.png",
     "productType": "ruou-sam",
     "healthGoal": "stress",
     "audiences": [
@@ -246,7 +246,7 @@ export const products: Product[] = [
     "slug": "ruou-ngoc-de-sam-ngoc-linh-10-nam-500ml",
     "name": "Rượu Ngọc Đế Sâm Ngọc Linh 10 năm – 500ml",
     "price": 980000,
-    "image": "/products/19-ruou-ngoc-de-sam-ngoc-linh-10-nam-500ml.png",
+    "image": "/products/premium-bg/19-ruou-ngoc-de-sam-ngoc-linh-10-nam-500ml.png",
     "productType": "ruou-sam",
     "healthGoal": "stress",
     "audiences": [
@@ -378,7 +378,7 @@ export const products: Product[] = [
     "slug": "combo-2-chai-ruou-sam-ngoc-linh-19-5-do",
     "name": "Combo 2 Chai Rượu Sâm Ngọc Linh 19.5 Độ",
     "price": 715000,
-    "image": "/products/25-combo-2-chai-ruou-sam-ngoc-linh-19-5-do.png",
+    "image": "/products/premium-bg/25-combo-2-chai-ruou-sam-ngoc-linh-19-5-do.png",
     "productType": "ruou-sam",
     "healthGoal": "stress",
     "audiences": [
@@ -464,7 +464,7 @@ export const products: Product[] = [
     "slug": "bo-tre-hoa-combo-big-size",
     "name": "Bộ Trẻ Hóa Combo (Big Size)",
     "price": 8760000,
-    "image": "/products/29-bo-tre-hoa-combo-big-size.png",
+    "image": "/products/premium-bg/29-bo-tre-hoa-combo-big-size.png",
     "productType": "my-pham-sam",
     "healthGoal": "youth",
     "audiences": [
@@ -506,7 +506,7 @@ export const products: Product[] = [
     "slug": "nuoc-tre-hoa-da-purely-refreshing",
     "name": "Nước Trẻ Hóa Da (Purely Refreshing)",
     "price": 3470000,
-    "image": "/products/31-nuoc-tre-hoa-da-purely-refreshing.png",
+    "image": "/products/premium-bg/31-nuoc-tre-hoa-da-purely-refreshing.png",
     "productType": "my-pham-sam",
     "healthGoal": "youth",
     "audiences": [
@@ -766,7 +766,7 @@ export const products: Product[] = [
     "slug": "tra-sam-ngoc-linh-thuong-hang",
     "name": "Trà Sâm Ngọc Linh Thượng Hạng - MITRI TEA",
     "price": 690000,
-    "image": "/products/trimico/02-tra-sam-ngoc-linh-thuong-hang.png",
+    "image": "/products/premium-bg/02-tra-sam-ngoc-linh-thuong-hang.png",
     "productType": "tra-nuoc-uong-sam",
     "healthGoal": "immunity",
     "audiences": [
@@ -979,7 +979,7 @@ export const products: Product[] = [
     "slug": "hoa-sam-ngoc-linh-tuoi",
     "name": "Hoa Sâm Ngọc Linh Tươi",
     "price": null,
-    "image": "/products/trimico/11-hoa-sam-tuoi.png",
+    "image": "/products/premium-bg/11-hoa-sam-tuoi.png",
     "productType": "sam-cu-tuoi-kho",
     "healthGoal": "youth",
     "audiences": [
@@ -1670,7 +1670,7 @@ export const products: Product[] = [
     "slug": "mat-ong-dang-rung-ngoc-linh-500ml",
     "name": "Mật Ong Đắng Rừng Ngọc Linh 500ml",
     "price": 600000,
-    "image": "/products/trimico/42-mat-ong-dang-rung-500ml.png",
+    "image": "/products/premium-bg/42-mat-ong-dang-rung-500ml.png",
     "productType": "nam-lim-duoc-lieu",
     "healthGoal": "immunity",
     "audiences": [

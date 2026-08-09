@@ -61,14 +61,14 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
       <div
         ref={trackRef}
         onScroll={updateArrows}
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {products.map((product) => (
           <a
             key={product.sku}
             data-carousel-card
             href={`/product/${product.slug}`}
-            className="product-card group cursor-pointer flex-shrink-0 w-64 md:w-72 snap-start block"
+            className="product-card group cursor-pointer flex-shrink-0 w-64 md:w-72 block"
             onClick={(e) => {
               e.preventDefault();
               onNavigate?.('product-detail', product.slug);
