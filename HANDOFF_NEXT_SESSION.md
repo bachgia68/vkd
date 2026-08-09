@@ -19,10 +19,13 @@ theo từng trang):
 - Đã verify trực tiếp trên site thật — mở đúng trang sản phẩm, JSON-LD trả
   về đúng tên "Sâm Ngọc Linh thái lát ngâm mật ong", giá 2.500.000đ thật.
 
+**Cập nhật cùng phiên**: đã thêm luôn `BreadcrumbList` schema cho cả
+`ProductDetail.tsx` và `BlogPostDetail.tsx` (Trang chủ › Sản phẩm/Blog › tên
+trang) — verify trực tiếp trên site thật, JSON-LD trả về đủ 3 loại
+(Organization, Product, BreadcrumbList) trên 1 trang sản phẩm.
+
 **Hướng SEO/KOL tiếp theo nếu Joe muốn làm nữa** (chưa làm, ghi lại ý
 tưởng):
-- Breadcrumb structured data (`BreadcrumbList`) cho trang sản phẩm/blog —
-  giúp Google hiện đường dẫn phân cấp trong kết quả tìm kiếm.
 - `FAQPage` schema nếu blog có mục hỏi-đáp thật (không bịa câu hỏi).
 - Nội dung KOL/influencer: đây là việc khác hẳn (outreach, kịch bản review,
   không phải sửa code site) — nếu Joe muốn làm phần này, dùng skill
