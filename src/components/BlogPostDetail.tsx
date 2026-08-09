@@ -51,6 +51,7 @@ function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[]
   const blocks: ReactElement[] = [];
   const toc: TocEntry[] = [];
   let listItems: string[] = [];
+  let listType: 'ul' | 'ol' | null = null;
   let paragraph: string[] = [];
   let quoteLines: string[] = [];
   let key = 0;
@@ -80,14 +81,17 @@ function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[]
 
   const flushList = () => {
     if (listItems.length) {
+      const Tag = listType === 'ol' ? 'ol' : 'ul';
+      const listClass = listType === 'ol' ? 'list-decimal' : 'list-disc';
       blocks.push(
-        <ul key={key++} className="list-disc pl-5 space-y-1.5 text-forest-700 leading-relaxed mb-4">
+        <Tag key={key++} className={`${listClass} pl-5 space-y-1.5 text-forest-700 leading-relaxed mb-4`}>
           {listItems.map((item, i) => (
             <li key={i}>{renderInline(item)}</li>
           ))}
-        </ul>
+        </Tag>
       );
       listItems = [];
+      listType = null;
     }
   };
 
@@ -204,7 +208,15 @@ function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[]
     } else if (line.startsWith('* ') || line.startsWith('- ')) {
       flushParagraph();
       flushQuote();
+      if (listType === 'ol') flushList();
+      listType = 'ul';
       listItems.push(line.slice(2));
+    } else if (/^\d+\.\s+/.test(line)) {
+      flushParagraph();
+      flushQuote();
+      if (listType === 'ul') flushList();
+      listType = 'ol';
+      listItems.push(line.replace(/^\d+\.\s+/, ''));
     } else {
       flushList();
       flushQuote();
