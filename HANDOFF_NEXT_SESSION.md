@@ -4,10 +4,37 @@ Ngày: 2026-08-09 (cập nhật lần 11). Phiên trước dừng ở đây — 
 trước khi làm gì tiếp.
 
 ## -10. Joe giao 4 nhiệm vụ lớn (audit SEO/UX/link, slider Shopee, redesign
-blog theo KGC, admin edit + media) — ĐANG LÀM, 2/4 xong, 2/4 CHƯA BẮT ĐẦU
+blog theo KGC, admin edit + media) — ĐANG LÀM, 3/4 xong (1 phần), 1/4 CHƯA
+BẮT ĐẦU
 
 Thứ tự Joe chọn: (1) audit ảnh/link + SEO kỹ thuật → (2) sửa bài trong admin
 → (3) slider Shopee → (4) tái cấu trúc blog theo KGC (jungkwanjang.us).
+
+**Bước 3 (slider Shopee) — ĐÃ LÀM PHẦN CODE, push + verify trên site thật:**
+- Joe phản hồi thêm 2 điểm cụ thể sau khi xem: (a) carousel "chạy từ từ" khó
+  chịu — hoá ra là do `snap-x snap-mandatory` trên `ProductCarousel.tsx`
+  khiến sau mỗi lần vuốt nó tự "trôi" và khớp về đúng 1 thẻ thay vì dừng
+  ngay chỗ khách thả tay — đã bỏ hẳn snap, giờ là vuốt tự do đúng kiểu
+  Shopee. (b) không cần số "đã bán"/rating — Joe xác nhận bỏ yêu cầu này
+  (không có nguồn dữ liệu bán hàng thật, không bịa số).
+- Ảnh sản phẩm trước đây nền trắng phẳng (ảnh chụp studio thật, nền trắng
+  ĐÃ FLATTEN vào pixel, không phải alpha trong suốt) — viết
+  `scripts/generate_premium_product_bg.py` (Python/Pillow+scipy): xoá nền
+  trắng bằng flood-fill từ viền ảnh vào (chỉ vùng trắng NỐI VỚI viền mới bị
+  xoá, nên chữ/nhãn trắng bên trong sản phẩm không bị ăn mất), rồi ghép lên
+  gradient màu thương hiệu (Ivory → Ivory Dim → vignette ấm) + đổ bóng mềm
+  dưới sản phẩm — thẩm mỹ theo hướng KGC. **Mới áp dụng cho 12 SKU đang hiện
+  ở carousel trang chủ** (`public/products/premium-bg/`), CHƯA chạy cho hết
+  90 SKU trong catalog đầy đủ (script tái dùng được, chỉ cần sửa mảng
+  `IMAGES` trong script hoặc đổi sang đọc toàn bộ `products.ts`).
+- **Việc CÒN LẠI trong bước 3** (Joe chưa nhắc lại nhưng nằm trong yêu cầu
+  gốc "NHIỆM VỤ 2"): badge giảm giá (`discount_percent`) — vẫn chưa có, cần
+  Joe xác nhận có muốn thêm giá gạch/giảm giá thật không trước khi làm (dễ
+  hiểu lầm là khuyến mãi giả nếu không có coupon/giảm giá thật đứng sau).
+  Chưa chạy premium-bg cho 78 SKU còn lại trong `ProductCatalog.tsx` (trang
+  "Xem Tất Cả") — ảnh ở đó vẫn nền trắng cũ.
+- Đã verify trên `tasamngoclinh.com`: 12 ảnh nền mới load đúng (không vỡ),
+  build/tsc/`check:brand` sạch trước khi push.
 
 **Bước 1 (audit SEO/link/ảnh) — ĐÃ XONG, push + verify trên site thật:**
 - Sửa 4 bug nhỏ: ảnh Heritage bị xoá nhầm (khôi phục), QR Zalo trong catalog
