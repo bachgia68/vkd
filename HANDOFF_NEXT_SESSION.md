@@ -1,7 +1,108 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-08 (cập nhật lần 10). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-09 (cập nhật lần 11). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -10. Joe giao 4 nhiệm vụ lớn (audit SEO/UX/link, slider Shopee, redesign
+blog theo KGC, admin edit + media) — ĐANG LÀM, 2/4 xong, 2/4 CHƯA BẮT ĐẦU
+
+Thứ tự Joe chọn: (1) audit ảnh/link + SEO kỹ thuật → (2) sửa bài trong admin
+→ (3) slider Shopee → (4) tái cấu trúc blog theo KGC (jungkwanjang.us).
+
+**Bước 1 (audit SEO/link/ảnh) — ĐÃ XONG, push + verify trên site thật:**
+- Sửa 4 bug nhỏ: ảnh Heritage bị xoá nhầm (khôi phục), QR Zalo trong catalog
+  PDF sai số (`84984999309`→`0984999309`), nút "Tìm Hiểu Thêm" ở trang Về TA
+  bấm vào bị bật về trang chủ thay vì cuộn tới Di Sản (thiếu onClick, đã sửa
+  theo đúng pattern `handleFooterNav` của Footer — **CHƯA click-test lại
+  được trên site thật qua browser tool phiên này, mới sửa theo code review**,
+  nên test tay khi rảnh), JSON-LD dùng email/Zalo cũ sai domain.
+- **Phát hiện + sửa lỗ hổng SEO lớn nhất trên site**: sitemap.xml trước đây
+  chỉ có đúng URL "/", catalog/blog dùng client-state routing không có URL
+  riêng → Google gần như không index được từng sản phẩm/bài viết. Đã thêm:
+  - Route thật `/product/<slug>` (giống `/blog/<id>` có sẵn) — sửa trong
+    `App.tsx` (hàm `matchPathname`/`navigate`).
+  - `api/sitemap.ts` (Vercel serverless function) sinh sitemap động: liệt kê
+    "/" + 90 URL sản phẩm + toàn bộ bài blog `published=true`. **Lưu ý quan
+    trọng nếu sửa file này**: KHÔNG import trực tiếp từ `src/data/products.ts`
+    — đã thử, Vercel build mỗi `/api/*.ts` thành bundle tách biệt và không
+    resolve được import xuyên sang `src/`, sập 500 (`ERR_MODULE_NOT_FOUND`)
+    ngay khi lên production (đã tự phát hiện qua `get_runtime_logs` và vá
+    trong ~5 phút, nhưng là bài học: mọi thay đổi trong `api/*.ts` phải test
+    kỹ hoặc tối thiểu hiểu rõ nó chạy tách biệt khỏi app). Cách đúng: sản
+    phẩm đọc qua `public/product-slugs.json` (sinh lúc build bởi
+    `scripts/generate-product-slugs.mjs`, đã thêm vào `prebuild` trong
+    `package.json`, gitignored) — hàm serverless fetch file này qua HTTP,
+    không import module.
+  - `Blog.tsx` card và `ProductCarousel.tsx`/`ProductCatalog.tsx` card giờ là
+    `<a href>` thật (trước là `<article onClick>`/`<div onClick>` — Google
+    không bò được, không dùng Tab được) — vẫn giữ client-side nav qua
+    `preventDefault()`.
+  - Hook mới `src/hooks/useDocumentMeta.ts` — set `document.title`/meta
+    description/canonical/OG động cho `/blog/<id>` và `/product/<slug>` (SPA
+    không SSR nên trước đây mọi trang dùng chung title/meta trang chủ).
+  - Đã verify trực tiếp trên `tasamngoclinh.com`: `/sitemap.xml` liệt kê đủ,
+    `/product/<slug>` mở đúng + đổi title, `/blog/<id>` mở đúng qua click
+    card thật + đổi title.
+- **Việc audit CHƯA làm** (mới phát hiện, ghi lại để không mất): JSON-LD
+  `Product` trong `index.html` chỉ có 1 SKU hardcode giá 320 USD, không khớp
+  90 sản phẩm thật — có thể khiến Google hiện sai giá/tình trạng trong kết
+  quả tìm kiếm. Cần sinh structured data Product động (tương tự cách vừa làm
+  sitemap) hoặc bỏ hẳn nếu không dùng được đúng.
+- **Ảnh trang chủ — CHƯA xử lý, đang chờ Joe**: trong lúc audit, phát hiện
+  Joe đang tự sắp xếp lại `public/assets/images/` (xoá/đổi tên liên tục
+  song song lúc tôi làm việc — `heritage-cay-sam.jpg`, `heritage-vuon-sam-2.webp`,
+  `cay-sam-vkd.png`, `dai-bieu.jpg`, `hero-mountain1.jpg` đều bị xoá ở máy
+  local, có các file tên lạ mới xuất hiện: `sam k5.jpg`, `cu sam dep.jpg`,
+  `heritage-cay-sam - k dung anh nay k5.jpg`, `ruou.png`...). **Cố tình
+  KHÔNG commit/đụng thư mục ảnh trong mọi commit của phiên này** để không
+  đè lên việc Joe đang làm dở. Code hiện tại (đã push) vẫn trỏ đúng tên file
+  gốc (`heritage-cay-sam.jpg` v.v. — đã khôi phục về đúng tên cũ 1 lần khi
+  phát hiện bị xoá nhầm). Bảng link ảnh cố định (Joe có thể tự thay qua
+  GitHub web UI, giữ nguyên tên file, Vercel tự deploy) đã gửi Joe trong
+  chat, chưa lưu thành file — nên hỏi Joe muốn lưu vào đâu (docs/ hay ngay
+  trong README admin) nếu cần tra lại.
+
+**Bước 2 (sửa bài đã đăng trong admin CMS) — ĐÃ XONG, push, ĐANG đợi Vercel
+build lúc dừng phiên — kiểm tra `git log -1` / Vercel dashboard xem deploy
+`ccaac82` đã READY chưa, nếu build lỗi thì đọc `get_runtime_logs`/build logs
+trước khi sửa tiếp:**
+- `updateBlogPost()` mới trong `src/admin/adminApi.ts`.
+- Modal sửa bài trong `CmsPage.tsx` (icon bút chì cạnh mỗi bài trong danh
+  sách "Bài viết SEO công khai") — sửa tiêu đề/tóm tắt/nội dung/ảnh, có nút
+  Lưu. Không cần cơ chế "xoá cache" riêng — trang chủ vốn đã fetch
+  `blog_posts` mới mỗi lần tải trang (không có cache/ISR), nên sửa xong là
+  lên site ngay lập tức.
+- **CHƯA test tay bằng tài khoản admin thật** (phiên non-interactive không
+  có sẵn cách đăng nhập `/gate-vkd-control-2026`) — chỉ build/tsc sạch. Phiên
+  sau nếu có quyền đăng nhập admin, thử sửa 1 bài thật để xác nhận UX đúng
+  trước khi báo Joe là xong hẳn.
+- Kéo-thả ảnh trong bài (Joe có nhắc "Drag & Drop Gallery" trong yêu cầu gốc)
+  — **CHƯA làm**, hiện chỉ thay được 1 ảnh cover, chưa có gallery nhiều ảnh
+  chèn giữa bài. Nếu Joe cần, đây là việc tiếp theo trong đúng mục "quản lý
+  media bài viết".
+
+**Bước 3 (slider sản phẩm kiểu Shopee) — CHƯA BẮT ĐẦU.** Ghi chú quan trọng
+từ lúc khảo sát: `ProductCarousel.tsx` đã là carousel cuộn ngang
+`snap-x snap-mandatory` (vuốt mượt trên mobile sẵn, không cần thêm
+SwiperJS/Slick — dùng CSS scroll-snap nhẹ hơn cho Core Web Vitals). Còn thiếu
+đúng phần Joe muốn: badge giảm giá, số "Đã bán", xếp hạng sao. **Dữ liệu này
+CHƯA tồn tại** trong `src/data/products.ts` lẫn Supabase `products` — cần
+thêm field (`sold_count`, `rating`, `discount_percent` hoặc tương đương)
+trước khi hiển thị được, không được bịa số bán/rating giả. Nên hỏi Joe lấy
+số liệu thật từ đâu (đơn hàng thật qua PayOS? nhập tay?) trước khi code UI.
+
+**Bước 4 (tái cấu trúc blog theo KGC) — CHƯA BẮT ĐẦU.** Yêu cầu gốc: nghiên
+cứu https://jungkwanjang.us/blogs/ginseng-101/ginseng-vs-caffeine làm chuẩn
+(Hero Banner, Hook+Subtitle, TOC tương tác, Key Stat Box, Comparison Table,
+Infographic HPLC, Social Proof Box, Product CTA Card). Việc liên quan đã có
+sẵn: `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md`
+(nghiên cứu màu/thiết kế jungkwanjang.us từ phiên trước, có thể tái dùng).
+`BlogPostDetail.tsx` hiện dùng parser markdown tự viết (H2/H3/bullet/bold/
+table) — layout mới nên xây trên top của component này, không thay hẳn
+parser nếu không cần. Đa số bài hiện tại (`blog_posts`) không có
+`featured_image_url` — layout mới cần fallback đẹp cho bài không ảnh, hoặc
+yêu cầu bắt buộc có ảnh khi đăng bài mới (đã có thể sửa qua modal edit vừa
+làm ở bước 2).
 
 ## -9. Track A tiếp tục: 3 bài thật đã live + webhook duyệt kênh CMS — ĐÃ XONG
 
