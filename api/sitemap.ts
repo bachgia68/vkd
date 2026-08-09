@@ -1,5 +1,3 @@
-import { products } from '../src/data/products.ts';
-
 export const config = { runtime: 'nodejs' };
 
 // Sinh sitemap.xml động: "/" + toàn bộ bài Blog đã published (route thật /blog/<id>,
@@ -7,6 +5,12 @@ export const config = { runtime: 'nodejs' };
 // Thay cho public/sitemap.xml tĩnh trước đây chỉ liệt kê "/" — xem ghi chú trong git
 // history của file đó về lý do. vercel.json rewrite "/sitemap.xml" -> "/api/sitemap"
 // để URL công khai vẫn là /sitemap.xml như robots.txt đã khai báo.
+//
+// Slug sản phẩm đọc từ public/product-slugs.json (sinh lúc build bởi
+// scripts/generate-product-slugs.mjs) thay vì import trực tiếp
+// src/data/products.ts — hàm serverless này build tách biệt với app, import
+// xuyên sang src/ từng làm crash production (ERR_MODULE_NOT_FOUND, file .ts
+// không được bundle vào /var/task).
 interface BlogPostRow {
   id: string;
   created_at: string;
@@ -39,11 +43,19 @@ export async function GET() {
     }
   }
 
+  let productSlugs: string[] = [];
+  try {
+    const res = await fetch('https://tasamngoclinh.com/product-slugs.json');
+    if (res.ok) productSlugs = (await res.json()) as string[];
+  } catch (err) {
+    console.error('sitemap: fetch product-slugs.json failed:', err);
+  }
+
   const urls = [
     `<url><loc>https://tasamngoclinh.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>`,
-    ...products.map(
-      (p) =>
-        `<url><loc>${escapeXml(`https://tasamngoclinh.com/product/${p.slug}`)}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
+    ...productSlugs.map(
+      (slug) =>
+        `<url><loc>${escapeXml(`https://tasamngoclinh.com/product/${slug}`)}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
     ),
     ...posts.map((p) => {
       const lastmod = (p.updated_at ?? p.created_at)?.slice(0, 10);

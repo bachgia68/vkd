@@ -9,6 +9,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+public/product-slugs.json
 *.local
 
 .vscode/*
