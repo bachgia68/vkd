@@ -28,7 +28,6 @@ export default function Hero({ lang }: HeroProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-forest-950/80 via-forest-900/60 to-forest-950/90" />
         <div className="absolute inset-0 opacity-10 bg-ginseng-pattern" />
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-forest-500/20 rounded-full blur-[150px] animate-pulse-slow" />
       </div>
 
       {/* Floating Ginseng Graphics */}

@@ -87,9 +87,7 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
   };
 
   return (
-    <section className="section-padding bg-gradient-to-b from-cream-50 to-cream-100 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gold-300/10 rounded-full blur-[140px]" />
-
+    <section className="section-padding bg-cream-100 relative overflow-hidden">
       <div className="container-wide relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-900 rounded-full mb-6">

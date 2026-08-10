@@ -47,7 +47,7 @@ export default function EliteTeaser({ lang, onNavigate }: EliteTeaserProps) {
   return (
     <section className="section-padding-sm bg-forest-900" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-br from-forest-800 to-forest-900 border border-gold-400/20 rounded-3xl p-8 md:p-10">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-forest-800 border border-gold-400/20 rounded-3xl p-8 md:p-10">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gold-400/15 flex items-center justify-center shrink-0">
               <Crown className="w-7 h-7 text-gold-400" />

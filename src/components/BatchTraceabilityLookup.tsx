@@ -82,7 +82,7 @@ export default function BatchTraceabilityLookup({ lang, qrHash, onNavigate }: Pr
                 </span>
               </div>
             )}
-            <div className="bg-gradient-to-br from-forest-950 via-forest-900 to-forest-800 text-white p-8 text-center">
+            <div className="bg-forest-950 text-white p-8 text-center">
               <ShieldCheck className="w-14 h-14 text-gold-400 mx-auto mb-3" />
               <h1 className="font-display text-2xl">{isVi ? 'Sản phẩm chính hãng TA' : 'Genuine TA product'}</h1>
               <p className="text-white/60 text-xs font-mono mt-2">{batch.batch_id}</p>

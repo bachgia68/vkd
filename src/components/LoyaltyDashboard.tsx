@@ -86,7 +86,7 @@ export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: Loyalt
           <div className="lg:col-span-1 space-y-6">
 
             {/* Member card */}
-            <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-gradient-to-br from-forest-800 to-forest-950 p-6 text-white">
+            <div className="relative rounded-3xl overflow-hidden shadow-elegant-lg bg-forest-900 p-6 text-white">
               <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-gold-400/10 -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-forest-600/20 translate-y-1/2 -translate-x-1/2" />
               <div className="relative">

@@ -64,9 +64,14 @@ export default function Heritage({ lang }: HeritageProps) {
             học khác biệt mạnh nhất của Sâm Ngọc Linh — không loài sâm nào
             khác trên thế giới có, nên đây là nơi đúng để chứng minh bằng
             dữ liệu so sánh thay vì lặp một con số suông. */}
-        <div className="relative mb-16 overflow-hidden rounded-3xl bg-gradient-to-br from-forest-900 to-forest-700">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-forest-400/15 rounded-full blur-[100px]" />
+        <div className="relative mb-16 overflow-hidden rounded-3xl">
+          <img
+            src="/assets/images/cusam.jpg"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-forest-950/95 via-forest-950/85 to-forest-950/50" />
 
           <div className="relative z-10 px-6 md:px-14 py-10 md:py-14">
             <span className="text-gold-400 text-sm font-semibold tracking-wider uppercase mb-3 block">

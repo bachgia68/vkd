@@ -20,14 +20,12 @@ export default function Traceability({ lang }: TraceabilityProps) {
   return (
     <section
       id="traceability"
-      className="section-padding bg-gradient-to-br from-forest-950 via-forest-900 to-forest-800 text-white relative overflow-hidden"
+      className="section-padding bg-forest-950 text-white relative overflow-hidden"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Background decorations */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 opacity-5 bg-ginseng-pattern" />
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-forest-400/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-400/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="container-wide relative z-10">
@@ -35,8 +33,6 @@ export default function Traceability({ lang }: TraceabilityProps) {
           {/* Left side - QR Scanner */}
           <div className="relative">
             <div className="relative w-full max-w-md mx-auto">
-              <div className="absolute -inset-4 bg-gradient-to-br from-gold-400/30 to-forest-400/30 rounded-3xl blur-xl" />
-
               <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8">
                 {/* QR Icon placeholder */}
                 <div className="relative w-48 h-48 mx-auto mb-6">

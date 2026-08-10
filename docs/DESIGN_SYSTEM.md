@@ -14,6 +14,24 @@ site này từng bị chê "lộn xộn" dù đổi bao nhiêu repo cũng vậy.
   = Inter (nội dung). Không thêm font thứ 3.
 - **Bo góc/đổ bóng**: card dùng `rounded-xl`/`rounded-2xl` + `shadow-elegant`
   (nhẹ) hoặc `shadow-elegant-lg` (nổi bật) — không tự chế shadow mới.
+- **CẤM tuyệt đối — khối gradient trang trí + vòng tròn mờ (blur glow)**:
+  `bg-gradient-to-br from-forest-900 to-forest-700` (hay bất kỳ gradient 2 tông
+  cùng màu nào) cộng thêm `rounded-full blur-[...]` là dấu hiệu kinh điển của
+  thiết kế AI tạo hàng loạt — đã bị gỡ khỏi Hero/Heritage/EliteTeaser/
+  ProductAdvisor/ResearchHub/Traceability/Blog ngày 2026-08-10 vì lý do này
+  (phản hồi trực tiếp: "nhìn là biết AI tạo"). Quy tắc thay thế:
+  - Panel tối cần nền: dùng **1 màu phẳng** (`bg-forest-900` hoặc
+    `bg-forest-950`), KHÔNG gradient giữa 2 sắc cùng tông.
+  - Panel cần gây ấn tượng thị giác: dùng **ảnh thật** làm nền + 1 lớp
+    gradient overlay MỘT CHIỀU (vd. `bg-gradient-to-r from-forest-950/95
+    to-forest-950/50`) chỉ để chữ đọc được — đây là gradient có chức năng,
+    được phép, khác với gradient trang trí suông.
+  - KHÔNG thêm `<div>` hình tròn mờ (`blur-[...px]`, `blur-xl`) chỉ để "cho
+    có texture". Nếu cần điểm nhấn thị giác, dùng ảnh thật hoặc icon, không
+    dùng vệt sáng mờ ảo.
+  - Tham chiếu chuẩn: kgc.co.kr (Korea Ginseng Corporation) — khối nào cũng
+    là ảnh sản phẩm thật + chữ đè lên, không có khối màu phẳng trang trí vô
+    nghĩa nào.
 - **Layout**: `container-wide` cho chiều rộng trang, `section-padding` cho
   khoảng cách giữa các section trên trang chủ.
 

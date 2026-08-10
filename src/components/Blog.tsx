@@ -57,8 +57,7 @@ export default function Blog({ onNavigate }: BlogProps) {
                   loading="lazy"
                 />
               ) : (
-                <div className="relative w-full h-48 bg-gradient-to-br from-forest-900 to-forest-950 flex items-end p-6 overflow-hidden">
-                  <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-gold-400/10" />
+                <div className="relative w-full h-48 bg-forest-900 flex items-end p-6 overflow-hidden">
                   <p className="relative font-display text-lg text-white leading-snug line-clamp-3">
                     {post.title}
                   </p>

@@ -68,7 +68,7 @@ export default function ResearchHub({ lang }: ResearchHubProps) {
         {/* Saponin Matrix Tab */}
         {activeTab === 'saponin' && (
           <div className="animate-fade-in">
-            <div className="bg-gradient-to-br from-forest-950 to-forest-800 rounded-3xl p-8 md:p-12 mb-8">
+            <div className="bg-forest-950 rounded-3xl p-8 md:p-12 mb-8">
               <div className="grid md:grid-cols-2 gap-8 items-center mb-10">
                 <div>
                   <h3 className="font-display text-2xl text-white mb-4">
