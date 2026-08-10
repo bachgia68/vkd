@@ -10,7 +10,10 @@ description: Use when starting ANY work on the VKD Group website project (this r
 - Repo: `bachgia68/vkd` (remote `origin`, nhanh `main`). Site song (that): `https://tasamngoclinh.com` (Vercel project `ta`, team `bachgia68-1157s-projects`) - chi tiet deploy xem skill `deploy-vkd-site`.
 - Netlify (`old-site-nature.netlify.app`, doi ten tu `vkd-nature-storefront` ngay 2026-08-04 de tranh nham) la site cu/backup, KHONG con dung - dung dan link nay cho khach hang hay bao cao trang thai site.
 - Trang khach hang: `src/App.tsx` + `src/components/*`. Cong quan tri noi bo: `src/admin/*` (mat khau demo - xem `manage-admin-mockdata`).
-- CHUA co database that (xem `vkd-feature-audit`) - moi thu ngoai `src/data/vkdProducts.ts` (san pham that) deu la state/mock trong trinh duyet, mat khi tai lai trang.
+- **CO database that** (Supabase project `xcwirgrlnibnjmseglee`) cho: products, blog_posts, trust_proof_items, combo_sets, heritage_gallery_images, site_sections, orders/checkout (PayOS). Phan con lai cua cong quan tri (Doanh thu da kenh, CRM/ERP, Dai ly...) van la mock trong `adminMockData.ts` - xem `vkd-feature-audit` de biet chinh xac phan he nao that/mock.
+
+## BAT BUOC doc truoc - chuan thiet ke & noi dung
+File **[docs/DESIGN_SYSTEM.md](../../../docs/DESIGN_SYSTEM.md)** (cung repo, cung cap boi `CLAUDE.md` o goc) la nguon chuan duy nhat cho: token mau/font, pattern bat buoc cho moi noi dung admin-quan-ly-duoc (bang + RLS + storage bucket + adminApi + trang admin), quy tac `site_sections` cho moi section moi, chuan cau truc bai blog. Doc file do TRUOC khi them tinh nang/noi dung/section moi - khong tu sang tao pattern rieng khi da co pattern tuong duong.
 
 ## Chon skill con theo viec can lam
 - Them/sua/xoa san pham that (dong bo tu samngoclinhvkdgroup.com) -> `update-vkd-products`
