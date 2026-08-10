@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { FlaskConical, Building2, Microscope } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
 
 interface HeritageProps {
   lang: Language;
@@ -9,6 +11,13 @@ interface HeritageProps {
 export default function Heritage({ lang }: HeritageProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
+
+  useEffect(() => {
+    fetchHeritageGalleryImages()
+      .then(setGalleryImages)
+      .catch(() => setGalleryImages([]));
+  }, []);
 
   const pillars = [
     {
@@ -80,43 +89,14 @@ export default function Heritage({ lang }: HeritageProps) {
             {t.heritage.galleryLabel}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { src: '/assets/images/heritage-cay-sam.png', alt: t.heritage.altCaySam },
-              { src: '/assets/images/cusam.jpg', alt: t.heritage.altCuSam },
-              { src: '/assets/images/heritage-vuon-sam-1.jpg', alt: t.heritage.altVuonSam1 },
-              { src: '/assets/images/heritage-vuon-sam-2.jpg', alt: t.heritage.altVuonSam2 },
-              {
-                src: '/assets/images/heritage-la-sam.jpg',
-                alt: lang === 'vi' ? 'Lá sâm Ngọc Linh nhìn từ trên xuống' : 'Ngoc Linh ginseng leaves from above',
-              },
-              {
-                src: '/assets/images/heritage-cu-sam-2.jpg',
-                alt: lang === 'vi' ? 'Rễ sâm Ngọc Linh mới thu hoạch' : 'Freshly harvested Ngoc Linh ginseng root',
-              },
-              {
-                src: '/assets/images/heritage-cu-sam-3.jpg',
-                alt: lang === 'vi' ? 'Cây sâm con cùng rễ mới đào' : 'Young ginseng plant with freshly dug root',
-              },
-              {
-                src: '/assets/images/heritage-hat-sam-1.jpg',
-                alt: lang === 'vi' ? 'Hạt sâm Ngọc Linh chín đỏ' : 'Ripe Ngoc Linh ginseng seeds',
-              },
-              {
-                src: '/assets/images/heritage-hat-sam-2.jpg',
-                alt: lang === 'vi' ? 'Chùm hạt sâm Ngọc Linh' : 'Cluster of Ngoc Linh ginseng seeds',
-              },
-              {
-                src: '/assets/images/heritage-ruou-sam.png',
-                alt: lang === 'vi' ? 'Rượu ngâm sâm Ngọc Linh nguyên củ' : 'Whole-root Ngoc Linh ginseng wine',
-              },
-            ].map((photo, index) => (
+            {galleryImages.map((photo) => (
               <div
-                key={index}
+                key={photo.id}
                 className="aspect-square overflow-hidden rounded-2xl shadow-elegant"
               >
                 <img
-                  src={photo.src}
-                  alt={photo.alt}
+                  src={photo.image_url}
+                  alt={(lang === 'vi' ? photo.alt_vi : photo.alt_en) || photo.alt_vi}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />

@@ -1,8 +1,8 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage } from '../lib/siteContentApi';
 
-export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection };
+export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
 export { fetchAllBlogPostsForAdmin };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
@@ -773,6 +773,59 @@ export async function uploadComboImage(file: File): Promise<string> {
   });
   if (error) throw new Error(error.message);
   const { data } = supabase.storage.from('combo-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ---------- Heritage Gallery (Vườn Sâm Nguyên Sinh photo grid on homepage) ----------
+
+export async function fetchAllHeritageGalleryImages(): Promise<(HeritageGalleryImage & { visible: boolean })[]> {
+  return throwIfError(
+    await supabase
+      .from('heritage_gallery_images')
+      .select('id, image_url, alt_vi, alt_en, sort_order, visible')
+      .order('sort_order')
+  );
+}
+
+export async function createHeritageGalleryImage(input: {
+  image_url: string;
+  alt_vi: string;
+  alt_en?: string;
+  sort_order?: number;
+}) {
+  const res = await supabase
+    .from('heritage_gallery_images')
+    .insert({ alt_en: '', sort_order: 0, ...input, visible: true })
+    .select('id, image_url, alt_vi, alt_en, sort_order, visible')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateHeritageGalleryImage(
+  id: string,
+  patch: Partial<Pick<HeritageGalleryImage, 'alt_vi' | 'alt_en' | 'sort_order'> & { visible: boolean }>
+) {
+  const { error } = await supabase
+    .from('heritage_gallery_images')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteHeritageGalleryImage(id: string) {
+  const { error } = await supabase.from('heritage_gallery_images').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function uploadHeritageGalleryImage(file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('heritage-images').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('heritage-images').getPublicUrl(path);
   return data.publicUrl;
 }
 

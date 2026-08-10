@@ -17,6 +17,7 @@ import TrustProofPage from './pages/TrustProofPage';
 import CombosPage from './pages/CombosPage';
 import SiteSectionsPage from './pages/SiteSectionsPage';
 import LoyaltyPage from './pages/LoyaltyPage';
+import HeritageGalleryPage from './pages/HeritageGalleryPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -43,6 +44,7 @@ export default function AdminApp() {
           <Route path="revenue" element={<RevenuePage />} />
           <Route path="channels" element={<ChannelsPage />} />
           <Route path="trust-proof" element={<TrustProofPage />} />
+          <Route path="heritage-gallery" element={<HeritageGalleryPage />} />
           <Route path="combos" element={<CombosPage />} />
           <Route path="site-sections" element={<SiteSectionsPage />} />
           <Route path="settings" element={<SettingsPage />} />

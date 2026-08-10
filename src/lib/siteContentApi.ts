@@ -144,6 +144,24 @@ export interface SiteSection {
   sort_order: number;
 }
 
+export interface HeritageGalleryImage {
+  id: string;
+  image_url: string;
+  alt_vi: string;
+  alt_en: string;
+  sort_order: number;
+}
+
+export async function fetchHeritageGalleryImages(): Promise<HeritageGalleryImage[]> {
+  const { data, error } = await supabase
+    .from('heritage_gallery_images')
+    .select('id, image_url, alt_vi, alt_en, sort_order')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function fetchVisibleSections(): Promise<SiteSection[]> {
   const { data, error } = await supabase
     .from('site_sections')
