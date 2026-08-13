@@ -10,6 +10,7 @@ node_modules
 dist
 dist-ssr
 public/product-slugs.json
+public/products-seo.json
 *.local
 
 .vscode/*

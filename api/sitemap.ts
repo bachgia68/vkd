@@ -14,7 +14,6 @@ export const config = { runtime: 'nodejs' };
 interface BlogPostRow {
   id: string;
   created_at: string;
-  updated_at?: string | null;
 }
 
 function escapeXml(s: string) {
@@ -29,7 +28,7 @@ export async function GET() {
   if (supabaseUrl && supabaseAnonKey) {
     try {
       const res = await fetch(
-        `${supabaseUrl}/rest/v1/blog_posts?select=id,created_at,updated_at&published=eq.true&order=created_at.desc`,
+        `${supabaseUrl}/rest/v1/blog_posts?select=id,created_at&published=eq.true&order=created_at.desc`,
         {
           headers: {
             apikey: supabaseAnonKey,
@@ -58,7 +57,7 @@ export async function GET() {
         `<url><loc>${escapeXml(`https://tasamngoclinh.com/product/${slug}`)}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
     ),
     ...posts.map((p) => {
-      const lastmod = (p.updated_at ?? p.created_at)?.slice(0, 10);
+      const lastmod = p.created_at?.slice(0, 10);
       return `<url><loc>${escapeXml(`https://tasamngoclinh.com/blog/${p.id}`)}</loc>${
         lastmod ? `<lastmod>${lastmod}</lastmod>` : ''
       }<changefreq>monthly</changefreq><priority>0.7</priority></url>`;
