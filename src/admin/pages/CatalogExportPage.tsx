@@ -4,6 +4,7 @@ import { products } from '../../data/products';
 import { getProductTypeMeta } from '../../data/productTypes';
 import { vkdProducts } from '../../data/vkdProducts';
 import { trimicoProducts } from '../../data/trimicoProducts';
+import { Button } from '../../components/ui/button';
 
 const CONTACT_PHONE = '0984 999 309';
 const ZALO_URL = 'https://zalo.me/0984999309';
@@ -450,14 +451,15 @@ export default function CatalogExportPage() {
               </p>
             </div>
           </div>
-          <button
+          <Button
             onClick={exportExcel}
             disabled={exportingExcel}
-            className="btn-gold shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="gold"
+            className="shrink-0"
           >
             {exportingExcel ? <Loader className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
             Tải Excel (.xlsx)
-          </button>
+          </Button>
         </div>
       </section>
 
@@ -477,18 +479,22 @@ export default function CatalogExportPage() {
         </div>
 
         <div className="flex items-center gap-2 mb-4 p-1 bg-cream-100 rounded-lg w-fit">
-          <button
+          <Button
             onClick={() => setPdfLang('vi')}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${pdfLang === 'vi' ? 'bg-white text-forest-900 shadow-sm' : 'text-forest-700/60'}`}
+            variant="ghost"
+            size="sm"
+            className={`rounded-md ${pdfLang === 'vi' ? 'bg-white text-forest-900 shadow-sm hover:bg-white' : 'text-forest-700/60'}`}
           >
             🇻🇳 Tiếng Việt
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setPdfLang('en')}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${pdfLang === 'en' ? 'bg-white text-forest-900 shadow-sm' : 'text-forest-700/60'}`}
+            variant="ghost"
+            size="sm"
+            className={`rounded-md ${pdfLang === 'en' ? 'bg-white text-forest-900 shadow-sm hover:bg-white' : 'text-forest-700/60'}`}
           >
             🇬🇧 English (USD)
-          </button>
+          </Button>
         </div>
         {pdfLang === 'en' && (
           <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
@@ -507,12 +513,12 @@ export default function CatalogExportPage() {
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-cream-300 text-sm focus:outline-none focus:border-gold-400"
             />
           </div>
-          <button onClick={selectAllFiltered} className="text-sm text-forest-700 hover:text-forest-900 flex items-center gap-1.5">
+          <Button onClick={selectAllFiltered} variant="ghost" size="sm" className="text-forest-700 hover:text-forest-900">
             <CheckSquare className="w-4 h-4" /> Chọn tất cả (kết quả lọc)
-          </button>
-          <button onClick={clearAllFiltered} className="text-sm text-forest-700/70 hover:text-forest-900 flex items-center gap-1.5">
+          </Button>
+          <Button onClick={clearAllFiltered} variant="ghost" size="sm" className="text-forest-700/70 hover:text-forest-900">
             <Square className="w-4 h-4" /> Bỏ chọn (kết quả lọc)
-          </button>
+          </Button>
         </div>
 
         <div className="max-h-80 overflow-y-auto border border-cream-200 rounded-xl divide-y divide-cream-100">
@@ -539,14 +545,14 @@ export default function CatalogExportPage() {
             Đã chọn <span className="font-medium text-forest-900">{selected.size}</span> / {products.length} sản phẩm
             {exportingPdf && pdfProgress ? ` — ${pdfProgress}` : ''}
           </p>
-          <button
+          <Button
             onClick={exportPdf}
             disabled={exportingPdf || selected.size === 0}
-            className="btn-gold disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="gold"
           >
             {exportingPdf ? <Loader className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
             Xuất PDF ({selected.size})
-          </button>
+          </Button>
         </div>
       </section>
 

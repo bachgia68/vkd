@@ -16,6 +16,7 @@ import {
   type CultivationRegion,
   type Batch,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 function traceUrl(qrHash: string) {
   return `${window.location.origin}/?trace=${encodeURIComponent(qrHash)}`;
@@ -196,16 +197,16 @@ export default function InventoryQrPage() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-forest-500">Cập nhật thời gian thực · {warehouses.length} kho/showroom</p>
-        <button
+        <Button
           onClick={() => {
             setRouteOpen(true);
             setResult(null);
             setRanOnce(false);
           }}
-          className="btn-primary text-xs"
+          size="sm"
         >
           <Route className="w-4 h-4" /> Tự động định tuyến kho
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-2xl border border-forest-100 shadow-elegant">
@@ -386,9 +387,9 @@ export default function InventoryQrPage() {
 
             {batchError && <p className="text-xs text-red-600">{batchError}</p>}
 
-            <button onClick={submitBatch} disabled={creatingBatch} className="btn-primary text-xs w-full justify-center mt-2 disabled:opacity-60">
+            <Button onClick={submitBatch} disabled={creatingBatch} size="sm" className="w-full">
               <QrCode className="w-4 h-4" /> {creatingBatch ? 'Đang tạo…' : 'Tạo lô hàng & sinh mã QR'}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -396,12 +397,14 @@ export default function InventoryQrPage() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display text-lg text-forest-900">Lô hàng đã tạo ({batches.length})</h3>
             {batches.length > 0 && (
-              <button
+              <Button
                 onClick={printAllLabels}
-                className="text-[11px] px-2.5 py-1.5 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+                variant="outline"
+                size="sm"
+                className="h-auto rounded-md px-2.5 py-1.5 text-[11px]"
               >
                 <Printer className="w-3.5 h-3.5" /> In tất cả nhãn
-              </button>
+              </Button>
             )}
           </div>
           {batches.length === 0 ? (
@@ -434,18 +437,22 @@ export default function InventoryQrPage() {
                       >
                         <Download className="w-3 h-3" /> Tải QR
                       </a>
-                      <button
+                      <Button
                         onClick={() => copyLink(b.qr_hash)}
-                        className="text-[11px] px-2 py-1 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+                        variant="outline"
+                        size="sm"
+                        className="h-auto rounded-md px-2 py-1 text-[11px]"
                       >
                         <Copy className="w-3 h-3" /> {copiedHash === b.qr_hash ? 'Đã chép!' : 'Sao chép link'}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => printSingleLabel(b)}
-                        className="text-[11px] px-2 py-1 rounded-md border border-forest-200 text-forest-700 flex items-center gap-1"
+                        variant="outline"
+                        size="sm"
+                        className="h-auto rounded-md px-2 py-1 text-[11px]"
                       >
                         <Printer className="w-3 h-3" /> In nhãn
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -476,15 +483,16 @@ export default function InventoryQrPage() {
                 <option key={p}>{p}</option>
               ))}
             </select>
-            <button
+            <Button
               onClick={() => {
                 setResult(autoRoute(province));
                 setRanOnce(true);
               }}
-              className="btn-primary text-xs w-full justify-center"
+              size="sm"
+              className="w-full"
             >
               Chạy thuật toán định tuyến
-            </button>
+            </Button>
 
             {result && (
               <div className="flex items-start gap-2.5 bg-forest-50 text-forest-700 rounded-xl p-4 text-sm mt-4">
@@ -502,12 +510,9 @@ export default function InventoryQrPage() {
             )}
 
             <div className="flex justify-end mt-5">
-              <button
-                onClick={() => setRouteOpen(false)}
-                className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700"
-              >
+              <Button onClick={() => setRouteOpen(false)} variant="outline">
                 Đóng
-              </button>
+              </Button>
             </div>
           </div>
         </div>

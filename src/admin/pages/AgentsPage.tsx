@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { PauseCircle, PlayCircle, Plus } from 'lucide-react';
 import { fmt } from '../adminMockData';
 import { fetchAgents, createAgent, updateAgent, type Agent } from '../adminApi';
+import { Button } from '../../components/ui/button';
+import { Badge, type BadgeProps } from '../../components/ui/badge';
 
-const TIER_TONE: Record<Agent['tier'], string> = {
-  'Cấp 1': 'bg-forest-50 text-forest-700',
-  'Cấp 2': 'bg-cream-200 text-cream-800',
-  'Affiliate KOL/KOC': 'bg-gold-100 text-gold-700',
+const TIER_TONE: Record<Agent['tier'], BadgeProps['tone']> = {
+  'Cấp 1': 'neutral',
+  'Cấp 2': 'muted',
+  'Affiliate KOL/KOC': 'gold',
 };
 
 export default function AgentsPage() {
@@ -66,9 +68,9 @@ export default function AgentsPage() {
           <p className="text-xs uppercase tracking-widest text-forest-500 mb-1">Vận hành / Đại lý &amp; Affiliate</p>
           <h1 className="font-display text-3xl text-forest-900">Đại lý &amp; Affiliate</h1>
         </div>
-        <button onClick={() => setShowAddModal(true)} className="btn-primary text-xs">
+        <Button onClick={() => setShowAddModal(true)} size="sm">
           <Plus className="w-4 h-4" /> Thêm đại lý
-        </button>
+        </Button>
       </div>
 
       {agents.length === 0 ? (
@@ -95,7 +97,7 @@ export default function AgentsPage() {
                   <td className="px-4 py-3 font-mono text-xs text-forest-400">{a.code}</td>
                   <td className="px-4 py-3 font-medium text-forest-900">{a.name}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${TIER_TONE[a.tier]}`}>{a.tier}</span>
+                    <Badge tone={TIER_TONE[a.tier]} className="text-[10px] rounded px-2 py-0.5">{a.tier}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
@@ -110,19 +112,12 @@ export default function AgentsPage() {
                   </td>
                   <td className="px-4 py-3 text-right font-mono tabular-nums">{fmt(a.revenue)}đ</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                        a.status === 'active' ? 'bg-forest-50 text-forest-700' : 'bg-red-50 text-red-600'
-                      }`}
-                    >
+                    <Badge tone={a.status === 'active' ? 'success' : 'danger'} className="text-[10px] rounded px-2 py-0.5">
                       {a.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => toggleStatus(a)}
-                      className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-forest-100 hover:bg-forest-50 text-forest-700"
-                    >
+                    <Button onClick={() => toggleStatus(a)} variant="outline" size="sm">
                       {a.status === 'active' ? (
                         <>
                           <PauseCircle className="w-3.5 h-3.5" /> Tạm dừng
@@ -132,7 +127,7 @@ export default function AgentsPage() {
                           <PlayCircle className="w-3.5 h-3.5" /> Duyệt lại
                         </>
                       )}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -213,16 +208,17 @@ function AddAgentModal({
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+          <Button onClick={onClose} variant="outline">
             Huỷ
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={!canSubmit}
             onClick={() => onCreate({ code: code.trim(), name: name.trim(), tier, discount_pct: Math.max(0, Math.min(90, Number(discountPct) || 0)) })}
-            className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+            variant="gold"
+            size="sm"
           >
             Lưu đại lý
-          </button>
+          </Button>
         </div>
       </div>
     </div>

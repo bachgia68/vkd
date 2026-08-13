@@ -7,6 +7,7 @@ import {
   deleteChannel,
   type Channel,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 const PLATFORM_LABELS: Record<Channel['platform_type'], string> = {
   facebook: 'Facebook',
@@ -93,9 +94,9 @@ export default function ChannelsPage() {
         <p className="text-sm text-forest-500">
           {channels.length} kênh — Fanpage, TikTok, YouTube, Zalo OA, Instagram, LinkedIn... không giới hạn số lượng.
         </p>
-        <button onClick={() => setShowNew(true)} className="btn-primary text-xs">
+        <Button onClick={() => setShowNew(true)} size="sm">
           <Plus className="w-4 h-4" /> Thêm kênh mới
-        </button>
+        </Button>
       </div>
 
       <div className="bg-cream-200/60 border-l-2 border-gold-400 rounded-lg p-4 text-xs text-forest-600 leading-relaxed">
@@ -126,16 +127,18 @@ export default function ChannelsPage() {
                     />
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() => patchDraft(c.id, { is_active: !d.is_active })}
-                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
+                  variant="outline"
+                  size="sm"
+                  className={`rounded-full ${
                     d.is_active
                       ? 'border-forest-200 text-forest-700 bg-forest-50'
                       : 'border-forest-100 text-forest-400'
                   }`}
                 >
                   <Power className="w-3.5 h-3.5" /> {d.is_active ? 'Đang bật' : 'Đã tắt'}
-                </button>
+                </Button>
               </div>
 
               <div className="grid md:grid-cols-2 gap-3 mt-4">
@@ -160,16 +163,18 @@ export default function ChannelsPage() {
               </div>
 
               <div className="flex justify-between items-center mt-4">
-                <button
+                <Button
                   onClick={() => remove(c.id)}
-                  className="flex items-center gap-1.5 text-xs text-forest-400 hover:text-red-600"
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto p-0 text-forest-400 hover:text-red-600 hover:bg-transparent"
                 >
                   <Trash2 className="w-3.5 h-3.5" /> Xoá kênh
-                </button>
+                </Button>
                 {dirty && (
-                  <button onClick={() => save(c)} className="btn-gold text-xs">
+                  <Button onClick={() => save(c)} variant="gold" size="sm">
                     <Save className="w-4 h-4" /> Lưu thay đổi
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -256,16 +261,17 @@ function NewChannelModal({
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+          <Button onClick={onClose} variant="outline">
             Huỷ
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={!name.trim()}
             onClick={() => onCreate({ channel_name: name.trim(), platform_type: platform, channel_url: url.trim() || undefined })}
-            className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+            variant="gold"
+            size="sm"
           >
             Tạo kênh
-          </button>
+          </Button>
         </div>
       </div>
     </div>

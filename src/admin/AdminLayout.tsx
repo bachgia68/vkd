@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye, Crown, Images } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
+import { Button } from '../components/ui/button';
 
 const NAV = [
   { to: '/gate-vkd-control-2026', end: true, label: 'Tổng quan', icon: LayoutGrid },
@@ -52,20 +53,23 @@ export default function AdminLayout() {
             ))}
           </nav>
           <div className="flex items-center gap-1">
-            <button
+            <Button
               onClick={logout}
-              className="hidden md:flex items-center gap-2 text-sm text-cream-300/70 hover:text-cream-50 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors"
+              variant="ghost"
+              className="hidden md:flex text-cream-300/70 hover:text-cream-50 hover:bg-white/5"
             >
               <LogOut className="w-4 h-4" /> Đăng xuất
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setMobileNavOpen((v) => !v)}
-              className="md:hidden p-2.5 rounded-lg text-cream-200 hover:bg-white/5"
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-cream-200 hover:bg-white/5"
               aria-label={mobileNavOpen ? 'Đóng menu' : 'Mở menu'}
               aria-expanded={mobileNavOpen}
             >
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            </Button>
           </div>
         </div>
         {mobileNavOpen && (
@@ -86,12 +90,13 @@ export default function AdminLayout() {
                 {item.label}
               </NavLink>
             ))}
-            <button
+            <Button
               onClick={logout}
-              className="w-full flex items-center gap-3 text-sm text-cream-300/70 px-3.5 py-3 rounded-lg hover:bg-white/5 mt-2 border-t border-white/10 pt-4"
+              variant="ghost"
+              className="w-full justify-start text-cream-300/70 hover:bg-white/5 mt-2 border-t border-white/10 pt-4 rounded-lg"
             >
               <LogOut className="w-4 h-4" /> Đăng xuất
-            </button>
+            </Button>
           </nav>
         )}
       </header>

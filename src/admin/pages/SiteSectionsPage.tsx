@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { fetchAllSiteSections, updateSiteSectionVisibility, type SiteSection } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 type Row = SiteSection & { visible: boolean };
 
@@ -54,15 +55,16 @@ export default function SiteSectionsPage() {
                 <p className="text-sm font-medium text-forest-900">{row.label_vi}</p>
                 <p className="text-xs text-forest-500">key: {row.key}{row.nav_group ? ` · nhóm nav: ${row.nav_group}` : ''}</p>
               </div>
-              <button
+              <Button
                 onClick={() => toggle(row)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium ${
-                  row.visible ? 'bg-forest-100 text-forest-800' : 'bg-gold-400/15 text-gold-700'
+                size="sm"
+                className={`text-xs ${
+                  row.visible ? 'bg-forest-100 text-forest-800 hover:bg-forest-200' : 'bg-gold-400/15 text-gold-700 hover:bg-gold-400/25'
                 }`}
               >
                 {row.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                 {row.visible ? 'Đang hiện' : 'Đang ẩn'}
-              </button>
+              </Button>
             </div>
           ))}
         </div>

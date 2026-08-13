@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react';
 import { Send, Trash2, CheckCircle2 } from 'lucide-react';
 import { ADMIN_IMAGES, fmt } from '../adminMockData';
 import { fetchCrmCustomers, fetchConsentLog, purgeSensitiveData, type CrmCustomer, type ConsentLogRow } from '../adminApi';
+import { Button } from '../../components/ui/button';
+import { Badge, type BadgeProps } from '../../components/ui/badge';
+
+function tierTone(tier: string): BadgeProps['tone'] {
+  if (tier === 'Platinum') return 'neutral';
+  if (tier === 'Gold') return 'gold';
+  return 'muted';
+}
 
 type CustomerSegment = 'active_vip' | 'lapsed_vip' | 'active';
 
@@ -86,12 +94,12 @@ export default function CrmErpPage() {
                 <option value="lapsed_vip">Chi tiêu &gt;20tr, chưa mua lại 3 tháng</option>
                 <option value="active_vip">VIP đang hoạt động</option>
               </select>
-              <button
+              <Button
                 onClick={() => showToast('Đã đẩy nhóm khách hàng sang HubSpot & gửi ZNS qua Zalo OA')}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2.5 rounded-xl transition-colors"
+                className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Send className="w-4 h-4" /> Gửi chiến dịch Zalo OA/HubSpot
-              </button>
+              </Button>
             </div>
 
             <div className="bg-white rounded-2xl border border-forest-100 overflow-hidden shadow-elegant">
@@ -115,17 +123,9 @@ export default function CrmErpPage() {
                     >
                       <td className="px-4 py-3">{c.full_name ?? c.email ?? '(chưa có tên)'}</td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                            c.tier === 'Platinum'
-                              ? 'bg-slate-200 text-slate-700'
-                              : c.tier === 'Gold'
-                              ? 'bg-gold-100 text-gold-700'
-                              : 'bg-cream-200 text-cream-800'
-                          }`}
-                        >
+                        <Badge tone={tierTone(c.tier)} className="text-[10px] rounded px-2 py-0.5">
                           {c.tier}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-4 py-3 font-mono tabular-nums">{fmt(c.spend)}đ</td>
                       <td className="px-4 py-3">{formatDate(c.lastOrderAt)}</td>
@@ -140,9 +140,9 @@ export default function CrmErpPage() {
             <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant sticky top-24">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-display text-lg text-forest-900">{selected.full_name ?? selected.email}</h3>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-gold-100 text-gold-700">
+                <Badge tone="gold" className="text-[10px] rounded px-2 py-0.5">
                   Elite {selected.tier}
-                </span>
+                </Badge>
               </div>
 
               <dl className="space-y-2.5 text-sm">
@@ -182,12 +182,14 @@ export default function CrmErpPage() {
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> Đã xoá toàn bộ dữ liệu nhạy cảm theo yêu cầu khách hàng.
                 </div>
               ) : (
-                <button
+                <Button
                   onClick={() => setPurgeTarget(selected.id)}
-                  className="w-full mt-4 flex items-center justify-center gap-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg py-2.5 text-xs transition-colors"
+                  variant="danger"
+                  size="sm"
+                  className="w-full border border-red-300"
                 >
                   <Trash2 className="w-4 h-4" /> Xoá dữ liệu nhạy cảm của khách hàng
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -210,13 +212,10 @@ export default function CrmErpPage() {
               không thể hoàn tác.
             </p>
             <div className="flex justify-end gap-3 mt-5">
-              <button
-                onClick={() => setPurgeTarget(null)}
-                className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700"
-              >
+              <Button onClick={() => setPurgeTarget(null)} variant="outline">
                 Huỷ
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={async () => {
                   if (!purgeTarget) return;
                   try {
@@ -228,10 +227,10 @@ export default function CrmErpPage() {
                   }
                   setPurgeTarget(null);
                 }}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm"
+                className="bg-red-600 text-white hover:bg-red-700"
               >
                 Xác nhận xoá
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -20,6 +20,8 @@ import {
   type CustomerLead,
 } from '../adminApi';
 import { fetchSiteAddresses, fetchContactPhones, fetchSocialLinks } from '../../lib/siteContentApi';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
 
 const LEAD_TYPE_LABELS: Record<string, string> = {
   distributor: 'Nhà Phân Phối',
@@ -192,16 +194,16 @@ export default function SettingsPage() {
                 <div>
                   <p className="text-sm font-medium text-forest-900">
                     {a.name}{' '}
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-forest-100 text-forest-600 ml-1">
+                    <Badge tone="neutral" className="text-[10px] rounded px-2 py-0.5 ml-1">
                       {a.category === 'showroom' ? 'Showroom' : 'Vùng trồng'}
-                    </span>
+                    </Badge>
                   </p>
                   <p className="text-xs text-forest-500 mt-0.5">{a.address}</p>
                   <p className="text-xs text-forest-400 mt-0.5">{a.hours} · {a.phone}</p>
                 </div>
-                <button onClick={() => removeAddress(a.id)} aria-label="Xoá địa chỉ" className="text-forest-400 hover:text-red-600 flex-shrink-0">
+                <Button onClick={() => removeAddress(a.id)} variant="ghost" size="icon" aria-label="Xoá địa chỉ" className="h-8 w-8 text-forest-400 hover:text-red-600 flex-shrink-0">
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             ))
           )}
@@ -241,9 +243,9 @@ export default function SettingsPage() {
             className="border border-forest-100 rounded-lg px-3 py-2 text-sm"
           />
         </div>
-        <button onClick={addAddress} className="btn-primary text-xs mt-3">
+        <Button onClick={addAddress} size="sm" className="mt-3">
           <Plus className="w-4 h-4" /> Thêm địa chỉ
-        </button>
+        </Button>
       </div>
 
       {/* Contact & socials */}
@@ -257,16 +259,16 @@ export default function SettingsPage() {
             {phones.map((p) => (
               <div key={p.id} className="flex items-center justify-between bg-cream-50 rounded-xl p-3 text-sm">
                 <span><b>{p.label}</b>: {p.value}</span>
-                <button onClick={() => removePhone(p.id)} aria-label="Xoá số điện thoại" className="text-forest-400 hover:text-red-600">
+                <Button onClick={() => removePhone(p.id)} variant="ghost" size="icon" aria-label="Xoá số điện thoại" className="h-8 w-8 text-forest-400 hover:text-red-600">
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             ))}
           </div>
           <div className="flex gap-2">
             <input value={newPhoneLabel} onChange={(e) => setNewPhoneLabel(e.target.value)} placeholder="Nhãn (vd. Hotline)" className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm" />
             <input value={newPhoneValue} onChange={(e) => setNewPhoneValue(e.target.value)} placeholder="Số điện thoại" className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm" />
-            <button onClick={addPhone} className="btn-primary text-xs px-3"><Plus className="w-4 h-4" /></button>
+            <Button onClick={addPhone} size="icon" aria-label="Thêm số điện thoại"><Plus className="w-4 h-4" /></Button>
           </div>
         </div>
 
@@ -279,9 +281,9 @@ export default function SettingsPage() {
             {socialLinks.map((s) => (
               <div key={s.id} className="flex items-center justify-between bg-cream-50 rounded-xl p-3 text-sm">
                 <span><b>{s.platform}</b>: <span className="text-forest-500 truncate">{s.url}</span></span>
-                <button onClick={() => removeSocial(s.id)} aria-label="Xoá liên kết" className="text-forest-400 hover:text-red-600 flex-shrink-0 ml-2">
+                <Button onClick={() => removeSocial(s.id)} variant="ghost" size="icon" aria-label="Xoá liên kết" className="h-8 w-8 text-forest-400 hover:text-red-600 flex-shrink-0 ml-2">
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -295,7 +297,7 @@ export default function SettingsPage() {
               <option>WhatsApp</option>
             </select>
             <input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="Dán link trang/kênh" className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm" />
-            <button onClick={addSocial} className="btn-primary text-xs px-3"><Plus className="w-4 h-4" /></button>
+            <Button onClick={addSocial} size="icon" aria-label="Thêm liên kết"><Plus className="w-4 h-4" /></Button>
           </div>
         </div>
       </div>
@@ -332,19 +334,19 @@ export default function SettingsPage() {
                     <td className="px-4 py-3 text-forest-600 max-w-xs truncate">{l.message || '—'}</td>
                     <td className="px-4 py-3 text-forest-500">{new Date(l.created_at).toLocaleString('vi-VN')}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${l.status === 'new' ? 'bg-gold-100 text-gold-700' : 'bg-forest-100 text-forest-600'}`}>
+                      <Badge tone={l.status === 'new' ? 'gold' : 'neutral'} className="text-[10px] rounded px-2 py-0.5">
                         {l.status === 'new' ? 'Mới' : 'Đã liên hệ'}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-4 py-3 flex items-center gap-2">
                       {l.status === 'new' && (
-                        <button onClick={() => markContacted(l.id)} className="text-xs text-forest-600 hover:underline">
+                        <Button onClick={() => markContacted(l.id)} variant="ghost" size="sm" className="h-auto p-0 text-forest-600 hover:underline hover:bg-transparent">
                           Đánh dấu đã liên hệ
-                        </button>
+                        </Button>
                       )}
-                      <button onClick={() => removeLead(l.id)} aria-label="Xoá" className="text-forest-400 hover:text-red-600">
+                      <Button onClick={() => removeLead(l.id)} variant="ghost" size="icon" aria-label="Xoá" className="h-8 w-8 text-forest-400 hover:text-red-600">
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -384,19 +386,19 @@ export default function SettingsPage() {
                     <td className="px-4 py-3 text-forest-600 max-w-xs truncate">{cl.interest || '—'}</td>
                     <td className="px-4 py-3 text-forest-500">{new Date(cl.created_at).toLocaleString('vi-VN')}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${cl.status === 'new' ? 'bg-gold-100 text-gold-700' : 'bg-forest-100 text-forest-600'}`}>
+                      <Badge tone={cl.status === 'new' ? 'gold' : 'neutral'} className="text-[10px] rounded px-2 py-0.5">
                         {cl.status === 'new' ? 'Mới' : 'Đã liên hệ'}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-4 py-3 flex items-center gap-2">
                       {cl.status === 'new' && (
-                        <button onClick={() => markCustomerContacted(cl.id)} className="text-xs text-forest-600 hover:underline">
+                        <Button onClick={() => markCustomerContacted(cl.id)} variant="ghost" size="sm" className="h-auto p-0 text-forest-600 hover:underline hover:bg-transparent">
                           Đánh dấu đã liên hệ
-                        </button>
+                        </Button>
                       )}
-                      <button onClick={() => removeCustomerLead(cl.id)} aria-label="Xoá" className="text-forest-400 hover:text-red-600">
+                      <Button onClick={() => removeCustomerLead(cl.id)} variant="ghost" size="icon" aria-label="Xoá" className="h-8 w-8 text-forest-400 hover:text-red-600">
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

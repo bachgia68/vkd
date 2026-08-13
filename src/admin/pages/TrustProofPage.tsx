@@ -8,6 +8,7 @@ import {
   uploadTrustProofImage,
   type TrustProofItem,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 const KIND_LABELS: Record<TrustProofItem['kind'], string> = {
   testimonial: 'Cảm nhận khách hàng',
@@ -166,14 +167,14 @@ export default function TrustProofPage() {
             {imagePreview && <img src={imagePreview} alt="" className="mt-2 h-20 rounded-lg object-cover" />}
           </div>
         </div>
-        <button
+        <Button
           onClick={submit}
           disabled={saving || !quoteText.trim() || !sourceName.trim()}
-          className="w-full sm:w-auto mt-4 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-forest-900 text-white text-sm font-medium disabled:opacity-50"
+          className="w-full sm:w-auto mt-4"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           Thêm nội dung
-        </button>
+        </Button>
       </div>
 
       {/* Danh sách */}
@@ -202,13 +203,14 @@ export default function TrustProofPage() {
                   <input type="checkbox" checked={item.published} onChange={() => togglePublish(item)} />
                   Đăng công khai
                 </label>
-                <button
+                <Button
                   onClick={() => remove(item.id)}
-                  className="w-full sm:w-auto p-2 rounded-lg text-red-600 hover:bg-red-50"
+                  variant="danger"
+                  size="icon"
                   aria-label="Xoá"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}

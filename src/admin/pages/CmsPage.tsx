@@ -38,6 +38,7 @@ import {
   type Channel,
   type PostCaption,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 const PLATFORM_LABELS: Record<Channel['platform_type'], string> = {
   facebook: 'Facebook',
@@ -440,9 +441,9 @@ export default function CmsPage() {
 
       <div className="flex justify-between items-center">
         <p className="text-sm text-forest-500">{articles.length} bài viết</p>
-        <button onClick={() => setShowNewModal(true)} className="btn-primary text-xs">
+        <Button onClick={() => setShowNewModal(true)} size="sm">
           <Plus className="w-4 h-4" /> Bài viết mới
-        </button>
+        </Button>
       </div>
 
       {articles.length === 0 ? (
@@ -497,16 +498,16 @@ export default function CmsPage() {
               />
 
               <div className="flex gap-3 mt-4 flex-wrap">
-                <button onClick={runScan} className="btn-primary text-xs">
+                <Button onClick={runScan} size="sm">
                   <Search className="w-4 h-4" /> Quét từ khoá cấm quảng cáo
-                </button>
-                <button onClick={saveDraft} className="text-xs px-4 py-2.5 rounded-xl border border-forest-100 text-forest-700 flex items-center gap-2 hover:bg-forest-50">
+                </Button>
+                <Button onClick={saveDraft} variant="outline" size="sm" className="rounded-xl">
                   <Save className="w-4 h-4" /> Lưu nháp
-                </button>
+                </Button>
                 {selected.stage < 2 && scan?.clean && (
-                  <button onClick={advance} className="btn-gold text-xs">
+                  <Button onClick={advance} variant="gold" size="sm">
                     Chuyển sang: {STAGE_LABELS[selected.stage + 1]}
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -606,10 +607,10 @@ export default function CmsPage() {
                 <img src={newImagePreview} alt="Xem trước ảnh" className="mt-2 w-full h-32 object-cover rounded-lg" />
               )}
             </div>
-            <button onClick={publishPost} disabled={uploadingImage} className="btn-gold text-xs disabled:opacity-50">
+            <Button onClick={publishPost} disabled={uploadingImage} variant="gold" size="sm">
               {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               {uploadingImage ? 'Đang tải ảnh lên...' : 'Đăng bài lên trang chủ'}
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -755,17 +756,18 @@ export default function CmsPage() {
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={closeEdit} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+              <Button onClick={closeEdit} variant="outline">
                 Huỷ
-              </button>
-              <button
+              </Button>
+              <Button
                 disabled={!editTitle.trim() || !editBody.trim() || savingEdit}
                 onClick={saveEdit}
-                className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+                variant="gold"
+                size="sm"
               >
                 {savingEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {savingEdit ? 'Đang lưu...' : 'Lưu thay đổi'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -834,21 +836,23 @@ function CaptionPanel({
         <h4 className="font-display text-base text-forest-900">
           Caption đa kênh — <span className="text-gold-600">{post.title}</span>
         </h4>
-        <button onClick={onClose} className="text-xs text-forest-400 hover:text-forest-700">
+        <Button onClick={onClose} variant="ghost" size="sm" className="h-auto p-0 text-forest-400 hover:text-forest-700 hover:bg-transparent">
           Đóng
-        </button>
+        </Button>
       </div>
       <p className="text-xs text-forest-500 mb-1">
         Sửa nội dung/ảnh/video từng kênh nếu cần, tick chọn nhiều kênh rồi bấm 1 nút để đăng đồng loạt. Chưa cấu hình
         kênh nào (kể cả nhiều fanpage/trang cá nhân cùng nền tảng) thì vào mục <strong>Kênh phân phối</strong> ở menu
         bên trên để thêm — không giới hạn số lượng.
       </p>
-      <button
+      <Button
         onClick={() => setShowWebhookHelp((v) => !v)}
-        className="flex items-center gap-1.5 text-xs text-gold-700 hover:text-gold-800 mb-4"
+        variant="ghost"
+        size="sm"
+        className="h-auto p-0 text-gold-700 hover:text-gold-800 hover:bg-transparent mb-4"
       >
         <HelpCircle className="w-3.5 h-3.5" /> {showWebhookHelp ? 'Ẩn hướng dẫn gắn webhook' : 'Xem hướng dẫn gắn webhook để đăng tự động'}
-      </button>
+      </Button>
 
       {showWebhookHelp && (
         <div className="bg-cream-200/60 border-l-2 border-gold-400 rounded-lg p-4 text-xs text-forest-700 leading-relaxed mb-4 space-y-2">
@@ -889,13 +893,14 @@ function CaptionPanel({
         <>
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs text-forest-500">{selected.size} kênh đã chọn</p>
-            <button
+            <Button
               onClick={() => onApproveSelected(post)}
               disabled={selected.size === 0 || busy !== null}
-              className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+              variant="gold"
+              size="sm"
             >
               <Send className="w-4 h-4" /> Duyệt & Đăng {selected.size > 0 ? `${selected.size} kênh đã chọn` : 'đã chọn'}
-            </button>
+            </Button>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -936,13 +941,15 @@ function CaptionPanel({
                         <div className="flex flex-col gap-1">
                           <span className="text-[11px] text-forest-500">Đã gắn video</span>
                           {isPublished && (
-                            <button
+                            <Button
                               onClick={() => onRemoveVideo(c)}
                               disabled={busy === c.id}
-                              className="flex items-center gap-1 text-[11px] text-forest-500 hover:text-red-600"
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto p-0 text-[11px] text-forest-500 hover:text-red-600 hover:bg-transparent"
                             >
                               <VideoOff className="w-3.5 h-3.5" /> Xoá video (đã đăng xong, khỏi tốn dung lượng)
-                            </button>
+                            </Button>
                           )}
                         </div>
                       </div>
@@ -962,14 +969,15 @@ function CaptionPanel({
                     )}
                   </div>
 
-                  <button
+                  <Button
                     onClick={() => onApprove(post, c)}
                     disabled={busy === c.id}
-                    className="mt-2 btn-primary text-xs disabled:opacity-50"
+                    size="sm"
+                    className="mt-2"
                   >
                     {busy === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     {c.webhook_url ? 'Duyệt & Đăng' : 'Duyệt (chưa gắn webhook)'}
-                  </button>
+                  </Button>
                 </div>
               );
             })}
@@ -993,16 +1001,17 @@ function NewArticleModal({ onClose, onCreate }: { onClose: () => void; onCreate:
           className="w-full border border-forest-100 rounded-lg px-3 py-2.5 text-sm"
         />
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+          <Button onClick={onClose} variant="outline">
             Huỷ
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={!title.trim()}
             onClick={() => onCreate(title.trim())}
-            className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+            variant="gold"
+            size="sm"
           >
             Tạo bài viết
-          </button>
+          </Button>
         </div>
       </div>
     </div>

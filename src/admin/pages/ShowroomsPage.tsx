@@ -15,6 +15,7 @@ import {
   type ShowroomRevenueUploadRow,
   type DemoRevenueRow,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 const CSV_HEADER = 'warehouse_code,revenue_date,revenue_amount,orders_count';
 
@@ -175,16 +176,16 @@ export default function ShowroomsPage() {
           điền số liệu thật rồi nạp lại lên đây.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <button onClick={downloadTemplate} className="px-4 py-2 rounded-lg border border-forest-200 text-xs text-forest-700 flex items-center gap-1.5">
+          <Button onClick={downloadTemplate} variant="outline" size="sm">
             <Download className="w-3.5 h-3.5" /> Tải file mẫu (CSV)
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="btn-primary text-xs flex items-center gap-1.5 disabled:opacity-60"
+            size="sm"
           >
             <Upload className="w-3.5 h-3.5" /> {uploading ? 'Đang nạp…' : 'Nạp file doanh thu'}
-          </button>
+          </Button>
           <input
             ref={fileInputRef}
             type="file"
@@ -308,9 +309,9 @@ export default function ShowroomsPage() {
 
             {error && <p className="text-xs text-red-600">{error}</p>}
 
-            <button onClick={submitTransfer} className="btn-primary text-xs w-full justify-center mt-2">
+            <Button onClick={submitTransfer} size="sm" className="w-full mt-2">
               <ArrowRightLeft className="w-4 h-4" /> Tạo lệnh chuyển kho
-            </button>
+            </Button>
           </div>
         </div>
 

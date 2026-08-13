@@ -8,6 +8,7 @@ import {
   uploadHeritageGalleryImage,
   type HeritageGalleryImage,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
 
 type Row = HeritageGalleryImage & { visible: boolean };
 
@@ -113,14 +114,14 @@ export default function HeritageGalleryPage() {
             {imagePreview && <img src={imagePreview} alt="" className="mt-2 h-20 rounded-lg object-cover" />}
           </div>
         </div>
-        <button
+        <Button
           onClick={submit}
           disabled={saving || !imageFile || !altVi.trim()}
-          className="w-full sm:w-auto mt-4 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-forest-900 text-white text-sm font-medium disabled:opacity-50"
+          className="w-full sm:w-auto mt-4"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
           Thêm ảnh
-        </button>
+        </Button>
       </div>
 
       {loading ? (
@@ -143,22 +144,25 @@ export default function HeritageGalleryPage() {
               <div className="p-2.5 space-y-2">
                 <p className="text-xs text-forest-600 truncate" title={row.alt_vi}>{row.alt_vi}</p>
                 <div className="flex items-center justify-between gap-1">
-                  <button
+                  <Button
                     onClick={() => toggle(row)}
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium ${
-                      row.visible ? 'bg-forest-100 text-forest-800' : 'bg-gold-400/15 text-gold-700'
+                    size="sm"
+                    className={`h-auto px-2 py-1 text-[11px] rounded-lg ${
+                      row.visible ? 'bg-forest-100 text-forest-800 hover:bg-forest-200' : 'bg-gold-400/15 text-gold-700 hover:bg-gold-400/25'
                     }`}
                   >
                     {row.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                     {row.visible ? 'Đang hiện' : 'Đang ẩn'}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => remove(row.id)}
-                    className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-red-600 hover:bg-red-50"
                     aria-label="Xoá"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

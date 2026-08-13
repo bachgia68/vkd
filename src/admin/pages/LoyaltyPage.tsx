@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Crown } from 'lucide-react';
 import { fetchLoyaltyMembers, type LoyaltyMember } from '../adminApi';
+import { Badge, type BadgeProps } from '../../components/ui/badge';
 
-const TIER_STYLE: Record<string, string> = {
-  Elite: 'bg-gold-100 text-gold-700',
-  Platinum: 'bg-forest-100 text-forest-700',
-  Gold: 'bg-yellow-100 text-yellow-700',
-  Silver: 'bg-cream-200 text-forest-500',
+const TIER_TONE: Record<string, BadgeProps['tone']> = {
+  Elite: 'gold',
+  Platinum: 'neutral',
+  Gold: 'warning',
+  Silver: 'muted',
 };
 
 function formatDate(iso: string) {
@@ -84,9 +85,9 @@ export default function LoyaltyPage() {
                     <p className="text-forest-400 text-xs">{m.customer_email || '—'}</p>
                   </td>
                   <td className="px-5 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${TIER_STYLE[m.tier] ?? TIER_STYLE.Silver}`}>
+                    <Badge tone={TIER_TONE[m.tier] ?? 'muted'} className="font-semibold">
                       {m.tier}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-5 py-3 text-right font-semibold text-forest-900">{m.points_balance.toLocaleString()}</td>
                   <td className="px-5 py-3 text-right text-forest-500">{m.lifetime_points.toLocaleString()}</td>

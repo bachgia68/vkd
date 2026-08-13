@@ -10,6 +10,8 @@ import {
   type DbProduct,
   type ProductCategory,
 } from '../adminApi';
+import { Button } from '../../components/ui/button';
+import { Badge, type BadgeProps } from '../../components/ui/badge';
 
 type ProductStatus = 'active' | 'hidden' | 'out_of_stock';
 
@@ -33,10 +35,10 @@ const STATUS_LABEL: Record<ProductStatus, string> = {
   hidden: 'Đã ẩn',
   out_of_stock: 'Hết hàng',
 };
-const STATUS_TONE: Record<ProductStatus, string> = {
-  active: 'bg-forest-50 text-forest-700',
-  hidden: 'bg-cream-200 text-cream-800',
-  out_of_stock: 'bg-red-50 text-red-600',
+const STATUS_TONE: Record<ProductStatus, BadgeProps['tone']> = {
+  active: 'neutral',
+  hidden: 'muted',
+  out_of_stock: 'danger',
 };
 
 export default function ProductsPage() {
@@ -126,9 +128,9 @@ export default function ProductsPage() {
 
       <div className="flex justify-between items-center">
         <p className="text-sm text-forest-500">{products.length} sản phẩm</p>
-        <button onClick={() => setShowAddModal(true)} className="btn-primary text-xs">
+        <Button onClick={() => setShowAddModal(true)} size="sm">
           <Plus className="w-4 h-4" /> Thêm sản phẩm mới
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-2xl border border-forest-100 shadow-elegant">
@@ -182,41 +184,47 @@ export default function ProductsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${STATUS_TONE[status]}`}>
+                    <Badge tone={STATUS_TONE[status]} className="text-[10px] rounded px-2 py-0.5">
                       {STATUS_LABEL[status]}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1.5">
                       {isEditing ? (
                         <>
-                          <button onClick={() => saveEdit(p.id)} className="p-1.5 rounded-lg hover:bg-forest-50 text-forest-700">
+                          <Button onClick={() => saveEdit(p.id)} variant="ghost" size="icon" className="h-7 w-7 text-forest-700" aria-label="Lưu">
                             <Check className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => setEditingId(null)} className="p-1.5 rounded-lg hover:bg-cream-100 text-forest-400">
+                          </Button>
+                          <Button onClick={() => setEditingId(null)} variant="ghost" size="icon" className="h-7 w-7 text-forest-400 hover:bg-cream-100" aria-label="Huỷ sửa">
                             <X className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </>
                       ) : (
                         <>
-                          <button onClick={() => startEdit(p)} className="p-1.5 rounded-lg hover:bg-forest-50 text-forest-600" title="Sửa">
+                          <Button onClick={() => startEdit(p)} variant="ghost" size="icon" className="h-7 w-7 text-forest-600" title="Sửa" aria-label="Sửa">
                             <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => toggleVisibility(p)}
                             disabled={status === 'out_of_stock'}
-                            className="p-1.5 rounded-lg hover:bg-forest-50 text-forest-600 disabled:opacity-30"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-forest-600"
                             title="Ẩn/Hiện"
+                            aria-label="Ẩn/Hiện"
                           >
                             {status === 'active' ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => setDeleteTarget(p.id)}
-                            className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-red-500 hover:bg-red-50"
                             title="Xoá"
+                            aria-label="Xoá"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </>
                       )}
                     </div>
@@ -257,12 +265,12 @@ export default function ProductsPage() {
               này không thể hoàn tác.
             </p>
             <div className="flex justify-end gap-3 mt-5">
-              <button onClick={() => setDeleteTarget(null)} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+              <Button onClick={() => setDeleteTarget(null)} variant="outline">
                 Huỷ
-              </button>
-              <button onClick={confirmDelete} className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm">
+              </Button>
+              <Button onClick={confirmDelete} className="bg-red-600 text-white hover:bg-red-700">
                 Xoá sản phẩm
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -334,16 +342,17 @@ function AddProductModal({
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-forest-100 text-sm text-forest-700">
+          <Button onClick={onClose} variant="outline">
             Huỷ
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={!canSubmit}
             onClick={() => onCreate({ sku, name_vi: name, category_id: categoryId, price_vnd: Number(price) })}
-            className="btn-gold text-xs disabled:opacity-40 disabled:pointer-events-none"
+            variant="gold"
+            size="sm"
           >
             Lưu sản phẩm
-          </button>
+          </Button>
         </div>
       </div>
     </div>

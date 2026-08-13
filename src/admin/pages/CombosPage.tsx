@@ -10,6 +10,7 @@ import {
 } from '../adminApi';
 import { products } from '../../data/products';
 import { getComboPosterImage, getComboSuggestedPrice, getComboAutoDescription } from '../../data/combos';
+import { Button } from '../../components/ui/button';
 
 type EditableCombo = ComboSet & { active: boolean };
 
@@ -198,16 +199,16 @@ export default function CombosPage() {
           <label className="block text-xs text-forest-700/70 mb-1.5 uppercase tracking-wide">Tháng áp dụng</label>
           <div className="flex flex-wrap gap-2">
             {MONTHS.map((m) => (
-              <button
+              <Button
                 key={m}
                 type="button"
                 onClick={() => toggleMonth(m)}
-                className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
-                  months.has(m) ? 'bg-forest-900 text-cream-50 border-forest-900' : 'bg-white text-forest-700 border-cream-300'
-                }`}
+                variant={months.has(m) ? 'primary' : 'outline'}
+                size="sm"
+                className="h-auto py-2"
               >
                 Tháng {m}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -281,16 +282,18 @@ export default function CombosPage() {
                 {priceTouched && Number(price) !== suggestedPrice && (
                   <>
                     {' — '}
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setPrice(String(suggestedPrice));
                         setPriceTouched(false);
                       }}
-                      className="text-gold-600 underline underline-offset-2 hover:text-gold-700"
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-gold-600 underline underline-offset-2 hover:text-gold-700 hover:bg-transparent"
                     >
                       Dùng giá này
-                    </button>
+                    </Button>
                   </>
                 )}
               </p>
@@ -307,10 +310,10 @@ export default function CombosPage() {
           </div>
         </div>
 
-        <button onClick={handleCreate} disabled={saving} className="btn-gold w-full sm:w-auto disabled:opacity-50">
+        <Button onClick={handleCreate} disabled={saving} variant="gold" className="w-full sm:w-auto">
           {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           Tạo combo
-        </button>
+        </Button>
       </section>
 
       <section className="bg-white rounded-2xl border border-cream-300 p-4 sm:p-6">
@@ -331,18 +334,19 @@ export default function CombosPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <button
+                  <Button
                     onClick={() => toggleActive(c)}
-                    className={`px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 w-full sm:w-auto justify-center ${
-                      c.active ? 'bg-forest-100 text-forest-800' : 'bg-gold-400/15 text-gold-700'
+                    size="sm"
+                    className={`w-full sm:w-auto ${
+                      c.active ? 'bg-forest-100 text-forest-800 hover:bg-forest-200' : 'bg-gold-400/15 text-gold-700 hover:bg-gold-400/25'
                     }`}
                   >
                     <CheckSquare className="w-3.5 h-3.5" />
                     {c.active ? 'Đang hiện' : 'Kích hoạt'}
-                  </button>
-                  <button onClick={() => handleDelete(c.id)} className="p-2 rounded-lg text-red-600 hover:bg-red-50">
+                  </Button>
+                  <Button onClick={() => handleDelete(c.id)} variant="danger" size="icon" aria-label="Xoá combo">
                     <Trash2 className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
