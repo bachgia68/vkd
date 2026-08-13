@@ -57,6 +57,13 @@ xem `trust_proof_items` / `heritage_gallery_images` / `combo_sets` làm mẫu:
 6. Đăng ký route trong `AdminApp.tsx` + 1 dòng trong `NAV` của
    `AdminLayout.tsx`.
 
+## 2b. Sửa/rà soát ảnh trên site, hoặc chuẩn bị ảnh đăng fanpage
+
+Có quy trình riêng đã đúc kết — xem skill `.claude/skills/manage-site-images/
+SKILL.md`. KHÔNG tự nghĩ cách mới mỗi lần: luôn rà soát bằng SQL trước (ảnh
+thiếu/trùng), chỉ dùng ảnh thật trong `public/assets/images/` (không
+Unsplash/AI), và theo đúng pattern gán ảnh của mục 2 ở trên.
+
 ## 3. Section trên trang khách hàng — bắt buộc qua `site_sections`
 
 Không được thêm section mới vào `App.tsx` mà hiện luôn (hardcode). Mọi

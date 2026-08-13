@@ -16,6 +16,7 @@ description: Use when starting ANY work on the VKD Group website project (this r
 File **[docs/DESIGN_SYSTEM.md](../../../docs/DESIGN_SYSTEM.md)** (cung repo, cung cap boi `CLAUDE.md` o goc) la nguon chuan duy nhat cho: token mau/font, pattern bat buoc cho moi noi dung admin-quan-ly-duoc (bang + RLS + storage bucket + adminApi + trang admin), quy tac `site_sections` cho moi section moi, chuan cau truc bai blog. Doc file do TRUOC khi them tinh nang/noi dung/section moi - khong tu sang tao pattern rieng khi da co pattern tuong duong.
 
 ## Chon skill con theo viec can lam
+- Sua/thay/ra soat anh tren site (thieu, trung, xau, khoi trang tri khong co anh that), hoac chuan bi anh dang fanpage/mang xa hoi -> `manage-site-images`
 - Them/sua/xoa san pham that (dong bo tu samngoclinhvkdgroup.com) -> `update-vkd-products`
 - Debug/kiem tra luong thanh toan PayOS (VietQR), webhook, form checkout -> `manage-payos-checkout`
 - Sua noi dung/so lieu mau trong cong quan tri (7 phan he) -> `manage-admin-mockdata`
