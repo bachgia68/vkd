@@ -48,6 +48,13 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', country: 'Vietnam' });
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Mã giới thiệu KOC/đại lý — tự điền nếu khách vào site qua link ?ref=<mã>
+  // (App.tsx lưu vào localStorage), khách vẫn sửa/xoá được ở đây nếu ai đó
+  // đọc mã cho họ thay vì bấm link. Server (record_payos_order) mới là nơi
+  // xác thực mã có khớp đại lý đang active hay không — sai mã ở đây không
+  // chặn đặt hàng, chỉ đơn giản là không được ghi nhận affiliate.
+  const [referralCode, setReferralCode] = useState(() => localStorage.getItem('ta_ref_code') || '');
+
   // Chỉ tra điểm khi email hợp lệ và đã rời khỏi ô nhập (blur) — tránh gọi
   // RPC theo từng phím gõ.
   const [lookupEmail, setLookupEmail] = useState<string | null>(null);
@@ -87,6 +94,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
           returnUrl: `${origin}/?payos_return=1`,
           cancelUrl: `${origin}/?payos_cancel=1`,
           pointsRedeemed: appliedPoints,
+          referralCode: referralCode.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -376,6 +384,23 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                     </p>
                   </div>
                 )}
+
+                <div className="mt-4">
+                  <label className="block text-xs font-semibold text-forest-600 mb-1.5 uppercase tracking-wide">
+                    {isVi ? 'Mã Giới Thiệu / Đại Lý (Nếu Có)' : 'Referral / Agent Code (Optional)'}
+                  </label>
+                  <input
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value)}
+                    placeholder={isVi ? 'VD: AFF-007' : 'e.g. AFF-007'}
+                    className="w-full px-4 py-2.5 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-100 outline-none text-forest-900 text-sm bg-cream-50 transition-all font-mono"
+                  />
+                  <p className="text-forest-400 text-xs mt-1.5">
+                    {isVi
+                      ? 'Nếu bạn được một đại lý/KOC giới thiệu, nhập mã của họ tại đây để ghi nhận.'
+                      : 'If an agent or KOC referred you, enter their code here so the referral is credited.'}
+                  </p>
+                </div>
 
                 <button
                   onClick={handlePlaceOrder}

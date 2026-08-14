@@ -361,8 +361,15 @@ export interface ChannelRevenueRow {
 }
 
 export async function fetchChannelRevenue(): Promise<ChannelRevenueRow[]> {
-  const orders = throwIfError(await supabase.from('orders').select('total').eq('status', 'paid'));
-  const onlineRevenue = (orders as { total: number }[]).reduce((s, o) => s + Number(o.total), 0);
+  const orders = throwIfError(await supabase.from('orders').select('total, agent_id').eq('status', 'paid'));
+  const orderRows = orders as { total: number; agent_id: string | null }[];
+  // Đơn có agent_id (mã giới thiệu KOC/đại lý khớp lúc đặt hàng — xem
+  // record_payos_order) tách riêng vào kênh Affiliate thay vì gộp chung
+  // Online, để 4 kênh không đè doanh thu lên nhau.
+  const directOrders = orderRows.filter((o) => !o.agent_id);
+  const affiliateOrders = orderRows.filter((o) => o.agent_id);
+  const onlineRevenue = directOrders.reduce((s, o) => s + Number(o.total), 0);
+  const affiliateRevenue = affiliateOrders.reduce((s, o) => s + Number(o.total), 0);
   const showroomEntries = throwIfError(
     await supabase.from('showroom_revenue_entries').select('revenue_amount, orders_count').eq('is_demo', false)
   );
@@ -375,9 +382,9 @@ export async function fetchChannelRevenue(): Promise<ChannelRevenueRow[]> {
     0
   );
   const rows: ChannelRevenueRow[] = [
-    { channel: 'Website/TMĐT (Online)', revenue: onlineRevenue, orders: orders.length, share: 0 },
+    { channel: 'Website/TMĐT (Online)', revenue: onlineRevenue, orders: directOrders.length, share: 0 },
     { channel: 'Showroom (Offline)', revenue: showroomRevenue, orders: showroomOrders, share: 0 },
-    { channel: 'Affiliate (KOL/KOC)', revenue: 0, orders: 0, share: 0 },
+    { channel: 'Affiliate (KOL/KOC)', revenue: affiliateRevenue, orders: affiliateOrders.length, share: 0 },
     { channel: 'Nhà thuốc/Siêu thị (OTC-KA)', revenue: 0, orders: 0, share: 0 },
   ];
   const total = rows.reduce((s, r) => s + r.revenue, 0) || 1;
