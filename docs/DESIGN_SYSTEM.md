@@ -85,6 +85,11 @@ mạch không heading:
 - `featured_image_url` **bắt buộc có** trước khi bấm "Đăng công khai" trong
   CMS — không xuất bản bài thiếu ảnh bìa.
 - `featured_image_alt` mô tả đúng nội dung ảnh (SEO + accessibility).
+- URL bài là `/blog/<slug>` (cột `slug`, tự sinh từ title lúc tạo, đọc được
+  — không phải UUID) — xem `src/lib/slugify.ts`.
+- **Ít nhất 2 ảnh/bài** (ảnh bìa + ≥1 ảnh chèn trong thân bằng
+  `![mô tả](url)`) — không để bài toàn chữ. Quy trình làm ảnh: xem skill
+  `make-blog-images`.
 
 ## 5. Deploy — xem skill `deploy-vkd-site`
 

@@ -17,6 +17,7 @@ File **[docs/DESIGN_SYSTEM.md](../../../docs/DESIGN_SYSTEM.md)** (cung repo, cun
 
 ## Chon skill con theo viec can lam
 - Sua/thay/ra soat anh tren site (thieu, trung, xau, khoi trang tri khong co anh that), hoac chuan bi anh dang fanpage/mang xa hoi -> `manage-site-images`
+- Viet bai blog moi, hoac ra soat bai cu thieu anh (bat buoc >=2 anh/bai) -> `make-blog-images`
 - Them/sua/xoa san pham that (dong bo tu samngoclinhvkdgroup.com) -> `update-vkd-products`
 - Debug/kiem tra luong thanh toan PayOS (VietQR), webhook, form checkout -> `manage-payos-checkout`
 - Sua noi dung/so lieu mau trong cong quan tri (7 phan he) -> `manage-admin-mockdata`
