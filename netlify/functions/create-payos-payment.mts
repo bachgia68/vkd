@@ -23,6 +23,7 @@ async function recordOrder(params: {
   buyerName?: string;
   buyerEmail?: string;
   buyerPhone?: string;
+  referralCode?: string;
 }) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -44,6 +45,7 @@ async function recordOrder(params: {
         p_buyer_phone: params.buyerPhone ?? null,
         p_shipping_address: null,
         p_items: params.items.map((i) => ({ sku: i.sku, name: i.name, quantity: i.quantity, price: i.price })),
+        p_referral_code: params.referralCode || null,
       }),
     });
   } catch (err) {
@@ -78,6 +80,7 @@ export default async (req: Request) => {
       buyerPhone?: string;
       returnUrl: string;
       cancelUrl: string;
+      referralCode?: string;
     };
 
     if (!body.amount || body.amount < 1000) {
@@ -106,6 +109,7 @@ export default async (req: Request) => {
       buyerName: body.buyerName,
       buyerEmail: body.buyerEmail,
       buyerPhone: body.buyerPhone,
+      referralCode: body.referralCode?.trim() || undefined,
     });
 
     return new Response(

@@ -30,6 +30,7 @@ async function recordOrder(params: {
   buyerEmail?: string;
   buyerPhone?: string;
   pointsRedeemed?: number;
+  referralCode?: string;
 }) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -52,6 +53,7 @@ async function recordOrder(params: {
         p_shipping_address: null,
         p_items: params.items.map((i) => ({ sku: i.sku, name: i.name, quantity: i.quantity, price: i.price })),
         p_points_redeemed: params.pointsRedeemed ?? 0,
+        p_referral_code: params.referralCode || null,
       }),
     });
   } catch (err) {
@@ -87,6 +89,7 @@ export async function POST(req: Request) {
       returnUrl: string;
       cancelUrl: string;
       pointsRedeemed?: number;
+      referralCode?: string;
     };
 
     if (!body.amount || body.amount < 1000) {
@@ -116,6 +119,7 @@ export async function POST(req: Request) {
       buyerEmail: body.buyerEmail,
       buyerPhone: body.buyerPhone,
       pointsRedeemed: body.pointsRedeemed && body.pointsRedeemed > 0 ? Math.round(body.pointsRedeemed) : 0,
+      referralCode: body.referralCode?.trim() || undefined,
     });
 
     return new Response(

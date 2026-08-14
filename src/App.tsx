@@ -118,6 +118,18 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Link affiliate KOC/đại lý (?ref=<mã>) — lưu lại mã giới thiệu ngay khi
+  // khách vào site qua link chia sẻ, dùng last-touch (mã mới nhất ghi đè mã
+  // cũ) và giữ nguyên suốt phiên duyệt web tới lúc đặt hàng ở Checkout.tsx,
+  // dù khách landing ở trang sản phẩm/blog rồi mới điều hướng nội bộ tới giỏ hàng.
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref && ref.trim()) {
+      localStorage.setItem('ta_ref_code', ref.trim());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
