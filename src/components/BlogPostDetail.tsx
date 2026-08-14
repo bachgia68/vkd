@@ -178,14 +178,24 @@ function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[]
       flushParagraph();
       flushQuote();
       const [, alt, src] = imageMatch;
+      const isVideo = /\.(mp4|webm|mov)$/i.test(src.split('?')[0]);
       blocks.push(
         <figure key={key++} className="my-8">
-          <img
-            src={src}
-            alt={alt}
-            loading="lazy"
-            className="w-full rounded-2xl shadow-elegant object-cover"
-          />
+          {isVideo ? (
+            <video
+              src={src}
+              controls
+              playsInline
+              className="w-full rounded-2xl shadow-elegant"
+            />
+          ) : (
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              className="w-full rounded-2xl shadow-elegant object-cover"
+            />
+          )}
           {alt && <figcaption className="mt-2 text-center text-sm text-forest-500">{alt}</figcaption>}
         </figure>
       );
