@@ -42,10 +42,10 @@ export default function Blog({ onNavigate }: BlogProps) {
           {posts.map((post) => (
             <a
               key={post.id}
-              href={`/blog/${post.id}`}
+              href={`/blog/${post.slug}`}
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate?.('blog-post', post.id);
+                onNavigate?.('blog-post', post.slug);
               }}
               className="block bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1 cursor-pointer"
             >

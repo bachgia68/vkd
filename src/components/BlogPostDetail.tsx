@@ -7,10 +7,11 @@ import { useLiveProducts } from '../hooks/useLiveProducts';
 import { getFeaturedProducts } from '../data/featuredProducts';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
+import { slugify } from '../lib/slugify';
 import ProductCarousel from './ProductCarousel';
 
 interface BlogPostDetailProps {
-  postId: string;
+  slug: string;
   lang: Language;
   onNavigate?: (page: string, slug?: string) => void;
 }
@@ -20,13 +21,7 @@ function formatDate(iso: string) {
 }
 
 function slugifyHeading(text: string, index: number) {
-  const base = text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  const base = slugify(text);
   return `${base || 'section'}-${index}`;
 }
 
@@ -177,6 +172,25 @@ function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[]
       quoteLines.push(line.slice(2));
       continue;
     }
+    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imageMatch) {
+      flushList();
+      flushParagraph();
+      flushQuote();
+      const [, alt, src] = imageMatch;
+      blocks.push(
+        <figure key={key++} className="my-8">
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            className="w-full rounded-2xl shadow-elegant object-cover"
+          />
+          {alt && <figcaption className="mt-2 text-center text-sm text-forest-500">{alt}</figcaption>}
+        </figure>
+      );
+      continue;
+    }
     if (line.startsWith('### ')) {
       flushList();
       flushParagraph();
@@ -229,7 +243,7 @@ function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[]
   return { blocks, toc };
 }
 
-export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDetailProps) {
+export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetailProps) {
   const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
   const liveProducts = useLiveProducts(staticProducts);
   const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
@@ -238,15 +252,15 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
 
   useEffect(() => {
     setPost(undefined);
-    fetchBlogPost(postId)
+    fetchBlogPost(slug)
       .then(setPost)
       .catch(() => setPost(null));
-  }, [postId]);
+  }, [slug]);
 
   useDocumentMeta({
     title: post ? `${post.title} — TA Sâm Ngọc Linh` : 'TA Sâm Ngọc Linh',
     description: post?.excerpt,
-    path: `/blog/${postId}`,
+    path: `/blog/${slug}`,
     image: post?.featured_image_url ?? undefined,
   });
 
@@ -265,7 +279,7 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
             name: 'TA Sâm Ngọc Linh',
             logo: { '@type': 'ImageObject', url: 'https://tasamngoclinh.com/assets/images/TA_logo_clean.png' },
           },
-          mainEntityOfPage: `https://tasamngoclinh.com/blog/${postId}`,
+          mainEntityOfPage: `https://tasamngoclinh.com/blog/${slug}`,
         }
       : null
   );
@@ -278,7 +292,7 @@ export default function BlogPostDetail({ postId, lang, onNavigate }: BlogPostDet
           itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://tasamngoclinh.com/' },
             { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://tasamngoclinh.com/blog' },
-            { '@type': 'ListItem', position: 3, name: post.title, item: `https://tasamngoclinh.com/blog/${postId}` },
+            { '@type': 'ListItem', position: 3, name: post.title, item: `https://tasamngoclinh.com/blog/${slug}` },
           ],
         }
       : null

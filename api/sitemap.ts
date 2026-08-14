@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-// Sinh sitemap.xml động: "/" + toàn bộ bài Blog đã published (route thật /blog/<id>,
+// Sinh sitemap.xml động: "/" + toàn bộ bài Blog đã published (route thật /blog/<slug>,
 // xem App.tsx) + toàn bộ sản phẩm trong catalog thật (route thật /product/<slug>).
 // Thay cho public/sitemap.xml tĩnh trước đây chỉ liệt kê "/" — xem ghi chú trong git
 // history của file đó về lý do. vercel.json rewrite "/sitemap.xml" -> "/api/sitemap"
@@ -13,6 +13,7 @@ export const config = { runtime: 'nodejs' };
 // không được bundle vào /var/task).
 interface BlogPostRow {
   id: string;
+  slug: string | null;
   created_at: string;
 }
 
@@ -28,7 +29,7 @@ export async function GET() {
   if (supabaseUrl && supabaseAnonKey) {
     try {
       const res = await fetch(
-        `${supabaseUrl}/rest/v1/blog_posts?select=id,created_at&published=eq.true&order=created_at.desc`,
+        `${supabaseUrl}/rest/v1/blog_posts?select=id,slug,created_at&published=eq.true&order=created_at.desc`,
         {
           headers: {
             apikey: supabaseAnonKey,
@@ -58,7 +59,7 @@ export async function GET() {
     ),
     ...posts.map((p) => {
       const lastmod = p.created_at?.slice(0, 10);
-      return `<url><loc>${escapeXml(`https://tasamngoclinh.com/blog/${p.id}`)}</loc>${
+      return `<url><loc>${escapeXml(`https://tasamngoclinh.com/blog/${p.slug ?? p.id}`)}</loc>${
         lastmod ? `<lastmod>${lastmod}</lastmod>` : ''
       }<changefreq>monthly</changefreq><priority>0.7</priority></url>`;
     }),

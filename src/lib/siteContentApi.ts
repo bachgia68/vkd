@@ -51,6 +51,7 @@ export async function fetchSocialLinks(): Promise<SocialLink[]> {
 
 export interface BlogPost {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   body: string;
@@ -63,7 +64,7 @@ export interface BlogPost {
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .eq('published', true)
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
@@ -75,19 +76,25 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
 export async function fetchAllBlogPostsForAdmin(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
 }
 
-export async function fetchBlogPost(id: string): Promise<BlogPost | null> {
-  const { data, error } = await supabase
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Route /blog/<slug> là chuẩn (đọc được, chuẩn SEO — xem docs/DESIGN_SYSTEM.md).
+// Vẫn chấp nhận UUID cũ (post.id) để không vỡ link đã chia sẻ trước khi cột
+// slug được thêm vào (2026-08-14) — nhưng KHÔNG dùng .or('id.eq.<slug>')
+// chung với slug thường: cột id là kiểu uuid, PostgREST sẽ lỗi 400
+// "invalid input syntax for type uuid" nếu giá trị không phải UUID hợp lệ.
+export async function fetchBlogPost(slugOrId: string): Promise<BlogPost | null> {
+  const query = supabase
     .from('blog_posts')
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
-    .eq('id', id)
-    .eq('published', true)
-    .maybeSingle();
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .eq('published', true);
+  const { data, error } = await (UUID_RE.test(slugOrId) ? query.eq('id', slugOrId) : query.eq('slug', slugOrId)).maybeSingle();
   if (error) throw new Error(error.message);
   return data;
 }

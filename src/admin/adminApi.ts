@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
+import { slugify } from '../lib/slugify';
 import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage } from '../lib/siteContentApi';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
@@ -611,6 +612,21 @@ export async function deleteSocialLink(id: string) {
   if (error) throw new Error(error.message);
 }
 
+// URL /blog/<slug> phải đọc được (chuẩn SEO, xem docs/DESIGN_SYSTEM.md) —
+// sinh slug từ title lúc tạo bài, tự thêm hậu tố -2/-3... nếu trùng thay vì
+// để lỗi unique constraint văng ra tay admin.
+async function generateUniqueBlogSlug(title: string): Promise<string> {
+  const base = slugify(title) || 'bai-viet';
+  let candidate = base;
+  let suffix = 2;
+  for (;;) {
+    const { data, error } = await supabase.from('blog_posts').select('id').eq('slug', candidate).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) return candidate;
+    candidate = `${base}-${suffix++}`;
+  }
+}
+
 export async function createBlogPost(input: {
   title: string;
   excerpt: string;
@@ -618,10 +634,11 @@ export async function createBlogPost(input: {
   featured_image_url?: string | null;
   featured_image_alt?: string | null;
 }): Promise<BlogPost> {
+  const slug = await generateUniqueBlogSlug(input.title);
   const res = await supabase
     .from('blog_posts')
-    .insert(input)
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .insert({ ...input, slug })
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .single();
   return throwIfError(res);
 }
@@ -636,11 +653,13 @@ export async function updateBlogPost(
     featured_image_alt: string | null;
   }>,
 ): Promise<BlogPost> {
+  // Cố ý KHÔNG tự sinh lại slug khi title đổi — slug đã public (SEO, link đã
+  // chia sẻ) không nên đổi ngầm sau khi bài đã đăng.
   const res = await supabase
     .from('blog_posts')
     .update(patch)
     .eq('id', id)
-    .select('id, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
     .single();
   return throwIfError(res);
 }

@@ -188,7 +188,7 @@ function App() {
           )}
 
           {currentPage === 'blog-post' && visibleSections.has('blog') && (
-            <BlogPostDetail postId={selectedSlug} lang={lang} onNavigate={navigate} />
+            <BlogPostDetail slug={selectedSlug} lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'showrooms' && visibleSections.has('showrooms') && (

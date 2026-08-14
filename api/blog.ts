@@ -1,6 +1,6 @@
 export const config = { runtime: 'nodejs' };
 
-// vercel.json rewrite "/blog/:id" -> "/api/blog?id=:id".
+// vercel.json rewrite "/blog/:slug" -> "/api/blog?slug=:slug".
 //
 // Site là Vite SPA thuần client-side, không SSR — src/hooks/useDocumentMeta.ts
 // chỉ đổi title/OG SAU KHI JS chạy, nên crawler không chạy JS (Zalo, Facebook/
@@ -17,12 +17,15 @@ export const config = { runtime: 'nodejs' };
 // code để mỗi function tự chứa đủ, đúng pattern đã có sẵn trong repo.
 interface BlogPostRow {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   featured_image_url: string | null;
   featured_image_alt: string | null;
   created_at: string;
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function escapeHtml(s: string): string {
   return s
@@ -97,21 +100,23 @@ function renderPage(baseHtml: string, meta: PageMeta): string {
 
 export async function GET(request: Request) {
   const origin = originFromRequest(request);
-  const id = new URL(request.url).searchParams.get('id') ?? '';
+  const slugOrId = new URL(request.url).searchParams.get('slug') ?? '';
 
   const [baseHtmlRes, post] = await Promise.all([
     fetch(`${origin}/index.html`),
-    fetchPost(id),
+    fetchPost(slugOrId),
   ]);
   const baseHtml = await baseHtmlRes.text();
 
   if (!post) {
     // Bài không tồn tại/chưa published — trả HTML gốc, để React tự hiện
-    // "Không tìm thấy bài viết." như hiện tại, không giả mạo meta cho ID rác.
+    // "Không tìm thấy bài viết." như hiện tại, không giả mạo meta cho slug rác.
     return new Response(baseHtml, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  const url = `https://tasamngoclinh.com/blog/${post.id}`;
+  // Canonical LUÔN dùng slug (kể cả khi request đến bằng UUID cũ) — tránh
+  // duplicate content 2 URL cho cùng 1 bài trong mắt Google.
+  const url = `https://tasamngoclinh.com/blog/${post.slug}`;
   const imageUrl = post.featured_image_url
     ? post.featured_image_url.startsWith('http')
       ? post.featured_image_url
@@ -159,15 +164,21 @@ export async function GET(request: Request) {
   });
 }
 
-async function fetchPost(id: string): Promise<BlogPostRow | null> {
-  if (!id) return null;
+async function fetchPost(slugOrId: string): Promise<BlogPostRow | null> {
+  if (!slugOrId) return null;
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnonKey) return null;
 
+  // id là cột uuid — lọc theo id.eq.<chuỗi không phải UUID> khiến PostgREST
+  // trả lỗi 400 "invalid input syntax for type uuid" thay vì 0 dòng, nên
+  // phải tự chọn đúng cột trước khi query, không gộp chung id/slug trong 1
+  // filter (xem lỗi tương tự đã fix trong src/lib/siteContentApi.ts).
+  const filterColumn = UUID_RE.test(slugOrId) ? 'id' : 'slug';
+
   try {
     const res = await fetch(
-      `${supabaseUrl}/rest/v1/blog_posts?select=id,title,excerpt,featured_image_url,featured_image_alt,created_at&id=eq.${encodeURIComponent(id)}&published=eq.true`,
+      `${supabaseUrl}/rest/v1/blog_posts?select=id,slug,title,excerpt,featured_image_url,featured_image_alt,created_at&${filterColumn}=eq.${encodeURIComponent(slugOrId)}&published=eq.true`,
       { headers: { apikey: supabaseAnonKey, authorization: `Bearer ${supabaseAnonKey}` } },
     );
     if (!res.ok) return null;
