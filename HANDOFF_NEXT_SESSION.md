@@ -1,7 +1,87 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-09 (cập nhật lần 13). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-14 (cập nhật lần 14). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -13. Audit ảnh blog theo yêu cầu Joe ("AI làm sai hình củ sâm Ngọc Linh,
+toàn lấy ảnh sâm Hàn") — ĐÃ FIX 7 link ảnh vỡ thật (404), CÒN 2 ảnh AI chưa
+verify được (môi trường phiên này chặn mạng ra ngoài)
+
+Joe báo qua tin nhắn ngắn, gõ vội trên điện thoại ("bị ngắt kết nối với
+laptop"): lo ảnh "củ sâm Ngọc Linh" trên site bị AI vẽ sai, giống sâm Hàn
+Quốc thay vì sâm Ngọc Linh thật. Đã điều tra kỹ:
+
+**Toàn bộ ảnh trong `public/assets/images/` dùng cho trang chủ/Heritage đã
+xem trực tiếp bằng mắt (Read tool) — tất cả là ẢNH THẬT** (ảnh chụp thật củ
+sâm/cây sâm/hạt sâm cầm tay, nền đất/khay vườn thật, không phải ảnh AI vẽ,
+không phải sâm Hàn): `cusam.jpg`, `heritage-cu-sam-2.jpg`,
+`heritage-cu-sam-3.jpg`, `cay-sam-ngoc-linh.png`/`cay-sam-vkd.png`/
+`heritage-cay-sam.png` (3 file trùng nhau, MD5 giống hệt), `sam-ngoc-linh-plant.png`,
+`heritage-hat-sam-1.jpg`, ảnh `1785728936567_...jpg`. Đặc điểm rễ có đốt
+(giống đốt trúc) trong các ảnh này khớp đúng hình thái *Panax vietnamensis*
+thật, không phải rễ chẻ nhánh kiểu sâm Hàn Quốc (*Panax ginseng*). **Không
+cần sửa gì ở nhóm ảnh này.**
+
+**Phát hiện lỗi thật (không phải nghi ngờ AI, mà là ảnh VỠ hẳn — 404) khi
+đối chiếu toàn bộ ảnh trong `blog_posts` (Supabase) với file thật có trong
+`public/assets/images/`:** 7 tên file được `featured_image_url`/nội dung bài
+tham chiếu nhưng KHÔNG TỒN TẠI trên repo (Joe đổi tên/xoá file cục bộ lúc tự
+sắp xếp lại ảnh — xem cảnh báo cũ ở mục -10 cuối file — nhưng pipeline n8n
+viết bài đã lỡ trỏ vào tên file đó trước khi Joe kịp thêm/push):
+`la sam toi.jpg`, `cu sam dep.jpg`, `cu sam.jpg`, `heritage-cu-sam.jpg` (chỉ
+có `-2`/`-3`, không có bản không số), `ruou.png`, `hat sam.jpg`, `hat.jpg`.
+Ảnh hưởng 6 bài blog LIVE (bấm vào là vỡ ảnh ngay lúc phát hiện):
+- `tra-sam-ngoc-linh-...` (featured)
+- `sam-ngoc-linh-ngam-mat-ong-...` (featured + 1 ảnh trong bài)
+- `tieu-chuan-tham-dinh-sam-ngoc-linh-che-bien-sau-tai-ta` (featured)
+- `ruou-sam-ngoc-linh-nen-chon-loai-u-...` (1 ảnh trong bài)
+- `hon-300-hop-chat-sinh-hoc-trong-sam-ngoc-linh-...` (1 ảnh trong bài)
+- `sam-ngoc-linh-va-kha-nang-chong-stress-...` (1 ảnh trong bài)
+
+**Đã sửa ngay qua `execute_sql`** (UPDATE trực tiếp `blog_posts.featured_image_url`/
+`body`, trỏ về đúng ảnh THẬT đã verify bằng mắt ở trên thay vì tên file ma):
+`la sam toi.jpg`→`heritage-la-sam.jpg`, `cu sam dep.jpg`→`heritage-cu-sam-2.jpg`,
+`cu sam.jpg`→`heritage-cu-sam-3.jpg`, `heritage-cu-sam.jpg`→`cusam.jpg`,
+`ruou.png`→`heritage-ruou-sam.png`, `hat sam.jpg`→`heritage-hat-sam-2.jpg`,
+`hat.jpg`→`heritage-hat-sam-1.jpg`. Verify lại bằng SQL sau khi sửa: cả 6 bài
+không còn tham chiếu tên file vỡ nào. **Không cần build/deploy — sửa dữ liệu
+Supabase, site đọc trực tiếp, lên ngay.**
+
+**CHƯA verify được 2 ảnh — ghi rõ để phiên sau/Joe tự kiểm tra, đừng bỏ
+sót:** 2 file nằm trong Supabase Storage bucket `blog-images` (không phải
+`public/assets/images/` nên không xem bằng Read tool được), do pipeline AI
+(n8n/marketing-sam) tự sinh khi viết bài, KHÔNG phải ảnh chụp thật:
+- `a1174c61-...-comparison.png` (bài "Thẩm Định Sâm Ngọc Linh: Vì Sao Màu
+  Vàng Thân Rễ Không Thể Thay Thế Kiểm Định Hoạt Chất Majonoside R2") — theo
+  `featured_image_alt` mô tả là ảnh so sánh Sâm Ngọc Linh (*Panax
+  vietnamensis*) với Tam Thất (*Panax notoginseng*) — **đây đúng loại ảnh
+  Joe lo ngại nhất** (AI vẽ so sánh 2 loài sâm, rất dễ vẽ sai hình thái).
+- `sam-ngoc-linh-hoa-hau-dau-gia-725-trieu-stat.png` (bài "Sâm Ngọc Linh Hoa
+  Hậu Đấu Giá 725 Triệu") — có vẻ là ảnh thẻ số liệu (stat card), rủi ro thấp
+  hơn nhưng vẫn chưa xem được.
+
+**Vì sao chưa tự sửa/xoá 2 ảnh này**: môi trường phiên này (remote sandbox)
+bị chặn mạng ra ngoài tới cả `xcwirgrlnibnjmseglee.supabase.co` lẫn
+`tasamngoclinh.com` (`EGRESS_BLOCKED` từ proxy chính sách tổ chức, đã thử
+`curl` + `WebFetch`, cả hai đều bị chặn 403 — không phải lỗi ảnh, là chính
+sách mạng của phiên) nên KHÔNG xem được nội dung 2 ảnh này bằng mắt. Theo
+đúng quy tắc trong skill `manage-site-images` ("không bao giờ dùng ảnh
+AI-generate làm ảnh thật của vườn sâm/sản phẩm TA") — không tự đoán mà sửa
+liều, cũng không tự xoá vì có thể ảnh đang đúng/hữu ích. **Việc cần làm khi
+có quyền xem ảnh thật (phiên có browser/network đầy đủ, hoặc Joe tự xem
+trên điện thoại)**: mở 2 bài trên, xem ảnh so sánh có vẽ đúng hình thái củ
+sâm Ngọc Linh (thân rễ có đốt, không phải củ chẻ nhánh trơn kiểu sâm Hàn)
+không — nếu sai, thay bằng ảnh thật ghép 2 loài (có thể dùng `cusam.jpg`
+thật của TA + tìm ảnh Tam Thất thật khác, không AI-generate).
+
+**⚠️ Vẫn còn tồn tại từ mục -10 cũ, chưa Joe xử lý xong**: `git status` khi
+bắt đầu phiên này sạch (không phải đang có ảnh lạ untracked như mô tả cũ),
+có vẻ Joe đã tự dọn xong việc sắp xếp `public/assets/images/` — nhưng các
+tên file "lạ" Joe từng đổi (`sam k5.jpg`, `cu sam dep.jpg`...) rõ ràng chưa
+từng được `git add`/push, nên bài blog viết ra trước đó bị lỡ trỏ vào tên
+không tồn tại — đã fix ở trên. Nếu Joe tiếp tục đổi tên ảnh cục bộ, nhắc Joe
+push lên GitHub trước khi pipeline n8n viết bài mới dùng tên file đó, tránh
+lặp lại lỗi 404 tương tự.
 
 **Nếu Joe hỏi về "KOL"/tăng follow/tương tác fanpage-TikTok**: đó KHÔNG phải
 việc trong repo web này — xem `D:\TA page\site\docs\kol-sam-ngoc-linh\00-HANDOFF.md`
