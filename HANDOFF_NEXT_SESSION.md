@@ -1,7 +1,96 @@
 # Handoff — TA Sâm Ngọc Linh Website
 
-Ngày: 2026-08-14 (cập nhật lần 14). Phiên trước dừng ở đây — đọc file này
+Ngày: 2026-08-14 (cập nhật lần 15). Phiên trước dừng ở đây — đọc file này
 trước khi làm gì tiếp.
+
+## -14. Tiếp mục -13 cùng ngày: đổi màu nền 90 SKU (alternate gold/xanh) +
+logo/URL, 3 clip video draft từ ảnh thật, skill chuẩn ảnh premium — ĐÃ LÀM,
+2 PR (#2 merged, #3 đang chờ)
+
+Cùng phiên với mục -13 (audit ảnh blog), Joe nhắn tiếp qua điện thoại (rất
+tắt, nhiều lệnh dồn 1 tin) yêu cầu: (1) thêm logo TA + `tasamngoclinh.com`
+lên toàn bộ ảnh sản phẩm còn lại, đổ màu nền vàng/xanh xen kẽ giống logo;
+(2) đăng vài clip đã dựng thành bài blog **ẩn** trong admin để Joe tự bật
+khi duyệt; (3) sau đó phản hồi "hơi giả, không sang" về màu nền lần đầu +
+"video ngắn quá chưa thu hút" + gửi thêm 5 ảnh thật Vườn Sâm nhà Khánh +
+yêu cầu học đúng kiểu phối màu KGC, lưu thành skill chuẩn.
+
+**Đã làm (PR #2, đã merge vào main):**
+- `scripts/batch_premium_bg_alternate.py` (mới) — chạy cho ĐỦ 90/90 SKU,
+  xen kẽ 2 tông màu (gold/green, alternate theo index), stamp logo TA +
+  `tasamngoclinh.com` lên mọi ảnh (trước đó logo mới chỉ có ở 12 SKU
+  carousel trang chủ). `products.ts` đã trỏ sẵn mọi SKU vào
+  `/products/premium-bg/...` nên không cần sửa code, chỉ overwrite ảnh.
+- `src/components/BlogPostDetail.tsx` — cú pháp markdown ảnh
+  `![alt](url)` giờ tự nhận diện đuôi `.mp4/.webm/.mov` để render
+  `<video controls>` thay vì `<img>` — dùng chung 1 cú pháp cho cả ảnh lẫn
+  video trong bài blog, không cần cú pháp mới.
+- 2 clip đầu (`sam-ngoc-linh-chuan-goc-realphoto.mp4` 15s,
+  `vung-trong-di-san-realphoto.mp4` 15s) dựng bằng ffmpeg (Ken Burns +
+  crossfade) từ ảnh thật có sẵn — lưu `public/assets/videos/`, thêm làm 2
+  bài `blog_posts` với `published=false` (ẩn) — admin vào
+  `/gate-vkd-control-2026/cms` sẽ thấy 2 bài nháp này, bấm nút có sẵn
+  "Duyệt & công khai" (đã có từ trước trong `CmsPage.tsx`, không cần code
+  thêm) là hiện lên site ngay.
+
+**Đã làm tiếp (PR #3, tạo sau khi PR #2 đã merge — theo đúng quy tắc
+"PR merged rồi thì làm tiếp trên nhánh mới từ main", xem instructions đầu
+phiên):**
+- **Sửa phản hồi "hơi giả, không sang"**: 2 nguyên nhân thật —
+  (1) màu nền lần đầu quá đậm/bão hoà, không đúng nguyên tắc KGC thật
+  (nền trắng/kem chủ đạo, màu thương hiệu chỉ là điểm nhấn rất nhẹ — xem
+  `docs/reports/2026-08-07-premium-positioning-brand-guidelines.md` mục
+  "nguyên tắc phối màu") — đã tune lại 6 stop màu nhạt hơn hẳn, xem chi
+  tiết trong skill mới `make-premium-product-photos`.
+  (2) thuật toán cắt nền border-flood-fill bỏ sót khe hở nền trắng kẹt giữa
+  các nhánh rễ/cành mảnh (vô hình trên nền ivory nhạt cũ, lộ rõ trên nền có
+  màu) — đã thêm bước dilate-rồi-intersect để nối khe hở nhỏ mà không ăn
+  lẹm sản phẩm thật. **Vẫn còn 1-2 ảnh dạng "bó rễ rời" (vd.
+  `trimico/15-cu-sam-tuoi.png`) còn khe hở nhỏ dù đã thử dilate rất lớn
+  (20 lần)** — đây là giới hạn thật của thuật toán với khe hở quá rộng,
+  không phải bug, cần Joe chụp lại ảnh sạch nền hơn hoặc retouch tay nếu
+  muốn hoàn hảo 100%.
+- **5 ảnh thật Joe gửi (Vườn Sâm nhà Khánh — cây nguyên rễ+lá, thu hoạch,
+  cân đo, cận cảnh rễ)** đã lưu vào `public/assets/images/heritage-vuon-
+  khanh-*.jpg`.
+- **Clip 3 mới, dài hơn hẳn (26s so với 15s trước)** —
+  `vuon-sam-nha-khanh-realphoto.mp4`, dựng từ đúng 5 ảnh trên theo mạch kể
+  chuyện (núi → vườn → cây đơn → thu hoạch → cân đo → rễ cận cảnh → cầm tay
+  → CTA), cũng thêm làm bài `blog_posts` ẩn thứ 3 (`published=false`), cùng
+  pattern toggle qua CmsPage như 2 bài trước.
+- **Skill mới `.claude/skills/make-premium-product-photos/SKILL.md`** —
+  đúc kết toàn bộ bài học trên (bảng màu chuẩn, kỹ thuật dilate chống khe
+  hở, quy trình chạy, checklist xem bằng mắt trước khi commit) để không
+  phải làm lại từ đầu lần sau. **Lưu ý quan trọng ghi trong skill**: môi
+  trường phiên non-interactive/cloud này bị chặn mạng ra ngoài
+  (`EGRESS_BLOCKED`) — không tự mở được `kgc.co.kr` trực tiếp dù Joe gửi
+  link yêu cầu xem, phải dùng lại dữ liệu màu đã đo DOM thật từ report
+  2026-08-07 (làm ở phiên có browser). Nếu cần audit lại KGC bản mới nhất,
+  phải làm ở phiên có công cụ browser/WebFetch không bị chặn.
+
+**Việc Joe hỏi nhưng CHƯA làm được từ phiên này (giới hạn môi trường, ghi
+rõ để không lặp lại nhầm lẫn "đã làm"):**
+- **Clip tham khảo VTV/đài truyền hình về núi Ngọc Linh**: phiên này không
+  tải/xem được video từ nguồn ngoài (mạng bị chặn hoàn toàn ngoài GitHub +
+  vài domain hệ thống) — không thể "lấy tham khảo" từ clip VTV thật. Việc
+  duy nhất làm được là dựng clip dài hơn (mục trên) từ ảnh thật có sẵn.
+  Cần phiên có quyền browser/tải video, hoặc Joe tự gửi link/file video VTV
+  cụ thể để tham khảo bố cục/nhịp cắt.
+- **Giọng văn khác ngoài MR2 khoa học**: đã đưa ra 2-3 mẫu giọng văn thay
+  thế (di sản/gia đình, nghi thức sống, tin cậy/kiểm định — không phải số
+  liệu khoa học thuần) trực tiếp trong chat phiên này, CHƯA lưu thành file
+  chuẩn trong skill `marketing-sam` (skill đó nằm ngoài repo này,
+  `/root/.claude/skills/synced/marketing-sam`, không sync ngược lại được từ
+  phiên cloud này) — nếu Joe muốn lưu vĩnh viễn, cần làm ở phiên local có
+  quyền sửa thư mục skill đó, hoặc yêu cầu lưu vào 1 file trong repo này
+  (vd. `docs/` ) thay thế.
+- **Trạng thái Affiliates TikTok KOC/KOL**: theo đúng cảnh báo đầu file
+  handoff này (mục "Nếu Joe hỏi về KOL") — việc này nằm ở
+  `D:\TA page\site\docs\kol-sam-ngoc-linh\00-HANDOFF.md` trên máy Joe,
+  KHÔNG phải trong repo web `bachgia68/vkd`. Phiên cloud này không có
+  đường dẫn `D:\` của Joe nên không xem/tiếp tục được — cần hỏi ở đúng
+  phiên local trên máy Joe, hoặc Joe copy nội dung file đó vào đây nếu
+  muốn tiếp tục từ phiên cloud.
 
 ## -13. Audit ảnh blog theo yêu cầu Joe ("AI làm sai hình củ sâm Ngọc Linh,
 toàn lấy ảnh sâm Hàn") — ĐÃ FIX 7 link ảnh vỡ thật (404), CÒN 2 ảnh AI chưa
