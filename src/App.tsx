@@ -40,8 +40,12 @@ function App() {
   const [selectedSlug, setSelectedSlug] = useState('');
   const [traceQr, setTraceQr] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
-  // TODO: Replace with real auth context when user sign-in is implemented
-  const [userEmail, _setUserEmail] = useState<string | undefined>(undefined);
+  // Chưa có hệ thống đăng nhập thật — tạm nhận diện khách qua email đã dùng
+  // ở lần đặt hàng gần nhất (lưu ở Checkout.tsx), để trang Loyalty Dashboard
+  // hiển thị đúng điểm/hạng của khách quay lại thay vì luôn coi là "chưa có".
+  const [userEmail] = useState<string | undefined>(
+    () => localStorage.getItem('ta_customer_email') || undefined
+  );
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
