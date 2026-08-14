@@ -16,7 +16,7 @@ import os
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
-from scipy.ndimage import label
+from scipy.ndimage import binary_dilation, label
 
 PUBLIC_ROOT = "public"
 PREMIUM_DIR = os.path.join(PUBLIC_ROOT, "products", "premium-bg")
@@ -24,16 +24,22 @@ LOGO_PATH = os.path.join(PUBLIC_ROOT, "assets/images/TA_logo_clean.png")
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 SITE_URL = "tasamngoclinh.com"
 
+# Toned down from the first pass — Joe's feedback was "hơi giả, không sang"
+# (looks a bit fake, not premium). KGC-style product photography keeps
+# white/cream as the dominant tone (docs/reports/2026-08-07-premium-
+# positioning-brand-guidelines.md §"nguyên tắc phối màu") and uses brand
+# color only as a soft accent, not a saturated wash — these stops stay much
+# closer to neutral cream, with gold/green only as a faint warm edge tint.
 VARIANTS = {
     "gold": {
-        "center": (250, 245, 228),
-        "mid": (234, 213, 160),
-        "edge": (196, 160, 70),
+        "center": (253, 251, 246),
+        "mid": (248, 241, 223),
+        "edge": (225, 205, 158),
     },
     "green": {
-        "center": (244, 247, 240),
-        "mid": (193, 209, 191),
-        "edge": (63, 92, 68),
+        "center": (251, 252, 249),
+        "mid": (236, 240, 231),
+        "edge": (194, 208, 191),
     },
 }
 
@@ -62,10 +68,22 @@ def cut_white_background(im, thresh=205):
     rgb = arr[:, :, :3].astype(np.int16)
     minc = rgb.min(axis=2)
     whiteish = minc >= thresh
-    labeled, _ = label(whiteish)
+
+    # Border-flood-fill alone misses whiteish background trapped in narrow
+    # gaps between thin structures (root hairs, leaf stems on loose herbal
+    # material like hoa-sam-tuoi/cu-sam-tuoi) — those gaps aren't connected
+    # to the image edge through other whiteish pixels, so they stayed as
+    # visible flat-white patches once composited onto a colored background
+    # (invisible before against near-white ivory, obvious now). Dilate first
+    # to bridge small gaps for CONNECTIVITY purposes only, then intersect
+    # back with the original mask so only genuinely whiteish pixels are ever
+    # actually cut — this never eats into real product edges.
+    bridged = binary_dilation(whiteish, iterations=4)
+    labeled, _ = label(bridged)
     border_labels = set(labeled[0, :]) | set(labeled[-1, :]) | set(labeled[:, 0]) | set(labeled[:, -1])
     border_labels.discard(0)
-    bg_mask = np.isin(labeled, list(border_labels))
+    bg_mask = np.isin(labeled, list(border_labels)) & whiteish
+
     alpha = arr[:, :, 3].astype(np.float32)
     alpha[bg_mask] = 0
     alpha_img = Image.fromarray(alpha.astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(1.5))
