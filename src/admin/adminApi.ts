@@ -2,9 +2,11 @@ import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
 import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage } from '../lib/siteContentApi';
+import type { DbOrder, DbRevenueDaily } from './types/admin';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
 export { fetchAllBlogPostsForAdmin };
+export type { DbOrder, DbRevenueDaily };
 
 // Shared data-access layer for the admin panel. All reads/writes go through
 // the Supabase client with the signed-in admin's session — RLS policies
@@ -1074,6 +1076,48 @@ export async function markCustomerLeadContacted(id: string) {
 export async function deleteCustomerLead(id: string) {
   const { error } = await supabase.from('customer_leads').delete().eq('id', id);
   if (error) throw new Error(error.message);
+}
+
+// ---------- Orders (realtime) ----------
+
+export async function fetchOrders(): Promise<DbOrder[]> {
+  return throwIfError(
+    await supabase
+      .from('orders')
+      .select('id, customer_name, customer_phone, total_vnd, status, created_at, updated_at')
+      .order('created_at', { ascending: false })
+  );
+}
+
+export async function createOrder(input: Omit<DbOrder, 'id' | 'created_at' | 'updated_at'>): Promise<DbOrder> {
+  const res = await supabase
+    .from('orders')
+    .insert(input)
+    .select('id, customer_name, customer_phone, total_vnd, status, created_at, updated_at')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateOrderStatus(id: string, status: DbOrder['status']): Promise<DbOrder> {
+  const res = await supabase
+    .from('orders')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select('id, customer_name, customer_phone, total_vnd, status, created_at, updated_at')
+    .single();
+  return throwIfError(res);
+}
+
+// ---------- Revenue Daily (metrics) ----------
+
+export async function fetchRevenueDaily(): Promise<DbRevenueDaily[]> {
+  return throwIfError(
+    await supabase
+      .from('revenue_daily')
+      .select('date, showroom_vnd, online_vnd, affiliate_vnd, otc_ka_vnd, total_vnd')
+      .order('date', { ascending: false })
+      .limit(90)
+  );
 }
 
 // ---------- Dashboard KPIs (Tổng quan) ----------
