@@ -254,7 +254,7 @@ export default function CmsPage() {
         drafts[r.channel_id] = r.caption_text;
       });
       activeChannels.forEach((c) => {
-        if (!(c.id in drafts)) drafts[c.id] = draftCaption(c.platform_type, post);
+        if (!(c.id in drafts)) drafts[c.id] = post.captions?.[c.platform_type] ?? draftCaption(c.platform_type, post);
       });
       setExistingCaptions(byChannel);
       setCaptionDrafts(drafts);
@@ -828,7 +828,28 @@ function CaptionPanel({
   onClose: () => void;
 }) {
   const [showWebhookHelp, setShowWebhookHelp] = useState(false);
+  const [telegramStatus, setTelegramStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   if (!post) return null;
+
+  const sendToTelegram = async () => {
+    if (!post.captions || Object.keys(post.captions).length === 0) {
+      setTelegramStatus('err');
+      setTimeout(() => setTelegramStatus('idle'), 3000);
+      return;
+    }
+    setTelegramStatus('sending');
+    try {
+      const res = await fetch('/api/send-captions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: post.title, captions: post.captions }),
+      });
+      setTelegramStatus(res.ok ? 'ok' : 'err');
+    } catch {
+      setTelegramStatus('err');
+    }
+    setTimeout(() => setTelegramStatus('idle'), 4000);
+  };
 
   return (
     <div className="mt-6 pt-6 border-t border-forest-100">
@@ -836,9 +857,20 @@ function CaptionPanel({
         <h4 className="font-display text-base text-forest-900">
           Caption đa kênh — <span className="text-gold-600">{post.title}</span>
         </h4>
-        <Button onClick={onClose} variant="ghost" size="sm" className="h-auto p-0 text-forest-400 hover:text-forest-700 hover:bg-transparent">
-          Đóng
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={sendToTelegram}
+            disabled={telegramStatus === 'sending'}
+            variant="ghost"
+            size="sm"
+            className="h-auto p-0 text-blue-500 hover:text-blue-700 hover:bg-transparent text-xs"
+          >
+            {telegramStatus === 'sending' ? 'Đang gửi...' : telegramStatus === 'ok' ? '✓ Đã gửi Telegram' : telegramStatus === 'err' ? '✗ Lỗi gửi' : 'Gửi Telegram'}
+          </Button>
+          <Button onClick={onClose} variant="ghost" size="sm" className="h-auto p-0 text-forest-400 hover:text-forest-700 hover:bg-transparent">
+            Đóng
+          </Button>
+        </div>
       </div>
       <p className="text-xs text-forest-500 mb-1">
         Sửa nội dung/ảnh/video từng kênh nếu cần, tick chọn nhiều kênh rồi bấm 1 nút để đăng đồng loạt. Chưa cấu hình

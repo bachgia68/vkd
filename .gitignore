@@ -26,3 +26,5 @@ public/products-seo.json
 build-output.txt
 .superpowers/
 __pycache__/
+.vercel
+.env*

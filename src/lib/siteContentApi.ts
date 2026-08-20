@@ -59,6 +59,7 @@ export interface BlogPost {
   featured_image_alt: string | null;
   created_at: string;
   published: boolean;
+  captions?: Record<string, string>;
 }
 
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
@@ -76,7 +77,7 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
 export async function fetchAllBlogPostsForAdmin(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published, captions')
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
