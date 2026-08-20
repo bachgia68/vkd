@@ -20,6 +20,9 @@
 
 Sâm Ngọc Linh (*Panax vietnamensis*) là loài sâm hoang dã quý hiếm chỉ mọc ở vùng Ngọc Linh, Kon Tum, Việt Nam. Khác với sâm nhân tạo, sâm tự nhiên mọc từ 10-50 năm, tích lũy hàng trăm dưỡng chất.
 
+![Sâm Ngọc Linh tự nhiên — Rễ sâm hoang dã tuổi 20-50 năm](public/blog-images/sam-ngoc-linh-root.webp)
+_Hình 1: Sâm Ngọc Linh hoang dã từ vùng Kon Tum. Tuổi càng cao, chất lượng càng tốt._
+
 > **Sự thật**: Mỗi 1kg sâm Ngọc Linh đòi hỏi 50m² rừng nguyên sinh và 20+ năm trồng. Hiếm ngang vàng quý trong tự nhiên.
 
 Thành phần chính gồm:
@@ -50,6 +53,9 @@ Nghiên cứu từ Đại học Y Hà Nội (2024) cho thấy:
 - Polysaccharide trong sâm tăng sản xuất ATP (năng lượng tế bào)
 - Người dùng báo cáo cảm thấy tỉnh táo hơn sau 1-2 tuần
 - Không gây mất ngủ (không chứa caffeine)
+
+![Tổ Yến Sâm — Kết Hợp Collagen & Saponin](public/blog-images/sam-ngoc-linh-tho-yen.webp)
+_Hình 2: Tổ Yến Sâm Ngọc Linh 100ml. Collagen + saponin tăng hấp thu năng lượng._
 
 ### 3. Hỗ Trợ Làm Đẹp Từ Bên Trong
 
