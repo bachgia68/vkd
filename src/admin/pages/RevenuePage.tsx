@@ -1,94 +1,57 @@
-import { useEffect, useState } from 'react';
-import { fmt } from '../adminMockData';
-import { fetchChannelRevenue, fetchSocialCampaigns, type ChannelRevenueRow, type SocialCampaignRow } from '../adminApi';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useMetrics } from '../hooks/useMetrics';
 
 export default function RevenuePage() {
-  const [channels, setChannels] = useState<ChannelRevenueRow[]>([]);
-  const [campaigns, setCampaigns] = useState<SocialCampaignRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const { revenue, kpis, isLoading, error } = useMetrics();
 
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([fetchChannelRevenue(), fetchSocialCampaigns()])
-      .then(([c, s]) => {
-        setChannels(c);
-        setCampaigns(s);
-        setLoadError(null);
-      })
-      .catch((e) => setLoadError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  if (isLoading) return <div className="p-6">Đang tải dữ liệu...</div>;
+  if (error) return <div className="p-6 text-red-600">Lỗi: {String(error)}</div>;
 
-  if (loading) return <p className="text-sm text-forest-500">Đang tải dữ liệu doanh thu…</p>;
-  if (loadError) return <p className="text-sm text-red-600">Lỗi tải dữ liệu: {loadError}</p>;
-
-  const totalRevenue = channels.reduce((s, c) => s + c.revenue, 0);
-  const maxReach = Math.max(1, ...campaigns.map((c) => c.reach));
+  const chartData = revenue.map((day) => ({
+    date: new Date(day.date).toLocaleDateString('vi-VN'),
+    showroom: day.showroom_vnd,
+    online: day.online_vnd,
+    affiliate: day.affiliate_vnd,
+    total: day.total_vnd,
+  }));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-xs uppercase tracking-widest text-forest-500 mb-1">Vận hành / Doanh thu &amp; Hiệu suất</p>
-        <h1 className="font-display text-3xl text-forest-900">Doanh thu &amp; hiệu suất đa kênh</h1>
-      </div>
+    <div className="p-6 space-y-8">
+      <h1 className="text-2xl font-bold">Doanh thu Đa kênh</h1>
 
-      <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
-        <div className="flex items-baseline justify-between mb-4">
-          <h3 className="font-display text-lg text-forest-900">Doanh thu theo kênh bán</h3>
-          <span className="font-mono text-sm text-forest-500">Tổng: {fmt(totalRevenue)}đ</span>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-gray-600">Tổng doanh thu (30 ngày)</p>
+          <p className="text-2xl font-bold">{kpis.revenueThisMonth.toLocaleString()} đ</p>
         </div>
-        <p className="text-xs text-forest-400 mb-3">
-          Kênh Website/TMĐT tính từ đơn hàng PayOS thật đã thanh toán. Showroom tính từ file doanh thu nạp thủ công ở
-          trang Showroom (chưa có POS trực tiếp). Affiliate, OTC-KA hiện là 0 do chưa có nguồn dữ liệu.
-        </p>
-        <div className="space-y-3">
-          {channels.map((c) => (
-            <div key={c.channel} className="flex items-center gap-3 text-sm">
-              <span className="w-56 flex-shrink-0 text-forest-700">{c.channel}</span>
-              <div className="flex-1 h-2.5 rounded-full bg-cream-200 overflow-hidden">
-                <div className="h-full rounded-full bg-gradient-to-r from-forest-500 to-gold-400" style={{ width: `${c.share}%` }} />
-              </div>
-              <span className="w-14 text-right text-forest-500">{c.share}%</span>
-              <span className="w-32 text-right font-mono tabular-nums">{fmt(c.revenue)}đ</span>
-              <span className="w-20 text-right text-xs text-forest-400">{c.orders} đơn</span>
-            </div>
-          ))}
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm text-gray-600">Số đơn hàng</p>
+          <p className="text-2xl font-bold">{kpis.paidOrdersThisMonth}</p>
+        </div>
+        <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <p className="text-sm text-gray-600">Khách hàng</p>
+          <p className="text-2xl font-bold">{kpis.totalCustomers}</p>
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-2xl border border-forest-100 shadow-elegant">
-        <table className="w-full text-sm min-w-[680px]">
-          <thead>
-            <tr className="bg-forest-900 text-cream-100 text-xs uppercase tracking-wide">
-              <th className="text-left font-medium px-4 py-3">Nền tảng</th>
-              <th className="text-right font-medium px-4 py-3">Tiếp cận (Reach)</th>
-              <th className="text-right font-medium px-4 py-3">Tương tác</th>
-              <th className="text-right font-medium px-4 py-3">Chuyển đổi</th>
-              <th className="text-right font-medium px-4 py-3">Tỷ lệ CĐ</th>
-              <th className="text-left font-medium px-4 py-3 w-40">So sánh Reach</th>
-            </tr>
-          </thead>
-          <tbody>
-            {campaigns.map((c) => (
-              <tr key={c.platform} className="border-t border-forest-50">
-                <td className="px-4 py-3 font-medium text-forest-900">{c.platform}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">{fmt(c.reach)}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">{fmt(c.engagement)}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">{fmt(c.conversions)}</td>
-                <td className="px-4 py-3 text-right font-mono">{c.convRate}%</td>
-                <td className="px-4 py-3">
-                  <div className="h-2 rounded-full bg-cream-200 overflow-hidden">
-                    <div className="h-full rounded-full bg-gold-400" style={{ width: `${(c.reach / maxReach) * 100}%` }} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p className="text-xs text-forest-400 px-4 py-3 border-t border-forest-50">
-          Chưa kết nối Ads API (Facebook/TikTok/Zalo) — số liệu bắt đầu ở 0 cho đến khi tích hợp thật.
-        </p>
+      <div className="bg-white border rounded-lg p-4">
+        <h2 className="text-lg font-semibold mb-4">Doanh thu 90 ngày</h2>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
+              <YAxis />
+              <Tooltip formatter={(value) => (value as number).toLocaleString()} />
+              <Legend />
+              <Line type="monotone" dataKey="showroom" stroke="#3b82f6" name="Showroom" />
+              <Line type="monotone" dataKey="online" stroke="#10b981" name="Online" />
+              <Line type="monotone" dataKey="affiliate" stroke="#f59e0b" name="Affiliate" />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-gray-600 text-center py-8">Chưa có dữ liệu doanh thu</p>
+        )}
       </div>
     </div>
   );
