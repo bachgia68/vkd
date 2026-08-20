@@ -10,7 +10,6 @@ export default function ProductsPage() {
   const { isOwner } = useAdminAuth();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState({ name_vi: '', price_vnd: 0 });
-  const [showAddModal, setShowAddModal] = useState(false);
 
   if (isLoading) return <div className="p-6">Đang tải...</div>;
   if (error) return <div className="p-6 text-red-600">Lỗi: {String(error)}</div>;
@@ -28,16 +27,13 @@ export default function ProductsPage() {
   };
 
   const handleToggle = (p: DbProduct) => {
-    update({ id: p.id, input: { active: !p.active } });
+    update({ id: p.id, input: { active: !p.active } as any });
   };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Sản phẩm & Kho hàng</h1>
-        <Button onClick={() => setShowAddModal(true)} variant="primary">
-          <Plus className="w-4 h-4" /> Thêm sản phẩm
-        </Button>
       </div>
 
       <div className="space-y-2">
@@ -80,7 +76,7 @@ export default function ProductsPage() {
       </div>
 
       {editingId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md space-y-4">
             <h2 className="text-lg font-bold">Sửa sản phẩm</h2>
             <input
