@@ -8,9 +8,13 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 // checking auth.jwt() -> 'app_metadata' ->> 'role' = 'admin') once admin pages
 // read/write real Supabase tables instead of local mock data.
 
+export type UserRole = 'owner' | 'editor' | 'viewer';
+
 interface AdminAuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
+  role: UserRole | null;
+  isOwner: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
@@ -21,9 +25,14 @@ function hasAdminRole(session: Session | null) {
   return session?.user?.app_metadata?.role === 'admin';
 }
 
+function getRoleFromSession(session: Session | null): UserRole {
+  return (session?.user?.app_metadata?.role as UserRole) || 'viewer';
+}
+
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -32,12 +41,16 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
 
     supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
-      setIsAuthenticated(hasAdminRole(data.session));
+      const isAdmin = hasAdminRole(data.session);
+      setIsAuthenticated(isAdmin);
+      setRole(isAdmin ? getRoleFromSession(data.session) : null);
       setIsLoading(false);
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
-      setIsAuthenticated(hasAdminRole(session));
+      const isAdmin = hasAdminRole(session);
+      setIsAuthenticated(isAdmin);
+      setRole(isAdmin ? getRoleFromSession(session) : null);
     });
 
     return () => sub.subscription.unsubscribe();
@@ -74,7 +87,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AdminAuthContext.Provider value={{ isAuthenticated, isLoading, role, isOwner: role === 'owner', login, logout }}>
       {children}
     </AdminAuthContext.Provider>
   );

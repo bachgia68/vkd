@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Plus, Pencil, EyeOff, Eye, Trash2 } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
+import { useAdminAuth } from '../AdminAuthContext';
 import type { DbProduct } from '../types/admin';
 import { Button } from '../../components/ui/button';
 
 export default function ProductsPage() {
   const { data: products = [], isLoading, error, update, delete: deleteProduct } = useProducts();
+  const { isOwner } = useAdminAuth();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState({ name_vi: '', price_vnd: 0 });
   const [showAddModal, setShowAddModal] = useState(false);
@@ -63,13 +65,15 @@ export default function ProductsPage() {
               >
                 <Pencil className="w-4 h-4" />
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => deleteProduct(p.id)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              {isOwner && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => deleteProduct(p.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         ))}
