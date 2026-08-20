@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Plus, Pencil, EyeOff, Eye, Trash2 } from 'lucide-react';
+import { Pencil, EyeOff, Eye, Trash2 } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import { useAdminAuth } from '../AdminAuthContext';
-import type { DbProduct } from '../types/admin';
 import { Button } from '../../components/ui/button';
 
 export default function ProductsPage() {
@@ -14,7 +13,7 @@ export default function ProductsPage() {
   if (isLoading) return <div className="p-6">Đang tải...</div>;
   if (error) return <div className="p-6 text-red-600">Lỗi: {String(error)}</div>;
 
-  const handleEdit = (p: DbProduct) => {
+  const handleEdit = (p: any) => {
     setEditingId(p.id);
     setEditDraft({ name_vi: p.name_vi, price_vnd: p.price_vnd || 0 });
   };
@@ -26,8 +25,8 @@ export default function ProductsPage() {
     }
   };
 
-  const handleToggle = (p: DbProduct) => {
-    update({ id: p.id, input: { active: !p.active } as any });
+  const handleToggle = (p: any) => {
+    update({ id: p.id, input: { active: !p.active } });
   };
 
   return (
