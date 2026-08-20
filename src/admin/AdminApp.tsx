@@ -18,6 +18,7 @@ import CombosPage from './pages/CombosPage';
 import SiteSectionsPage from './pages/SiteSectionsPage';
 import LoyaltyPage from './pages/LoyaltyPage';
 import HeritageGalleryPage from './pages/HeritageGalleryPage';
+import OrdersPage from './pages/OrdersPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -38,6 +39,7 @@ export default function AdminApp() {
           <Route path="loyalty" element={<LoyaltyPage />} />
           <Route path="inventory-qr" element={<InventoryQrPage />} />
           <Route path="products" element={<ProductsPage />} />
+          <Route path="orders" element={<OrdersPage />} />
           <Route path="catalog-export" element={<CatalogExportPage />} />
           <Route path="agents" element={<AgentsPage />} />
           <Route path="showrooms" element={<ShowroomsPage />} />
