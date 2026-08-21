@@ -30,44 +30,28 @@ SITE_URL = "tasamngoclinh.com"
 # positioning-brand-guidelines.md §"nguyên tắc phối màu") and uses brand
 # color only as a soft accent, not a saturated wash — these stops stay much
 # closer to neutral cream, with gold/green only as a faint warm edge tint.
-# Dark dramatic palette — KGC/JungKwanJang studio style: near-black + center spotlight
+# Luxury white — Apple/KGC product catalog style: bright center, cream/green tinted edge
 VARIANTS = {
-    "gold": {
-        "center": (58, 44, 16),   # dark warm amber — lifted at spotlight center
-        "mid":    (28, 21,  6),
-        "edge":   (10,  7,  2),   # near-black warm
-    },
-    "green": {
-        "center": (20, 50, 30),   # dark forest — lifted at center
-        "mid":    (10, 26, 16),
-        "edge":   ( 4, 10,  7),   # near-black cool green
-    },
+    "gold":  {"c": (255, 252, 245), "e": (232, 220, 198)},  # warm ivory edge
+    "green": {"c": (250, 255, 250), "e": (210, 232, 215)},  # cool sage edge
 }
 
 
 def make_gradient_bg(size, stops):
-    """Dark dramatic studio background with central spotlight — KGC style."""
+    """Luxury white radial gradient: pure white center → warm/cool cream edge."""
     w, h = size
-    cx, cy = w / 2, h * 0.38
+    cx, cy = w / 2.0, h / 2.0
     yy, xx = np.mgrid[0:h, 0:w]
-    dist = np.sqrt(((xx - cx) / (w * 0.65)) ** 2 + ((yy - cy) / (h * 0.65)) ** 2)
-    dist = np.clip(dist, 0, 1)
+    dist = np.clip(np.sqrt(((xx-cx)/(w*0.6))**2 + ((yy-cy)/(h*0.6))**2), 0, 1)
     bg = np.zeros((h, w, 3), dtype=np.float32)
+    c, e = stops["c"], stops["e"]
     for i in range(3):
-        stop1, stop2, stop3 = stops["center"][i], stops["mid"][i], stops["edge"][i]
-        near = dist < 0.5
-        val_near = stop1 + (stop2 - stop1) * (dist / 0.5)
-        t2 = np.clip((dist - 0.5) / 0.5, 0, 1)
-        val_far = stop2 + (stop3 - stop2) * t2
-        bg[:, :, i] = np.where(near, val_near, val_far)
-
-    # Soft white spotlight ellipse at top-center — studio key light effect
-    spot_dist = np.sqrt(((xx - cx) / (w * 0.45)) ** 2 + ((yy - h * 0.28) / (h * 0.35)) ** 2)
-    spot = np.clip(1.0 - spot_dist, 0, 1) ** 2.2
+        bg[:,:,i] = c[i] + (e[i] - c[i]) * dist
+    # Paper texture: barely visible
+    noise = np.random.normal(0, 2.5, (h, w))
     for i in range(3):
-        bg[:, :, i] = np.clip(bg[:, :, i] + spot * 38, 0, 255)
-
-    return Image.fromarray(bg.astype(np.uint8), "RGB")
+        bg[:,:,i] = np.clip(bg[:,:,i] + noise, 0, 255)
+    return Image.fromarray(bg.astype(np.uint8), "RGB").filter(ImageFilter.GaussianBlur(1))
 
 
 def cut_white_background(im, thresh=205):
@@ -169,8 +153,8 @@ def stamp_logo_and_url(im, logo_cutout):
     tx = max(margin, min(tx, w - url_w_px - margin))
     ty = max(margin, block_top)
     # Shadow + white text on dark bg
-    draw.text((tx + 1, ty + 1), SITE_URL, font=font, fill=(0, 0, 0, 160))
-    draw.text((tx, ty), SITE_URL, font=font, fill=(255, 255, 255, 220))
+    draw.text((tx + 1, ty + 1), SITE_URL, font=font, fill=(180, 170, 155, 120))
+    draw.text((tx, ty), SITE_URL, font=font, fill=(14, 58, 34, 200))
 
     return im.convert("RGB")
 
@@ -180,7 +164,7 @@ def process_one(rel_path, variant_name, logo_cutout):
     out_path = os.path.join(PREMIUM_DIR, rel_path)
     im = Image.open(src_path)
     cutout = cut_white_background(im)
-    bg = make_gradient_bg(im.size, VARIANTS[variant_name])
+    bg = make_gradient_bg(im.size, VARIANTS[variant_name])  # color tuple
     composited = composite_with_shadow(cutout, bg).convert("RGB")
     stamped = stamp_logo_and_url(composited, logo_cutout)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
