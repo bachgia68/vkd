@@ -37,7 +37,7 @@ interface MaiJob {
 type Screen = 'scripts' | 'edit' | 'generating' | 'review' | 'history';
 
 const N8N_WEBHOOK = import.meta.env.VITE_N8N_MAI_WEBHOOK ?? '';
-const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY ?? '';
+const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY ?? '';
 const PLATFORMS = ['TikTok', 'Facebook', 'YouTube Shorts'];
 
 const GEMINI_PROMPTS = [
@@ -216,32 +216,31 @@ export default function MaiStudio() {
   const [geminiLoading, setGeminiLoading] = useState(false);
 
   async function generateWithGemini(promptIdx: number) {
-    if (!GEMINI_KEY) {
-      setError('Chưa có VITE_GEMINI_API_KEY trong .env');
+    if (!GROQ_KEY) {
+      setError('Chưa có VITE_GROQ_API_KEY trong .env');
       return;
     }
     setGeminiLoading(true);
     setError('');
     try {
-      // Supports both AIza... (API key) and AQ... (OAuth token)
-      const isOAuth = GEMINI_KEY.startsWith('AQ.');
-      const url = isOAuth
-        ? 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
-        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (isOAuth) headers['Authorization'] = `Bearer ${GEMINI_KEY}`;
-
-      const res = await fetch(url, {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ contents: [{ parts: [{ text: GEMINI_PROMPTS[promptIdx] }] }] }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${GROQ_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-120b',
+          messages: [{ role: 'user', content: GEMINI_PROMPTS[promptIdx] }],
+          temperature: 0.7,
+        }),
       });
       const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-      if (text) setEditContent(text);
-      else setError(data?.error?.message ?? 'Gemini không trả về nội dung');
+      const text = data?.choices?.[0]?.message?.content ?? '';
+      if (text) setEditContent(text.trim());
+      else setError(data?.error?.message ?? 'AI không trả về nội dung');
     } catch {
-      setError('Lỗi kết nối Gemini API');
+      setError('Lỗi kết nối AI API');
     }
     setGeminiLoading(false);
   }
