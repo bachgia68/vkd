@@ -30,35 +30,43 @@ SITE_URL = "tasamngoclinh.com"
 # positioning-brand-guidelines.md §"nguyên tắc phối màu") and uses brand
 # color only as a soft accent, not a saturated wash — these stops stay much
 # closer to neutral cream, with gold/green only as a faint warm edge tint.
+# Dark dramatic palette — KGC/JungKwanJang studio style: near-black + center spotlight
 VARIANTS = {
     "gold": {
-        "center": (253, 251, 246),
-        "mid": (248, 241, 223),
-        "edge": (225, 205, 158),
+        "center": (58, 44, 16),   # dark warm amber — lifted at spotlight center
+        "mid":    (28, 21,  6),
+        "edge":   (10,  7,  2),   # near-black warm
     },
     "green": {
-        "center": (251, 252, 249),
-        "mid": (236, 240, 231),
-        "edge": (194, 208, 191),
+        "center": (20, 50, 30),   # dark forest — lifted at center
+        "mid":    (10, 26, 16),
+        "edge":   ( 4, 10,  7),   # near-black cool green
     },
 }
 
 
 def make_gradient_bg(size, stops):
+    """Dark dramatic studio background with central spotlight — KGC style."""
     w, h = size
-    cx, cy = w / 2, h * 0.42
+    cx, cy = w / 2, h * 0.38
     yy, xx = np.mgrid[0:h, 0:w]
-    dist = np.sqrt(((xx - cx) / (w * 0.75)) ** 2 + ((yy - cy) / (h * 0.75)) ** 2)
+    dist = np.sqrt(((xx - cx) / (w * 0.65)) ** 2 + ((yy - cy) / (h * 0.65)) ** 2)
     dist = np.clip(dist, 0, 1)
     bg = np.zeros((h, w, 3), dtype=np.float32)
     for i in range(3):
         stop1, stop2, stop3 = stops["center"][i], stops["mid"][i], stops["edge"][i]
-        t = dist
-        near = t < 0.55
-        val_near = stop1 + (stop2 - stop1) * (t / 0.55)
-        t2 = np.clip((t - 0.55) / 0.45, 0, 1)
+        near = dist < 0.5
+        val_near = stop1 + (stop2 - stop1) * (dist / 0.5)
+        t2 = np.clip((dist - 0.5) / 0.5, 0, 1)
         val_far = stop2 + (stop3 - stop2) * t2
         bg[:, :, i] = np.where(near, val_near, val_far)
+
+    # Soft white spotlight ellipse at top-center — studio key light effect
+    spot_dist = np.sqrt(((xx - cx) / (w * 0.45)) ** 2 + ((yy - h * 0.28) / (h * 0.35)) ** 2)
+    spot = np.clip(1.0 - spot_dist, 0, 1) ** 2.2
+    for i in range(3):
+        bg[:, :, i] = np.clip(bg[:, :, i] + spot * 38, 0, 255)
+
     return Image.fromarray(bg.astype(np.uint8), "RGB")
 
 
@@ -122,29 +130,48 @@ def load_logo_cutout():
 
 
 def stamp_logo_and_url(im, logo_cutout):
+    """Clean dark-style stamp: logo bottom-right + URL below — no white strip, KGC minimal."""
     im = im.convert("RGBA")
     w, h = im.size
-    logo_w = int(w * 0.16)
+    margin = int(w * 0.035)
+
+    # Logo
+    logo_w = int(w * 0.12)
     scale = logo_w / logo_cutout.width
     logo_h = int(logo_cutout.height * scale)
     logo_resized = logo_cutout.resize((logo_w, logo_h), Image.LANCZOS)
-    alpha = logo_resized.split()[-1].point(lambda a: int(a * 0.85))
-    logo_resized = Image.merge("RGBA", (*logo_resized.split()[:3], alpha))
-    margin = int(w * 0.04)
-    x = w - logo_w - margin
-    y = h - logo_h - margin
-    im.alpha_composite(logo_resized, (x, y))
+
+    # URL font
+    font_size = max(11, int(w * 0.022))
+    try:
+        font = ImageFont.truetype(FONT_PATH, font_size)
+    except Exception:
+        font = ImageFont.load_default()
 
     draw = ImageDraw.Draw(im)
-    font_size = max(14, int(w * 0.032))
-    font = ImageFont.truetype(FONT_PATH, font_size)
-    bbox = draw.textbbox((0, 0), SITE_URL, font=font)
-    text_w = bbox[2] - bbox[0]
-    text_h = bbox[3] - bbox[1]
-    tx = w - text_w - margin
-    ty = y - text_h - int(h * 0.012)
-    draw.text((tx + 1, ty + 1), SITE_URL, font=font, fill=(0, 0, 0, 110))
-    draw.text((tx, ty), SITE_URL, font=font, fill=(255, 255, 255, 235))
+    b = draw.textbbox((0, 0), SITE_URL, font=font)
+    url_w_px = b[2] - b[0]
+    url_h_px = b[3] - b[1]
+    gap = int(h * 0.008)
+
+    # Total block height: url + gap + logo
+    block_h = url_h_px + gap + logo_h
+    # Anchor bottom-right, fully inside image
+    lx = min(w - logo_w - margin, w - logo_w)
+    block_top = max(margin, h - block_h - margin)
+    ly = min(block_top + url_h_px + gap, h - logo_h)
+
+    # Logo
+    im.alpha_composite(logo_resized, (max(0, lx), max(0, ly)))
+
+    # URL — right-aligned with logo, above it
+    tx = lx + (logo_w - url_w_px) // 2  # center under logo
+    tx = max(margin, min(tx, w - url_w_px - margin))
+    ty = max(margin, block_top)
+    # Shadow + white text on dark bg
+    draw.text((tx + 1, ty + 1), SITE_URL, font=font, fill=(0, 0, 0, 160))
+    draw.text((tx, ty), SITE_URL, font=font, fill=(255, 255, 255, 220))
+
     return im.convert("RGB")
 
 
