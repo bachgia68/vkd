@@ -80,7 +80,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
       <nav className="container-wide">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <button onClick={() => handleNav('home')} className="flex items-center gap-3 group">
+          <button onClick={() => handleNav('home')} className="flex-shrink-0 flex items-center gap-3 group">
             <img
               src="/assets/images/TA_logo_header.png"
               alt="TA — Sàn Giao Dịch Sâm Ngọc Linh Logo"
