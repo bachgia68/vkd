@@ -476,14 +476,44 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
           )}
         </div>
 
-        {/* CTA */}
-        <div className="rounded-3xl bg-forest-900 p-10 md:p-14 text-center">
-          <h3 className="font-display text-2xl md:text-3xl text-cream-50 mb-4">{ui.ctaTitle}</h3>
-          <p className="text-cream-200 max-w-xl mx-auto mb-8">{ui.ctaText}</p>
-          <button onClick={() => onNavigate('catalog')} className="btn-primary text-xs">
-            {ui.ctaButton}
-          </button>
-        </div>
+        {/* Related Products — KGC style */}
+        {(() => {
+          const related = [
+            ...staticProducts.filter(p => p.slug !== product.slug && p.productType === product.productType),
+            ...staticProducts.filter(p => p.slug !== product.slug && p.supplierId === product.supplierId && p.productType !== product.productType),
+          ].slice(0, 8);
+          if (!related.length) return null;
+          return (
+            <div className="pt-4">
+              <h3 className="font-display text-xl md:text-2xl text-forest-900 mb-6">
+                {lang === 'vi' ? 'Sản phẩm liên quan' : lang === 'en' ? 'You may also like' : lang === 'zh' ? '相关产品' : lang === 'fr' ? 'Produits similaires' : 'منتجات مشابهة'}
+              </h3>
+              <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {related.map(rp => (
+                  <a
+                    key={rp.sku}
+                    href={`/product/${rp.slug}`}
+                    onClick={e => { e.preventDefault(); onNavigate('product-detail', rp.slug); }}
+                    className="flex-shrink-0 w-44 md:w-52 group cursor-pointer"
+                  >
+                    <div className="aspect-square rounded-2xl overflow-hidden bg-cream-100 mb-3">
+                      <img
+                        src={rp.image}
+                        alt={rp.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                    <p className="text-sm font-semibold text-forest-900 leading-snug line-clamp-2 mb-1">{rp.name}</p>
+                    {rp.price != null && (
+                      <p className="text-sm text-gold-700 font-bold">{rp.price.toLocaleString('vi-VN')}₫</p>
+                    )}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </section>
   );
