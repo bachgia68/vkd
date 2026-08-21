@@ -38,6 +38,9 @@ type Screen = 'scripts' | 'edit' | 'generating' | 'review' | 'history';
 
 const N8N_WEBHOOK = import.meta.env.VITE_N8N_MAI_WEBHOOK ?? '';
 const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY ?? '';
+const ELEVENLABS_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY ?? '';
+const FAL_KEY = import.meta.env.VITE_FAL_KEY ?? '';
+const DEFAULT_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Bella — free-tier API compatible (Rachel is library-only, blocked)
 const PLATFORMS = ['TikTok', 'Facebook', 'YouTube Shorts'];
 
 const GEMINI_PROMPTS = [
@@ -147,39 +150,96 @@ export default function MaiStudio() {
     }
   }
 
+  async function updateJob(scriptId: string, fields: Partial<MaiJob> & Record<string, unknown>) {
+    await supabase.from('mai_jobs').update(fields).eq('script_id', scriptId);
+  }
+
   async function triggerGenerate() {
-    if (!selected || !N8N_WEBHOOK) {
-      setError('Chưa cấu hình N8N_MAI_WEBHOOK trong .env');
+    if (!selected) return;
+    if (!ELEVENLABS_KEY || !FAL_KEY) {
+      setError('Chưa cấu hình VITE_ELEVENLABS_API_KEY hoặc VITE_FAL_KEY trong .env');
       return;
     }
     setTriggering(true);
     setError('');
 
-    // Save edits first
+    const scriptId = selected.id;
+    const scriptContent = editContent;
+
     const { error: saveErr } = await supabase
       .from('mai_scripts')
-      .update({ content: editContent, status: 'generating' })
-      .eq('id', selected.id);
-
+      .update({ content: scriptContent, status: 'generating' })
+      .eq('id', scriptId);
     if (saveErr) { setError(saveErr.message); setTriggering(false); return; }
 
-    // Trigger n8n
-    try {
-      await fetch(N8N_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          script_id: selected.id,
-          text: editContent,
-          platforms,
-        }),
-      });
-      setSelected({ ...selected, content: editContent, status: 'generating' });
-      setScreen('generating');
-    } catch (e) {
-      setError('Không kết nối được n8n webhook. Kiểm tra tunnel đang chạy?');
-    }
+    setSelected({ ...selected, content: scriptContent, status: 'generating' });
+    setScreen('generating');
     setTriggering(false);
+
+    // Everything below runs in the background — screen already switched to
+    // 'generating' and listens to mai_jobs via realtime subscription.
+    (async () => {
+      try {
+        await supabase.from('mai_jobs').insert({
+          script_id: scriptId, stage: 'voice', progress: 10, message: 'Đang tạo giọng nói...',
+        });
+
+        // 1. ElevenLabs TTS
+        const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${DEFAULT_VOICE_ID}`, {
+          method: 'POST',
+          headers: { 'xi-api-key': ELEVENLABS_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: scriptContent,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+          }),
+        });
+        if (!ttsRes.ok) throw new Error(`ElevenLabs lỗi: ${await ttsRes.text()}`);
+        const audioBlob = await ttsRes.blob();
+
+        // 2. Upload audio to Supabase storage
+        const { error: uploadErr } = await supabase.storage.from('mai-media').upload(`audio/${scriptId}.mp3`, audioBlob, {
+          contentType: 'audio/mpeg', upsert: true,
+        });
+        if (uploadErr) throw new Error(`Upload audio lỗi: ${uploadErr.message}`);
+
+        await updateJob(scriptId, { stage: 'video', progress: 30, message: 'Đang tạo video AI...' });
+
+        // 3. fal.ai (Kling) submit
+        const falRes = await fetch('https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video', {
+          method: 'POST',
+          headers: { Authorization: `Key ${FAL_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: scriptContent, duration: '5', aspect_ratio: '9:16' }),
+        });
+        if (!falRes.ok) throw new Error(`fal.ai lỗi: ${await falRes.text()}`);
+        const falData = await falRes.json();
+        await updateJob(scriptId, { kling_task_id: falData.request_id });
+
+        // 4. Poll status_url until COMPLETED
+        let videoUrl = '';
+        for (let attempt = 0; attempt < 40; attempt++) {
+          await new Promise(r => setTimeout(r, 8000));
+          const statusRes = await fetch(falData.status_url, { headers: { Authorization: `Key ${FAL_KEY}` } });
+          const statusData = await statusRes.json();
+          if (statusData.status === 'COMPLETED') {
+            const resultRes = await fetch(falData.response_url, { headers: { Authorization: `Key ${FAL_KEY}` } });
+            const resultData = await resultRes.json();
+            videoUrl = resultData.video?.url ?? '';
+            break;
+          }
+          await updateJob(scriptId, { progress: Math.min(30 + attempt * 2, 90), message: 'Đang render video, vui lòng chờ...' });
+        }
+        if (!videoUrl) throw new Error('fal.ai không trả video sau thời gian chờ tối đa');
+
+        // 5. Done
+        await supabase.from('mai_scripts').update({ video_url: videoUrl, status: 'ready' }).eq('id', scriptId);
+        await updateJob(scriptId, { stage: 'posting', progress: 100, message: 'Video đã sẵn sàng!' });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Lỗi không xác định';
+        await updateJob(scriptId, { error: msg, message: msg });
+        await supabase.from('mai_scripts').update({ status: 'draft' }).eq('id', scriptId);
+      }
+    })();
   }
 
   async function approveVideo() {
