@@ -257,6 +257,18 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
   const categoryMeta = productTypes.find((t) => t.id === product.productType);
   const categoryLabel = categoryMeta ? (lang === 'en' ? categoryMeta.labelEn : categoryMeta.labelVi) : undefined;
 
+  const displayName =
+    lang === 'en' ? (product.nameEn || product.name) :
+    lang === 'zh' ? (product.nameZh || product.name) :
+    lang === 'fr' ? (product.nameFr || product.name) :
+    product.name;
+
+  const displayDescription =
+    lang === 'en' ? (product.descriptionEn || product.description) :
+    lang === 'zh' ? (product.descriptionZh || product.description) :
+    lang === 'fr' ? (product.descriptionFr || product.description) :
+    product.description;
+
   const canOrder = product.price != null && !product.displayOnly18Plus;
 
   const handleAddToCart = () => {
@@ -290,7 +302,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
           <ChevronRight className="w-3 h-3 text-forest-300" />
           {categoryLabel && <span className="text-forest-400">{categoryLabel}</span>}
           <ChevronRight className="w-3 h-3 text-forest-300" />
-          <span className="text-forest-700 font-medium truncate max-w-[220px]">{product.name}</span>
+          <span className="text-forest-700 font-medium truncate max-w-[220px]">{displayName}</span>
         </div>
 
         {/* Main */}
@@ -300,7 +312,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
               <div className="aspect-[4/5] overflow-hidden bg-cream-100">
                 <img
                   src={product.image}
-                  alt={product.name}
+                  alt={displayName}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.opacity = '0';
@@ -341,7 +353,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
             )}
 
             <h1 className="font-display text-3xl md:text-4xl text-forest-900 mb-3 leading-tight">
-              {product.name}
+              {displayName}
             </h1>
 
             <div className="text-3xl font-display font-bold text-forest-900 mb-6 pb-6 border-b border-cream-200">
@@ -351,7 +363,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
               )}
             </div>
 
-            <p className="text-forest-600 leading-relaxed mb-6">{product.description}</p>
+            <p className="text-forest-600 leading-relaxed mb-6">{displayDescription}</p>
 
             {product.displayOnly18Plus && (
               <div className="inline-flex items-start gap-2 mb-6 p-4 rounded-2xl bg-red-50 border border-red-200">

@@ -31,6 +31,10 @@ export interface Product {
   warnings?: string;
   volume?: string;
   sourceUrl: string;
+  // i18n translations (optional — falls back to Vietnamese)
+  nameEn?: string; descriptionEn?: string;
+  nameZh?: string; descriptionZh?: string;
+  nameFr?: string; descriptionFr?: string;
 }
 
 export const products: Product[] = [
