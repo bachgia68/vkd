@@ -28,6 +28,7 @@ import About from './components/About';
 import Blog from './components/Blog';
 import BlogPostDetail from './components/BlogPostDetail';
 import OmniChannel from './components/OmniChannel';
+import VideoGallery from './components/VideoGallery';
 import Showrooms from './components/Showrooms';
 import PolicyPage from './components/PolicyPage';
 import { fetchVisibleSections } from './lib/siteContentApi';
@@ -175,6 +176,7 @@ function App() {
               <Certifications lang={lang} />
               <TrustProof lang={lang} />
               <B2B lang={lang} />
+              {visibleSections.has('video-gallery') && <VideoGallery />}
               {visibleSections.has('omnichannel') && <OmniChannel lang={lang} onNavigate={navigate} />}
             </>
           )}

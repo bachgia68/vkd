@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
-import { ArrowLeft, Newspaper, Clock, UserRound, Quote, List } from 'lucide-react';
+import { ArrowLeft, Clock, UserRound, Quote, List } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { fetchBlogPost, type BlogPost } from '../lib/siteContentApi';
 import { products as staticProducts } from '../data/products';
@@ -330,17 +330,11 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
         <>
           {/* Hero Banner */}
           <div className="relative w-full h-72 md:h-[420px] overflow-hidden">
-            {post.featured_image_url ? (
-              <img
-                src={post.featured_image_url}
-                alt={post.featured_image_alt || post.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-forest-900 flex items-center justify-center">
-                <Newspaper className="w-12 h-12 text-forest-400" />
-              </div>
-            )}
+            <img
+              src={post.featured_image_url || '/assets/images/heritage-vuon-sam-1.jpg'}
+              alt={post.featured_image_alt || post.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-forest-950/60 to-forest-950/10" />
 
             <div className="relative h-full container-wide max-w-3xl flex flex-col justify-end pb-8">
