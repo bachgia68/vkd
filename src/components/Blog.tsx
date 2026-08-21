@@ -1,9 +1,35 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight, Clock, ChevronRight } from 'lucide-react';
 import { fetchBlogPosts, type BlogPost } from '../lib/siteContentApi';
 
 interface BlogProps {
   onNavigate?: (page: string, slug?: string) => void;
+}
+
+// Rotation fallback — dùng ảnh thật trong public/assets, không dark box
+const FALLBACK_IMAGES = [
+  '/assets/images/heritage-cu-sam-2.jpg',
+  '/assets/images/heritage-vuon-sam-1.jpg',
+  '/assets/images/heritage-la-sam.jpg',
+  '/assets/images/heritage-hat-sam-1.jpg',
+  '/assets/images/heritage-cu-sam-3.jpg',
+  '/assets/images/sam-ngoc-linh-plant.png',
+  '/assets/images/heritage-vuon-khanh-nhieu-cay.jpg',
+  '/assets/images/cay-sam-ngoc-linh.png',
+];
+
+function getFallback(index: number): string {
+  return FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
+}
+
+// Tự detect category từ title/body
+function detectCategory(post: BlogPost): string {
+  const text = (post.title + ' ' + (post.excerpt || '')).toLowerCase();
+  if (/mr2|majonoside|saponin|hoạt chất|dược chất|enzyme|vi sinh/i.test(text)) return 'Khoa học';
+  if (/vùng trồng|ngọc linh|núi|vườn|canh tác|bảo tồn/i.test(text)) return 'Vùng trồng';
+  if (/dinh dưỡng|sức khỏe|miễn dịch|tăng cường|bổ sung/i.test(text)) return 'Sức khoẻ';
+  if (/kol|testimonial|câu chuyện|kinh nghiệm/i.test(text)) return 'Câu chuyện';
+  return 'Kiến thức';
 }
 
 function formatDate(iso: string) {
@@ -15,6 +41,98 @@ function estimateReadingMinutes(body: string) {
   return Math.max(1, Math.ceil(words / 200));
 }
 
+interface PostCardProps {
+  post: BlogPost;
+  index: number;
+  onNavigate?: (page: string, slug?: string) => void;
+}
+
+function PostCard({ post, index, onNavigate }: PostCardProps) {
+  const img = post.featured_image_url || getFallback(index);
+  const category = detectCategory(post);
+  const slug = post.slug;
+
+  return (
+    <a
+      href={`/blog/${slug}`}
+      onClick={(e) => { e.preventDefault(); onNavigate?.('blog-post', slug); }}
+      className="group block bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1"
+    >
+      <div className="relative overflow-hidden aspect-[16/9]">
+        <img
+          src={img}
+          alt={post.featured_image_alt || post.title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-forest-950/30 to-transparent" />
+        <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-forest-800 text-xs font-semibold rounded-full">
+          {category}
+        </span>
+      </div>
+
+      <div className="p-6">
+        <div className="flex items-center gap-2 text-xs text-forest-400 mb-3">
+          <span>{formatDate(post.created_at)}</span>
+          <span className="w-1 h-1 rounded-full bg-forest-300" />
+          <Clock className="w-3 h-3" />
+          <span>{estimateReadingMinutes(post.body)} phút</span>
+        </div>
+        <h3 className="font-display text-lg font-semibold text-forest-900 mb-2 line-clamp-2 leading-snug group-hover:text-forest-700 transition-colors">
+          {post.title}
+        </h3>
+        <p className="text-forest-500 text-sm leading-relaxed line-clamp-2 mb-4">{post.excerpt}</p>
+        <div className="flex items-center gap-1.5 text-sm font-medium text-forest-600 group-hover:text-forest-800 transition-colors">
+          Đọc tiếp <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function HeroPost({ post, onNavigate }: { post: BlogPost; onNavigate?: (page: string, slug?: string) => void }) {
+  const img = post.featured_image_url || getFallback(0);
+  const category = detectCategory(post);
+  const slug = post.slug;
+
+  return (
+    <a
+      href={`/blog/${slug}`}
+      onClick={(e) => { e.preventDefault(); onNavigate?.('blog-post', slug); }}
+      className="group relative block rounded-3xl overflow-hidden shadow-elegant-lg hover:shadow-2xl transition-all duration-500"
+      style={{ minHeight: '420px' }}
+    >
+      <img
+        src={img}
+        alt={post.featured_image_alt || post.title}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      {/* gradient overlay một chiều — đúng chuẩn design system, không gradient trang trí */}
+      <div className="absolute inset-0 bg-gradient-to-r from-forest-950/90 to-forest-950/20" />
+
+      <div className="relative h-full flex flex-col justify-end p-8 md:p-12" style={{ minHeight: '420px' }}>
+        <div className="max-w-xl">
+          <span className="inline-block px-3 py-1 bg-gold-400/20 border border-gold-400/40 text-gold-300 text-xs font-semibold rounded-full mb-4 uppercase tracking-wide">
+            {category}
+          </span>
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-white leading-tight mb-4">
+            {post.title}
+          </h2>
+          <p className="text-white/70 text-sm leading-relaxed line-clamp-2 mb-6">{post.excerpt}</p>
+          <div className="flex items-center gap-4 text-white/60 text-xs mb-6">
+            <span>{formatDate(post.created_at)}</span>
+            <span>·</span>
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {estimateReadingMinutes(post.body)} phút đọc</span>
+          </div>
+          <span className="inline-flex items-center gap-2 px-6 py-3 bg-white text-forest-900 text-sm font-semibold rounded-full transition-all group-hover:bg-gold-400 group-hover:text-white">
+            Đọc bài viết <ChevronRight className="w-4 h-4" />
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
 export default function Blog({ onNavigate }: BlogProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
@@ -24,63 +142,59 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   if (posts.length === 0) return null;
 
+  const [hero, ...rest] = posts;
+  // Hiện tối đa 6 bài kế tiếp trong grid
+  const gridPosts = rest.slice(0, 6);
+
   return (
     <section id="blog" className="section-padding bg-cream-50">
       <div className="container-wide">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-100 rounded-full mb-6">
-            <span className="w-2 h-2 bg-forest-500 rounded-full" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-forest-700">Tin Tức &amp; Kiến Thức</span>
+        {/* Header */}
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-100 rounded-full mb-4">
+              <span className="w-2 h-2 bg-forest-500 rounded-full" />
+              <span className="text-xs font-semibold tracking-wider uppercase text-forest-700">Tin Tức &amp; Kiến Thức</span>
+            </div>
+            <h2 className="font-display text-display-sm md:text-display-md text-forest-900">Bài Viết Từ TA</h2>
           </div>
-          <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">Bài Viết Từ TA</h2>
-          <p className="text-forest-600 text-lg leading-relaxed">
-            Cập nhật kiến thức khoa học và câu chuyện vùng trồng Sâm Ngọc Linh.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post) => (
+          {posts.length > 4 && (
             <a
-              key={post.id}
-              href={`/blog/${post.slug}`}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate?.('blog-post', post.slug);
-              }}
-              className="block bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1 cursor-pointer"
+              href="/blog"
+              onClick={(e) => { e.preventDefault(); onNavigate?.('blog'); }}
+              className="hidden md:flex items-center gap-2 text-sm font-medium text-forest-600 hover:text-forest-900 transition-colors"
             >
-              {post.featured_image_url ? (
-                <img
-                  src={post.featured_image_url}
-                  alt={post.featured_image_alt || post.title}
-                  className="w-full h-48 object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="relative w-full h-48 bg-forest-900 flex items-end p-6 overflow-hidden">
-                  <p className="relative font-display text-lg text-white leading-snug line-clamp-3">
-                    {post.title}
-                  </p>
-                </div>
-              )}
-
-              <div className="p-8">
-              <div className="flex items-center gap-3 text-xs text-forest-400 mb-2">
-                <span>{formatDate(post.created_at)}</span>
-                <span className="w-1 h-1 rounded-full bg-forest-300" />
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {estimateReadingMinutes(post.body)} phút đọc
-                </span>
-              </div>
-              <h3 className="font-display text-xl font-semibold text-forest-900 mb-3">{post.title}</h3>
-              <p className="text-forest-600 leading-relaxed line-clamp-3">{post.excerpt}</p>
-              <div className="mt-6 flex items-center gap-2 text-sm font-medium text-forest-600">
-                Đọc tiếp <ArrowRight className="w-4 h-4" />
-              </div>
-              </div>
+              Xem tất cả <ArrowRight className="w-4 h-4" />
             </a>
-          ))}
+          )}
         </div>
+
+        {/* Hero post */}
+        <div className="mb-10">
+          <HeroPost post={hero} onNavigate={onNavigate} />
+        </div>
+
+        {/* Grid posts — bắt đầu từ index 1 để fallback không trùng với hero */}
+        {gridPosts.length > 0 && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {gridPosts.map((post, i) => (
+              <PostCard key={post.id} post={post} index={i + 1} onNavigate={onNavigate} />
+            ))}
+          </div>
+        )}
+
+        {/* Mobile xem tất cả */}
+        {posts.length > 4 && (
+          <div className="mt-10 flex justify-center md:hidden">
+            <a
+              href="/blog"
+              onClick={(e) => { e.preventDefault(); onNavigate?.('blog'); }}
+              className="inline-flex items-center gap-2 px-6 py-3 border border-forest-300 text-forest-700 rounded-full text-sm font-medium hover:bg-forest-50 transition-colors"
+            >
+              Xem tất cả bài viết <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

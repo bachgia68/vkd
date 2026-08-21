@@ -110,6 +110,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
       return;
     }
     setFormError(null);
+    localStorage.setItem('ta_customer_email', form.email);
     await handlePayOSCheckout();
   };
 
