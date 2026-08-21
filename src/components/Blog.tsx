@@ -135,6 +135,8 @@ function HeroPost({ post, onNavigate }: { post: BlogPost; onNavigate?: (page: st
 
 export default function Blog({ onNavigate }: BlogProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [page, setPage] = useState(1);
+  const POSTS_PER_PAGE = 12;
 
   useEffect(() => {
     fetchBlogPosts().then(setPosts).catch(() => setPosts([]));
@@ -143,11 +145,22 @@ export default function Blog({ onNavigate }: BlogProps) {
   if (posts.length === 0) return null;
 
   const [hero, ...rest] = posts;
-  // Hiện tối đa 6 bài kế tiếp trong grid
-  const gridPosts = rest.slice(0, 6);
+  // Full blog page: hiện tất cả với pagination (12/page)
+  // Homepage: hiện chỉ 6 bài (+ hero = 7 tổng) không pagination
+  const isFullPage = window.location.pathname === '/blog';
+  const postsToShow = isFullPage ? rest : rest.slice(0, 6);
+
+  // Pagination for full page
+  let gridPosts = postsToShow;
+  let totalPages = 1;
+  if (isFullPage && rest.length > POSTS_PER_PAGE) {
+    totalPages = Math.ceil(rest.length / POSTS_PER_PAGE);
+    const start = (page - 1) * POSTS_PER_PAGE;
+    gridPosts = rest.slice(start, start + POSTS_PER_PAGE);
+  }
 
   return (
-    <section id="blog" className="section-padding bg-cream-50">
+    <section id="blog" className={`${isFullPage ? 'pt-32 pb-16' : 'section-padding'} bg-cream-50`}>
       <div className="container-wide">
         {/* Header */}
         <div className="flex items-end justify-between mb-12">
@@ -156,9 +169,12 @@ export default function Blog({ onNavigate }: BlogProps) {
               <span className="w-2 h-2 bg-forest-500 rounded-full" />
               <span className="text-xs font-semibold tracking-wider uppercase text-forest-700">Tin Tức &amp; Kiến Thức</span>
             </div>
-            <h2 className="font-display text-display-sm md:text-display-md text-forest-900">Bài Viết Từ TA</h2>
+            <h2 className="font-display text-display-sm md:text-display-md text-forest-900">
+              {isFullPage ? 'Tất Cả Bài Viết' : 'Bài Viết Từ TA'}
+            </h2>
+            {isFullPage && <p className="text-forest-600 text-sm mt-2">{rest.length} bài viết</p>}
           </div>
-          {posts.length > 4 && (
+          {!isFullPage && posts.length > 4 && (
             <a
               href="/blog"
               onClick={(e) => { e.preventDefault(); onNavigate?.('blog'); }}
@@ -183,8 +199,45 @@ export default function Blog({ onNavigate }: BlogProps) {
           </div>
         )}
 
-        {/* Mobile xem tất cả */}
-        {posts.length > 4 && (
+        {/* Pagination — hiển thị trên trang /blog đầy đủ */}
+        {isFullPage && totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-2">
+            {page > 1 && (
+              <button
+                onClick={() => { setPage(page - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="px-4 py-2 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 transition-colors text-sm font-medium"
+              >
+                ← Trước
+              </button>
+            )}
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                    p === page
+                      ? 'bg-forest-600 text-white'
+                      : 'border border-forest-300 text-forest-700 hover:bg-forest-50'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            {page < totalPages && (
+              <button
+                onClick={() => { setPage(page + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="px-4 py-2 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 transition-colors text-sm font-medium"
+              >
+                Sau →
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Mobile xem tất cả — chỉ hiển thị trên homepage, không show trên /blog page */}
+        {!isFullPage && posts.length > 4 && (
           <div className="mt-10 flex justify-center md:hidden">
             <a
               href="/blog"
