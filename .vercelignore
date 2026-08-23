@@ -1,0 +1,11 @@
+video/
+luu tru/
+*.mp4
+*.webm
+*.mov
+node_modules/
+.git/
+.next/
+out/
+.env.local
+.DS_Store
