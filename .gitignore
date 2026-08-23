@@ -13,3 +13,5 @@ scripts/test-coder-model.txt
 scripts/test-instruct-model.txt
 video/
 luu tru/
+
+.vercel
