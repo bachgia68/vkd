@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TA CMS Admin - Quản Lý Sâm Ngọc Linh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status.loading {
+            background: #f59e0b;
+        }
+        .status.error {
+            background: #ef4444;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #f3f4f6;
+            color: #333;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-btn:hover {
+            background: #e5e7eb;
+        }
+        .tab-btn.active:hover {
+            background: #5568d3;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        .card-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .sale-price {
+            text-decoration: line-through;
+            color: #999;
+            margin-right: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .badge.featured {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .multilang {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .lang-section {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+        .lang-label {
+            font-size: 11px;
+            color: #999;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .lang-text {
+            font-size: 14px;
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc2626;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌿 TA CMS Admin - Quản Lý Sâm Ngọc Linh</h1>
+            <p>Hệ thống quản lý nội dung Strapi cho trang web tasamngoclinh.com</p>
+            <div class="status" id="status">Đang kết nối...</div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('products')">📦 Sản Phẩm</button>
+            <button class="tab-btn" onclick="switchTab('header')">🎨 Header</button>
+            <button class="tab-btn" onclick="switchTab('footer')">🔗 Footer</button>
+            <button class="tab-btn" onclick="switchTab('social')">📱 Mạng Xã Hội</button>
+            <button class="tab-btn" onclick="switchTab('api')">⚙️ API</button>
+        </div>
+
+        <div class="content">
+            <!-- PRODUCTS TAB -->
+            <div id="products" class="tab-pane active">
+                <h2>📦 Sản Phẩm</h2>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number" id="productCount">0</div>
+                        <div class="stat-label">Tổng Sản Phẩm</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalStock">0</div>
+                        <div class="stat-label">Tổng Kho</div>
+                    </div>
+                </div>
+                <div id="productsContent" class="loading">Đang tải sản phẩm...</div>
+            </div>
+
+            <!-- HEADER TAB -->
+            <div id="header" class="tab-pane">
+                <h2>🎨 Header / Banner</h2>
+                <div id="headerContent" class="loading">Đang tải header...</div>
+            </div>
+
+            <!-- FOOTER TAB -->
+            <div id="footer" class="tab-pane">
+                <h2>🔗 Footer / Thông Tin Công Ty</h2>
+                <div id="footerContent" class="loading">Đang tải footer...</div>
+            </div>
+
+            <!-- SOCIAL LINKS TAB -->
+            <div id="social" class="tab-pane">
+                <h2>📱 Liên Kết Mạng Xã Hội</h2>
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number" id="socialCount">0</div>
+                        <div class="stat-label">Nền Tảng</div>
+                    </div>
+                </div>
+                <div id="socialContent" class="loading">Đang tải mạng xã hội...</div>
+            </div>
+
+            <!-- API TAB -->
+            <div id="api" class="tab-pane">
+                <h2>⚙️ API Endpoints</h2>
+                <p style="color: #666; margin-bottom: 20px;">Các endpoint API để tích hợp với frontend:</p>
+                <div class="card">
+                    <div class="card-title">Base URL</div>
+                    <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; margin-top: 10px; font-family: monospace;">
+                        http://localhost:1337
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">GET /api/products</div>
+                    <p style="color: #666; margin: 10px 0;">Lấy danh sách tất cả sản phẩm</p>
+                    <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+<pre>curl -X GET "http://localhost:1337/api/products"</pre>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">GET /api/site-headers</div>
+                    <p style="color: #666; margin: 10px 0;">Lấy thông tin header/banner</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">GET /api/site-footers</div>
+                    <p style="color: #666; margin: 10px 0;">Lấy thông tin footer</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">GET /api/social-links</div>
+                    <p style="color: #666; margin: 10px 0;">Lấy danh sách mạng xã hội</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>✅ TA CMS Admin Dashboard | API Server: http://localhost:1337</p>
+            <p>Phiên bản: 1.0.0 | Cập nhật: 2026-08-23</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:1337';
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-pane').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        async function loadData() {
+            try {
+                // Load products
+                const productsRes = await fetch(`${API_URL}/api/products`);
+                const productsData = await productsRes.json();
+                displayProducts(productsData.data || []);
+
+                // Load header
+                const headerRes = await fetch(`${API_URL}/api/site-headers`);
+                const headerData = await headerRes.json();
+                displayHeader(headerData.data?.[0]);
+
+                // Load footer
+                const footerRes = await fetch(`${API_URL}/api/site-footers`);
+                const footerData = await footerRes.json();
+                displayFooter(footerData.data?.[0]);
+
+                // Load social links
+                const socialRes = await fetch(`${API_URL}/api/social-links`);
+                const socialData = await socialRes.json();
+                displaySocial(socialData.data || []);
+
+                // Update status
+                document.getElementById('status').textContent = '✅ Kết nối thành công';
+                document.getElementById('status').className = 'status';
+            } catch (err) {
+                console.error('Error loading data:', err);
+                document.getElementById('status').textContent = '❌ Lỗi kết nối API';
+                document.getElementById('status').className = 'status error';
+                document.getElementById('productsContent').innerHTML = `<div class="error-msg">⚠️ Không thể kết nối đến API server. Hãy chắc chắn mock-strapi-server.js đang chạy tại port 1337</div>`;
+            }
+        }
+
+        function displayProducts(products) {
+            let html = '';
+            let totalStock = 0;
+
+            products.forEach(p => {
+                totalStock += p.stock || 0;
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${p.sku}</div>
+                                <div class="card-meta">
+                                    <span>${p.category || 'N/A'}</span>
+                                    <span>📦 ${p.stock} sản phẩm</span>
+                                </div>
+                            </div>
+                            <div>
+                                ${p.featured ? '<span class="badge featured">⭐ Nổi Bật</span>' : ''}
+                                ${p.isActive ? '<span class="badge active">✓ Hoạt Động</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="multilang">
+                            ${p.name ? `
+                                <div class="lang-section">
+                                    <div class="lang-label">🇻🇳 Tiếng Việt</div>
+                                    <div class="lang-text">${p.name.vi || ''}</div>
+                                </div>
+                                <div class="lang-section">
+                                    <div class="lang-label">🇺🇸 English</div>
+                                    <div class="lang-text">${p.name.en || ''}</div>
+                                </div>
+                                <div class="lang-section">
+                                    <div class="lang-label">🇫🇷 Français</div>
+                                    <div class="lang-text">${p.name.fr || ''}</div>
+                                </div>
+                                <div class="lang-section">
+                                    <div class="lang-label">🇨🇳 中文</div>
+                                    <div class="lang-text">${p.name.zh || ''}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div style="margin: 15px 0; padding: 15px; background: #f9fafb; border-radius: 6px;">
+                            <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Giá</div>
+                            <div>
+                                <span class="sale-price">${p.price?.toLocaleString('vi-VN')} ₫</span>
+                                <span class="price">${p.salePrice?.toLocaleString('vi-VN')} ₫</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('productCount').textContent = products.length;
+            document.getElementById('totalStock').textContent = totalStock.toLocaleString('vi-VN');
+            document.getElementById('productsContent').innerHTML = html || '<p>Không có sản phẩm</p>';
+        }
+
+        function displayHeader(header) {
+            if (!header) {
+                document.getElementById('headerContent').innerHTML = '<p>Không có dữ liệu header</p>';
+                return;
+            }
+
+            let navLinksHtml = (header.navLinks || []).map(link => `
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
+                    <span>${link.text?.vi || link.text?.en || 'N/A'}</span>
+                    <span style="color: #667eea; font-family: monospace;">${link.url}</span>
+                </div>
+            `).join('');
+
+            let html = `
+                <div class="card">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="${header.logoUrl}" alt="${header.logoAlt}" style="max-width: 150px; height: auto;">
+                    </div>
+                    <div class="card-header">
+                        <div class="card-title">Logo & Navigation</div>
+                        ${header.isActive ? '<span class="badge active">✓ Hoạt Động</span>' : ''}
+                    </div>
+                    ${navLinksHtml}
+                </div>
+                <div class="card">
+                    <div class="card-title">Hero Section</div>
+                    <div class="multilang" style="margin-top: 15px;">
+                        <div class="lang-section">
+                            <div class="lang-label">Tiêu Đề</div>
+                            <div class="lang-text" style="font-size: 16px; font-weight: bold;">${header.heroTitle?.vi || ''}</div>
+                        </div>
+                        <div class="lang-section">
+                            <div class="lang-label">Mô Tả</div>
+                            <div class="lang-text">${header.heroSubtitle?.vi || ''}</div>
+                        </div>
+                        <div class="lang-section">
+                            <div class="lang-label">Nút CTA</div>
+                            <div class="lang-text">${header.ctaButtonText?.vi || ''} → ${header.ctaButtonLink}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('headerContent').innerHTML = html;
+        }
+
+        function displayFooter(footer) {
+            if (!footer) {
+                document.getElementById('footerContent').innerHTML = '<p>Không có dữ liệu footer</p>';
+                return;
+            }
+
+            let html = `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">${footer.companyName?.vi || ''}</div>
+                        ${footer.isActive ? '<span class="badge active">✓ Hoạt Động</span>' : ''}
+                    </div>
+                    <div style="margin: 20px 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div>
+                            <div style="color: #999; font-size: 12px; font-weight: bold; margin-bottom: 5px;">📍 Địa Chỉ</div>
+                            <div style="color: #333; font-size: 14px;">${footer.companyAddress?.vi || ''}</div>
+                        </div>
+                        <div>
+                            <div style="color: #999; font-size: 12px; font-weight: bold; margin-bottom: 5px;">☎️ Điện Thoại</div>
+                            <div style="color: #333; font-size: 14px;">${footer.companyPhone}</div>
+                        </div>
+                        <div>
+                            <div style="color: #999; font-size: 12px; font-weight: bold; margin-bottom: 5px;">📧 Email</div>
+                            <div style="color: #333; font-size: 14px;">${footer.companyEmail}</div>
+                        </div>
+                        <div>
+                            <div style="color: #999; font-size: 12px; font-weight: bold; margin-bottom: 5px;">📝 Bản Quyền</div>
+                            <div style="color: #333; font-size: 14px;">${footer.copyrightText?.vi || ''}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('footerContent').innerHTML = html;
+        }
+
+        function displaySocial(links) {
+            document.getElementById('socialCount').textContent = links.length;
+
+            let html = '';
+            links.forEach(link => {
+                const icons = {
+                    facebook: '👍',
+                    instagram: '📸',
+                    youtube: '🎥',
+                    telegram: '✈️',
+                    zalo: '💬'
+                };
+                const icon = icons[link.platform] || '🔗';
+
+                html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${icon} ${link.platform.toUpperCase()}</div>
+                                <div class="card-meta">
+                                    <span>#${link.displayOrder}</span>
+                                </div>
+                            </div>
+                            ${link.isActive ? '<span class="badge active">✓ Hoạt Động</span>' : ''}
+                        </div>
+                        <div style="margin: 15px 0;">
+                            <div style="color: #999; font-size: 12px; margin-bottom: 5px;">URL</div>
+                            <a href="${link.url}" target="${link.openInNewTab ? '_blank' : '_self'}" style="color: #667eea; word-break: break-all;">
+                                ${link.url}
+                            </a>
+                        </div>
+                        <div style="color: #999; font-size: 12px;">
+                            ${link.openInNewTab ? '📂 Mở trong cửa sổ mới' : '📂 Mở trong cửa sổ hiện tại'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('socialContent').innerHTML = html || '<p>Không có mạng xã hội</p>';
+        }
+
+        // Load data on page load
+        window.addEventListener('load', loadData);
+        // Reload every 10 seconds
+        setInterval(loadData, 10000);
+    </script>
+</body>
+</html>
