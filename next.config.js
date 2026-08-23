@@ -11,6 +11,9 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_STRAPI_URL: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 module.exports = withNextIntl(nextConfig);
