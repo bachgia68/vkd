@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sâm Ngọc Linh VKD Group — Danh mục sản phẩm</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          forest: { DEFAULT: '#0B2F1D', deep: '#071A11' },
+          gold: { DEFAULT: '#C9A646', bright: '#E4C568' },
+          ivory: { DEFAULT: '#F6F2E9', dim: '#EDE7D8' },
+        },
+        fontFamily: {
+          serif: ['Georgia', 'ui-serif', 'serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  .card-hover { transition: transform .3s ease, box-shadow .3s ease; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 28px -8px rgba(11,47,29,.25); }
+</style>
+</head>
+<body class="bg-ivory text-[#1B1E1B] font-sans">
+
+  <!-- ============ HEADER ============ -->
+  <header class="bg-forest text-ivory sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
+      <div>
+        <div class="text-[10px] tracking-[0.3em] text-gold">VÕ KIM ĐƯỜNG</div>
+        <div class="font-serif italic text-lg sm:text-xl">Sâm Ngọc Linh VKD Group</div>
+      </div>
+      <nav class="hidden md:flex gap-8 text-sm">
+        <a href="#san-pham" class="hover:text-gold transition-colors">Sản phẩm</a>
+        <a href="#minh-bach" class="hover:text-gold transition-colors">Minh bạch nguồn gốc</a>
+        <a href="#lien-he" class="hover:text-gold transition-colors">Liên hệ</a>
+      </nav>
+      <button id="mobileMenuBtn" class="md:hidden text-ivory" aria-label="Mở menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="bg-forest text-ivory">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 pb-14 pt-4 text-center">
+      <p class="text-xs tracking-[0.25em] text-gold mb-3">MAJONOSIDE R2 · ĐẶC HỮU PANAX VIETNAMENSIS</p>
+      <h1 class="font-serif italic text-3xl sm:text-5xl leading-tight max-w-3xl mx-auto">
+        Sâm quý vùng cao — minh bạch từ vườn trồng đến tay bạn
+      </h1>
+      <p class="text-sm sm:text-base text-[#9FB0A2] max-w-xl mx-auto mt-4">
+        Mỗi sản phẩm đều có mã lô truy xuất nguồn gốc, kết quả kiểm định hàm lượng MR2 và bản đồ vùng trồng thật.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FILTER + GRID ============ -->
+  <main id="san-pham" class="max-w-7xl mx-auto px-4 sm:px-8 py-12">
+    <div class="flex flex-wrap gap-2 mb-8" id="categoryTabs">
+      <button data-cat="all" class="cat-btn px-4 py-2 rounded-full text-sm border border-forest bg-forest text-ivory">Tất cả</button>
+      <button data-cat="cu-tuoi-kho" class="cat-btn px-4 py-2 rounded-full text-sm border border-forest text-forest hover:bg-forest hover:text-ivory transition-colors">Sâm Củ Tươi & Khô</button>
+      <button data-cat="tpbvsk" class="cat-btn px-4 py-2 rounded-full text-sm border border-forest text-forest hover:bg-forest hover:text-ivory transition-colors">Thực Phẩm Bảo Vệ Sức Khỏe</button>
+      <button data-cat="tra-do-uong" class="cat-btn px-4 py-2 rounded-full text-sm border border-forest text-forest hover:bg-forest hover:text-ivory transition-colors">Trà & Đồ Uống Sâm</button>
+      <button data-cat="my-pham" class="cat-btn px-4 py-2 rounded-full text-sm border border-forest text-forest hover:bg-forest hover:text-ivory transition-colors">Mỹ Phẩm & Làm Đẹp</button>
+    </div>
+
+    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    <!-- ==== Rượu Sâm Ngọc Linh — TÁCH RIÊNG khỏi lưới sản phẩm chính, có Age-Gate ====
+         Ghi chú: bản demo này dùng modal xác minh tuổi ngay trên trang để tiện xem
+         trước. Ở production, VKD nên tách hẳn dòng rượu sang sub-domain riêng
+         (vd ruou.samngoclinhvkdgroup.com) có age-gate chặn ở tầng server/CDN
+         (Vercel Edge Middleware) — không chỉ dựa vào 1 modal JS phía client. -->
+    <div class="mt-14 rounded-2xl border border-gold/60 bg-forest-deep bg-forest p-8 flex flex-col sm:flex-row items-center gap-6 text-ivory">
+      <div class="flex-1">
+        <p class="text-[11px] tracking-[0.25em] text-gold mb-2">SẢN PHẨM CÓ ĐỘ CỒN — 18+</p>
+        <h3 class="font-serif italic text-xl mb-2">Rượu Sâm Ngọc Linh Cao Cấp 15 Năm</h3>
+        <p class="text-sm text-[#9FB0A2]">Nội dung dòng rượu được hiển thị trên tên miền/phân hệ riêng, yêu cầu xác minh độ tuổi trước khi xem chi tiết.</p>
+      </div>
+      <button id="openAgeGate" class="shrink-0 border border-gold text-gold px-6 py-3 rounded-lg text-sm hover:bg-gold hover:text-forest transition-colors">
+        Xác minh tuổi để xem →
+      </button>
+    </div>
+  </main>
+
+  <!-- ============ MINH BẠCH NGUỒN GỐC ============ -->
+  <section id="minh-bach" class="bg-ivory-dim bg-[#EDE7D8] py-14">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 grid sm:grid-cols-3 gap-8 text-center">
+      <div>
+        <div class="text-3xl mb-2">📍</div>
+        <h4 class="font-serif italic text-forest mb-1">3 vùng trồng xác thực</h4>
+        <p class="text-sm text-[#6B7268]">Tu Mơ Rông · Nam Trà My · Puxailaileng</p>
+      </div>
+      <div>
+        <div class="text-3xl mb-2">🧪</div>
+        <h4 class="font-serif italic text-forest mb-1">Kiểm định độc lập MR2</h4>
+        <p class="text-sm text-[#6B7268]">Mỗi lô đều có phiếu kết quả hàm lượng Majonoside R2</p>
+      </div>
+      <div>
+        <div class="text-3xl mb-2">🔎</div>
+        <h4 class="font-serif italic text-forest mb-1">QR truy xuất 2 lớp</h4>
+        <p class="text-sm text-[#6B7268]">Quét mã trên bao bì để xem ngày đóng gói, chứng chỉ, vùng trồng</p>
+      </div>
+    </div>
+  </section>
+
+  <footer id="lien-he" class="bg-forest-deep bg-[#071A11] text-[#9FB0A2] text-center text-xs py-8">
+    © <span id="year"></span> Võ Kim Đường — Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam. Trang minh họa demo.
+  </footer>
+
+  <!-- ============ AGE GATE MODAL ============ -->
+  <div id="ageGateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div class="bg-ivory rounded-2xl max-w-sm w-full p-8 text-center">
+      <p class="text-[11px] tracking-[0.25em] text-gold mb-3">XÁC MINH ĐỘ TUỔI</p>
+      <h3 class="font-serif italic text-forest text-xl mb-3">Bạn đã đủ 18 tuổi?</h3>
+      <p class="text-sm text-[#6B7268] mb-6">Nội dung tiếp theo liên quan đến sản phẩm có cồn, chỉ dành cho người từ 18 tuổi trở lên.</p>
+      <div class="flex gap-3">
+        <button id="ageGateNo" class="flex-1 border border-forest text-forest rounded-lg py-2.5 text-sm hover:bg-forest hover:text-ivory transition-colors">Chưa đủ 18</button>
+        <button id="ageGateYes" class="flex-1 bg-forest text-ivory rounded-lg py-2.5 text-sm hover:bg-gold hover:text-forest transition-colors">Tôi đã đủ 18 tuổi</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ---- Dữ liệu sản phẩm demo (KHÔNG bao gồm rượu — dòng rượu tách riêng ở trên) ----
+    const PRODUCTS = [
+      { sku: 'SNL-CUTUOI-TMR', category: 'cu-tuoi-kho', name: 'Sâm Ngọc Linh Củ Tươi Tu Mơ Rông', price: 18500000, unit: '100g', mr2: '4.8 mg/g', region: 'Tu Mơ Rông', image: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'SNL-KHO-NTM', category: 'cu-tuoi-kho', name: 'Sâm Ngọc Linh Khô Thái Lát Nam Trà My', price: 22900000, unit: '100g', mr2: '5.1 mg/g', region: 'Nam Trà My', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'SNL-DICHCHIET', category: 'tpbvsk', name: 'Dịch Chiết Sâm Ngọc Linh Cô Đặc', price: 1290000, unit: 'hộp 30 gói', mr2: '2.3 mg/g', region: 'Tu Mơ Rông', image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'SNL-VIENNANG', category: 'tpbvsk', name: 'Viên Nang Sâm Ngọc Linh Plus', price: 890000, unit: 'hộp 60 viên', mr2: '1.8 mg/g', region: 'Nam Trà My', image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'PANAXX-250', category: 'tpbvsk', name: 'PanaxX — Nước Uống Năng Lượng Sâm', price: 45000, unit: 'chai 250ml', mr2: '0.6 mg/g', region: 'Puxailaileng', image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'TRA-TUILOC', category: 'tra-do-uong', name: 'Trà Sâm Ngọc Linh Túi Lọc', price: 320000, unit: 'hộp 20 túi', mr2: '0.9 mg/g', region: 'Tu Mơ Rông', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'NUOCCOT-SNL', category: 'tra-do-uong', name: 'Nước Cốt Sâm Ngọc Linh Nguyên Chất', price: 1580000, unit: 'set 6 chai', mr2: '3.2 mg/g', region: 'Nam Trà My', image: 'https://images.unsplash.com/photo-1601312378427-822b2b41da35?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'COLLAGEN-SNL', category: 'my-pham', name: 'Collagen Sâm Ngọc Linh Trẻ Hóa', price: 990000, unit: 'hộp 30 gói', mr2: '1.1 mg/g', region: 'Tu Mơ Rông', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=600&auto=format&fit=crop' },
+      { sku: 'KEMDUONG-SNL', category: 'my-pham', name: 'Kem Dưỡng Sâm Ngọc Linh Phục Hồi', price: 1250000, unit: 'hũ 50g', mr2: '0.8 mg/g', region: 'Puxailaileng', image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=600&auto=format&fit=crop' },
+    ];
+
+    function formatVnd(n) { return n.toLocaleString('vi-VN') + 'đ'; }
+
+    function renderGrid(filter) {
+      const grid = document.getElementById('productGrid');
+      const items = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
+      grid.innerHTML = items.map(p => `
+        <a href="product-detail.html?sku=${encodeURIComponent(p.sku)}"
+           class="card-hover block bg-white rounded-2xl border border-[#E4DFCF] overflow-hidden">
+          <div class="relative h-48 bg-ivory overflow-hidden">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" />
+            <span class="absolute left-3 top-3 bg-forest/90 text-ivory text-[11px] px-3 py-1 rounded-full">Chính gốc Ngọc Linh</span>
+          </div>
+          <div class="p-5">
+            <h3 class="font-serif italic text-forest text-base mb-2">${p.name}</h3>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              <span class="text-[11px] bg-ivory-dim bg-[#EDE7D8] text-[#8A6A16] px-2.5 py-1 rounded-full">MR2 ${p.mr2}</span>
+              <span class="text-[11px] bg-ivory-dim bg-[#EDE7D8] text-[#8A6A16] px-2.5 py-1 rounded-full">${p.region}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-lg font-semibold text-forest">${formatVnd(p.price)}</p>
+                <p class="text-xs text-[#9FB0A2]">/ ${p.unit}</p>
+              </div>
+              <span class="text-sm border border-gold text-[#8A6A16] px-3 py-2 rounded-lg">Xem chi tiết</span>
+            </div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => {
+          b.classList.remove('bg-forest', 'text-ivory');
+          b.classList.add('text-forest');
+        });
+        btn.classList.add('bg-forest', 'text-ivory');
+        btn.classList.remove('text-forest');
+        renderGrid(btn.dataset.cat);
+      });
+    });
+
+    renderGrid('all');
+
+    // ---- Age Gate (demo: trạng thái chỉ tồn tại trong phiên xem trang này,
+    // KHÔNG dùng localStorage/sessionStorage theo khuyến nghị tránh phụ thuộc
+    // browser storage trong bản xem trước; ở production nên xác thực tuổi lại
+    // bằng cookie phía server trên sub-domain rượu riêng). ----
+    const ageGateModal = document.getElementById('ageGateModal');
+    document.getElementById('openAgeGate').addEventListener('click', () => ageGateModal.classList.remove('hidden'));
+    document.getElementById('ageGateNo').addEventListener('click', () => {
+      ageGateModal.classList.add('hidden');
+      alert('Rất tiếc, nội dung này chỉ dành cho người từ 18 tuổi trở lên.');
+    });
+    document.getElementById('ageGateYes').addEventListener('click', () => {
+      window.location.href = 'product-detail.html?sku=RUOU-SNL-15Y';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chi tiết sản phẩm — Sâm Ngọc Linh VKD Group</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          forest: { DEFAULT: '#0B2F1D', deep: '#071A11' },
+          gold: { DEFAULT: '#C9A646', bright: '#E4C568' },
+          ivory: { DEFAULT: '#F6F2E9', dim: '#EDE7D8' },
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="bg-ivory text-[#1B1E1B] font-sans">
+
+  <header class="bg-forest text-ivory sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
+      <a href="index.html">
+        <div class="text-[10px] tracking-[0.3em] text-gold">VÕ KIM ĐƯỜNG</div>
+        <div class="font-serif italic text-lg sm:text-xl">Sâm Ngọc Linh VKD Group</div>
+      </a>
+      <a href="index.html" class="text-sm hover:text-gold transition-colors">← Quay lại danh mục</a>
+    </div>
+  </header>
+
+  <main id="detailRoot" class="max-w-6xl mx-auto px-4 sm:px-8 py-12"></main>
+
+  <div id="notFound" class="hidden max-w-xl mx-auto px-4 py-24 text-center">
+    <p class="text-forest font-serif italic text-xl mb-3">Không tìm thấy sản phẩm này.</p>
+    <a href="index.html" class="text-sm text-gold underline">Quay lại danh mục sản phẩm</a>
+  </div>
+
+  <footer class="bg-[#071A11] text-[#9FB0A2] text-center text-xs py-8 mt-12">
+    © <span id="year"></span> Võ Kim Đường — Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam. Trang minh họa demo.
+  </footer>
+
+  <!-- ============ AGE GATE (chỉ hiện với sản phẩm có cồn) ============ -->
+  <div id="ageGateModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div class="bg-ivory rounded-2xl max-w-sm w-full p-8 text-center">
+      <p class="text-[11px] tracking-[0.25em] text-gold mb-3">XÁC MINH ĐỘ TUỔI</p>
+      <h3 class="font-serif italic text-forest text-xl mb-3">Bạn đã đủ 18 tuổi?</h3>
+      <p class="text-sm text-[#6B7268] mb-6">Sản phẩm này có chứa cồn, chỉ dành cho người từ 18 tuổi trở lên.</p>
+      <div class="flex gap-3">
+        <button id="ageGateNo" class="flex-1 border border-forest text-forest rounded-lg py-2.5 text-sm hover:bg-forest hover:text-ivory transition-colors">Chưa đủ 18</button>
+        <button id="ageGateYes" class="flex-1 bg-forest text-ivory rounded-lg py-2.5 text-sm hover:bg-gold hover:text-forest transition-colors">Tôi đã đủ 18 tuổi</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Cùng bộ dữ liệu demo với index.html + 1 sản phẩm rượu (age-gated).
+    // Ở production, dữ liệu này nên đến từ API thật (bảng product_variants/
+    // product_batches trong vkd-db-schema.sql), KHÔNG hard-code trong JS.
+    const PRODUCTS = {
+      'SNL-CUTUOI-TMR': { name: 'Sâm Ngọc Linh Củ Tươi Tu Mơ Rông', price: 18500000, unit: '100g', mr2: '4.8 mg/g', saponin: '~52%', region: 'Tu Mơ Rông, Kon Tum', batch: 'SNL-24-0917-001', packedDate: '17/09/2025', expiryDate: '17/09/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=900&auto=format&fit=crop', desc: 'Sâm củ tươi nguyên rễ, thu hoạch trực tiếp từ vùng trồng đạt chuẩn GACP-WHO tại Tu Mơ Rông.' },
+      'SNL-KHO-NTM': { name: 'Sâm Ngọc Linh Khô Thái Lát Nam Trà My', price: 22900000, unit: '100g', mr2: '5.1 mg/g', saponin: '~54%', region: 'Nam Trà My, Quảng Nam', batch: 'SNL-24-1002-014', packedDate: '02/10/2025', expiryDate: '02/10/2028', isAlcohol: false, image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?q=80&w=900&auto=format&fit=crop', desc: 'Sấy thăng hoa giữ nguyên hoạt chất, thái lát tiện dùng, đóng gói hút chân không.' },
+      'SNL-DICHCHIET': { name: 'Dịch Chiết Sâm Ngọc Linh Cô Đặc', price: 1290000, unit: 'hộp 30 gói', mr2: '2.3 mg/g', saponin: '~30%', region: 'Tu Mơ Rông, Kon Tum', batch: 'SNL-24-1105-078', packedDate: '05/11/2025', expiryDate: '05/11/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?q=80&w=900&auto=format&fit=crop', desc: 'Chiết xuất lạnh giữ hoạt tính sinh học, tiện dùng mỗi ngày.' },
+      'SNL-VIENNANG': { name: 'Viên Nang Sâm Ngọc Linh Plus', price: 890000, unit: 'hộp 60 viên', mr2: '1.8 mg/g', saponin: '~22%', region: 'Nam Trà My, Quảng Nam', batch: 'SNL-24-1110-033', packedDate: '10/11/2025', expiryDate: '10/11/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1550572017-edd951b55104?q=80&w=900&auto=format&fit=crop', desc: 'Bổ sung Vitamin B Complex, dạng viên nang tiện lợi.' },
+      'PANAXX-250': { name: 'PanaxX — Nước Uống Năng Lượng Sâm', price: 45000, unit: 'chai 250ml', mr2: '0.6 mg/g', saponin: '~8%', region: 'Puxailaileng, Nghệ An', batch: 'SNL-24-1201-201', packedDate: '01/12/2025', expiryDate: '01/06/2026', isAlcohol: false, image: 'https://images.unsplash.com/photo-1622597467836-f3285f2131b8?q=80&w=900&auto=format&fit=crop', desc: 'Không đường, tiện mang theo, năng lượng tức thời từ chiết xuất sâm thật.' },
+      'TRA-TUILOC': { name: 'Trà Sâm Ngọc Linh Túi Lọc', price: 320000, unit: 'hộp 20 túi', mr2: '0.9 mg/g', saponin: '~10%', region: 'Tu Mơ Rông, Kon Tum', batch: 'SNL-24-1015-052', packedDate: '15/10/2025', expiryDate: '15/10/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?q=80&w=900&auto=format&fit=crop', desc: 'Túi lọc tiện dùng, hương vị thanh nhẹ, 100% tự nhiên.' },
+      'NUOCCOT-SNL': { name: 'Nước Cốt Sâm Ngọc Linh Nguyên Chất', price: 1580000, unit: 'set 6 chai', mr2: '3.2 mg/g', saponin: '~38%', region: 'Nam Trà My, Quảng Nam', batch: 'SNL-24-1120-091', packedDate: '20/11/2025', expiryDate: '20/05/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1601312378427-822b2b41da35?q=80&w=900&auto=format&fit=crop', desc: 'Không chất bảo quản, giữ trọn hoạt chất tự nhiên từ củ sâm tươi.' },
+      'COLLAGEN-SNL': { name: 'Collagen Sâm Ngọc Linh Trẻ Hóa', price: 990000, unit: 'hộp 30 gói', mr2: '1.1 mg/g', saponin: '~15%', region: 'Tu Mơ Rông, Kon Tum', batch: 'SNL-24-1201-115', packedDate: '01/12/2025', expiryDate: '01/12/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=900&auto=format&fit=crop', desc: 'Kết hợp Collagen thủy phân và chiết xuất sâm cho làn da trẻ hóa từ bên trong.' },
+      'KEMDUONG-SNL': { name: 'Kem Dưỡng Sâm Ngọc Linh Phục Hồi', price: 1250000, unit: 'hũ 50g', mr2: '0.8 mg/g', saponin: '~12%', region: 'Puxailaileng, Nghệ An', batch: 'SNL-24-1128-066', packedDate: '28/11/2025', expiryDate: '28/11/2027', isAlcohol: false, image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=900&auto=format&fit=crop', desc: 'Không paraben, phục hồi và dưỡng ẩm chuyên sâu cho da.' },
+      'RUOU-SNL-15Y': { name: 'Rượu Sâm Ngọc Linh Cao Cấp 15 Năm', price: 6800000, unit: 'chai 700ml', mr2: '2.1 mg/g', saponin: '~28%', region: 'Tu Mơ Rông, Kon Tum', batch: 'SNL-24-0815-007', packedDate: '15/08/2025', expiryDate: 'Không giới hạn', isAlcohol: true, image: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?q=80&w=900&auto=format&fit=crop', desc: 'Ủ 15 năm theo phương pháp truyền thống, chỉ dành cho người từ 18 tuổi trở lên.' },
+    };
+
+    function formatVnd(n) { return n.toLocaleString('vi-VN') + 'đ'; }
+
+    const params = new URLSearchParams(window.location.search);
+    const sku = params.get('sku');
+    const product = sku ? PRODUCTS[sku] : null;
+
+    function renderDetail(p) {
+      const qrData = encodeURIComponent(`https://vkd.vn/truy-xuat/${p.batch}`);
+      document.getElementById('detailRoot').innerHTML = `
+        <div class="grid md:grid-cols-2 gap-10">
+          <div class="rounded-2xl overflow-hidden bg-white border border-[#E4DFCF]">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-96 object-cover" />
+          </div>
+          <div>
+            <p class="text-[11px] tracking-[0.25em] text-gold mb-2">SÂM NGỌC LINH VKD GROUP</p>
+            <h1 class="font-serif italic text-forest text-2xl sm:text-3xl mb-3">${p.name}</h1>
+            <p class="text-sm text-[#6B7268] mb-5">${p.desc}</p>
+
+            <div class="flex items-end gap-2 mb-6">
+              <span class="text-2xl font-semibold text-forest">${formatVnd(p.price)}</span>
+              <span class="text-sm text-[#9FB0A2]">/ ${p.unit}</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-[#EDE7D8] rounded-lg px-4 py-3">
+                <p class="text-[11px] text-[#8A6A16] mb-1">Hàm lượng MR2</p>
+                <p class="text-sm font-medium text-forest">${p.mr2}</p>
+              </div>
+              <div class="bg-[#EDE7D8] rounded-lg px-4 py-3">
+                <p class="text-[11px] text-[#8A6A16] mb-1">Saponin toàn phần</p>
+                <p class="text-sm font-medium text-forest">${p.saponin}</p>
+              </div>
+              <div class="bg-[#EDE7D8] rounded-lg px-4 py-3 col-span-2">
+                <p class="text-[11px] text-[#8A6A16] mb-1">Vùng trồng</p>
+                <p class="text-sm font-medium text-forest">${p.region}</p>
+              </div>
+            </div>
+
+            <button onclick="alert('Đây là trang demo — chưa kết nối giỏ hàng/thanh toán thật.')"
+              class="w-full bg-forest text-ivory rounded-lg py-3.5 text-sm font-medium hover:bg-[#0f3d26] transition-colors mb-3">
+              Thêm vào giỏ hàng
+            </button>
+            <p class="text-xs text-[#9FB0A2] text-center">Miễn phí vận chuyển cho đơn từ 2.000.000đ</p>
+          </div>
+        </div>
+
+        <div class="mt-14 rounded-2xl border border-[#E4DFCF] bg-white p-8 grid sm:grid-cols-[auto_1fr] gap-8 items-center">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${qrData}" alt="QR truy xuất nguồn gốc" class="rounded-lg border border-[#E4DFCF]" width="140" height="140" />
+          <div>
+            <p class="text-[11px] tracking-[0.25em] text-gold mb-2">TRUY XUẤT NGUỒN GỐC 2 LỚP</p>
+            <h3 class="font-serif italic text-forest text-lg mb-3">Quét mã hoặc xem thông tin lô hàng bên dưới</h3>
+            <dl class="grid grid-cols-2 gap-y-2 text-sm">
+              <dt class="text-[#9FB0A2]">Mã lô</dt><dd class="font-mono text-forest">${p.batch}</dd>
+              <dt class="text-[#9FB0A2]">Ngày đóng gói</dt><dd>${p.packedDate}</dd>
+              <dt class="text-[#9FB0A2]">Hạn sử dụng</dt><dd>${p.expiryDate}</dd>
+              <dt class="text-[#9FB0A2]">Chứng chỉ</dt><dd>cGMP · HACCP · ISO 22000</dd>
+            </dl>
+          </div>
+        </div>
+      `;
+    }
+
+    if (!product) {
+      document.getElementById('notFound').classList.remove('hidden');
+    } else if (product.isAlcohol) {
+      // Sản phẩm có cồn -> bắt buộc xác minh tuổi TRƯỚC khi render nội dung.
+      // Demo này chỉ chặn ở client (JS) để tiện xem trước; production PHẢI
+      // chặn thêm ở tầng server/CDN (vd Vercel Edge Middleware trên sub-domain
+      // rượu riêng) vì age-gate chỉ bằng JS có thể bị bỏ qua dễ dàng.
+      document.getElementById('ageGateModal').classList.remove('hidden');
+      document.getElementById('ageGateYes').addEventListener('click', () => {
+        document.getElementById('ageGateModal').classList.add('hidden');
+        renderDetail(product);
+      });
+      document.getElementById('ageGateNo').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+    } else {
+      renderDetail(product);
+    }
+  </script>
+</body>
+</html>

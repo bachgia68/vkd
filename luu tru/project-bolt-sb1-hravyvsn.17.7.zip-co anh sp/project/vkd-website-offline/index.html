@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VKD Group - Tập Đoàn Y Dược Sâm Ngọc Linh Việt Nam</title>
+  <meta name="description" content="Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam - Quốc bảo Việt Nam" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d', 950: '#052e16' },
+            gold: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309' },
+            earth: { 50: '#faf5f0', 100: '#f5ebe0', 200: '#e8d5c4', 300: '#d4b896', 400: '#c4a373', 500: '#a7885f', 600: '#8b6f4e', 700: '#6f5640', 800: '#5a4535', 900: '#4a3829', 950: '#261a10' },
+          },
+          fontFamily: { display: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Playfair Display', serif; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-earth-50 text-earth-900">
+  <!-- Header -->
+  <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="#home" class="flex items-center gap-3">
+        <img src="assets/images/logo-sam-ngoc-linh.png" alt="VKD Group Logo" class="h-12 md:h-14 w-auto" />
+      </a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#home" class="text-white/90 hover:text-white transition-colors">Trang chủ</a>
+        <a href="#about" class="text-white/90 hover:text-white transition-colors">Về chúng tôi</a>
+        <a href="#products" class="text-white/90 hover:text-white transition-colors">Sản phẩm</a>
+        <a href="#contact" class="text-white/90 hover:text-white transition-colors">Liên hệ</a>
+      </div>
+      <button id="menuBtn" class="md:hidden text-white p-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('assets/images/cay-sam-vkd.png'); background-position: center 30%;"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-primary-950/80"></div>
+    <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
+      <h1 class="font-display text-4xl md:text-6xl lg:text-7xl text-white mb-6 leading-tight">
+        Tập Đoàn Y Dược<br/>
+        <span class="text-gold-400">Sâm Ngọc Linh</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-white/90 mb-4">Quốc Bảo Việt Nam</p>
+      <p class="text-lg text-white/70 mb-8 max-w-2xl mx-auto">
+        Bảo tồn và phát triển nguồn gen Sâm Ngọc Linh quý giá - Mang sâm Việt đến với mọi nhà
+      </p>
+      <a href="#products" class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl">
+        Khám phá sản phẩm
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="relative -mt-16 z-20 px-4">
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="grid grid-cols-2 lg:grid-cols-4">
+        <div class="p-8 text-center border-r border-b lg:border-b-0">
+          <div class="text-4xl font-display font-bold text-primary-700 mb-2">10+</div>
+          <div class="text-earth-500 text-sm">Năm nghiên cứu</div>
+        </div>
+        <div class="p-8 text-center border-b lg:border-b-0">
+          <div class="text-4xl font-display font-bold text-gold-600 mb-2">3</div>
+          <div class="text-earth-500 text-sm">Vùng trồng</div>
+        </div>
+        <div class="p-8 text-center border-r">
+          <div class="text-4xl font-display font-bold text-primary-700 mb-2">50+</div>
+          <div class="text-earth-500 text-sm">Sản phẩm</div>
+        </div>
+        <div class="p-8 text-center">
+          <div class="text-4xl font-display font-bold text-gold-600 mb-2">20+</div>
+          <div class="text-earth-500 text-sm">Quốc gia xuất khẩu</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="font-display text-3xl md:text-5xl text-primary-800 mb-4">Câu Chuyện Thương Hiệu</h2>
+        <p class="text-earth-600 text-lg max-w-2xl mx-auto">Sâm Ngọc Linh - Một trong 4 loại sâm quý nhất thế giới</p>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <img src="assets/images/sam-ngoc-linh-su-menh.jpg" alt="Sâm Ngọc Linh" class="rounded-2xl shadow-lg w-full" />
+        </div>
+        <div class="space-y-6">
+          <h3 class="font-display text-2xl text-primary-700">Quốc Bảo Việt Nam</h3>
+          <p class="text-earth-600 leading-relaxed">
+            Sâm Ngọc Linh (Panax Vietnamensis) là loài dược liệu quý hiếm chỉ có ở Việt Nam, được mệnh danh là "Quốc bảo".
+            Với hàm lượng Saponin cao gấp nhiều lần so với các loại sâm khác, sâm Ngọc Linh có tác dụng vượt trội trong việc
+            bồi bổ sức khỏe, tăng cường miễn dịch và hỗ trợ điều trị nhiều bệnh lý.
+          </p>
+          <p class="text-earth-600 leading-relaxed">
+            VKD Group là một trong năm doanh nghiệp được Bộ Khoa học và Công nghệ giao nhiệm vụ Bảo tồn và Phát triển
+            nguồn gen quý Sâm Ngọc Linh, với mục tiêu xây dựng sâm Việt thành ngành hàng có giá trị kinh tế cao.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section id="products" class="py-20 px-4 bg-gradient-to-b from-earth-50 to-earth-100">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="font-display text-3xl md:text-5xl text-primary-800 mb-4">Sản Phẩm Nổi Bật</h2>
+        <p class="text-earth-600 text-lg">Hệ sinh thái sản phẩm từ Sâm Ngọc Linh nguyên chất</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group">
+          <div class="aspect-square overflow-hidden">
+            <img src="assets/images/banner-snl.png" alt="Sản phẩm Sâm Ngọc Linh" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl text-primary-800 mb-2">TPBS Sâm Ngọc Linh</h3>
+            <p class="text-earth-600 text-sm">Thực phẩm bảo vệ sức khỏe từ sâm Ngọc Linh nguyên chất</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group">
+          <div class="aspect-square overflow-hidden">
+            <img src="assets/images/product-1.jpg" alt="Sản phẩm Sâm Ngọc Linh" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl text-primary-800 mb-2">Rượu Ngọc Đế</h3>
+            <p class="text-earth-600 text-sm">Rượu sâm Ngọc Linh cao cấp</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow group">
+          <div class="aspect-square overflow-hidden">
+            <img src="assets/images/cay-sam-vkd.png" alt="Cây Sâm Ngọc Linh" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+          </div>
+          <div class="p-6">
+            <h3 class="font-display text-xl text-primary-800 mb-2">Sâm Ngọc Linh Tươi</h3>
+            <p class="text-earth-600 text-sm">Sâm tươi nguyên chất từ vùng trồng Ngọc Linh</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Event -->
+  <section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="font-display text-3xl md:text-5xl text-primary-800 mb-4">Sự Kiện Nổi Bật</h2>
+        <p class="text-earth-600 text-lg">Kỷ niệm 40 năm thành lập VUSTA</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <img src="assets/images/gian-hang.jpg" alt="Gian hàng VKD" class="rounded-2xl shadow-lg w-full" />
+        <img src="assets/images/dai-bieu.jpg" alt="Đại biểu tham quan" class="rounded-2xl shadow-lg w-full" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-20 px-4 bg-earth-900 text-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <div>
+          <img src="assets/images/logo-sam-ngoc-linh.png" alt="VKD Logo" class="h-20 mb-6" />
+          <h3 class="font-display text-2xl mb-4">CÔNG TY CỔ PHẦN TẬP ĐOÀN Y DƯỢC SÂM NGỌC LINH VIỆT NAM</h3>
+          <div class="space-y-4 text-earth-300">
+            <p class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+              1800 28 28 66
+            </p>
+            <p class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              info@vkdnature.com
+            </p>
+            <p class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-primary-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Tòa nhà 44/120 Trường Chinh, Phường Kim Liên, Thành Phố Hà Nội
+            </p>
+          </div>
+        </div>
+        <div class="text-center lg:text-right">
+          <h4 class="font-display text-xl mb-4">Theo dõi chúng tôi</h4>
+          <div class="flex gap-4 justify-center lg:justify-end">
+            <a href="https://facebook.com/tapdoanyduocsamngoclinhvn" target="_blank" class="w-12 h-12 bg-primary-600 hover:bg-primary-500 rounded-full flex items-center justify-center transition-colors">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="https://samngoclinhvkdgroup.com" target="_blank" class="w-12 h-12 bg-gold-600 hover:bg-gold-500 rounded-full flex items-center justify-center transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-earth-700 mt-12 pt-8 text-center text-earth-400 text-sm">
+        <p>© 2024 VKD Group - Tập Đoàn Y Dược Sâm Ngọc Linh Việt Nam. All rights reserved.</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('bg-primary-900/95', 'backdrop-blur-md', 'shadow-lg');
+      } else {
+        header.classList.remove('bg-primary-900/95', 'backdrop-blur-md', 'shadow-lg');
+      }
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

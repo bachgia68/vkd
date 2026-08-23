@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0e16">
+<title>TA Studio</title>
+<link rel="manifest" href="manifest.json">
+<style>
+/* ─── tokens ─────────────────────────────────────────────── */
+:root{
+  --bg:#0e0e16;--panel:#181824;--card:#222232;--card2:#2a2a3e;
+  --border:#30304a;--border2:#3e3e5a;
+  --gold:#c9a050;--gold2:#e8c870;--gold-bg:#1e1800;
+  --teal:#3d8fa0;--teal-bg:#051a20;
+  --green:#4caf7d;--green-bg:#0a1f14;
+  --red:#e05555;--red-bg:#200a0a;
+  --purple:#8b6fd6;
+  --text:#eaeaf8;--text2:#9090b8;--text3:#50506a;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --r:10px;
+}
+/* ─── reset ─────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{background:var(--bg);color:var(--text);
+  font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+  font-size:14px;display:flex;flex-direction:column;
+  max-width:500px;margin:0 auto;}
+
+/* ─── header ─────────────────────────────────────────────── */
+.hdr{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:calc(var(--safe-t) + 8px) 14px 8px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.logo{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.logo-badge{
+  background:var(--gold);color:#0e0e16;
+  font-weight:900;font-size:13px;
+  width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-text{font-weight:800;font-size:15px;color:var(--gold);letter-spacing:.04em}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 6px var(--green);
+  display:inline-block;
+}
+.status-dot.off{background:var(--red);box-shadow:0 0 6px var(--red)}
+.icon-btn{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;
+  transition:background .15s;
+}
+.icon-btn:active{background:var(--card2)}
+
+/* ─── tab bar ─────────────────────────────────────────────── */
+.tabs{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;flex-shrink:0;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:10px 13px;font-size:12px;font-weight:600;
+  color:var(--text3);white-space:nowrap;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:color .15s;flex-shrink:0;
+  display:flex;align-items:center;gap:4px;
+}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab .badge{
+  background:var(--green);color:#fff;
+  border-radius:10px;padding:0px 5px;
+  font-size:9px;font-weight:800;
+}
+
+/* ─── content ─────────────────────────────────────────────── */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px}
+
+/* ─── cards ─────────────────────────────────────────────── */
+.card{background:var(--panel);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
+.card-hdr{padding:11px 13px 7px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:0 13px 13px}
+
+/* ─── forms ─────────────────────────────────────────────── */
+label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);display:block;margin:9px 0 5px}
+select,input[type=text],input[type=password]{
+  width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;
+  padding:9px 11px;color:var(--text);font:inherit;font-size:13px;
+  outline:none;transition:border-color .15s;-webkit-appearance:none;
+}
+select:focus,input:focus{border-color:var(--gold)}
+textarea{
+  width:100%;background:var(--card);border:1px solid var(--border);border-radius:7px;
+  padding:10px 11px;color:var(--text);font:inherit;font-size:13px;line-height:1.65;
+  outline:none;resize:none;min-height:130px;transition:border-color .15s;
+}
+textarea:focus{border-color:var(--gold)}
+input[type=file]{display:none}
+input[type=range]{accent-color:var(--gold);width:100%;cursor:pointer}
+
+/* ─── buttons ─────────────────────────────────────────────── */
+.btn{
+  border:none;border-radius:8px;padding:10px 14px;
+  font:600 13px/1 inherit;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  transition:opacity .15s,transform .1s;-webkit-appearance:none;
+  touch-action:manipulation;
+}
+.btn:active{transform:scale(.96);opacity:.88}
+.btn-gold{background:var(--gold);color:#0e0e16}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-red{background:var(--red);color:#fff}
+.btn-full{width:100%}
+.btn-sm{padding:7px 11px;font-size:12px;border-radius:6px}
+.btn-xs{padding:4px 9px;font-size:11px;border-radius:5px}
+
+/* ─── image grid ─────────────────────────────────────────── */
+.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.img-slot{
+  aspect-ratio:3/4;background:var(--card);border:1.5px dashed var(--border2);
+  border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;font-size:10px;color:var(--text3);
+  text-align:center;position:relative;overflow:hidden;
+  touch-action:manipulation;transition:border-color .15s;
+}
+.img-slot:active{opacity:.8}
+.img-slot.filled{border-style:solid;border-color:var(--border)}
+.img-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.img-slot .del{
+  position:absolute;top:3px;right:3px;background:var(--red);color:#fff;
+  border:none;border-radius:50%;width:20px;height:20px;font-size:11px;
+  display:none;align-items:center;justify-content:center;cursor:pointer;z-index:2;
+}
+.img-slot.filled .del{display:flex}
+.plus{font-size:22px;color:var(--text3)}
+
+/* ─── voice list ─────────────────────────────────────────── */
+.voice-item{
+  display:flex;align-items:center;gap:10px;padding:10px 11px;
+  background:var(--card);border-radius:8px;border:1.5px solid var(--border);
+  cursor:pointer;margin-bottom:7px;transition:border-color .15s;
+}
+.voice-item.sel{border-color:var(--gold)}
+.v-ava{font-size:22px}
+.v-info{flex:1}
+.v-name{font-size:13px;font-weight:700}
+.v-desc{font-size:11px;color:var(--text2);margin-top:1px}
+
+/* ─── model chips ─────────────────────────────────────────── */
+.model-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.model-chip{
+  padding:5px 11px;border-radius:20px;border:1.5px solid var(--border);
+  font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);
+  transition:all .15s;touch-action:manipulation;
+}
+.model-chip.sel{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.model-chip.locked{opacity:.4;cursor:not-allowed}
+
+/* ─── progress ─────────────────────────────────────────────── */
+.pbar-wrap{background:var(--card);border-radius:6px;height:5px;overflow:hidden;margin:8px 0}
+.pbar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--teal));border-radius:6px;transition:width .4s}
+.pstep{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--text2)}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.dot.active{border-color:var(--gold);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ─── preview ─────────────────────────────────────────────── */
+.vid-wrap{border-radius:10px;overflow:hidden;background:#000;aspect-ratio:9/16;width:100%;max-height:48vh;display:flex;align-items:center;justify-content:center}
+.vid-wrap video{width:100%;height:100%;object-fit:contain}
+
+/* ─── export grid ─────────────────────────────────────────── */
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.exp-btn{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:14px 8px;text-align:center;cursor:pointer;
+  font-size:11px;font-weight:700;color:var(--text2);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  touch-action:manipulation;transition:border-color .15s;
+}
+.exp-btn:active{opacity:.8}
+.exp-btn .eico{font-size:26px}
+
+/* ─── admin ─────────────────────────────────────────────── */
+.admin-section{display:none}
+.admin-section.show{display:block}
+.admin-item{
+  display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid var(--border);
+}
+.admin-item:last-child{border:none}
+.admin-item-label{flex:1;font-size:13px}
+.admin-item-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.toggle{width:36px;height:20px;background:var(--border2);border-radius:10px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
+.toggle.on{background:var(--gold)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.toggle.on::after{left:19px}
+.history-item{
+  display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--border);font-size:12px;
+}
+.history-item:last-child{border:none}
+.hist-time{font-size:10px;color:var(--text3);white-space:nowrap}
+.hist-dur{
+  padding:2px 7px;border-radius:10px;background:var(--gold-bg);
+  color:var(--gold);font-size:10px;font-weight:700;white-space:nowrap;
+}
+
+/* ─── bottom bar ─────────────────────────────────────────── */
+.bot-bar{
+  background:var(--panel);border-top:1px solid var(--border);
+  padding:10px 14px calc(var(--safe-b) + 10px);
+  display:flex;gap:8px;flex-shrink:0;
+}
+
+/* ─── overlay/modal ─────────────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;
+  z-index:50;padding:20px;
+}
+.overlay.show{display:flex}
+.modal{
+  background:var(--panel);border-radius:14px;border:1px solid var(--border);
+  width:100%;max-width:420px;overflow:hidden;
+}
+.modal-hdr{padding:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-weight:700}
+.modal-body{padding:14px;max-height:60vh;overflow-y:auto}
+.modal-body .btn-full{margin-top:10px}
+
+/* ─── toast ─────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:calc(var(--safe-b) + 72px);
+  left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--gold);
+  border-radius:8px;padding:9px 16px;font-size:12px;
+  opacity:0;transition:all .25s;z-index:100;pointer-events:none;
+  max-width:calc(100vw - 32px);text-align:center;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── QR overlay ─────────────────────────────────────────── */
+.qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:60;flex-direction:column;gap:14px}
+.qr-overlay.show{display:flex}
+.qr-box{background:var(--panel);border-radius:14px;padding:20px;text-align:center}
+.qr-box img{width:180px;height:180px;border-radius:8px}
+
+/* ─── utils ─────────────────────────────────────────────── */
+.hidden{display:none!important}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.sep{height:1px;background:var(--border);margin:8px 0}
+.tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;background:var(--green-bg);color:var(--green)}
+.tag.warn{background:var(--gold-bg);color:var(--gold)}
+.tag.info{background:var(--teal-bg);color:var(--teal)}
+.char-count{font-size:10px;color:var(--text3);text-align:right;margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-badge">TA</div>
+    <div>
+      <div class="logo-text">TA Studio</div>
+      <div class="logo-sub">Video Marketing</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="status-dot off" id="status-dot" title="Kết nối backend"></span>
+    <div class="icon-btn" onclick="showQR()" title="QR Phone">📲</div>
+    <div class="icon-btn" onclick="showTab('admin')" title="Admin">⚙️</div>
+  </div>
+</div>
+
+<!-- ═══ TAB BAR ═══ -->
+<div class="tabs" id="tabs">
+  <div class="tab active" data-tab="script">📝 Kịch bản</div>
+  <div class="tab" data-tab="images">🖼️ Ảnh</div>
+  <div class="tab" data-tab="voice">🎙️ Giọng</div>
+  <div class="tab" data-tab="model">🤖 AI Model</div>
+  <div class="tab" data-tab="render">⚡ Slideshow</div>
+  <div class="tab" data-tab="did-render">🎬 KOL Video</div>
+  <div class="tab" data-tab="kling">🕺 Kling AI</div>
+  <div class="tab" data-tab="edit-video">✂️ Edit Video</div>
+  <div class="tab" data-tab="export">📤 Xuất</div>
+  <div class="tab" data-tab="history">📂 Lịch sử</div>
+  <div class="tab" data-tab="admin">⚙️ Admin</div>
+</div>
+
+<!-- ═══ CONTENT ═══ -->
+<div class="content" id="content">
+
+<!-- ── 1. SCRIPT ── -->
+<div id="tab-script">
+  <div class="card">
+    <div class="card-hdr">AI Tạo Kịch Bản</div>
+    <div class="card-body">
+      <label>Sản phẩm</label>
+      <select id="product-sel"></select>
+      <label>Phong cách</label>
+      <select id="style-sel">
+        <option>Bán hàng · Thuyết phục</option>
+        <option>Chia sẻ · Cảm xúc</option>
+        <option>Giáo dục · Thông tin</option>
+        <option>Hài hước · Gần gũi</option>
+        <option>Chuyên gia · Uy tín</option>
+      </select>
+      <label>Độ dài</label>
+      <select id="dur-sel">
+        <option value="15">15 giây – Ngắn (TikTok Reels)</option>
+        <option value="30">30 giây – Chuẩn</option>
+        <option value="45" selected>45 giây – Đầy đủ</option>
+        <option value="60">60 giây – Dài</option>
+      </select>
+      <label>Yêu cầu thêm (tùy chọn)</label>
+      <input type="text" id="extra-req" placeholder="VD: nhấn mạnh ưu đãi 20%, nhắc ship miễn phí...">
+      <div style="margin-top:10px">
+        <button class="btn btn-teal btn-full" onclick="genScript()" id="ai-btn">✨ Gemini Tạo Kịch Bản</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Kịch bản <span id="script-model-tag" class="tag info" style="font-size:9px;margin-left:4px"></span></div>
+    <div class="card-body">
+      <textarea id="script-txt" placeholder="Nhập kịch bản hoặc để AI tạo tự động..."></textarea>
+      <div class="char-count" id="char-count"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Hashtag & Caption</div>
+    <div class="card-body">
+      <textarea id="hashtag-txt" style="min-height:60px" placeholder="#samngoclinh #samta #suckhoe"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2. IMAGES ── -->
+<div id="tab-images" class="hidden">
+  <div class="card">
+    <div class="card-hdr">Ảnh sản phẩm / bối cảnh <span style="font-size:10px;color:var(--text2)">(tối đa 8)</span></div>
+    <div class="card-body">
+      <div class="img-grid" id="img-grid">
+        <div class="img-slot" onclick="openUpload()">
+          <div class="plus">+</div><span>Chụp / Chọn ảnh</span>
+        </div>
+      </div>
+      <input type="file" id="img-input" accept="image/*" multiple onchange="handleImgs(event)">
+      <div style="margin-top:10px">
+        <label>Hoặc để AI tạo ảnh (Gemini Imagen 3)</label>
+        <div class="row">
+          <select id="bg-sel" style="flex:2"></select>
+          <button class="btn btn-outline" onclick="genImages()" id="gen-img-btn" style="flex:1;white-space:nowrap">🤖 Tạo ảnh</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 3. VOICE ── -->
+<div id="tab-voice" class="hidden">
+  <div class="card">
+    <div class="card-hdr">Giọng đọc (edge-tts – miễn phí)</div>
+    <div class="card-body" id="voice-list"></div>
+  </div>
+</div>
+
+<!-- ── 4. AI MODEL ── -->
+<div id="tab-model" class="hidden">
+  <div class="card">
+    <div class="card-hdr">Model tạo kịch bản</div>
+    <div class="card-body">
+      <div class="model-row">
+        <div class="model-chip sel" data-type="script" data-val="gemini-2.0-flash" onclick="selModel(this)">Gemini 2.0 Flash <span class="tag" style="margin-left:3px">FREE</span></div>
+        <div class="model-chip" data-type="script" data-val="gemini-1.5-pro" onclick="selModel(this)">Gemini 1.5 Pro</div>
+        <div class="model-chip" data-type="script" data-val="claude-haiku" onclick="selModel(this)">Claude Haiku</div>
+        <div class="model-chip locked" data-type="script" data-val="gpt-4o" onclick="selModel(this)">GPT-4o 🔒</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Model tạo ảnh</div>
+    <div class="card-body">
+      <div class="model-row">
+        <div class="model-chip sel" data-type="image" data-val="imagen-3" onclick="selModel(this)">Imagen 3 <span class="tag" style="margin-left:3px">FREE</span></div>
+        <div class="model-chip" data-type="image" data-val="gemini-flash-img" onclick="selModel(this)">Gemini Flash</div>
+        <div class="model-chip locked" data-type="image" data-val="dalle3" onclick="selModel(this)">DALL·E 3 🔒</div>
+        <div class="model-chip locked" data-type="image" data-val="midjourney" onclick="selModel(this)">Midjourney 🔒</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Model tạo video 🎬</div>
+    <div class="card-body">
+      <div class="model-row">
+        <div class="model-chip sel" data-type="video" data-val="slideshow" onclick="selModel(this)">Slideshow <span class="tag" style="margin-left:3px">FREE</span></div>
+        <div class="model-chip" data-type="video" data-val="veo3" onclick="selModel(this)">Veo 3 <span class="tag warn" style="margin-left:3px">Beta</span></div>
+        <div class="model-chip locked" data-type="video" data-val="kling" onclick="selModel(this)">Kling 🔒</div>
+        <div class="model-chip locked" data-type="video" data-val="runway" onclick="selModel(this)">Runway 🔒</div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.5" id="model-note">
+        <b>Slideshow:</b> Ghép ảnh thật của bạn thành video 9:16, giọng AI, watermark TA. Miễn phí, nhanh.<br>
+        <b>Veo 3:</b> Google tạo video chuyển động thật sự. Cần Gemini API key.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Video KOL – Môi cử động (D-ID)</div>
+    <div class="card-body">
+      <div style="padding:10px;background:var(--teal-bg);border:1px solid var(--teal);border-radius:8px;font-size:12px;line-height:1.6;margin-bottom:10px">
+        🎬 <b>D-ID:</b> Upload ảnh KOL Mai → nhập kịch bản → D-ID tạo video môi cử động, chân thật.<br>
+        ✅ Free 20 video/tháng &nbsp;·&nbsp; 🔑 Cần D-ID API key bên dưới<br>
+        📌 Cách làm: <b>Ảnh KOL</b> → <b>Kịch bản</b> → nhấn <b>"KOL Nói (D-ID)"</b> bên dưới
+      </div>
+      <button class="btn btn-teal btn-full" onclick="showTab('did-render')" id="goto-did-btn">🎬 Tạo video KOL nói chuyện →</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">Gemini API Key <span id="gemini-status-tag" class="tag" style="display:none">✓ Đã kết nối</span></div>
+    <div class="card-body">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">
+        Lấy <b>miễn phí</b> tại <b>aistudio.google.com</b> → Get API key → dạng <b>AIzaSy...</b> (đã có sẵn, không cần nhập lại)
+      </div>
+      <input type="password" id="gemini-key-input" placeholder="AIzaSy..." autocomplete="off">
+      <div style="margin-top:8px">
+        <button class="btn btn-gold btn-full btn-sm" onclick="saveGeminiKey()">⚡ Lưu & Kích hoạt ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">D-ID API Key <span class="tag warn" style="margin-left:4px">Talking Head</span> <span id="did-status-tag" class="tag" style="display:none">✓ Đã kết nối</span></div>
+    <div class="card-body">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">
+        <b>D-ID</b> tạo video KOL nói: upload ảnh Mai → D-ID làm môi cử động khớp giọng.<br>
+        Free 20 video/tháng. Đăng ký tại <b>studio.d-id.com</b> → API → Basic Auth Token.<br>
+        <span style="color:var(--gold)">Dán token dạng Base64, không phải email:password.</span>
+      </div>
+      <input type="password" id="did-key-input" placeholder="Basic Auth token từ D-ID..." autocomplete="off">
+      <div style="margin-top:8px">
+        <button class="btn btn-teal btn-full btn-sm" onclick="saveDidKey()">⚡ Lưu D-ID Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr">🎬 Kling AI Key <span class="tag" style="background:#7c3aed;margin-left:4px">Full-body Video</span> <span id="kling-status-tag" class="tag" style="display:none">✓ Đã kết nối</span></div>
+    <div class="card-body">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.5">
+        Kling tạo video cả người di chuyển mượt mà (không chỉ môi mấp máy như D-ID).<br>
+        Lấy key tại <span style="color:var(--gold)">klingai.com → API Access</span>. ~$0.14/video 5s.
+      </div>
+      <input type="password" id="kling-key-input" placeholder="api-key-kling-..." autocomplete="off">
+      <div style="margin-top:8px">
+        <button class="btn btn-full btn-sm" style="background:#7c3aed;color:#fff" onclick="saveKlingKey()">⚡ Lưu Kling Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="kol-photo-card">
+    <div class="card-hdr">📸 Ảnh KOL (cho D-ID)</div>
+    <div class="card-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px" id="kol-photo-list"></div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Upload ảnh KOL rõ mặt, nhìn thẳng vào camera, nền đơn giản.</div>
+      <input type="file" id="kol-file-input" accept="image/*" onchange="uploadKolPhoto(event)">
+      <button class="btn btn-outline btn-sm btn-full" onclick="document.getElementById('kol-file-input').click()">📷 Upload ảnh KOL Mai</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 5. RENDER ── -->
+<div id="tab-render" class="hidden">
+  <div class="card" id="pre-check-card">
+    <div class="card-hdr">Kiểm tra</div>
+    <div class="card-body">
+      <div class="pstep"><div class="dot" id="chk-s"></div><span id="chk-s-lbl">Kịch bản</span></div>
+      <div class="pstep"><div class="dot" id="chk-i"></div><span id="chk-i-lbl">Ảnh sản phẩm</span></div>
+      <div class="pstep"><div class="dot" id="chk-v"></div><span id="chk-v-lbl">Giọng đọc</span></div>
+      <div class="pstep"><div class="dot" id="chk-m"></div><span id="chk-m-lbl">AI Model</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="render-prog-card" style="display:none">
+    <div class="card-hdr">Tiến trình</div>
+    <div class="card-body">
+      <div class="pbar-wrap"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
+      <div id="render-lbl" style="font-size:12px;color:var(--text2);text-align:center;margin:6px 0">...</div>
+      <div class="pstep"><div class="dot" id="d-tts"></div><span>🎙️ Tạo giọng đọc (edge-tts)</span></div>
+      <div class="pstep"><div class="dot" id="d-img"></div><span>🖼️ Chuẩn bị / tạo ảnh AI</span></div>
+      <div class="pstep"><div class="dot" id="d-rnd"></div><span>⚡ Render MP4 1080×1920</span></div>
+    </div>
+  </div>
+
+  <button class="btn btn-gold btn-full" id="render-btn" onclick="startRender()">⚡ Bắt Đầu Render</button>
+</div>
+
+<!-- ── 6. EXPORT ── -->
+<div id="tab-export" class="hidden">
+  <div class="card" id="preview-card" style="display:none">
+    <div class="card-hdr">Xem trước</div>
+    <div class="card-body">
+      <div class="vid-wrap"><video id="preview-vid" controls playsinline></video></div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px" id="vid-info"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">Xuất bản</div>
+    <div class="card-body">
+      <div class="export-grid">
+        <div class="exp-btn" onclick="doExport('download')"><div class="eico">💾</div>Tải xuống</div>
+        <div class="exp-btn" onclick="doExport('telegram')"><div class="eico">✈️</div>Telegram</div>
+        <div class="exp-btn" onclick="doExport('facebook')"><div class="eico">📘</div>Facebook</div>
+        <div class="exp-btn" onclick="doExport('tiktok')"><div class="eico">🎵</div>TikTok</div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Lên lịch đăng tự động</label>
+        <div class="row">
+          <button class="btn btn-outline btn-sm" onclick="schedule('08:00')">8:00</button>
+          <button class="btn btn-outline btn-sm" onclick="schedule('12:00')">12:00</button>
+          <button class="btn btn-gold btn-sm" onclick="schedule('20:00')">20:00</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 7. HISTORY ── -->
+<div id="tab-history" class="hidden">
+  <div class="card">
+    <div class="card-hdr">Video đã tạo</div>
+    <div class="card-body" id="history-list">
+      <div style="text-align:center;padding:20px;color:var(--text3)">Chưa có video nào</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── D-ID RENDER ── -->
+<div id="tab-did-render" class="hidden">
+  <div class="card">
+    <div class="card-hdr">🎬 KOL Nói – D-ID Talking Head</div>
+    <div class="card-body">
+      <label>Chọn ảnh KOL</label>
+      <select id="did-kol-sel"><option value="">-- Chưa có ảnh KOL nào --</option></select>
+      <div style="margin-top:6px;font-size:11px;color:var(--text3)">
+        Chưa có? Vào tab <b>AI Model</b> → upload ảnh KOL
+      </div>
+
+      <label style="margin-top:12px">Kịch bản (lấy từ tab Kịch bản)</label>
+      <textarea id="did-script-txt" style="min-height:100px" placeholder="Copy kịch bản vào đây..."></textarea>
+
+      <label>Giọng đọc</label>
+      <select id="did-voice-sel">
+        <option value="vi-VN-HoaiMyNeural">HoàiMy – Nữ Miền Nam 🔥</option>
+        <option value="vi-VN-NamMinhNeural">NamMinh – Nam Miền Bắc</option>
+        <option value="vi-VN-ThuHuongNeural">ThuHương – Nữ Miền Bắc</option>
+        <option value="vi-VN-QuangNeural">Quang – Nam Trung tính</option>
+      </select>
+
+      <div style="margin-top:12px;padding:8px 10px;background:var(--gold-bg);border-radius:7px;font-size:11px;color:var(--text2);line-height:1.6">
+        ⚠️ <b>Lưu ý:</b> D-ID cần kết nối internet. Video trả về trong 30–90 giây.<br>
+        💡 Mỗi video free tốn 1 credit (free 20/tháng tại studio.d-id.com)
+      </div>
+
+      <div style="margin-top:10px" id="did-status-area" style="display:none"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-teal btn-full" id="did-render-btn" onclick="startDidRender()">🎬 Bắt Đầu Tạo Video KOL</button>
+  <div style="margin-top:8px">
+    <button class="btn btn-outline btn-full btn-sm" onclick="showTab('script')">← Quay lại Kịch bản</button>
+  </div>
+</div>
+
+<!-- ── KLING VIDEO ── -->
+<div id="tab-kling" class="hidden">
+  <div class="card">
+    <div class="card-hdr">🎬 Kling AI – Video Người Di Chuyển</div>
+    <div class="card-body">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">
+        Kling tạo video nhân vật di chuyển tự nhiên, chất lượng điện ảnh — không chỉ môi mấp máy.<br>
+        <b>Text → Video</b>: mô tả cảnh quay. <b>Ảnh → Video</b>: KOL/sản phẩm "sống lại".
+      </div>
+      <label class="lbl">Chế độ</label>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-sm" id="kling-mode-t2v" style="background:#7c3aed;color:#fff;flex:1" onclick="setKlingMode('text2video')">📝 Text → Video</button>
+        <button class="btn btn-outline btn-sm" id="kling-mode-i2v" style="flex:1" onclick="setKlingMode('image2video')">🖼️ Ảnh → Video</button>
+      </div>
+      <div id="kling-img-row" style="display:none;margin-bottom:8px">
+        <label class="lbl">URL ảnh nguồn (public URL)</label>
+        <input type="text" id="kling-image-url" placeholder="https://... ảnh KOL hoặc sản phẩm">
+      </div>
+      <label class="lbl">Mô tả cảnh quay (tiếng Anh cho tốt nhất)</label>
+      <textarea id="kling-prompt" rows="3" placeholder="A Vietnamese woman holding ginseng root, walking through misty mountain forest, cinematic, golden hour..."></textarea>
+      <div style="display:flex;gap:8px;margin:8px 0">
+        <div style="flex:1">
+          <label class="lbl">Thời lượng</label>
+          <select id="kling-duration">
+            <option value="5">5 giây</option>
+            <option value="10">10 giây</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="lbl">Tỷ lệ khung hình</label>
+          <select id="kling-ratio">
+            <option value="9:16">9:16 (TikTok/Reels)</option>
+            <option value="16:9">16:9 (YouTube)</option>
+            <option value="1:1">1:1 (Feed)</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="lbl">Model</label>
+          <select id="kling-model">
+            <option value="kling-v1-5">Kling v1.5 🔥</option>
+            <option value="kling-v2">Kling v2</option>
+            <option value="kling-v1">Kling v1</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-full" style="background:#7c3aed;color:#fff" onclick="startKling()">🎬 Tạo Video Kling</button>
+    </div>
+  </div>
+  <div class="card" id="kling-progress-card" style="display:none">
+    <div class="card-hdr">Tiến độ</div>
+    <div class="card-body">
+      <div id="kling-status-msg" style="color:var(--gold);margin-bottom:8px">Đang gửi yêu cầu...</div>
+      <div id="kling-video-wrap" style="display:none">
+        <video id="kling-video-player" controls style="width:100%;border-radius:8px;margin-bottom:8px"></video>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-teal btn-sm" style="flex:1" onclick="downloadKlingVideo()">⬇️ Tải về</button>
+          <button class="btn btn-outline btn-sm" style="flex:1" onclick="sendKlingToTelegram()">📱 Gửi Telegram</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT VIDEO (CapCut-like) ── -->
+<div id="tab-edit-video" class="hidden">
+  <div class="card">
+    <div class="card-hdr">📂 Upload Video Nguồn</div>
+    <div class="card-body">
+      <div id="edit-source-preview" style="display:none">
+        <div class="vid-wrap" style="max-height:28vh"><video id="edit-source-vid" controls playsinline style="width:100%;height:100%;object-fit:contain"></video></div>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px" id="edit-src-info"></div>
+      </div>
+      <input type="file" id="edit-video-input" accept="video/*" onchange="uploadEditVideo(event)">
+      <button class="btn btn-outline btn-full" onclick="document.getElementById('edit-video-input').click()">📂 Chọn video từ máy / điện thoại</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px">Hỗ trợ MP4, MOV, MKV — không giới hạn thời lượng</div>
+    </div>
+  </div>
+
+  <div class="card" id="edit-ops-card" style="display:none">
+    <div class="card-hdr">✂️ Cắt & Chỉnh sửa</div>
+    <div class="card-body">
+      <!-- Trim -->
+      <div style="background:var(--card2);border-radius:8px;padding:10px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:12px">✂️ Cắt đoạn (Trim)</b>
+          <div class="toggle" id="trim-toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1"><label>Từ giây</label><input type="number" id="trim-start" value="0" min="0" step="0.5"></div>
+          <div style="flex:1"><label>Đến giây</label><input type="number" id="trim-end" value="30" min="1" step="0.5"></div>
+        </div>
+      </div>
+      <!-- Add voice -->
+      <div style="background:var(--card2);border-radius:8px;padding:10px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:12px">🎙️ Thêm giọng đọc</b>
+          <div class="toggle" id="voice-toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <select id="edit-voice-sel" style="margin-bottom:6px">
+          <option value="vi-VN-HoaiMyNeural">HoàiMy – Nữ Miền Nam 🔥</option>
+          <option value="vi-VN-NamMinhNeural">NamMinh – Nam Miền Bắc</option>
+          <option value="vi-VN-ThuHuongNeural">ThuHương – Nữ Miền Bắc</option>
+        </select>
+        <textarea id="edit-script" style="min-height:70px" placeholder="Nhập lời thoại sẽ được đọc thành giọng..."></textarea>
+      </div>
+      <!-- Watermark text -->
+      <div style="background:var(--card2);border-radius:8px;padding:10px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:12px">💬 Thêm chữ / Watermark</b>
+          <div class="toggle" id="text-toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <input type="text" id="edit-text" placeholder="VD: TA SÂM NGỌC LINH | 0984999309" value="TA SÂM NGỌC LINH">
+        <div class="row" style="margin-top:6px">
+          <select id="edit-text-pos">
+            <option value="top">Trên đầu</option>
+            <option value="bottom">Dưới cùng</option>
+            <option value="center">Giữa màn hình</option>
+          </select>
+          <input type="number" id="edit-fontsize" value="38" min="20" max="80" placeholder="Cỡ chữ">
+        </div>
+      </div>
+      <!-- Resize -->
+      <div style="background:var(--card2);border-radius:8px;padding:10px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:12px">📐 Chuyển về 9:16 (1080×1920)</b>
+          <div class="toggle on" id="resize-toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">Tự động crop/pad video về đúng format TikTok/Reels/Shorts</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-progress" style="display:none">
+    <div class="card">
+      <div class="card-body">
+        <div class="pbar-wrap"><div class="pbar-fill" id="edit-pbar" style="width:0%"></div></div>
+        <div id="edit-status" style="font-size:12px;color:var(--text2);text-align:center;margin-top:6px">...</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-gold btn-full" id="edit-export-btn" onclick="startEditExport()" style="display:none">⚡ Xuất Video</button>
+</div>
+
+<!-- ── 8. ADMIN ── -->
+<div id="tab-admin" class="hidden">
+  <div class="card" id="admin-login-card">
+    <div class="card-hdr">🔐 Admin Login</div>
+    <div class="card-body">
+      <label>Mật khẩu Admin</label>
+      <input type="password" id="admin-pw" placeholder="Mật khẩu..." onkeydown="if(event.key==='Enter')adminLogin()">
+      <div style="margin-top:8px">
+        <button class="btn btn-gold btn-full" onclick="adminLogin()">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-panel" class="hidden">
+    <div class="card">
+      <div class="card-hdr">🌿 Sản phẩm</div>
+      <div class="card-body" id="admin-products">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="new-product-name" placeholder="Tên sản phẩm..." style="flex:3">
+          <input type="text" id="new-product-emoji" placeholder="🌿" style="flex:0.6;text-align:center">
+          <button class="btn btn-gold btn-sm" onclick="addProduct()" style="flex:0;white-space:nowrap">+</button>
+        </div>
+        <div id="admin-products-list"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">🏔️ Bối cảnh</div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="new-bg-name" placeholder="Tên bối cảnh..." style="flex:3">
+          <input type="text" id="new-bg-emoji" placeholder="🏔️" style="flex:0.6;text-align:center">
+          <button class="btn btn-gold btn-sm" onclick="addBg()" style="flex:0;white-space:nowrap">+</button>
+        </div>
+        <div id="admin-bgs"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">👤 Nhân vật</div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input type="text" id="new-char-name" placeholder="Tên nhân vật..." style="flex:3">
+          <input type="text" id="new-char-emoji" placeholder="👩" style="flex:0.6;text-align:center">
+          <button class="btn btn-gold btn-sm" onclick="addChar()" style="flex:0;white-space:nowrap">+</button>
+        </div>
+        <div id="admin-chars"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">🏷️ Brand Kit</div>
+      <div class="card-body">
+        <label>Tên thương hiệu</label>
+        <input type="text" id="brand-name">
+        <label>Hashtag mặc định</label>
+        <textarea id="brand-hashtag" style="min-height:60px"></textarea>
+        <div style="margin-top:10px">
+          <button class="btn btn-gold btn-full btn-sm" onclick="saveBrand()">💾 Lưu Brand</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">📅 Lịch đăng</div>
+      <div class="card-body">
+        <div class="row">
+          <button class="btn btn-outline btn-sm" onclick="addSlot()">+ Thêm khung giờ</button>
+          <button class="btn btn-red btn-sm" onclick="clearSlots()">Xóa hết</button>
+        </div>
+        <div id="slot-list" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div style="padding:8px 0">
+      <button class="btn btn-outline btn-full btn-sm" onclick="adminLogout()">Đăng xuất Admin</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- ═══ BOTTOM BAR ═══ -->
+<div class="bot-bar">
+  <button class="btn btn-outline btn-sm" onclick="prevTab()" id="btn-prev">← Trước</button>
+  <button class="btn btn-gold" onclick="nextTab()" id="btn-next" style="flex:2">Tiếp theo →</button>
+</div>
+
+<!-- ═══ QR OVERLAY ═══ -->
+<div class="qr-overlay" id="qr-overlay" onclick="this.classList.remove('show')">
+  <div class="qr-box" onclick="event.stopPropagation()">
+    <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:8px">📲 Mở trên điện thoại</div>
+    <img id="qr-img" src="/api/qr" alt="QR">
+    <div style="font-size:12px;color:var(--text2);margin-top:8px" id="qr-url">Quét QR bằng camera điện thoại</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px">Hoặc kết nối cùng WiFi → mở URL trên</div>
+    <button class="btn btn-outline btn-sm btn-full" style="margin-top:10px" onclick="document.getElementById('qr-overlay').classList.remove('show')">Đóng</button>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────
+const API = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') || window.location.origin.includes('192.168')
+  ? window.location.origin  // served from Flask itself
+  : 'http://localhost:5050';
+
+const TABS = ['script','images','voice','model','render','did-render','kling','edit-video','export','history','admin'];
+let state = {
+  tab: 'script',
+  jobId: localStorage.getItem('ta_job_id') || 'job_' + Math.random().toString(36).slice(2,10),
+  voice: 'vi-VN-HoaiMyNeural',
+  videoModel: 'slideshow',
+  renderJobId: null,
+  adminToken: localStorage.getItem('ta_admin_token') || null,
+  images: [],
+  config: null,
+};
+localStorage.setItem('ta_job_id', state.jobId);
+
+// ── Boot ────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  setupTabs();
+  setupScriptListeners();
+  await loadConfig();
+  checkApi();
+  setInterval(checkApi, 30000);
+  // Restore saved keys
+  if (localStorage.getItem('ta_gemini_key')) document.getElementById('gemini-key-input').value = '••••••••••••';
+  if (localStorage.getItem('ta_did_key')) document.getElementById('did-key-input').value = '••••••••••••';
+  if (localStorage.getItem('ta_kling_key')) {
+    document.getElementById('kling-key-input').value = '••••••••••••';
+    const t = document.getElementById('kling-status-tag');
+    if (t) t.style.display='';
+  }
+});
+
+async function loadConfig() {
+  try {
+    const r = await fetch(`${API}/api/config`);
+    state.config = await r.json();
+    populateSelects();
+    populateVoices();
+    populateHistory();
+    if (state.adminToken) showAdminPanel();
+  } catch(e) {
+    // offline fallback
+    state.config = {
+      products:[{id:'sam-cu',name:'Sâm Ngọc Linh – Củ tươi',emoji:'🌿',active:true}],
+      backgrounds:[{id:'nui-ngoc-linh',name:'Núi Ngọc Linh',emoji:'🏔️',active:true}],
+      voices:[{id:'vi-VN-HoaiMyNeural',name:'HoàiMy',desc:'Nữ · Miền Nam 🔥',active:true}],
+      videos:[],brand:{name:'TA SÂM NGỌC LINH',hashtags:'#samngoclinh'},
+    };
+    populateSelects(); populateVoices();
+  }
+}
+
+function populateSelects() {
+  const cfg = state.config || {};
+  // Products
+  const ps = document.getElementById('product-sel');
+  ps.innerHTML = (cfg.products||[]).filter(p=>p.active).map(p=>`<option value="${p.id}">${p.emoji} ${p.name}</option>`).join('');
+  // Backgrounds
+  const bs = document.getElementById('bg-sel');
+  bs.innerHTML = (cfg.backgrounds||[]).filter(b=>b.active).map(b=>`<option value="${b.id}">${b.emoji} ${b.name}</option>`).join('');
+  // Hashtags
+  const brand = cfg.brand || {};
+  document.getElementById('hashtag-txt').value = brand.hashtags || '';
+  // Script model tag
+  document.getElementById('script-model-tag').textContent = 'Gemini Free';
+}
+
+function populateVoices() {
+  const cfg = state.config || {};
+  const vl = document.getElementById('voice-list');
+  const avatars = {'vi-VN-HoaiMyNeural':'👩‍🦱','vi-VN-NamMinhNeural':'👨‍💼','vi-VN-ThuHuongNeural':'👩','vi-VN-QuangNeural':'🧔'};
+  vl.innerHTML = (cfg.voices||[]).filter(v=>v.active).map(v=>`
+    <div class="voice-item ${v.id===state.voice?'sel':''}" data-voice="${v.id}" onclick="selVoice(this)">
+      <div class="v-ava">${avatars[v.id]||'🎙️'}</div>
+      <div class="v-info">
+        <div class="v-name">${v.name}</div>
+        <div class="v-desc">${v.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function populateHistory() {
+  try {
+    const r = await fetch(`${API}/api/videos`);
+    const vids = await r.json();
+    const hl = document.getElementById('history-list');
+    if (!vids.length) { hl.innerHTML='<div style="text-align:center;padding:16px;color:var(--text3)">Chưa có video nào</div>'; return; }
+    hl.innerHTML = vids.map(v=>`
+      <div class="history-item">
+        <div style="flex:1">
+          <div style="font-size:12px">${v.script_preview||'Video'}</div>
+          <div class="hist-time">${v.created||''}</div>
+        </div>
+        <div class="hist-dur">${v.duration||'?'}s</div>
+        <button class="btn btn-xs btn-outline" onclick="downloadHist('${v.id}')">⬇️</button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+function downloadHist(id) { window.open(`${API}/api/download/${id}`, '_blank'); }
+
+// ── API health ───────────────────────────────────────────────────────────
+async function checkApi() {
+  try {
+    const r = await fetch(`${API}/api/health`, {signal: AbortSignal.timeout(4000)});
+    const d = await r.json();
+    const dot = document.getElementById('status-dot');
+    dot.classList.toggle('off', d.status !== 'ok');
+    // Update QR URL hint
+    document.getElementById('qr-url').textContent = `http://${d.local_ip}:5050`;
+  } catch {
+    document.getElementById('status-dot').classList.add('off');
+  }
+}
+
+// ── Script ────────────────────────────────────────────────────────────────
+function setupScriptListeners() {
+  const ta = document.getElementById('script-txt');
+  ta.addEventListener('input', updateCharCount);
+  updateCharCount();
+}
+function updateCharCount() {
+  const txt = document.getElementById('script-txt').value;
+  const words = txt.trim().split(/\s+/).filter(Boolean).length;
+  const secs = Math.round(words / 2.4);
+  document.getElementById('char-count').textContent = `${txt.length} ký tự · ~${secs} giây đọc`;
+}
+
+async function genScript() {
+  const btn = document.getElementById('ai-btn');
+  btn.disabled = true; btn.textContent = '⏳ Đang hỏi Gemini...';
+  toast('✨ Gemini đang tạo kịch bản (miễn phí)...');
+  try {
+    const r = await fetch(`${API}/api/generate-script`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        product: document.getElementById('product-sel').value,
+        style:   document.getElementById('style-sel').value,
+        duration:document.getElementById('dur-sel').value,
+        extra:   document.getElementById('extra-req').value,
+      })
+    });
+    const d = await r.json();
+    document.getElementById('script-txt').value = d.script || '';
+    if (d.hashtags) document.getElementById('hashtag-txt').value = d.hashtags;
+    updateCharCount();
+    toast('✅ Kịch bản đã tạo xong!');
+  } catch(e) { toast('❌ Gemini chưa kết nối – kiểm tra API key'); }
+  finally { btn.disabled=false; btn.textContent='✨ Gemini Tạo Kịch Bản'; }
+}
+
+// ── Images ────────────────────────────────────────────────────────────────
+function openUpload() { document.getElementById('img-input').click(); }
+async function handleImgs(e) {
+  for (const f of Array.from(e.target.files)) {
+    if (state.images.length >= 8) { toast('Tối đa 8 ảnh'); break; }
+    const url = URL.createObjectURL(f);
+    addImgSlot(url);
+    state.images.push({type:'file', url, file:f});
+    uploadImg(f);
+  }
+  e.target.value='';
+}
+async function uploadImg(file) {
+  const fd = new FormData(); fd.append('file',file); fd.append('job_id',state.jobId);
+  try { await fetch(`${API}/api/upload-image`,{method:'POST',body:fd}); } catch {}
+}
+function addImgSlot(url, generated=false) {
+  const grid = document.getElementById('img-grid');
+  const idx = state.images.length;
+  const slot = document.createElement('div');
+  slot.className = 'img-slot filled';
+  slot.innerHTML = `<img src="${url}"><button class="del" onclick="rmImg(${idx},this)">×</button>`;
+  if (generated) {
+    const badge = document.createElement('div');
+    badge.style.cssText = 'position:absolute;bottom:3px;left:3px;background:rgba(60,143,160,.9);color:#fff;font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;z-index:2';
+    badge.textContent = 'AI';
+    slot.appendChild(badge);
+  }
+  grid.insertBefore(slot, grid.querySelector('.img-slot:not(.filled)'));
+}
+function rmImg(idx, btn) { state.images.splice(idx,1); btn.parentElement.remove(); }
+
+async function genImages() {
+  const btn = document.getElementById('gen-img-btn');
+  btn.disabled=true; btn.textContent='⏳...';
+  const bgId = document.getElementById('bg-sel').value;
+  const bgName = document.getElementById('bg-sel').selectedOptions[0]?.text || bgId;
+  toast('🤖 Gemini Imagen 3 đang tạo ảnh...');
+  try {
+    const r = await fetch(`${API}/api/generate-image`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({job_id:state.jobId, prompt:`Premium Vietnamese Sam Ngoc Linh ginseng, ${bgName}, photorealistic, 4K, warm light`})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      state.images.push({type:'ai'});
+      addImgSlot(`${API}/uploads/${state.jobId}/${d.file}`, true);
+      toast('✅ Ảnh AI đã tạo xong!');
+    } else { toast('⚠️ Cần Gemini API key để tạo ảnh'); }
+  } catch { toast('❌ Lỗi tạo ảnh'); }
+  finally { btn.disabled=false; btn.textContent='🤖 Tạo ảnh'; }
+}
+
+// ── Voice ─────────────────────────────────────────────────────────────────
+function selVoice(el) {
+  document.querySelectorAll('.voice-item').forEach(v=>v.classList.remove('sel'));
+  el.classList.add('sel');
+  state.voice = el.dataset.voice;
+  toast('✓ ' + el.querySelector('.v-name').textContent);
+}
+
+// ── Model ─────────────────────────────────────────────────────────────────
+function selModel(el) {
+  if (el.classList.contains('locked')) { toast('🔒 Tính năng này cần API key trả phí'); return; }
+  const type = el.dataset.type;
+  document.querySelectorAll(`[data-type="${type}"]`).forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  if (type === 'video') state.videoModel = el.dataset.val;
+}
+
+async function saveGeminiKey() {
+  const key = document.getElementById('gemini-key-input').value.trim();
+  if (!key || key.includes('•') || key.length < 20) { toast('Nhập API key Gemini hợp lệ'); return; }
+  try {
+    const r = await fetch(`${API}/api/set-key`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({gemini: key})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      localStorage.setItem('ta_gemini_key', key);
+      document.getElementById('gemini-key-input').value = '••••••••••••';
+      const tag = document.getElementById('gemini-status-tag');
+      if (tag) { tag.style.display=''; }
+      toast('✅ Gemini key đã kích hoạt! Thử "Tạo kịch bản" ngay.');
+      checkApi();
+    }
+  } catch(e) { toast('❌ Không kết nối được backend'); }
+}
+
+async function saveKlingKey() {
+  const key = document.getElementById('kling-key-input').value.trim();
+  if (!key || key.includes('•')) { toast('Nhập Kling API key'); return; }
+  try {
+    const r = await fetch(`${API}/api/set-key`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({kling: key})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      localStorage.setItem('ta_kling_key', key);
+      document.getElementById('kling-key-input').value = '••••••••••••';
+      const tag = document.getElementById('kling-status-tag');
+      if (tag) tag.style.display='';
+      toast('✅ Kling key đã lưu! Vào tab Kling AI để tạo video.');
+    }
+  } catch(e) { toast('❌ Không kết nối được backend'); }
+}
+
+let _klingMode = 'text2video';
+function setKlingMode(mode) {
+  _klingMode = mode;
+  const isImg = mode === 'image2video';
+  document.getElementById('kling-img-row').style.display = isImg ? '' : 'none';
+  document.getElementById('kling-mode-t2v').style.background = isImg ? '' : '#7c3aed';
+  document.getElementById('kling-mode-t2v').style.color = isImg ? '' : '#fff';
+  document.getElementById('kling-mode-t2v').className = isImg ? 'btn btn-outline btn-sm' : 'btn btn-sm';
+  document.getElementById('kling-mode-i2v').style.background = isImg ? '#7c3aed' : '';
+  document.getElementById('kling-mode-i2v').style.color = isImg ? '#fff' : '';
+  document.getElementById('kling-mode-i2v').className = isImg ? 'btn btn-sm' : 'btn btn-outline btn-sm';
+}
+
+let _klingTaskId = null;
+let _klingPollTimer = null;
+
+async function startKling() {
+  const prompt = document.getElementById('kling-prompt').value.trim();
+  if (!prompt) { toast('Nhập mô tả cảnh quay'); return; }
+  const payload = {
+    mode: _klingMode,
+    prompt,
+    duration: parseInt(document.getElementById('kling-duration').value),
+    ratio: document.getElementById('kling-ratio').value,
+    model: document.getElementById('kling-model').value,
+  };
+  if (_klingMode === 'image2video') {
+    const imgUrl = document.getElementById('kling-image-url').value.trim();
+    if (!imgUrl) { toast('Nhập URL ảnh nguồn'); return; }
+    payload.image_url = imgUrl;
+  }
+  const card = document.getElementById('kling-progress-card');
+  const msg = document.getElementById('kling-status-msg');
+  const vwrap = document.getElementById('kling-video-wrap');
+  card.style.display=''; vwrap.style.display='none';
+  msg.textContent='⏳ Đang gửi yêu cầu tới Kling...';
+  try {
+    const r = await fetch(`${API}/api/kling-generate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!d.ok) { msg.textContent = '❌ Lỗi: ' + (d.error||'unknown'); return; }
+    _klingTaskId = d.task_id;
+    msg.textContent = `⏳ Đang render... Task ID: ${_klingTaskId}`;
+    pollKlingStatus(_klingMode);
+  } catch(e) { msg.textContent='❌ Không kết nối backend'; }
+}
+
+async function pollKlingStatus(mode) {
+  const msg = document.getElementById('kling-status-msg');
+  const vwrap = document.getElementById('kling-video-wrap');
+  for (let i = 0; i < 120; i++) {
+    await new Promise(r => setTimeout(r, 5000));
+    try {
+      const r = await fetch(`${API}/api/kling-status/${_klingTaskId}?mode=${mode}`);
+      const d = await r.json();
+      const st = d.status;
+      if (st === 'succeed' && d.video_url) {
+        msg.textContent = '✅ Video Kling hoàn thành!';
+        const vid = document.getElementById('kling-video-player');
+        vid.src = d.video_url;
+        vwrap.style.display='';
+        vwrap.dataset.videoUrl = d.video_url;
+        return;
+      } else if (st === 'failed') {
+        msg.textContent = '❌ Kling render thất bại.'; return;
+      } else {
+        msg.textContent = `⏳ Trạng thái: ${st} — đang chờ...`;
+      }
+    } catch(e) { msg.textContent='❌ Lỗi poll'; return; }
+  }
+  msg.textContent='⏰ Timeout — thử lại sau.';
+}
+
+async function downloadKlingVideo() {
+  const vwrap = document.getElementById('kling-video-wrap');
+  const videoUrl = vwrap.dataset.videoUrl;
+  if (!videoUrl) { toast('Chưa có video'); return; }
+  const r = await fetch(`${API}/api/kling-download`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({video_url: videoUrl})
+  });
+  const d = await r.json();
+  if (d.ok) {
+    const a = document.createElement('a');
+    a.href = `${API}${d.url}`;
+    a.download = 'kling_video.mp4';
+    a.click();
+    toast('✅ Đang tải video...');
+  } else toast('❌ ' + d.error);
+}
+
+async function sendKlingToTelegram() {
+  const vwrap = document.getElementById('kling-video-wrap');
+  const videoUrl = vwrap.dataset.videoUrl;
+  if (!videoUrl) { toast('Chưa có video'); return; }
+  try {
+    const dl = await fetch(`${API}/api/kling-download`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({video_url: videoUrl})
+    });
+    const dlData = await dl.json();
+    if (!dlData.ok) { toast('❌ Download thất bại'); return; }
+    const r = await fetch(`${API}/api/send-telegram`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({job_id: dlData.job_id, message:'🎬 Kling AI Video – TA Sâm Ngọc Linh'})
+    });
+    const d = await r.json();
+    toast(d.ok ? '✅ Đã gửi Telegram!' : '❌ ' + d.error);
+  } catch(e) { toast('❌ Lỗi gửi Telegram'); }
+}
+
+async function saveDidKey() {
+  const key = document.getElementById('did-key-input').value.trim();
+  if (!key || key.includes('•')) { toast('Nhập D-ID Basic Auth token'); return; }
+  try {
+    const r = await fetch(`${API}/api/set-key`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({did: key})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      localStorage.setItem('ta_did_key', key);
+      document.getElementById('did-key-input').value = '••••••••••••';
+      const tag = document.getElementById('did-status-tag');
+      if (tag) tag.style.display='';
+      toast('✅ D-ID key đã lưu! Vào tab KOL Video để tạo.');
+    }
+  } catch(e) { toast('❌ Lỗi lưu D-ID key'); }
+}
+
+async function uploadKolPhoto(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const name = prompt('Tên KOL (VD: mai, lan, hung):', 'mai') || 'mai';
+  const fd = new FormData(); fd.append('file', file); fd.append('name', name);
+  toast('📷 Đang upload ảnh KOL...');
+  try {
+    const r = await fetch(`${API}/api/upload-kol`, {method: 'POST', body: fd});
+    const d = await r.json();
+    if (d.ok) { toast(`✅ Đã upload ảnh KOL "${name}"`); loadKolPhotos(); }
+    else toast('❌ Upload thất bại');
+  } catch { toast('❌ Lỗi upload'); }
+  e.target.value = '';
+}
+
+async function loadKolPhotos() {
+  try {
+    const r = await fetch(`${API}/api/kol-photos`);
+    const photos = await r.json();
+    const list = document.getElementById('kol-photo-list');
+    if (list) {
+      list.innerHTML = photos.map(p=>`
+        <div style="text-align:center">
+          <img src="${API}/api/kol-photo/${p.name}.jpg?t=${Date.now()}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">
+          <div style="font-size:10px;color:var(--text2);margin-top:3px">${p.name}</div>
+        </div>`).join('') || '<span style="font-size:12px;color:var(--text3)">Chưa có ảnh</span>';
+    }
+    // Update DID kol select
+    const sel = document.getElementById('did-kol-sel');
+    if (sel) {
+      sel.innerHTML = photos.length
+        ? photos.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')
+        : '<option value="">-- Chưa có ảnh KOL nào --</option>';
+    }
+    // Also prefill DID script from main script
+    const didTxt = document.getElementById('did-script-txt');
+    const mainTxt = document.getElementById('script-txt');
+    if (didTxt && mainTxt && !didTxt.value) didTxt.value = mainTxt.value;
+  } catch {}
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function runChecks() {
+  const s = document.getElementById('script-txt').value.trim();
+  setDot('chk-s', s.length>10?'done':'pending', s.length>10?'Kịch bản ✓':'⚠️ Thiếu kịch bản');
+  setDot('chk-i', state.images.length>0?'done':'pending', state.images.length>0?`${state.images.length} ảnh ✓`:'Chưa có ảnh (AI sẽ tạo tự động)');
+  setDot('chk-v', 'done', `Giọng: ${state.voice.split('-').pop()}`);
+  setDot('chk-m', 'done', `Model: ${state.videoModel==='veo3'?'Veo 3 (Google)':'Slideshow + Gemini'}`);
+}
+
+function setDot(id, st, lbl) {
+  const d=document.getElementById(id); d.className='dot '+(st==='done'?'done':st==='active'?'active':'');
+  d.textContent = st==='done'?'✓':'';
+  const l=document.getElementById(id+'-lbl'); if(l&&lbl) l.textContent=lbl;
+}
+
+async function startRender() {
+  const script = document.getElementById('script-txt').value.trim();
+  if (!script) { toast('⚠️ Nhập kịch bản trước'); showTab('script'); return; }
+  document.getElementById('render-prog-card').style.display='';
+  document.getElementById('render-btn').disabled=true;
+  document.getElementById('render-btn').textContent='⏳ Đang render...';
+  setDot('d-tts','active'); setDot('d-img','pending'); setDot('d-rnd','pending');
+  try {
+    const r = await fetch(`${API}/api/render`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        script, voice: state.voice,
+        job_id: state.jobId,
+        bg_id: document.getElementById('bg-sel')?.value || 'nui-ngoc-linh',
+        use_veo: state.videoModel === 'veo3',
+      })
+    });
+    const d = await r.json();
+    state.renderJobId = d.job_id;
+    pollRender();
+  } catch(e) { toast('❌ Backend chưa chạy'); resetRenderBtn(); }
+}
+
+let pollTimer = null;
+function pollRender() {
+  pollTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`${API}/api/status/${state.renderJobId}`);
+      const d = await r.json();
+      updateRenderUI(d);
+      if (d.status==='done' || d.status==='error') {
+        clearInterval(pollTimer);
+        resetRenderBtn();
+        if (d.status==='done') { toast(`🎉 Video xong! ${d.duration}s`); showTab('export'); loadPreview(); }
+        else toast('❌ '+d.step);
+      }
+    } catch {}
+  }, 1500);
+}
+
+function updateRenderUI(d) {
+  const p = d.progress||0;
+  document.getElementById('pbar').style.width = p+'%';
+  document.getElementById('render-lbl').textContent = d.step||'';
+  if(p>=15) setDot('d-tts','done');
+  if(p>=35) { setDot('d-img', p>=75?'done':'active'); }
+  if(p>=75) { setDot('d-img','done'); setDot('d-rnd', p>=100?'done':'active'); }
+  if(p>=100) setDot('d-rnd','done');
+}
+function resetRenderBtn() {
+  const b = document.getElementById('render-btn');
+  b.disabled=false; b.textContent='⚡ Bắt Đầu Render';
+}
+
+// ── Export ────────────────────────────────────────────────────────────────
+async function loadPreview() {
+  if (!state.renderJobId) return;
+  try {
+    const r = await fetch(`${API}/api/status/${state.renderJobId}`);
+    const d = await r.json();
+    if (d.status==='done') {
+      document.getElementById('preview-card').style.display='';
+      const vid = document.getElementById('preview-vid');
+      vid.src = `${API}/api/preview/${state.renderJobId}`;
+      document.getElementById('vid-info').textContent = `${d.duration}s · MP4 · 1080×1920 · 9:16`;
+    }
+  } catch {}
+}
+
+async function doExport(type) {
+  if (!state.renderJobId) { toast('⚠️ Cần render video trước'); showTab('render'); return; }
+  if (type==='download') { window.open(`${API}/api/download/${state.renderJobId}`,'_blank'); toast('💾 Đang tải...'); return; }
+  if (type==='telegram') {
+    toast('✈️ Gửi lên Telegram...');
+    try {
+      const r = await fetch(`${API}/api/send-telegram`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({job_id:state.renderJobId, caption:document.getElementById('script-txt').value.slice(0,200)})
+      });
+      const d = await r.json();
+      if(d.ok) toast('✅ Đã gửi Telegram!'); else toast('❌ '+d.error);
+    } catch { toast('❌ Lỗi gửi Telegram'); }
+    return;
+  }
+  toast(`📤 Mở ${type} để đăng video thủ công`);
+}
+function schedule(t) { toast(`📅 Đã lên lịch đăng lúc ${t}`); }
+
+// ── Admin ─────────────────────────────────────────────────────────────────
+async function adminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  try {
+    const r = await fetch(`${API}/api/admin/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
+    const d = await r.json();
+    if (d.ok) {
+      state.adminToken = d.token;
+      localStorage.setItem('ta_admin_token', d.token);
+      showAdminPanel();
+      toast('✅ Đăng nhập Admin thành công');
+    } else { toast('❌ Sai mật khẩu'); }
+  } catch { toast('❌ Lỗi kết nối'); }
+}
+
+function showAdminPanel() {
+  document.getElementById('admin-login-card').classList.add('hidden');
+  document.getElementById('admin-panel').classList.remove('hidden');
+  renderAdminData();
+}
+
+function adminLogout() {
+  state.adminToken = null;
+  localStorage.removeItem('ta_admin_token');
+  document.getElementById('admin-login-card').classList.remove('hidden');
+  document.getElementById('admin-panel').classList.add('hidden');
+  toast('Đã đăng xuất');
+}
+
+function renderAdminData() {
+  const cfg = state.config || {};
+  renderAdminList('admin-products-list', cfg.products||[], 'product');
+  renderAdminList('admin-bgs', cfg.backgrounds||[], 'bg');
+  renderAdminList('admin-chars', cfg.characters||[], 'char');
+  const b = cfg.brand||{};
+  document.getElementById('brand-name').value = b.name||'';
+  document.getElementById('brand-hashtag').value = b.hashtags||'';
+  renderSlots(cfg.schedule?.slots||[]);
+}
+
+function renderAdminList(containerId, items, type) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = items.map((item,i)=>`
+    <div class="admin-item">
+      <span style="font-size:18px">${item.emoji||'•'}</span>
+      <div style="flex:1">
+        <div class="admin-item-label">${item.name}</div>
+        ${item.desc?`<div class="admin-item-sub">${item.desc}</div>`:''}
+      </div>
+      <button class="btn btn-xs btn-red" onclick="deleteItem('${type}',${i})" style="margin-right:6px;flex-shrink:0">✕</button>
+      <div class="toggle ${item.active?'on':''}" onclick="toggleItem('${type}',${i},this)"></div>
+    </div>`).join('') || '<div style="color:var(--text3);font-size:12px;padding:8px 0">Chưa có – thêm ở trên</div>';
+}
+
+function toggleItem(type, idx, el) {
+  el.classList.toggle('on');
+  const map = {product:'products', bg:'backgrounds', char:'characters'};
+  const key = map[type];
+  if (state.config && state.config[key]) {
+    state.config[key][idx].active = el.classList.contains('on');
+    saveAdminData();
+  }
+}
+
+function addProduct() {
+  const name = document.getElementById('new-product-name').value.trim();
+  if (!name) { toast('Nhập tên sản phẩm'); return; }
+  const emoji = document.getElementById('new-product-emoji').value.trim() || '🌿';
+  if (!state.config) state.config = {};
+  if (!state.config.products) state.config.products = [];
+  state.config.products.push({id:'p_'+Date.now(), name, emoji, active:true});
+  document.getElementById('new-product-name').value = '';
+  document.getElementById('new-product-emoji').value = '';
+  renderAdminList('admin-products-list', state.config.products, 'product');
+  populateSelects(); saveAdminData(); toast('✅ Thêm: ' + name);
+}
+
+function addBg() {
+  const name = document.getElementById('new-bg-name').value.trim();
+  if (!name) { toast('Nhập tên bối cảnh'); return; }
+  const emoji = document.getElementById('new-bg-emoji').value.trim() || '🏔️';
+  if (!state.config.backgrounds) state.config.backgrounds = [];
+  state.config.backgrounds.push({id:'bg_'+Date.now(), name, emoji, prompt: name + ' Vietnam photorealistic', active:true});
+  document.getElementById('new-bg-name').value = '';
+  renderAdminList('admin-bgs', state.config.backgrounds, 'bg');
+  populateSelects(); saveAdminData(); toast('✅ Thêm: ' + name);
+}
+
+function addChar() {
+  const name = document.getElementById('new-char-name').value.trim();
+  if (!name) { toast('Nhập tên nhân vật'); return; }
+  const emoji = document.getElementById('new-char-emoji').value.trim() || '👩';
+  if (!state.config.characters) state.config.characters = [];
+  state.config.characters.push({id:'c_'+Date.now(), name, emoji, active:true});
+  document.getElementById('new-char-name').value = '';
+  renderAdminList('admin-chars', state.config.characters, 'char');
+  saveAdminData(); toast('✅ Thêm: ' + name);
+}
+
+function deleteItem(type, idx) {
+  const map = {product:'products', bg:'backgrounds', char:'characters'};
+  const key = map[type];
+  if (!state.config || !state.config[key]) return;
+  const item = state.config[key][idx];
+  state.config[key].splice(idx, 1);
+  const listId = type==='product' ? 'admin-products-list' : type==='bg' ? 'admin-bgs' : 'admin-chars';
+  renderAdminList(listId, state.config[key], type);
+  populateSelects(); saveAdminData(); toast('🗑️ Đã xóa: ' + (item?.name || ''));
+}
+
+function saveBrand() {
+  if (!state.config) state.config = {};
+  if (!state.config.brand) state.config.brand = {};
+  state.config.brand.name = document.getElementById('brand-name').value;
+  state.config.brand.hashtags = document.getElementById('brand-hashtag').value;
+  populateSelects(); saveAdminData(); toast('✅ Đã lưu Brand Kit');
+}
+
+function renderSlots(slots) {
+  document.getElementById('slot-list').innerHTML = slots.map((s,i)=>`
+    <div class="row" style="margin-bottom:6px;align-items:center">
+      <span style="flex:1;font-size:13px">📅 ${s}</span>
+      <button class="btn btn-xs btn-red" onclick="removeSlot(${i})">Xóa</button>
+    </div>`).join('');
+}
+function addSlot() {
+  const t = prompt('Thêm khung giờ (VD: 09:00):'); if (!t) return;
+  if (!state.config.schedule) state.config.schedule = {slots:[]};
+  state.config.schedule.slots.push(t);
+  renderSlots(state.config.schedule.slots); saveAdminData();
+}
+function removeSlot(i) {
+  state.config.schedule.slots.splice(i,1);
+  renderSlots(state.config.schedule.slots); saveAdminData();
+}
+function clearSlots() {
+  if (!confirm('Xóa hết lịch?')) return;
+  state.config.schedule.slots = [];
+  renderSlots([]); saveAdminData();
+}
+
+async function saveAdminData() {
+  if (!state.adminToken) return;
+  try {
+    await fetch(`${API}/api/admin/save`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Admin-Token':state.adminToken},
+      body: JSON.stringify(state.config)
+    });
+    populateSelects(); populateVoices();
+  } catch {}
+}
+
+// ── QR ────────────────────────────────────────────────────────────────────
+function showQR() {
+  document.getElementById('qr-img').src = `${API}/api/qr?t=`+Date.now();
+  document.getElementById('qr-overlay').classList.add('show');
+}
+
+// ── Tab navigation ────────────────────────────────────────────────────────
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>showTab(t.dataset.tab));
+  });
+}
+
+function showTab(tab) {
+  TABS.forEach(t=>{
+    document.getElementById('tab-'+t)?.classList.add('hidden');
+    document.querySelector(`[data-tab="${t}"]`)?.classList.remove('active');
+  });
+  document.getElementById('tab-'+tab)?.classList.remove('hidden');
+  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+  state.tab = tab;
+  document.querySelector(`[data-tab="${tab}"]`)?.scrollIntoView({behavior:'smooth',inline:'center'});
+  document.getElementById('btn-prev').style.opacity = tab===TABS[0]?'0':'1';
+  if (tab==='render') runChecks();
+  if (tab==='export') loadPreview();
+  if (tab==='history') populateHistory();
+  if (tab==='did-render') { loadKolPhotos(); syncDidScript(); }
+  if (tab==='model') loadKolPhotos();
+}
+
+function nextTab() {
+  const i = TABS.indexOf(state.tab);
+  if (i<TABS.length-1) showTab(TABS[i+1]);
+}
+function prevTab() {
+  const i = TABS.indexOf(state.tab);
+  if (i>0) showTab(TABS[i-1]);
+}
+
+// ── Edit Video (CapCut-like) ──────────────────────────────────────────────
+let editJobId = null;
+
+async function uploadEditVideo(e) {
+  const file = e.target.files[0]; if (!file) return;
+  toast('📤 Đang upload video...');
+  const fd = new FormData(); fd.append('file', file);
+  if (editJobId) fd.append('job_id', editJobId);
+  try {
+    const r = await fetch(`${API}/api/upload-video`, {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.ok) {
+      editJobId = d.job_id;
+      const vid = document.getElementById('edit-source-vid');
+      vid.src = URL.createObjectURL(file);
+      document.getElementById('edit-source-preview').style.display='';
+      document.getElementById('edit-src-info').textContent = `${d.duration}s · ${file.name}`;
+      document.getElementById('trim-end').value = Math.floor(d.duration);
+      document.getElementById('edit-ops-card').style.display='';
+      document.getElementById('edit-export-btn').style.display='';
+      toast(`✅ Upload xong! ${d.duration}s`);
+    }
+  } catch { toast('❌ Upload thất bại'); }
+  e.target.value='';
+}
+
+async function startEditExport() {
+  if (!editJobId) { toast('⚠️ Chọn video trước'); return; }
+  const ops = [];
+  if (document.getElementById('trim-toggle').classList.contains('on')) {
+    ops.push({type:'trim', start:+document.getElementById('trim-start').value, end:+document.getElementById('trim-end').value});
+  }
+  if (document.getElementById('resize-toggle').classList.contains('on')) {
+    ops.push({type:'resize', width:1080, height:1920});
+  }
+  if (document.getElementById('voice-toggle').classList.contains('on')) {
+    const script = document.getElementById('edit-script').value.trim();
+    if (script) ops.push({type:'add_audio', script, voice:document.getElementById('edit-voice-sel').value});
+  }
+  if (document.getElementById('text-toggle').classList.contains('on')) {
+    const text = document.getElementById('edit-text').value.trim();
+    if (text) ops.push({type:'add_text', text, position:document.getElementById('edit-text-pos').value, fontsize:+document.getElementById('edit-fontsize').value});
+  }
+  if (!ops.length) { toast('⚠️ Bật ít nhất 1 thao tác'); return; }
+  document.getElementById('edit-progress').style.display='';
+  document.getElementById('edit-export-btn').disabled=true;
+  try {
+    const r = await fetch(`${API}/api/edit-video`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({job_id: editJobId, operations: ops, script: document.getElementById('edit-script').value})
+    });
+    const d = await r.json();
+    if (d.ok) pollEditStatus(editJobId);
+    else toast('❌ ' + d.error);
+  } catch { toast('❌ Lỗi kết nối backend'); document.getElementById('edit-export-btn').disabled=false; }
+}
+
+function pollEditStatus(jid) {
+  const poll = setInterval(async () => {
+    try {
+      const r = await fetch(`${API}/api/status/${jid}`);
+      const d = await r.json();
+      document.getElementById('edit-pbar').style.width = (d.progress||0)+'%';
+      document.getElementById('edit-status').textContent = d.step||'';
+      if (d.status==='done') {
+        clearInterval(poll);
+        document.getElementById('edit-export-btn').disabled=false;
+        state.renderJobId = jid;
+        toast(`🎉 Video xong! ${d.duration}s → Tab Xuất`);
+        setTimeout(()=>showTab('export'), 1500);
+      } else if (d.status==='error') {
+        clearInterval(poll); toast('❌ '+d.step);
+        document.getElementById('edit-export-btn').disabled=false;
+      }
+    } catch {}
+  }, 1500);
+}
+
+// ── D-ID render ───────────────────────────────────────────────────────────
+function syncDidScript() {
+  const did = document.getElementById('did-script-txt');
+  const main = document.getElementById('script-txt');
+  if (did && main && !did.value && main.value) did.value = main.value;
+}
+
+async function startDidRender() {
+  const kol = document.getElementById('did-kol-sel')?.value;
+  const script = document.getElementById('did-script-txt')?.value.trim();
+  const voice = document.getElementById('did-voice-sel')?.value || 'vi-VN-HoaiMyNeural';
+  if (!kol) { toast('⚠️ Chưa có ảnh KOL – upload tại tab AI Model'); return; }
+  if (!script) { toast('⚠️ Nhập kịch bản'); return; }
+  const btn = document.getElementById('did-render-btn');
+  btn.disabled = true; btn.textContent = '⏳ Đang gửi D-ID...';
+  const statusArea = document.getElementById('did-status-area');
+  statusArea.style.display = '';
+  statusArea.innerHTML = '<div class="pbar-wrap"><div class="pbar-fill" style="width:20%"></div></div><div style="font-size:12px;color:var(--text2);margin-top:6px">🚀 Đang gửi yêu cầu lên D-ID...</div>';
+  try {
+    const r = await fetch(`${API}/api/did-talk`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({kol_name: kol, script, voice_id: voice})
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      toast('❌ ' + (d.error || 'D-ID lỗi'));
+      statusArea.innerHTML = `<div style="color:var(--red);font-size:12px">❌ ${d.error}</div>`;
+      btn.disabled = false; btn.textContent = '🎬 Bắt Đầu Tạo Video KOL';
+      return;
+    }
+    const talkId = d.talk_id;
+    statusArea.innerHTML = '<div class="pbar-wrap"><div class="pbar-fill" style="width:40%"></div></div><div style="font-size:12px;color:var(--text2);margin-top:6px">🎬 D-ID đang render video... (~30-90 giây)</div>';
+    pollDidStatus(talkId, script.slice(0,60), btn, statusArea);
+  } catch(e) {
+    toast('❌ Lỗi kết nối D-ID');
+    btn.disabled = false; btn.textContent = '🎬 Bắt Đầu Tạo Video KOL';
+  }
+}
+
+async function pollDidStatus(talkId, scriptPreview, btn, statusArea) {
+  for (let i = 0; i < 60; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const r = await fetch(`${API}/api/did-status/${talkId}`);
+      const d = await r.json();
+      const pct = 40 + Math.min(i*2, 55);
+      statusArea.innerHTML = `<div class="pbar-wrap"><div class="pbar-fill" style="width:${pct}%"></div></div><div style="font-size:12px;color:var(--text2);margin-top:6px">Status: ${d.status || '...'}</div>`;
+      if (d.status === 'done' && d.result_url) {
+        statusArea.innerHTML = '<div class="pbar-wrap"><div class="pbar-fill" style="width:90%"></div></div><div style="font-size:12px;color:var(--text2)">📥 Đang tải video về...</div>';
+        const r2 = await fetch(`${API}/api/did-download`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({result_url: d.result_url, job_id: talkId, script_preview: scriptPreview})
+        });
+        const d2 = await r2.json();
+        if (d2.ok) {
+          state.renderJobId = talkId;
+          statusArea.innerHTML = `<div style="color:var(--green);font-size:13px;font-weight:700">🎉 Video xong! ${d2.duration}s</div>`;
+          toast(`🎉 KOL Video xong! ${d2.duration}s`);
+          setTimeout(() => showTab('export'), 1500);
+        }
+        btn.disabled = false; btn.textContent = '🎬 Tạo Video Khác';
+        return;
+      }
+      if (d.status === 'error') {
+        statusArea.innerHTML = `<div style="color:var(--red);font-size:12px">❌ D-ID render lỗi</div>`;
+        btn.disabled = false; btn.textContent = '🎬 Thử Lại';
+        return;
+      }
+    } catch {}
+  }
+  statusArea.innerHTML = `<div style="color:var(--red);font-size:12px">⏰ Timeout – thử lại sau</div>`;
+  btn.disabled = false; btn.textContent = '🎬 Thử Lại';
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(window._t);
+  window._t = setTimeout(()=>el.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+{
+  "name": "Batch Upload Images to Strapi Media",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "list",
+        "path": "/public/images/optimized"
+      },
+      "name": "List Optimized Images",
+      "type": "n8n-nodes-base.fileSystem",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "action": "forEach"
+      },
+      "name": "Loop Files",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract metadata from filename\n// Format: <product-name>_<type>_<num>.webp\n// Example: sam-20nam_product_1.webp\n\nconst filename = $node['List Optimized Images'].json.name;\nconst parts = filename.replace('.webp', '').split('_');\n\nreturn {\n  filename: filename,\n  productName: parts[0] || 'Unknown',\n  type: parts[1] || 'product',\n  tags: [parts[1] || 'product', 'auto-generated'],\n  description: `${parts[0]} - ${parts[1] || 'product'} image (AI-generated & upscaled)`\n};"
+      },
+      "name": "Extract Metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env['STRAPI_URL'] || 'http://localhost:1337' }}/api/upload",
+        "authentication": "headerAuth",
+        "headers": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env['STRAPI_API_TOKEN'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "files",
+              "value": "=/public/images/optimized/{{ $node['Extract Metadata'].json.filename }}"
+            },
+            {
+              "name": "fileInfo",
+              "value": "{{ JSON.stringify({name: $node['Extract Metadata'].json.productName, tags: $node['Extract Metadata'].json.tags, type: $node['Extract Metadata'].json.type}) }}"
+            }
+          ]
+        }
+      },
+      "name": "Upload to Strapi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "json": "={\n  \"uploadResult\": $node['Upload to Strapi'].json,\n  \"filename\": $node['Extract Metadata'].json.filename,\n  \"metadata\": $node['Extract Metadata'].json,\n  \"uploadedUrl\": \"{{ $env['STRAPI_URL'] }}/api/upload/{{ $node['Upload to Strapi'].json.id }}\"\n}"
+      },
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "content": "=Batch upload complete!\n\nTotal uploaded: {{ $node['Loop Files'].json.length }}\n\nSuccessfully uploaded images:\n{{ JSON.stringify($node['Format Success Response'].json, null, 2) }}"
+      },
+      "name": "Done",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "List Optimized Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Optimized Images": {
+      "main": [
+        [
+          {
+            "node": "Loop Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Files": {
+      "main": [
+        [
+          {
+            "node": "Extract Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Metadata": {
+      "main": [
+        [
+          {
+            "node": "Upload to Strapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Strapi": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

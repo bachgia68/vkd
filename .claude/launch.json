@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vkd-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "ta_production/project", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "port": 5173
+    },
+    {
+      "name": "vkd-live",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "project-bolt-sb1-hravyvsn.10.7/project", "run", "dev", "--", "--port", "5174", "--strictPort"],
+      "port": 5174
+    },
+    {
+      "name": "ta-video-studio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "D:/AI_Skills/ai-marketing-skills/ta-video-studio", "run", "dev", "--", "--port", "3010"],
+      "port": 3010
+    },
+    {
+      "name": "next-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "3000"],
+      "port": 3000
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "name": "SD Image Generation via Replicate",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "prompts": "=a luxury ginseng product photo, professional studio lighting, gold and cream background, high resolution, premium product photography"
+      },
+      "name": "Set Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "credentialType": "httpHeaderAuth",
+        "method": "POST",
+        "url": "https://api.replicate.com/v1/predictions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "contentType": "application/json",
+        "body": "{\n  \"version\": \"25d0437203ea3fb18620a6524207e733110f99c2b46679e00924ce4974f66808\",\n  \"input\": {\n    \"prompt\": \"{{ $node.\\\"Set Prompt\\\".data.item.json.prompts }}\",\n    \"num_outputs\": 1,\n    \"width\": 512,\n    \"height\": 512,\n    \"num_inference_steps\": 25,\n    \"guidance_scale\": 7.5\n  }\n}"
+      },
+      "name": "Call Replicate SD API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getUrl",
+        "url": "={{ $node[\\\"Call Replicate SD API\\\"].json.output[0] }}",
+        "dataPropertyName": "data"
+      },
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env[\\\"STRAPI_URL\\\"] || \\\"http://localhost:1337\\\" }}",
+        "credentialType": "httpHeaderAuth",
+        "authentication": "headerAuth",
+        "method": "POST",
+        "headers": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env[\\\"STRAPI_API_TOKEN\\\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "files",
+              "value": "={{ $node[\\\"Download Image\\\"].data }}"
+            },
+            {
+              "name": "ref",
+              "value": "api::product.product"
+            }
+          ]
+        }
+      },
+      "name": "Upload to Strapi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Prompt": {
+      "main": [
+        [
+          {
+            "node": "Call Replicate SD API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Replicate SD API": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Upload to Strapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Strapi": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

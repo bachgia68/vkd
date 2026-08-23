@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TA Sam Ngoc Linh - Live Overlay</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: 700;
+    color: #c9a050;
+  }
+  .shadow-text {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
+  }
+  #time {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: 2.2em;
+    letter-spacing: 2px;
+  }
+  #live-badge {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: #d32f2f;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 1.4em;
+    letter-spacing: 3px;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  #ticker {
+    position: absolute;
+    bottom: 90px;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    height: 44px;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+  }
+  #ticker-track {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: scroll-left 38s linear infinite;
+    font-size: 1.15em;
+    color: #fff;
+  }
+  #ticker-track span {
+    padding: 0 60px;
+  }
+  @keyframes scroll-left {
+    0%   { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+  #countdown {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5em;
+    background: rgba(0,0,0,0.4);
+    padding: 8px 24px;
+    border-radius: 20px;
+  }
+  #countdown b { color: #ff5252; font-size: 1.2em; }
+</style>
+</head>
+<body>
+  <div id="time" class="shadow-text">00:00:00</div>
+  <div id="live-badge" class="shadow-text">● LIVE</div>
+  <div id="ticker">
+    <div id="ticker-track" class="shadow-text"></div>
+  </div>
+  <div id="countdown" class="shadow-text">Còn <b id="slots">50</b> suất giá sốc hôm nay</div>
+
+<script>
+  // Cau hoi khach that (thay bang cau hoi that cua Mai khi co, xem bi kip #3 file 37)
+  var QUESTIONS = [
+    "Chị Lan hỏi: Sâm Ngọc Linh dùng cho người tiểu đường được không ạ?",
+    "Anh Minh hỏi: Giao hàng về Hà Nội mất mấy ngày shop ơi?",
+    "Chị Hương hỏi: Sâm củ tươi bảo quản thế nào cho đúng ạ?",
+    "Bạn Ngọc hỏi: Có ship COD toàn quốc không shop?",
+    "Chị Thu hỏi: Mua combo quà tặng có được khắc tên không ạ?",
+    "Anh Tuấn hỏi: Sâm Ngọc Linh khác sâm Hàn Quốc chỗ nào vậy shop?"
+  ];
+
+  function initTicker() {
+    var track = document.getElementById('ticker-track');
+    track.innerHTML = QUESTIONS.map(function (q) {
+      return '<span>' + q + '</span>';
+    }).join('');
+  }
+  initTicker();
+
+  function tick() {
+    var now = new Date();
+    var hh = String(now.getHours()).padStart(2, '0');
+    var mm = String(now.getMinutes()).padStart(2, '0');
+    var ss = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('time').textContent = hh + ':' + mm + ':' + ss;
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  var slots = 50;
+  var slotsEl = document.getElementById('slots');
+  setInterval(function () {
+    slots = slots > 1 ? slots - 1 : 50;
+    slotsEl.textContent = slots;
+  }, 45000);
+</script>
+</body>
+</html>

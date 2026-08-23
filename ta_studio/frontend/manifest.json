@@ -1,0 +1,18 @@
+{
+  "name": "TA Studio",
+  "short_name": "TA Studio",
+  "description": "Video marketing cho TA Sâm Ngọc Linh",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#13131a",
+  "theme_color": "#13131a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c9a050'/><text y='.9em' font-size='70' x='15'>🎬</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

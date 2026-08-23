@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+dist/
+*.log
+logs/
+.playwright-mcp/
+scripts/n8n-workflows-export.json
+scripts/test-download.mp3
+scripts/test-coder-model.txt
+scripts/test-instruct-model.txt
+video/
+luu tru/

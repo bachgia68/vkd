@@ -1,0 +1,81 @@
+version: "3.1"
+
+stories:
+# Story 1: Simple greeting
+- story: greet
+  steps:
+    - intent: greeting
+    - action: utter_greet
+
+# Story 2: Ask price
+- story: ask_price
+  steps:
+    - intent: greeting
+    - action: utter_greet
+    - intent: ask_price
+    - action: utter_ask_price
+    - action: action_fetch_products
+
+# Story 3: Ask shipping
+- story: ask_shipping
+  steps:
+    - intent: ask_price
+    - action: action_fetch_products
+    - intent: ask_shipping
+    - action: utter_ask_shipping
+
+# Story 4: Ask benefits
+- story: ask_benefits
+  steps:
+    - intent: greeting
+    - action: utter_greet
+    - intent: ask_benefits
+    - action: utter_ask_benefits
+
+# Story 5: Ask usage
+- story: ask_usage
+  steps:
+    - intent: ask_benefits
+    - action: utter_ask_benefits
+    - intent: ask_usage
+    - action: utter_ask_usage
+
+# Story 6: Ask quality
+- story: ask_quality
+  steps:
+    - intent: greeting
+    - action: utter_greet
+    - intent: ask_quality
+    - action: utter_ask_quality
+
+# Story 7: Ask product types
+- story: ask_product_types
+  steps:
+    - intent: greeting
+    - action: utter_greet
+    - intent: ask_product_types
+    - action: utter_ask_product_types
+    - action: action_fetch_products
+
+# Story 8: Ask storage
+- story: ask_storage
+  steps:
+    - intent: ask_usage
+    - action: utter_ask_usage
+    - intent: ask_storage
+    - action: utter_ask_storage
+
+# Story 9: Complain
+- story: complain
+  steps:
+    - intent: complain
+    - action: utter_complain
+    - action: action_log_complaint
+
+# Story 10: Goodbye
+- story: goodbye
+  steps:
+    - intent: ask_price
+    - action: action_fetch_products
+    - intent: goodbye
+    - action: utter_goodbye

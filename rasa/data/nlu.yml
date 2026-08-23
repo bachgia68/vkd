@@ -1,0 +1,146 @@
+version: "3.1"
+
+nlu:
+# Intent: ask_price
+- intent: ask_price
+  examples: |
+    - Sâm Ngọc Linh 20 năm bao nhiêu tiền?
+    - Giá sâm bao lăn?
+    - Sâm loại nào rẻ nhất?
+    - Mua sâm Ngọc Linh tốn bao nhiêu?
+    - Bao giá sâm tươi?
+    - Sâm khô giá cỡ nào?
+    - Có sâm nào dưới 1 triệu không?
+    - Sâm 10 năm giá tầm bao nhiêu?
+    - Rễ sâm bao tiền một cái?
+    - How much is ginseng?
+    - What is the price?
+    - Ginseng cost?
+
+- intent: ask_shipping
+  examples: |
+    - Giao hàng mất bao lâu?
+    - Có giao hàng không?
+    - Phí vận chuyển bao nhiêu?
+    - Giao hàng đến đâu được?
+    - Có giao ngoài tỉnh không?
+    - Mua sâm giao mất mấy ngày?
+    - Vận chuyển an toàn không?
+    - Có bảo hiểm không?
+    - Free ship không?
+    - How long does shipping take?
+    - Do you ship abroad?
+    - Shipping fee?
+
+- intent: ask_benefits
+  examples: |
+    - Sâm Ngọc Linh có tác dụng gì?
+    - Sâm tốt cho cái gì?
+    - Uống sâm có lợi gì?
+    - Sâm giúp gì cho sức khỏe?
+    - Công dụng của sâm Ngọc Linh?
+    - Sâm có hỗ trợ gì?
+    - Lợi ích sâm đối với sức khỏe
+    - Sâm bổ gì?
+    - What are ginseng benefits?
+    - What does ginseng help with?
+    - Health benefits?
+
+- intent: ask_usage
+  examples: |
+    - Cách dùng sâm như thế nào?
+    - Dùng sâm sao cho đúng?
+    - Uống bao nhiêu sâm mỗi ngày?
+    - Có cách nấu sâm nào tốt?
+    - Nên ăn sâm sống hay sâm khô?
+    - Sâm nên dùng lúc nào?
+    - Mấy tuổi mới uống sâm được?
+    - Nên pha sâm với gì?
+    - How to consume ginseng?
+    - How to prepare?
+    - Dosage recommendation?
+
+- intent: ask_quality
+  examples: |
+    - Sâm của bạn loại gì?
+    - Sâm có thật không?
+    - Cách biết sâm thật giả?
+    - Sâm bạn có chứng chỉ không?
+    - Sâm này đến từ đâu?
+    - Có chứng chỉ bảo hành không?
+    - Sâm ở đâu mua?
+    - Cách kiểm tra chất lượng?
+    - Is the ginseng authentic?
+    - Quality guarantee?
+    - Certification?
+
+- intent: ask_product_types
+  examples: |
+    - Bạn bán những loại sâm nào?
+    - Có mấy loại sâm?
+    - Sâm tươi hay khô?
+    - Bạn có nước sâm không?
+    - Có viên sâm không?
+    - Có sâm nào đặc biệt không?
+    - Menu sâm có những gì?
+    - What types of ginseng do you sell?
+    - Product list?
+    - Available options?
+
+- intent: ask_storage
+  examples: |
+    - Bảo quản sâm như thế nào?
+    - Sâm bao lâu hết hạn?
+    - Cách bảo quản sâm sao cho tốt?
+    - Sâm có bị hư không?
+    - Để sâm ở đâu?
+    - Sâm tươi bảo quản bao lâu?
+    - How to store ginseng?
+    - Shelf life?
+    - Storage tips?
+
+- intent: complain
+  examples: |
+    - Hàng tôi bị hỏng
+    - Sâm này không tốt
+    - Chất lượng kém quá
+    - Mình không hài lòng
+    - Hàng không như mô tả
+    - I'm not satisfied
+    - The product is damaged
+    - Quality issue
+    - Complaint
+
+- intent: greeting
+  examples: |
+    - Xin chào
+    - Hi
+    - Hello
+    - Chào bạn
+    - Hey
+    - Tôi cần giúp
+    - Bạn là ai?
+    - Có người giúp không?
+
+- intent: goodbye
+  examples: |
+    - Tạm biệt
+    - Bye
+    - Cảm ơn bạn
+    - Hẹn gặp lại
+    - Goodbye
+    - See you
+    - Thanks
+
+# Entities
+- intent: inform_name
+  examples: |
+    - Tên tôi là [Hoàng](name)
+    - Gọi tôi là [Mai](name)
+    - Tôi là [Tùng](name)
+
+- intent: inform_phone
+  examples: |
+    - Số tôi [0989123456](phone)
+    - Call me [+84912345678](phone)
+    - [0984999309](phone)

@@ -1,0 +1,4 @@
+File	What It Is	Read Time
+SKILLS_SUMMARY_AND_ACTIVATION.md	Everything you need (activation checklist + examples)	10 min
+QUICK_START.md	Day 1 walkthrough + first approval example	8 min
+sam-daily-buzz/SKILL.md	Full technical documentation	20 min (reference)

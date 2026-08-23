@@ -1,0 +1,181 @@
+{
+  "name": "Image Optimization Pipeline (Upscale + Compress)",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "image"
+      },
+      "name": "Fetch Strapi Image",
+      "type": "n8n-nodes-base.strapi",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "strapiApi": "Strapi_API"
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const axios = require('axios');\nconst FormData = require('form-data');\nconst fs = require('fs');\nconst path = require('path');\n\n// Download original image\nconst imageUrl = $node.Fetch Strapi Image.json.url;\nconst response = await axios.get(imageUrl, { responseType: 'arraybuffer' });\nconst imageBuffer = Buffer.from(response.data);\n\nreturn {\n  imageBuffer: imageBuffer.toString('base64'),\n  filename: path.basename(imageUrl),\n  originalSize: imageBuffer.length\n};"
+      },
+      "name": "Download Image from Strapi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:7860/api/upscale",
+        "authentication": "none",
+        "contentType": "application/json",
+        "body": "{\n  \"input_path\": \"/app/input/image.png\",\n  \"output_path\": \"/app/output/image_upscaled.png\",\n  \"model\": \"RealESRGAN_x4plus\",\n  \"scale\": 4\n}"
+      },
+      "name": "Call Real-ESRGAN API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:7860/files/output/image_upscaled.png",
+        "dataPropertyName": "data"
+      },
+      "name": "Download Upscaled Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const sharp = require('sharp');\nconst imageBuffer = Buffer.from($node['Download Upscaled Image'].data, 'binary');\nlet quality = 80;\nlet compressed;\n\n// Iterative compression until <300KB\nfor (let attempt = 0; attempt < 5; attempt++) {\n  compressed = await sharp(imageBuffer)\n    .resize(1024, 1024, {\n      fit: 'inside',\n      withoutEnlargement: true\n    })\n    .webp({ quality })\n    .toBuffer();\n\n  const sizeKB = compressed.length / 1024;\n  if (sizeKB < 300) break;\n  quality -= 10;\n}\n\nreturn {\n  compressedImage: compressed.toString('base64'),\n  finalSize: compressed.length,\n  sizeKB: (compressed.length / 1024).toFixed(1),\n  upscaleSuccess: true\n};"
+      },
+      "name": "Compress with Sharp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env['STRAPI_URL'] || 'http://localhost:1337' }}/api/upload",
+        "authentication": "headerAuth",
+        "method": "POST",
+        "headers": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env['STRAPI_API_TOKEN'] }}"
+            }
+          ]
+        },
+        "bodyContentType": "form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "files",
+              "value": "={{ $node['Compress with Sharp'].json.compressedImage }}"
+            }
+          ]
+        }
+      },
+      "name": "Upload Optimized to Strapi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "content": "=Image optimized successfully!\nOriginal: {{ $node['Download Image from Strapi'].json.originalSize }} bytes\nUpscaled: 4x resolution\nCompressed: {{ $node['Compress with Sharp'].json.sizeKB }} KB\n\nStrapi upload response:\n{{ JSON.stringify($node['Upload Optimized to Strapi'].json, null, 2) }}"
+      },
+      "name": "Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Fetch Strapi Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Strapi Image": {
+      "main": [
+        [
+          {
+            "node": "Download Image from Strapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image from Strapi": {
+      "main": [
+        [
+          {
+            "node": "Call Real-ESRGAN API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Real-ESRGAN API": {
+      "main": [
+        [
+          {
+            "node": "Download Upscaled Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Upscaled Image": {
+      "main": [
+        [
+          {
+            "node": "Compress with Sharp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compress with Sharp": {
+      "main": [
+        [
+          {
+            "node": "Upload Optimized to Strapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Optimized to Strapi": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

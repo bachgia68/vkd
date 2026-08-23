@@ -1,0 +1,19 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install Strapi globally
+RUN npm install -g strapi@5
+
+# Copy strapi config if exists
+COPY ./strapi/config ./config 2>/dev/null || true
+
+# Initialize Strapi
+RUN strapi new . --template=quick-start --force 2>/dev/null || true
+
+# Copy setup script
+COPY ./strapi/scripts ./scripts 2>/dev/null || true
+
+EXPOSE 1337
+
+CMD ["strapi", "develop"]

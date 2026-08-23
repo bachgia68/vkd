@@ -1,0 +1,44 @@
+recipe: default.v1
+
+language: vi
+
+pipeline:
+  # Tokenizer for Vietnamese
+  - name: WhitespaceTokenizer
+
+  # Featurizer
+  - name: RegexFeaturizer
+
+  # Embedding with CountVectors
+  - name: CountVectorsFeaturizer
+    analyzer: "char_wb"
+    min_ngram: 1
+    max_ngram: 4
+
+  # Intent classifier using DietClassifier
+  - name: DIETClassifier
+    epochs: 100
+    constrain_similarities: true
+
+  # Entity extraction
+  - name: EntitySynonymMapper
+
+policies:
+  # Fallback policy (if confidence low)
+  - name: FallbackPolicy
+    nlu_threshold: 0.3
+    core_threshold: 0.3
+    fallback_action_name: "action_default_fallback"
+
+  # MemoizationPolicy (remembers stories)
+  - name: MemoizationPolicy
+    max_history: 5
+
+  # TED Policy (learns from stories)
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+    constrain_similarities: true
+
+# Enable end-to-end stories
+allow_empty_entities: true

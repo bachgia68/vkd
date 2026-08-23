@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: ta-n8n
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - DB_TYPE=sqlite
+      - DB_SQLITE_DATABASE=/home/node/data/database.sqlite
+    ports:
+      - "5678:5678"
+    volumes:
+      - ./n8n_data:/home/node/data
+    networks:
+      - ta-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ta-postgres
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi_password
+      POSTGRES_DB: strapi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ta-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U strapi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  strapi:
+    image: node:20-alpine
+    container_name: ta-strapi
+    working_dir: /app
+    command: sh -c "npm install -g strapi && strapi develop"
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi_db
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi_password
+      JWT_SECRET: ta_jwt_secret_2026
+      ADMIN_JWT_SECRET: ta_admin_secret_2026
+      NODE_ENV: development
+    ports:
+      - "1337:1337"
+    volumes:
+      - ./strapi-backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ta-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:1337/admin"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ta-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_models:/root/.ollama/models
+    networks:
+      - ta-network
+    environment:
+      - OLLAMA_MODELS=/root/.ollama/models
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  ta-network:
+    driver: bridge

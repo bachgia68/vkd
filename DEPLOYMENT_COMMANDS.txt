@@ -1,0 +1,335 @@
+================================================================================
+DEPLOYMENT COMMANDS - COPY & RUN ON YOUR MACHINE
+================================================================================
+
+⚠️  IMPORTANT: Replace "user" and "tasamngoclinh.com" with actual values
+
+================================================================================
+STEP 1: VERIFY FILES EXIST (Windows CMD or PowerShell)
+================================================================================
+
+cd D:\TA page\site
+
+dir strapi-admin-dashboard.html
+dir mock-strapi-server.js
+dir strapi\scripts\setup-collections.js
+
+Expected: All 3 files should exist
+
+
+================================================================================
+STEP 2: TEST SSH CONNECTION (Windows CMD)
+================================================================================
+
+ssh user@tasamngoclinh.com "echo SSH OK"
+
+If this fails:
+  - Verify SSH is installed (check OpenSSH Server on Windows)
+  - Check SSH key in ~/.ssh/authorized_keys on server
+  - Try: ssh-keygen -t rsa -f %USERPROFILE%\.ssh\id_rsa
+
+
+================================================================================
+STEP 3: COPY BACKEND FILES (Windows CMD)
+================================================================================
+
+scp mock-strapi-server.js user@tasamngoclinh.com:/opt/strapi-backend/server.js
+
+scp strapi\scripts\setup-collections.js user@tasamngoclinh.com:/opt/strapi-backend/setup.js
+
+Expected: No errors, files copied successfully
+
+
+================================================================================
+STEP 4: COPY DASHBOARD HTML (Windows CMD)
+================================================================================
+
+scp strapi-admin-dashboard.html user@tasamngoclinh.com:/var/www/tasamngoclinh.com/gate-vkd-control-2026/cms/index.html
+
+Expected: File copied successfully
+
+
+================================================================================
+STEP 5: CREATE DIRECTORIES (Run on server via SSH)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+# On server:
+mkdir -p /opt/strapi-backend
+chmod 755 /opt/strapi-backend
+
+sudo mkdir -p /var/www/tasamngoclinh.com/gate-vkd-control-2026/cms
+sudo chmod 755 /var/www/tasamngoclinh.com/gate-vkd-control-2026/cms
+
+exit
+
+
+================================================================================
+STEP 6: SETUP SYSTEMD SERVICE (Run on server via SSH)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+# Copy everything below and paste on server:
+sudo tee /etc/systemd/system/strapi-backend.service > /dev/null <<'EOF'
+[Unit]
+Description=TA Strapi Backend API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/strapi-backend
+ExecStart=/usr/bin/node /opt/strapi-backend/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable strapi-backend
+sudo systemctl start strapi-backend
+
+# Verify it's running:
+sudo systemctl status strapi-backend
+
+exit
+
+
+================================================================================
+STEP 7: TEST API SERVER (Run on server via SSH)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+curl http://127.0.0.1:1337/admin
+
+Expected output: {"status":"ok"}
+
+exit
+
+
+================================================================================
+STEP 8: POPULATE DATA (Run on server via SSH)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+cd /opt/strapi-backend
+node setup.js
+
+Expected output:
+  🚀 Starting Strapi setup...
+  🔐 Authenticating...
+  ✅ Authenticated
+  📦 Creating sample products...
+    ✅ Created: Sâm Ngọc Linh Premium 6 tuổi
+    ✅ Created: Sâm Ngọc Linh 3 tuổi
+    ✅ Created: Trà Sâm Ngọc Linh
+  🎨 Creating site header...
+  ✅ Site header created
+  🔗 Creating site footer...
+  ✅ Site footer created
+  📱 Creating social links...
+    ✅ Created: facebook
+    ✅ Created: instagram
+    ✅ Created: youtube
+    ✅ Created: telegram
+    ✅ Created: zalo
+  ✅ Setup complete!
+
+exit
+
+
+================================================================================
+STEP 9: CONFIGURE NGINX (Run on server via SSH)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+sudo nano /etc/nginx/sites-available/tasamngoclinh.com
+
+# Add these location blocks inside the server { ... } block:
+
+# Admin Dashboard
+location /gate-vkd-control-2026/cms/ {
+    alias /var/www/tasamngoclinh.com/gate-vkd-control-2026/cms/;
+    index index.html;
+    try_files $uri $uri/ /index.html;
+    add_header 'Access-Control-Allow-Origin' '$http_origin' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+}
+
+# API Proxy
+location /api/strapi/ {
+    proxy_pass http://127.0.0.1:1337/api/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+}
+
+# Save: Ctrl+X, then Y, then Enter
+
+
+================================================================================
+STEP 10: TEST & RELOAD NGINX (Run on server via SSH)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+sudo nginx -t
+
+Expected output:
+  nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+  nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+sudo systemctl reload nginx
+
+exit
+
+
+================================================================================
+STEP 11: VERIFY DEPLOYMENT (Windows CMD)
+================================================================================
+
+Test API server:
+curl https://tasamngoclinh.com/api/strapi/products
+
+Expected output: JSON with 3 products starting with {"data":[{"sku":"SAM-001",...
+
+
+Test API headers:
+curl https://tasamngoclinh.com/api/strapi/site-headers
+
+Expected output: JSON with header data
+
+
+Test social links:
+curl https://tasamngoclinh.com/api/strapi/social-links
+
+Expected output: JSON with 5 social links
+
+
+Test admin dashboard loads:
+curl https://tasamngoclinh.com/gate-vkd-control-2026/cms/
+
+Expected output: HTML page (very long, starts with <!DOCTYPE html>)
+
+
+================================================================================
+STEP 12: TEST IN BROWSER
+================================================================================
+
+Open: https://tasamngoclinh.com/gate-vkd-control-2026/cms
+
+Expected:
+  ✅ Page loads
+  ✅ Status shows green: "✅ Kết nối thành công"
+  ✅ Products tab: 3 items visible
+  ✅ Header tab: Logo + navigation
+  ✅ Footer tab: Company information
+  ✅ Social tab: 5 platforms
+  ✅ API tab: Documentation
+
+
+================================================================================
+STEP 13: MONITOR LOGS (Run on server)
+================================================================================
+
+ssh user@tasamngoclinh.com
+
+sudo journalctl -u strapi-backend -f
+
+Expected: No errors, showing successful requests
+
+Press Ctrl+C to stop
+
+exit
+
+
+================================================================================
+SUCCESS! 🎉
+================================================================================
+
+✅ Dashboard live at: https://tasamngoclinh.com/gate-vkd-control-2026/cms
+✅ API running at: https://tasamngoclinh.com/api/strapi/
+✅ All 4 tabs working
+✅ Auto-refresh active
+✅ Status green
+
+
+================================================================================
+NEXT STEP: SEND TASK 1 TO QWEN
+================================================================================
+
+File: D:\TA page\site\TASK_1_QWEN_REVENUE_CALCULATOR.md
+
+Send content to Qwen/Ollama with prompt:
+"Implement revenue calculator feature on strapi-admin-dashboard.html
+Follow all requirements and test cases provided."
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+❌ SSH fails
+   Solution: Install OpenSSH, verify SSH key configured
+
+❌ scp fails with "Permission denied"
+   Solution: Check /opt/strapi-backend exists and www-data owns it
+
+❌ setup.js fails to authenticate
+   Solution: Verify mock-strapi-server.js is running (curl test)
+
+❌ Nginx 502 error
+   Solution: Check API running: sudo systemctl status strapi-backend
+   Check port: sudo netstat -tuln | grep 1337
+
+❌ Dashboard shows empty data
+   Solution: Re-run setup: node /opt/strapi-backend/setup.js
+
+❌ CORS errors in browser
+   Solution: Clear browser cache (Ctrl+Shift+R), check Nginx headers
+
+
+================================================================================
+ESTIMATED TIMES
+================================================================================
+
+File transfer:    5-10 minutes
+Systemd setup:    5 minutes
+Setup script:     2-3 minutes
+Nginx config:     10 minutes
+Verification:     5-10 minutes
+Monitoring:       60 minutes (let it run)
+
+TOTAL: ~1-1.5 hours
+
+
+================================================================================
+FILES & REFERENCES
+================================================================================
+
+This file: DEPLOYMENT_COMMANDS.txt (copy-paste ready)
+Quick guide: DEPLOY_QUICK_START.txt (reference)
+Detailed: DEPLOY_NOW.md (full walkthrough)
+Qwen task: TASK_1_QWEN_REVENUE_CALCULATOR.md
+
+
+================================================================================
+YOU ARE HERE: ✅ READY TO EXECUTE
+================================================================================
+
+Copy commands above and run them in order.
+Total time: ~1-1.5 hours from start to live.
+
+Let's go! 🚀

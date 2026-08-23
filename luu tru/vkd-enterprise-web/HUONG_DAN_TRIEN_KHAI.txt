@@ -1,0 +1,108 @@
+# ================================================
+# HƯỚNG DẪN TRIỂN KHAI WEBSITE VKD GROUP
+# ================================================
+
+## PHƯƠNG ÁN 1: TẢI FILE ZIP (ĐƠN GIẢN NHẤT)
+=========================================
+1. Tải file: vkd-website-offline.zip
+2. Giải nén vào thư mục bất kỳ
+3. Mở file index.html bằng trình duyệt (Chrome/Firefox/Edge)
+4. Website sẽ hoạt động 100% OFFLINE, không cần internet
+
+## PHƯƠNG ÁN 2: DEPLOY LÊN HOSTING MIỄN PHÍ
+=========================================
+
+### A. NETLIFY (Khuyến nghị - Drag & Drop)
+1. Truy cập: https://app.netlify.com/drop
+2. Tạo tài khoản miễn phí (GitHub/Email)
+3. Kéo thả thư mục "dist" vào trang web
+4. Nhận URL: https://[tên-ngẫu-nhiên].netlify.app
+5. Có thể đổi tên trong Site settings
+
+### B. VERCEL
+1. Truy cập: https://vercel.com
+2. Đăng ký bằng GitHub
+3. Click "New Project" → Upload files
+4. Nhận URL miễn phí
+
+### C. GITHUB PAGES
+1. Tạo repo mới trên GitHub.com
+2. Upload tất cả file trong thư mục "dist" lên
+3. Vào Settings → Pages → Select branch "main"
+4. Website sẽ có URL: https://[username].github.io/[repo-name]
+
+### D. SURGE.SH (Nhanh nhất - 1 dòng lệnh)
+Yêu cầu: Node.js đã cài
+```bash
+npm install -g surge
+cd dist
+surge
+```
+Nhập email, password → nhận URL ngay
+
+### E. IPFS (Phi tập trung)
+1. Truy cập: https://pinata.cloud
+2. Upload thư mục "dist"
+3. Nhận IPFS hash → URL cổng: https://ipfs.io/ipfs/[hash]
+
+## PHƯƠNG ÁN 3: CHẠY LOCAL SERVER
+=========================================
+Yêu cầu: Node.js hoặc Python đã cài
+
+### Node.js:
+```bash
+npx serve dist
+```
+→ Mở: http://localhost:3000
+
+### Python:
+```bash
+python -m http.server 8080 -d dist
+```
+→ Mở: http://localhost:8080
+
+## ================================================
+# KIỂM TRA TRƯỚC KHI TRIỂN KHAI
+## ================================================
+
+1. Đảm bảo tất cả hình ảnh hiển thị:
+   - Logo VKD
+   - Cây sâm Ngọc Linh
+   - Banner sản phẩm
+   - Hình sự kiện
+
+2. Kiểm tra đa ngôn ngữ:
+   - Click vào Globe icon
+   - Chọn VN/EN/ZH/FR/AR
+   - Nội dung phải đổi ngôn ngữ
+
+3. Kiểm tra responsive:
+   - Thu nhỏ trình duyệt
+   - Menu mobile phải hoạt động
+
+## ================================================
+# DUNG LƯỢNG
+## ================================================
+
+- File ZIP: ~6.5 MB
+- Giải nén: ~7 MB
+- Gồm: 13 hình ảnh + code
+- Không cần backend/database
+
+## ================================================
+# YÊU CẦU HỆ THỐNG
+## ================================================
+
+- Trình duyệt: Chrome 80+, Firefox 75+, Safari 13+, Edge 80+
+- JavaScript: Bật
+- Không cần server-side processing
+- Hoạt động 100% client-side
+
+## ================================================
+# LIÊN HỆ HỖ TRỢ
+## ================================================
+
+VKD Group:
+- Hotline: 1800 28 28 66
+- Email: info@vkdnature.com
+- Website: https://samngoclinhvkdgroup.com

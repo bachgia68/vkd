@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "theme": "fake_detection",
+    "violations": [],
+    "isGibberish": false,
+    "maxRepeat": 2,
+    "pass": true
+  },
+  {
+    "id": 2,
+    "theme": "brewing_guide",
+    "violations": [],
+    "isGibberish": false,
+    "maxRepeat": 2,
+    "pass": true
+  },
+  {
+    "id": 3,
+    "theme": "limited_offer",
+    "violations": [],
+    "isGibberish": false,
+    "maxRepeat": 1,
+    "pass": true
+  },
+  {
+    "id": 4,
+    "theme": "testimonial",
+    "violations": [],
+    "isGibberish": false,
+    "maxRepeat": 2,
+    "pass": true
+  },
+  {
+    "id": 5,
+    "theme": "qa_common",
+    "violations": [],
+    "isGibberish": false,
+    "maxRepeat": 1,
+    "pass": true
+  }
+]

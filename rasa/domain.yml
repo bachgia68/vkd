@@ -1,0 +1,76 @@
+version: "3.1"
+
+intents:
+  - greeting
+  - goodbye
+  - ask_price
+  - ask_shipping
+  - ask_benefits
+  - ask_usage
+  - ask_quality
+  - ask_product_types
+  - ask_storage
+  - complain
+  - inform_name
+  - inform_phone
+
+entities:
+  - name
+  - phone
+
+slots:
+  customer_name:
+    type: text
+  customer_phone:
+    type: text
+  last_product:
+    type: text
+
+actions:
+  - utter_greet
+  - utter_ask_price
+  - utter_ask_shipping
+  - utter_ask_benefits
+  - utter_ask_usage
+  - utter_ask_quality
+  - utter_ask_product_types
+  - utter_ask_storage
+  - utter_complain
+  - utter_goodbye
+  - action_fetch_products
+  - action_log_complaint
+
+responses:
+  utter_greet:
+    - text: "Xin chào! 👋 Mình là trợ lý của Vườn sâm Ngọc Linh nhà Khánh. Mình có thể giúp bạn gì được không?"
+
+  utter_ask_price:
+    - text: "Sâm Ngọc Linh của chúng tôi có nhiều loại, giá từ 500k đến 5 triệu đồng tùy tuổi và chất lượng. Bạn quan tâm loại nào nhất?"
+
+  utter_ask_shipping:
+    - text: "Chúng tôi giao hàng toàn quốc trong 1-3 ngày. Phí vận chuyển tùy địa chỉ. Bạn ở đâu vậy?"
+
+  utter_ask_benefits:
+    - text: "Sâm Ngọc Linh có tác dụng bổ khí, tăng sức đề kháng, cải thiện tuần hoàn máu, chống mệt mỏi. Thích hợp cho tất cả mọi người."
+
+  utter_ask_usage:
+    - text: "Cách dùng: uống nước sâm hàng ngày, hoặc ăn sâm sống 1-2 lần/tuần. Liều lượng 3-5g/lần. Tốt nhất uống vào sáng hoặc chiều."
+
+  utter_ask_quality:
+    - text: "Sâm của chúng tôi 100% Ngọc Linh nguyên chất, có chứng chỉ xuất xứ. Được trồng theo tiêu chuẩn hữu cơ, không sử dụng hóa chất."
+
+  utter_ask_product_types:
+    - text: "Chúng tôi bán: sâm tươi, sâm khô, nước sâm, viên sâm, trà sâm. Chọn loại nào phù hợp với nhu cầu của bạn?"
+
+  utter_ask_storage:
+    - text: "Sâm khô: bảo quản trong hộp chuyên dụng, nơi khô, hạn 2 năm. Sâm tươi: để tủ lạnh, dùng trong 2-3 tuần."
+
+  utter_complain:
+    - text: "Chúng tôi rất tiếc! Bạn cho mình biết chi tiết vấn đề và liên hệ số hotline 0984999309 để được hỗ trợ nhanh nhất. Cảm ơn bạn!"
+
+  utter_goodbye:
+    - text: "Cảm ơn bạn đã tìm hiểu! Hẹn gặp lại bạn lần sau. 👋"
+
+session_config:
+  session_expiration_time_in_minutes: 60
+  carry_over_slots_to_new_session: true
