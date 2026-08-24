@@ -20,6 +20,7 @@ export async function fetchSiteAddresses(): Promise<SiteAddress[]> {
   const { data, error } = await supabase
     .from('site_addresses')
     .select('id, name, address, hours, phone, category')
+    .eq('visible', true)
     .order('created_at');
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -32,7 +33,11 @@ export interface ContactPhone {
 }
 
 export async function fetchContactPhones(): Promise<ContactPhone[]> {
-  const { data, error } = await supabase.from('contact_phones').select('id, label, value').order('sort_order');
+  const { data, error } = await supabase
+    .from('contact_phones')
+    .select('id, label, value')
+    .eq('visible', true)
+    .order('sort_order');
   if (error) throw new Error(error.message);
   return data ?? [];
 }
@@ -44,7 +49,30 @@ export interface SocialLink {
 }
 
 export async function fetchSocialLinks(): Promise<SocialLink[]> {
-  const { data, error } = await supabase.from('social_links').select('id, platform, url').order('sort_order');
+  const { data, error } = await supabase
+    .from('social_links')
+    .select('id, platform, url')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export interface FieldVideo {
+  id: string;
+  facebook_url: string;
+  thumbnail_url: string;
+  title: string;
+  subtitle: string;
+  sort_order: number;
+}
+
+export async function fetchFieldVideos(): Promise<FieldVideo[]> {
+  const { data, error } = await supabase
+    .from('field_videos')
+    .select('id, facebook_url, thumbnail_url, title, subtitle, sort_order')
+    .eq('visible', true)
+    .order('sort_order');
   if (error) throw new Error(error.message);
   return data ?? [];
 }

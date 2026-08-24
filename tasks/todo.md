@@ -59,6 +59,16 @@ Task 2 (sau khi Claude báo Phase 3-4 xong): chạy `npx tsc --noEmit -p tsconfi
 ## Phase 6 — About Us
 - [x] Task 19: FounderStory.tsx thêm khối ảnh + tọa độ 15°12'N 108°18'E (xong 2026-08-24, tsc sạch)
 
+## Phase 7 — 2026-08-24 phản hồi vòng 2 (đang chạy 3 subagent song song)
+- [~] Video Thực Địa: carousel kiểu KGC link ra fanpage Facebook (bảng field_videos
+      + bucket field-video-thumbnails đã tạo, admin FieldVideosPage đang viết)
+- [~] Certifications: bỏ style card/shadow, chuyển sang logo sạch + tên đậm kiểu KGC
+- [~] Gộp quản trị Mạng Xã Hội + Số Điện Thoại vào trang Header & Footer (thêm
+      visible column cho social_links/contact_phones/site_addresses, cho phép
+      sửa/ẩn-hiện chứ không chỉ thêm/xoá), xoá 2 khối trùng khỏi SettingsPage
+- [ ] Cần Joe tự kiểm tra dòng site_text_overrides key=footer.followUs
+      value="Liên hệ" — có phải test data cũ, có cần xoá không
+
 ## Checkpoint cuối
 - [ ] npm run build sạch
 - [ ] Test tay toàn luồng end-to-end

@@ -72,35 +72,33 @@ export default function Certifications({ lang }: CertificationsProps) {
     <section className="section-padding-sm bg-cream-100">
       <div className="container-wide">
         {/* Header */}
-        <div className="text-center mb-10">
-          <h3 className="font-display text-2xl text-forest-900 mb-2">
+        <div className="text-center mb-12">
+          <h3 className="font-display text-3xl md:text-4xl uppercase tracking-wide text-forest-900 mb-3">
             {t.certifications.title}
           </h3>
           <p className="text-forest-500">{t.certifications.subtitle}</p>
         </div>
 
-        {/* Certifications Grid — real scanned certificates */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {/* Certifications Grid — real scanned certificates, logo-style layout */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
           {certifications.map((cert, index) => (
             <button
               key={index}
               onClick={() => setPreview({ src: cert.image, name: cert.name })}
-              className="group relative flex flex-col rounded-xl bg-white overflow-hidden border border-cream-200 hover:shadow-elegant-lg transition-all duration-300 hover:-translate-y-1 text-left"
+              className="group flex flex-col items-center text-center"
             >
-              <div className="aspect-[3/4] overflow-hidden bg-cream-50">
+              <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-cream-50">
                 <img
                   src={cert.image}
                   alt={cert.name}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                 />
+                <div className="absolute inset-0 bg-forest-900/0 group-hover:bg-forest-900/20 transition-colors duration-300 flex items-center justify-center">
+                  <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
               </div>
-              <div className="absolute inset-0 bg-forest-900/0 group-hover:bg-forest-900/20 transition-colors duration-300 flex items-center justify-center">
-                <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-              <div className="p-3 border-t border-cream-100">
-                <p className="text-forest-900 text-xs font-semibold leading-snug">{cert.name}</p>
-              </div>
+              <p className="mt-4 text-forest-900 text-base font-bold leading-snug">{cert.name}</p>
             </button>
           ))}
         </div>

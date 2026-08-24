@@ -28,6 +28,7 @@ import CombosPage from './pages/CombosPage';
 import SiteSectionsPage from './pages/SiteSectionsPage';
 import LoyaltyPage from './pages/LoyaltyPage';
 import HeritageGalleryPage from './pages/HeritageGalleryPage';
+import FieldVideosPage from './pages/FieldVideosPage';
 import OrdersPage from './pages/OrdersPage';
 import LanguagesPage from './pages/LanguagesPage';
 import HeaderFooterPage from './pages/HeaderFooterPage';
@@ -60,6 +61,7 @@ export default function AdminApp() {
           <Route path="channels" element={<ChannelsPage />} />
           <Route path="trust-proof" element={<TrustProofPage />} />
           <Route path="heritage-gallery" element={<HeritageGalleryPage />} />
+          <Route path="field-videos" element={<FieldVideosPage />} />
           <Route path="combos" element={<CombosPage />} />
           <Route path="site-sections" element={<SiteSectionsPage />} />
           <Route path="languages" element={<LanguagesPage />} />

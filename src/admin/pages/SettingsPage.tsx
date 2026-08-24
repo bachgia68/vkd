@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, MapPin, Phone, Share2, Handshake, MessageCircle } from 'lucide-react';
+import { Plus, Trash2, MapPin, Handshake, MessageCircle } from 'lucide-react';
 import {
   createSiteAddress,
   deleteSiteAddress,
-  createContactPhone,
-  deleteContactPhone,
-  createSocialLink,
-  deleteSocialLink,
   fetchB2BLeads,
   markLeadContacted,
   deleteLead,
@@ -14,12 +10,10 @@ import {
   markCustomerLeadContacted,
   deleteCustomerLead,
   type SiteAddress,
-  type ContactPhone,
-  type SocialLink,
   type B2BLead,
   type CustomerLead,
 } from '../adminApi';
-import { fetchSiteAddresses, fetchContactPhones, fetchSocialLinks } from '../../lib/siteContentApi';
+import { fetchSiteAddresses } from '../../lib/siteContentApi';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 
@@ -31,8 +25,6 @@ const LEAD_TYPE_LABELS: Record<string, string> = {
 
 export default function SettingsPage() {
   const [addresses, setAddresses] = useState<SiteAddress[]>([]);
-  const [phones, setPhones] = useState<ContactPhone[]>([]);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [leads, setLeads] = useState<B2BLead[]>([]);
   const [customerLeads, setCustomerLeads] = useState<CustomerLead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,11 +38,9 @@ export default function SettingsPage() {
 
   const load = () => {
     setLoading(true);
-    Promise.all([fetchSiteAddresses(), fetchContactPhones(), fetchSocialLinks(), fetchB2BLeads(), fetchCustomerLeads()])
-      .then(([a, p, s, l, cl]) => {
+    Promise.all([fetchSiteAddresses(), fetchB2BLeads(), fetchCustomerLeads()])
+      .then(([a, l, cl]) => {
         setAddresses(a);
-        setPhones(p);
-        setSocialLinks(s);
         setLeads(l);
         setCustomerLeads(cl);
         setLoadError(null);
@@ -68,11 +58,6 @@ export default function SettingsPage() {
     phone: '(84) 984 999 309',
     category: 'showroom',
   });
-  const [newPhoneLabel, setNewPhoneLabel] = useState('');
-  const [newPhoneValue, setNewPhoneValue] = useState('');
-  const [newPlatform, setNewPlatform] = useState('Facebook');
-  const [newUrl, setNewUrl] = useState('');
-
   const addAddress = async () => {
     if (!newAddr.name.trim() || !newAddr.address.trim()) return;
     try {
@@ -89,45 +74,6 @@ export default function SettingsPage() {
       load();
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Lỗi xoá địa chỉ');
-    }
-  };
-
-  const addPhone = async () => {
-    if (!newPhoneLabel.trim() || !newPhoneValue.trim()) return;
-    try {
-      await createContactPhone(newPhoneLabel.trim(), newPhoneValue.trim());
-      setNewPhoneLabel('');
-      setNewPhoneValue('');
-      load();
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Lỗi thêm số điện thoại');
-    }
-  };
-  const removePhone = async (id: string) => {
-    try {
-      await deleteContactPhone(id);
-      load();
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Lỗi xoá số điện thoại');
-    }
-  };
-
-  const addSocial = async () => {
-    if (!newUrl.trim()) return;
-    try {
-      await createSocialLink(newPlatform, newUrl.trim());
-      setNewUrl('');
-      load();
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Lỗi thêm liên kết');
-    }
-  };
-  const removeSocial = async (id: string) => {
-    try {
-      await deleteSocialLink(id);
-      load();
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Lỗi xoá liên kết');
     }
   };
 
@@ -175,6 +121,8 @@ export default function SettingsPage() {
         <h1 className="font-display text-3xl text-forest-900">Địa Chỉ, Liên Hệ &amp; Đối Tác</h1>
         <p className="text-sm text-forest-500 mt-1">
           Thay đổi ở đây lưu vào database thật và hiển thị ngay trên trang chủ và footer khách hàng.
+          Mạng xã hội và số điện thoại liên hệ đã chuyển sang trang{' '}
+          <span className="font-medium text-forest-700">Header &amp; Footer</span>.
         </p>
       </div>
 
@@ -246,60 +194,6 @@ export default function SettingsPage() {
         <Button onClick={addAddress} size="sm" className="mt-3">
           <Plus className="w-4 h-4" /> Thêm địa chỉ
         </Button>
-      </div>
-
-      {/* Contact & socials */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant">
-          <div className="flex items-center gap-2 mb-4">
-            <Phone className="w-4 h-4 text-gold-600" />
-            <h3 className="font-display text-lg text-forest-900">Số điện thoại liên hệ</h3>
-          </div>
-          <div className="space-y-2 mb-4">
-            {phones.map((p) => (
-              <div key={p.id} className="flex items-center justify-between bg-cream-50 rounded-xl p-3 text-sm">
-                <span><b>{p.label}</b>: {p.value}</span>
-                <Button onClick={() => removePhone(p.id)} variant="ghost" size="icon" aria-label="Xoá số điện thoại" className="h-8 w-8 text-forest-400 hover:text-red-600">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <input value={newPhoneLabel} onChange={(e) => setNewPhoneLabel(e.target.value)} placeholder="Nhãn (vd. Hotline)" className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm" />
-            <input value={newPhoneValue} onChange={(e) => setNewPhoneValue(e.target.value)} placeholder="Số điện thoại" className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm" />
-            <Button onClick={addPhone} size="icon" aria-label="Thêm số điện thoại"><Plus className="w-4 h-4" /></Button>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant">
-          <div className="flex items-center gap-2 mb-4">
-            <Share2 className="w-4 h-4 text-gold-600" />
-            <h3 className="font-display text-lg text-forest-900">Mạng xã hội (Facebook, TikTok...)</h3>
-          </div>
-          <div className="space-y-2 mb-4">
-            {socialLinks.map((s) => (
-              <div key={s.id} className="flex items-center justify-between bg-cream-50 rounded-xl p-3 text-sm">
-                <span><b>{s.platform}</b>: <span className="text-forest-500 truncate">{s.url}</span></span>
-                <Button onClick={() => removeSocial(s.id)} variant="ghost" size="icon" aria-label="Xoá liên kết" className="h-8 w-8 text-forest-400 hover:text-red-600 flex-shrink-0 ml-2">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <select value={newPlatform} onChange={(e) => setNewPlatform(e.target.value)} className="border border-forest-100 rounded-lg px-2 py-2 text-sm">
-              <option>Facebook</option>
-              <option>TikTok</option>
-              <option>YouTube</option>
-              <option>Instagram</option>
-              <option>Zalo</option>
-              <option>WhatsApp</option>
-            </select>
-            <input value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="Dán link trang/kênh" className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm" />
-            <Button onClick={addSocial} size="icon" aria-label="Thêm liên kết"><Plus className="w-4 h-4" /></Button>
-          </div>
-        </div>
       </div>
 
       {/* B2B leads */}

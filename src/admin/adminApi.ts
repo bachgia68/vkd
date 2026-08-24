@@ -594,6 +594,17 @@ export async function deleteSiteAddress(id: string) {
   if (error) throw new Error(error.message);
 }
 
+export async function fetchAllSiteAddresses(): Promise<(SiteAddress & { visible: boolean })[]> {
+  return throwIfError(
+    await supabase.from('site_addresses').select('id, name, address, hours, phone, category, visible').order('created_at')
+  );
+}
+
+export async function updateSiteAddress(id: string, patch: Partial<Omit<SiteAddress, 'id'> & { visible: boolean }>) {
+  const { error } = await supabase.from('site_addresses').update(patch).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
 export async function createContactPhone(label: string, value: string): Promise<ContactPhone> {
   const res = await supabase.from('contact_phones').insert({ label, value }).select('id, label, value').single();
   return throwIfError(res);
@@ -601,6 +612,15 @@ export async function createContactPhone(label: string, value: string): Promise<
 
 export async function deleteContactPhone(id: string) {
   const { error } = await supabase.from('contact_phones').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function fetchAllContactPhones(): Promise<(ContactPhone & { visible: boolean })[]> {
+  return throwIfError(await supabase.from('contact_phones').select('id, label, value, visible').order('sort_order'));
+}
+
+export async function updateContactPhone(id: string, patch: Partial<{ label: string; value: string; visible: boolean }>) {
+  const { error } = await supabase.from('contact_phones').update(patch).eq('id', id);
   if (error) throw new Error(error.message);
 }
 
@@ -612,6 +632,75 @@ export async function createSocialLink(platform: string, url: string): Promise<S
 export async function deleteSocialLink(id: string) {
   const { error } = await supabase.from('social_links').delete().eq('id', id);
   if (error) throw new Error(error.message);
+}
+
+export async function fetchAllSocialLinks(): Promise<(SocialLink & { visible: boolean })[]> {
+  return throwIfError(await supabase.from('social_links').select('id, platform, url, visible').order('sort_order'));
+}
+
+export async function updateSocialLink(id: string, patch: Partial<{ platform: string; url: string; visible: boolean }>) {
+  const { error } = await supabase.from('social_links').update(patch).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Field Videos (Video Thuc Dia — link ra Facebook, khong host video nang) ----------
+
+export interface FieldVideo {
+  id: string;
+  facebook_url: string;
+  thumbnail_url: string;
+  title: string;
+  subtitle: string;
+  sort_order: number;
+}
+
+export async function fetchAllFieldVideos(): Promise<(FieldVideo & { visible: boolean })[]> {
+  return throwIfError(
+    await supabase
+      .from('field_videos')
+      .select('id, facebook_url, thumbnail_url, title, subtitle, sort_order, visible')
+      .order('sort_order')
+  );
+}
+
+export async function createFieldVideo(input: {
+  facebook_url: string;
+  thumbnail_url: string;
+  title: string;
+  subtitle?: string;
+  sort_order?: number;
+}) {
+  const res = await supabase
+    .from('field_videos')
+    .insert({ subtitle: '', sort_order: 0, ...input, visible: true })
+    .select('id, facebook_url, thumbnail_url, title, subtitle, sort_order, visible')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateFieldVideo(
+  id: string,
+  patch: Partial<Pick<FieldVideo, 'facebook_url' | 'thumbnail_url' | 'title' | 'subtitle' | 'sort_order'> & { visible: boolean }>
+) {
+  const { error } = await supabase.from('field_videos').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteFieldVideo(id: string) {
+  const { error } = await supabase.from('field_videos').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function uploadFieldVideoThumbnail(file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from('field-video-thumbnails').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('field-video-thumbnails').getPublicUrl(path);
+  return data.publicUrl;
 }
 
 // URL /blog/<slug> phải đọc được (chuẩn SEO, xem docs/DESIGN_SYSTEM.md) —
