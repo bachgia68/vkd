@@ -1,0 +1,47 @@
+[
+  {
+    "sku": "SK5-007",
+    "supplierId": "samk5",
+    "name": "Củ Sâm Ngọc Linh Tươi K5",
+    "price": null,
+    "image_url": "https://samkontumk5.com/uploads/source/san-pham/5-sam-ngoc-linh-trong-o-lai-chau-loai-duoc-lieu-quy-nhu-vang.webp",
+    "category": "sam-ngoc-linh",
+    "description": "Củ sâm Ngọc Linh tươi từ Kon Tum K5"
+  },
+  {
+    "sku": "SK5-008",
+    "supplierId": "samk5",
+    "name": "Yến Sâm Ngọc Linh K5 - Tổ Yến Tươi",
+    "price": null,
+    "image_url": "https://samkontumk5.com/uploads/source/san-pham/sam-yen/yen-sam-ngoc-linh-kon-tum-k5-to-yen-tuoi-va-sam-ngoc-linh-hop-5-hu.png",
+    "category": "to-yen",
+    "description": "Tổ yến tươi kết hợp sâm Ngọc Linh - Hộp 5 hũ"
+  },
+  {
+    "sku": "SK5-009",
+    "supplierId": "samk5",
+    "name": "Sâm Ngọc Linh Kon Tum K5 Ngâm Mật Ong",
+    "price": null,
+    "image_url": "https://samkontumk5.com/uploads/source/san-pham/sam-ngoc-linh/sam-ngoc-linh-kon-tum-k5-ngam-mat-ong.jpg",
+    "category": "sam-ngoc-linh",
+    "description": "Sâm Ngọc Linh ngâm mật ong từ Kon Tum K5"
+  },
+  {
+    "sku": "SK5-010",
+    "supplierId": "samk5",
+    "name": "Dịch Chiết Sâm Ngọc Linh K5 - Hộp 5 Chai",
+    "price": null,
+    "image_url": "https://samkontumk5.com/uploads/source/san-pham/sam-ngoc-linh/dich-chiet-sam-ngoc-linh-kon-tum-k5-hop-5-chai-(chai-50ml)-1.jpg",
+    "category": "sam-ngoc-linh",
+    "description": "Dịch chiết sâm Ngọc Linh - Hộp 5 chai 50ml"
+  },
+  {
+    "sku": "SK5-011",
+    "supplierId": "samk5",
+    "name": "Dịch Chiết Sâm Ngọc Linh K5 - Hộp 10 Chai",
+    "price": null,
+    "image_url": "https://samkontumk5.com/uploads/source/san-pham/sam-ngoc-linh/dich-chiet-sam-ngoc-linh-kon-tum-k5-hop-10-chai-3.jpg",
+    "category": "sam-ngoc-linh",
+    "description": "Dịch chiết sâm Ngọc Linh - Hộp 10 chai 50ml"
+  }
+]

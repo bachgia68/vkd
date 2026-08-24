@@ -60,12 +60,13 @@ export interface BlogPost {
   created_at: string;
   published: boolean;
   captions?: Record<string, string>;
+  meta_description?: string | null;
 }
 
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published, meta_description')
     .eq('published', true)
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
@@ -93,7 +94,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export async function fetchBlogPost(slugOrId: string): Promise<BlogPost | null> {
   const query = supabase
     .from('blog_posts')
-    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published, meta_description')
     .eq('published', true);
   const { data, error } = await (UUID_RE.test(slugOrId) ? query.eq('id', slugOrId) : query.eq('slug', slugOrId)).maybeSingle();
   if (error) throw new Error(error.message);

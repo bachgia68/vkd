@@ -16,7 +16,7 @@ import urllib.request
 
 PRODUCTS_TS = "src/data/products.ts"
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "qwen2.5:7b"  # or "llama3.2:3b", "phi3:mini" — any Ollama model
+MODEL = "qwen2.5:7b-instruct"  # or "llama3.2:3b", "phi3:mini" — any Ollama model
 
 LANG_MAP = {
     "en": ("nameEn", "descriptionEn", "English"),
@@ -25,16 +25,33 @@ LANG_MAP = {
 }
 
 
-def ollama_translate(text: str, target_lang: str) -> str:
+def ollama_translate_pair(name: str, desc: str, target_lang: str) -> tuple[str, str]:
+    """Translate name + description in one call. Returns (name_t, desc_t)."""
     prompt = (
-        f"Translate the following Vietnamese product text to {target_lang}. "
-        f"Return ONLY the translation, no explanation, no quotes.\n\n{text}"
+        f"Translate these two Vietnamese product texts to {target_lang}.\n"
+        f"Return ONLY a JSON object: {{\"name\": \"...\", \"desc\": \"...\"}}\n\n"
+        f"NAME: {name}\nDESC: {desc}"
     )
     body = json.dumps({"model": MODEL, "prompt": prompt, "stream": False}).encode()
-    req = urllib.request.Request(OLLAMA_URL, data=body, method="POST",
-                                 headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())["response"].strip()
+    for attempt in range(2):
+        try:
+            req = urllib.request.Request(OLLAMA_URL, data=body, method="POST",
+                                         headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=120) as r:
+                raw = json.loads(r.read())["response"].strip()
+            # extract JSON from response
+            m = re.search(r'\{.*?"name".*?"desc".*?\}', raw, re.DOTALL)
+            if m:
+                obj = json.loads(m.group())
+                return obj["name"].strip(), obj["desc"].strip()
+            # fallback: split by lines
+            lines = [l.strip() for l in raw.splitlines() if l.strip()]
+            return lines[0] if lines else name, lines[1] if len(lines) > 1 else desc
+        except Exception as e:
+            if attempt == 1:
+                raise
+            time.sleep(2)
+    return name, desc
 
 
 def extract_products(ts_src: str):
@@ -102,13 +119,12 @@ def main():
         for lang in args.lang:
             name_key, desc_key, lang_label = LANG_MAP[lang]
             try:
-                name_t = ollama_translate(p["name"], lang_label)
-                desc_t = ollama_translate(p["description"], lang_label)
+                name_t, desc_t = ollama_translate_pair(p["name"], p["description"], lang_label)
                 fields[name_key] = name_t
                 fields[desc_key] = desc_t
                 sys.stdout.write(f"{lang}:OK ")
             except Exception as e:
-                sys.stdout.write(f"{lang}:ERR({e}) ")
+                sys.stdout.write(f"{lang}:ERR({str(e)[:40]}) ")
         sys.stdout.write("\n")
         if fields and not args.dry:
             ts_src = patch_product(ts_src, p["slug"], fields)

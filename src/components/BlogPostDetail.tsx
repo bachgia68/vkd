@@ -269,7 +269,7 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
 
   useDocumentMeta({
     title: post ? `${post.title} — TA Sâm Ngọc Linh` : 'TA Sâm Ngọc Linh',
-    description: post?.excerpt,
+    description: post?.meta_description || post?.excerpt,
     path: `/blog/${slug}`,
     image: post?.featured_image_url ?? undefined,
   });
@@ -280,7 +280,7 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: post.title,
-          description: post.excerpt,
+          description: post.meta_description || post.excerpt,
           image: post.featured_image_url ?? undefined,
           datePublished: post.created_at,
           author: { '@type': 'Organization', name: 'TA Sâm Ngọc Linh' },

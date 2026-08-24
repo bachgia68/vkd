@@ -16,7 +16,7 @@ import AdminHome from './AdminHome';
 import CmsPage from './pages/CmsPage';
 import CrmErpPage from './pages/CrmErpPage';
 import InventoryQrPage from './pages/InventoryQrPage';
-import ProductsPage from './pages/ProductsPage';
+import ProductsManagePage from './pages/ProductsManagePage';
 import AgentsPage from './pages/AgentsPage';
 import ShowroomsPage from './pages/ShowroomsPage';
 import RevenuePage from './pages/RevenuePage';
@@ -49,7 +49,7 @@ export default function AdminApp() {
           <Route path="crm-erp" element={<CrmErpPage />} />
           <Route path="loyalty" element={<LoyaltyPage />} />
           <Route path="inventory-qr" element={<InventoryQrPage />} />
-          <Route path="products" element={<ProductsPage />} />
+          <Route path="products" element={<ProductsManagePage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="catalog-export" element={<CatalogExportPage />} />
           <Route path="agents" element={<AgentsPage />} />

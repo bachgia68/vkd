@@ -1,0 +1,22 @@
+[
+  {
+    "sku": "TN-001",
+    "name": "Sâm Ngọc Linh Tươi",
+    "image_url": "https://s3.samngoclinhtruongnhan.com/images/products/15343e64-037d-4561-acc5-f1e066129dd1.jpeg"
+  },
+  {
+    "sku": "TN-005",
+    "name": "Nước Sâm Ngọc Linh",
+    "image_url": "https://s3.samngoclinhtruongnhan.com/images/products/93fb4255-544e-4be2-bdd7-ea07d661d1f6.jpeg"
+  },
+  {
+    "sku": "TN-010",
+    "name": "Trà Sâm Ngọc Linh",
+    "image_url": "https://s3.samngoclinhtruongnhan.com/images/products/dc13989d-a53f-4b77-a327-f0a9737eb163.jpeg"
+  },
+  {
+    "sku": "TN-011",
+    "name": "Viên Sâm Ngọc Linh",
+    "image_url": "https://s3.samngoclinhtruongnhan.com/images/products/2c0a835c-4dcd-4de2-8bb0-70b42928104c.png"
+  }
+]
