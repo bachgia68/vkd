@@ -45,28 +45,38 @@ export default function EliteTeaser({ lang, onNavigate }: EliteTeaserProps) {
   const isRTL = lang === 'ar';
 
   return (
-    <section className="section-padding-sm bg-forest-900" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="section-padding-sm bg-cream-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-forest-800 border border-gold-400/20 rounded-3xl p-8 md:p-10">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gold-400/15 flex items-center justify-center shrink-0">
-              <Crown className="w-7 h-7 text-gold-400" />
+        <div className="relative overflow-hidden rounded-3xl border border-gold-400/20">
+          <img
+            src="/assets/images/heritage-vuon-sam-2.jpg"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-forest-950/95 via-forest-950/85 to-forest-950/60" />
+
+          <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 p-8 md:p-10">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gold-400/15 flex items-center justify-center shrink-0">
+                <Crown className="w-7 h-7 text-gold-400" />
+              </div>
+              <div>
+                <span className="text-gold-400 text-xs font-semibold tracking-wider uppercase block mb-1">
+                  {c.kicker}
+                </span>
+                <h3 className="font-display text-xl md:text-2xl text-white mb-1">{c.title}</h3>
+                <p className="text-white/70 text-sm max-w-xl">{c.body}</p>
+              </div>
             </div>
-            <div>
-              <span className="text-gold-400 text-xs font-semibold tracking-wider uppercase block mb-1">
-                {c.kicker}
-              </span>
-              <h3 className="font-display text-xl md:text-2xl text-white mb-1">{c.title}</h3>
-              <p className="text-white/70 text-sm max-w-xl">{c.body}</p>
-            </div>
+            <button
+              onClick={() => onNavigate('loyalty')}
+              className="btn-gold shrink-0 whitespace-nowrap"
+            >
+              {c.cta}
+              <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+            </button>
           </div>
-          <button
-            onClick={() => onNavigate('loyalty')}
-            className="btn-gold shrink-0 whitespace-nowrap"
-          >
-            {c.cta}
-            <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-          </button>
         </div>
       </div>
     </section>

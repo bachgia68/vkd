@@ -18,12 +18,13 @@ quả trước khi tick, không để mục nào "chạy song song" mà không a
 - [x] Component `SwipeCarousel.tsx` dùng chung + chuẩn hoá vào DESIGN_SYSTEM.md
       mục 7 (carousel bắt buộc cho mọi danh sách nhiều item)
 
-## ĐANG CHẠY — 4 việc giao Claude subagent trước khi có rule dùng Qwen/Ox (lỡ launch)
-- [x] Gộp menu Nghiên Cứu + Blog thành "Blog & Nghiên Cứu" — xong, tsc sạch
-- [x] Blog listing thêm carousel "Bài Viết Nổi Bật", giữ phân trang số cho 56 bài — xong, build sạch
-- [ ] Certifications.tsx chuyển sang SwipeCarousel + CarouselImage fit=contain — đang chạy
-- [ ] VideoGallery.tsx refactor dùng SwipeCarousel chung + ProductDetail.tsx
-      "Sản phẩm liên quan" chuyển carousel — đang chạy
+## XONG — verify thật bởi phiên chính (build sạch + xem DOM qua dev server, không chỉ tin subagent)
+- [x] Gộp menu Nghiên Cứu + Blog thành "Blog & Nghiên Cứu" — xác nhận trên DOM live
+- [x] Blog listing thêm carousel "Bài Viết Nổi Bật" (8 slide) + giữ phân trang số 56 bài — xác nhận
+- [x] Certifications.tsx → SwipeCarousel + CarouselImage fit=contain (7 slide, hết cắt mất ảnh) — xác nhận
+- [x] VideoGallery.tsx → SwipeCarousel chung (4 video Facebook thật) + ProductDetail
+      "Sản phẩm liên quan" → carousel — xác nhận
+- [x] Commit + push 07f037c (763e5b7..07f037c)
 
 ## CHƯA LÀM — sẽ giao Qwen/Ox khi có việc mới (KHÔNG viết brief rồi bỏ đó nữa)
 - [ ] Joe tự kiểm tra dòng site_text_overrides key=footer.followUs value="Liên hệ"
