@@ -13,18 +13,17 @@ export default function HeroSection() {
     );
   }
 
-  if (error) {
+  if (error || !header) {
     return (
-      <section className="w-full h-96 bg-gradient-to-r from-gold to-cream flex items-center justify-center">
-        <p className="text-red-600">Lỗi: {error}</p>
-      </section>
-    );
-  }
-
-  if (!header) {
-    return (
-      <section className="w-full h-96 bg-gradient-to-r from-gold to-cream flex items-center justify-center">
-        <p className="text-gray-600">Chưa cấu hình hero section</p>
+      <section className="w-full min-h-96 bg-gradient-to-r from-gold via-cream to-navy flex items-center justify-center px-4">
+        <div className="text-center max-w-2xl">
+          <h1 className="text-4xl md:text-5xl font-bold text-navy mb-4">
+            Sâm Ngọc Linh Vườn Nhà Khánh
+          </h1>
+          <p className="text-lg md:text-xl text-gray-700 mb-8">
+            Sâm Ngọc Linh nguyên chất, trồng tại vườn nhà, giao tận nơi
+          </p>
+        </div>
       </section>
     );
   }
