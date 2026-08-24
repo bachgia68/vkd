@@ -20,7 +20,7 @@ const NAV_OVERRIDE_KEYS: Partial<Record<string, string>> = {
   about: 'header.nav.about',
   products: 'header.nav.products',
   traceability: 'header.nav.traceability',
-  blog: 'header.nav.blog',
+  blogResearch: 'header.nav.blog',
   b2b: 'header.nav.partnership',
 };
 
@@ -40,6 +40,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
+  const [isBlogMenuOpen, setIsBlogMenuOpen] = useState(false);
   const [isMobileProductMenuOpen, setIsMobileProductMenuOpen] = useState(false);
   const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
@@ -72,10 +73,9 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
     { key: 'about', href: 'about' },
     { key: 'products', href: 'catalog' }, // render dropdown riêng, xem desktop nav
     { key: 'giftSets', href: 'catalog?type=set-qua-tang' },
-    { key: 'research', href: 'research' },
     { key: 'traceability', href: 'traceability' },
     ...(visibleSections.has('showrooms') ? [{ key: 'showrooms', href: 'showrooms' }] : []),
-    ...(visibleSections.has('blog') ? [{ key: 'blog', href: 'blog' }] : []),
+    ...(visibleSections.has('blog') ? [{ key: 'blogResearch', href: 'blog' }] : []),
     { key: 'b2b', href: 'b2b' },
     { key: 'autoship', href: 'autoship' },
   ];
@@ -199,6 +199,48 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                               </button>
                             ))}
                           </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              if (item.key === 'blogResearch') {
+                return (
+                  <div
+                    key={item.key}
+                    className="relative"
+                    onMouseEnter={() => setIsBlogMenuOpen(true)}
+                    onMouseLeave={() => setIsBlogMenuOpen(false)}
+                  >
+                    <button
+                      className={`nav-link text-sm font-medium tracking-wide flex items-center gap-1 ${
+                        currentPage === 'blog' || currentPage === 'research'
+                          ? 'text-gold-600'
+                          : useLightText
+                          ? 'text-white/90 hover:text-white'
+                          : 'text-forest-700 hover:text-forest-900'
+                      }`}
+                    >
+                      {navLabel('blogResearch')}
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                    {isBlogMenuOpen && (
+                      <div className="absolute top-full left-0 pt-2 w-56 z-50">
+                        <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3">
+                          <button
+                            onClick={() => { setIsBlogMenuOpen(false); onNavigate('blog'); }}
+                            className="w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                          >
+                            {t.nav.blog}
+                          </button>
+                          <button
+                            onClick={() => { setIsBlogMenuOpen(false); onNavigate('research'); }}
+                            className="w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                          >
+                            {lang === 'vi' ? 'Nghiên Cứu Khoa Học' : 'Scientific Research'}
+                          </button>
                         </div>
                       </div>
                     )}
@@ -399,6 +441,24 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                         </div>
                       </div>
                     )}
+                  </div>
+                ) : item.key === 'blogResearch' ? (
+                  <div key={item.key} className="space-y-1">
+                    <p className="px-4 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                      {navLabel('blogResearch')}
+                    </p>
+                    <button
+                      onClick={() => handleNav('blog')}
+                      className="block w-full text-left px-4 py-2.5 text-sm text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                    >
+                      {t.nav.blog}
+                    </button>
+                    <button
+                      onClick={() => handleNav('research')}
+                      className="block w-full text-left px-4 py-2.5 text-sm text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                    >
+                      {lang === 'vi' ? 'Nghiên Cứu Khoa Học' : 'Scientific Research'}
+                    </button>
                   </div>
                 ) : item.key === 'about' ? (
                   <div key={item.key} className="space-y-1">

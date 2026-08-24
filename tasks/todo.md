@@ -1,75 +1,39 @@
-# Todo — Admin ngôn ngữ/header-footer/ảnh vườn (2026-08-24)
+# Todo — TA site (cập nhật 2026-08-24, dọn lại cho đúng thực tế)
 
-Xem chi tiết ở `tasks/plan.md`. Checklist thi công theo thứ tự phase.
+Quy tắc từ giờ: KHÔNG đánh dấu [x] khi chỉ dựa vào lời subagent báo — chỉ tick
+sau khi PHIÊN CHÍNH tự chạy `npx tsc --noEmit` + `npm run build` và xác nhận
+sạch. Việc giao Qwen/Ox: xem [feedback_use_qwen_ox_not_claude_subagents]
+trong memory — brief nằm ở cuối file này, phiên chính phải tự kiểm tra kết
+quả trước khi tick, không để mục nào "chạy song song" mà không ai theo dõi.
 
-## Phase 1 — Supabase (làm trước tiên)
-- [ ] Task 1: bảng `site_languages` + RLS + seed 5 ngôn ngữ hiện có
-- [ ] Task 2: bảng `site_text_overrides` + RLS
-- [ ] Task 3: thêm cột `location`, `captured_date` vào `heritage_gallery_images`
-- [ ] **Checkpoint 1**: `list_tables` xác nhận đúng, RLS test qua `execute_sql`
+## ĐÃ XONG, ĐÃ VERIFY BUILD + PUSH LÊN MAIN (không phải chỉ nêu đề mục)
+- [x] Site_languages + site_text_overrides + heritage location/date (Supabase
+      + adminApi + admin pages Ngôn Ngữ/Header&Footer) — commit 7fd66f0
+- [x] Carousel vuốt Vườn Sâm Nguyên Sinh + tọa độ Trà Linh cho 10 ảnh — commit 7fd66f0
+- [x] About Us có ảnh thật + tọa độ — commit 7fd66f0
+- [x] Nav admin tràn màn hình (thêm scroll ngang) — commit b170932
+- [x] Trang Sản phẩm & Kho nối Supabase thật thay vì API 404 âm thầm — commit b170932
+- [x] Video Thực Địa carousel + admin, Certifications carousel, gộp MXH/Liên hệ
+      vào Header&Footer — commit 763e5b7
+- [x] Component `SwipeCarousel.tsx` dùng chung + chuẩn hoá vào DESIGN_SYSTEM.md
+      mục 7 (carousel bắt buộc cho mọi danh sách nhiều item)
 
-## Phase 2 — Backend layer
-- [ ] Task 4: adminApi.ts — CRUD site_languages (KHÔNG có hàm delete)
-- [ ] Task 5: siteContentApi.ts — fetchVisibleLanguages()
-- [ ] Task 6: adminApi.ts + siteContentApi.ts — CRUD site_text_overrides
-- [ ] Task 7: mở rộng HeritageGalleryImage type + create/update nhận location/captured_date
-- [ ] **Checkpoint 2**: `npx tsc --noEmit` sạch
+## ĐANG CHẠY — 4 việc giao Claude subagent trước khi có rule dùng Qwen/Ox (lỡ launch)
+- [x] Gộp menu Nghiên Cứu + Blog thành "Blog & Nghiên Cứu" — xong, tsc sạch
+- [x] Blog listing thêm carousel "Bài Viết Nổi Bật", giữ phân trang số cho 56 bài — xong, build sạch
+- [ ] Certifications.tsx chuyển sang SwipeCarousel + CarouselImage fit=contain — đang chạy
+- [ ] VideoGallery.tsx refactor dùng SwipeCarousel chung + ProductDetail.tsx
+      "Sản phẩm liên quan" chuyển carousel — đang chạy
 
-## Phase 3 — Trang admin
-- [ ] Task 8: LanguagesPage.tsx
-- [ ] Task 9: HeaderFooterPage.tsx
-- [ ] Task 10: đăng ký route + NAV trong AdminLayout.tsx
-- [ ] Task 11: form HeritageGalleryPage.tsx thêm địa điểm/ngày chụp
-- [ ] **Checkpoint 3**: 2 mục nav mới hiện trong admin, thao tác không lỗi
+## CHƯA LÀM — sẽ giao Qwen/Ox khi có việc mới (KHÔNG viết brief rồi bỏ đó nữa)
+- [ ] Joe tự kiểm tra dòng site_text_overrides key=footer.followUs value="Liên hệ"
+      (nghi test data cũ dán nhầm link Facebook, xem lại trong admin Header&Footer)
+- [ ] 7 SKU TN thiếu ảnh (TN-002,003,004,006,007,008,009) — site NCC Trường Nhân
+      đã đổi catalog, không gán ảnh an toàn được. Đề xuất: ẩn 7 SKU này qua
+      trang Sản phẩm & Kho (đã sửa xong nút ẩn/hiện) cho tới khi có ảnh thật
 
-## Phase 4 — Gate trang khách hàng
-- [ ] Task 12: Header.tsx + Footer.tsx dùng useSiteLanguages() thay hardcode
-- [ ] Task 13: Header.tsx + Footer.tsx đọc site_text_overrides, fallback translations.ts
-- [ ] Task 14: Heritage.tsx hiện caption location/ngày dưới ảnh
-- [ ] **Checkpoint 4**: build sạch, ẩn ngôn ngữ ở admin → biến mất ở trang khách ngay
-
-## Phase 5 — SỬA LẠI 2026-08-24: KGC-style = hiệu ứng carousel, KHÔNG phải màu ảnh
-Joe làm rõ lại: ảnh gốc không cần chỉnh màu. "Kiểu KGC" nghĩa là hiệu ứng
-vuốt/chuyển ảnh trên kgc.co.kr — ảnh đang active nổi lên (scale + shadow) khi
-vuốt ngang, không phải hậu kỳ màu sắc. Việc chỉnh màu (grade_heritage_photos.py)
-ĐÃ HỦY, không cần làm nữa.
-- [x] Task 15: xem ảnh gốc thật bằng mắt — kết luận: ảnh ổn, không cần chụp lại
-- [~] Task 20 (thay Task 16/17): carousel vuốt ngang + hiệu ứng "nổi lên" cho
-      slide active, thuần CSS scroll-snap + IntersectionObserver (không thêm
-      lib), giao subagent Claude chạy nền (2026-08-24)
-- [ ] Checkpoint: build sạch, carousel có dot indicator + nút mũi tên desktop,
-      caption location/ngày hiện dưới ảnh nếu có dữ liệu
-
-### Phiên Ox — Task 15 (khảo sát chất lượng ảnh gốc + rà soát build)
-```
-Task 1: Liệt kê toàn bộ ảnh trong bảng heritage_gallery_images (query Supabase project
-  xcwirgrlnibnjmseglee, SELECT id, image_url, alt_vi, location, visible FROM
-  heritage_gallery_images ORDER BY sort_order), tải từng ảnh về xem, ghi chú ảnh nào:
-  mờ/thiếu sáng/góc xấu (không cứu được bằng hậu kỳ, cần chụp lại) vs ảnh đủ chất lượng
-  để Qwen hậu kỳ (Task 16). Xuất danh sách phân loại 2 nhóm ra 1 file text.
-Task 2 (sau khi Claude báo Phase 3-4 xong): chạy `npx tsc --noEmit -p tsconfig.json` và
-  `npm run build` trong ta_production/project, xác nhận sạch — báo lại nếu có lỗi.
-```
-
-## Phiên chính (sau khi Qwen/Ox/subagent xong, cần Joe duyệt)
-- [ ] Duyệt danh sách phân loại ảnh của Ox (Task 15)
-- [ ] Duyệt bộ ảnh trước/sau của Qwen (Task 16/17), chọn ảnh nào thay
-- [ ] Ảnh đã duyệt: upload qua admin Heritage Gallery (kèm location/date) — không tự ý apply thẳng
-
-## Phase 6 — About Us
-- [x] Task 19: FounderStory.tsx thêm khối ảnh + tọa độ 15°12'N 108°18'E (xong 2026-08-24, tsc sạch)
-
-## Phase 7 — 2026-08-24 phản hồi vòng 2 (đang chạy 3 subagent song song)
-- [~] Video Thực Địa: carousel kiểu KGC link ra fanpage Facebook (bảng field_videos
-      + bucket field-video-thumbnails đã tạo, admin FieldVideosPage đang viết)
-- [~] Certifications: bỏ style card/shadow, chuyển sang logo sạch + tên đậm kiểu KGC
-- [~] Gộp quản trị Mạng Xã Hội + Số Điện Thoại vào trang Header & Footer (thêm
-      visible column cho social_links/contact_phones/site_addresses, cho phép
-      sửa/ẩn-hiện chứ không chỉ thêm/xoá), xoá 2 khối trùng khỏi SettingsPage
-- [ ] Cần Joe tự kiểm tra dòng site_text_overrides key=footer.followUs
-      value="Liên hệ" — có phải test data cũ, có cần xoá không
-
-## Checkpoint cuối
-- [ ] npm run build sạch
-- [ ] Test tay toàn luồng end-to-end
-- [ ] Deploy CHỈ khi Joe yêu cầu rõ ràng (skill deploy-vkd-site)
+## Checkpoint cuối (chỉ tick khi phiên chính tự chạy, không suy từ báo cáo subagent)
+- [ ] npm run build sạch — chạy lại LẦN CUỐI sau khi cả 4 việc trên xong
+- [ ] git commit + push (chỉ khi Joe yêu cầu)
+- [ ] Test tay trên trình duyệt: carousel vuốt được, nav admin đủ mục, ẩn/hiện
+      sản phẩm lưu được thật

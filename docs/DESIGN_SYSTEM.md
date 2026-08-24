@@ -97,8 +97,36 @@ Build → xem thử trên `npm run dev` → `git add` từng file cụ thể (kh
 `git add -A`) → commit rõ lý do → chỉ `push` khi được yêu cầu rõ ràng.
 Vercel project `ta` tự deploy khi có commit mới trên `main`.
 
-## 6. Trước khi thêm bất cứ thứ gì mới
+## 7. Danh sách nhiều item (ảnh, chứng chỉ, sản phẩm liên quan, bài blog...) — BẮT BUỘC carousel vuốt kiểu KGC
 
-Đọc mục 1–5 ở trên trước. Nếu loại nội dung/section mới không khớp pattern
+Chốt ngày 2026-08-24 (phản hồi trực tiếp: lưới tĩnh/phân trang số "quá cổ lỗ").
+Mọi khối hiển thị NHIỀU item cùng loại trên trang khách hàng (ảnh vườn, chứng
+chỉ, sản phẩm liên quan, video, card bài blog...) PHẢI dùng carousel vuốt
+ngang kiểu kgc.co.kr — không dùng lưới tĩnh (`grid`) hay phân trang số
+(`1 2 3 4 5`) cho danh sách duyệt được, trừ khi nội dung chỉ có 1-2 item cố
+định không bao giờ tăng thêm.
+
+- **Component dùng chung**: `src/components/ui/SwipeCarousel.tsx` — đã có
+  sẵn cơ chế scroll-snap + `IntersectionObserver` (slide giữa khung tự
+  "nổi lên": `scale-105 shadow-elegant-lg`, slide khác `scale-95 opacity-70`)
+  + nút mũi tên desktop + dot indicator. Dùng qua props `items` +
+  `renderSlide` — KHÔNG copy/viết lại cơ chế `IntersectionObserver` ở file
+  mới, luôn import component này.
+- **Ảnh không bị "mất mặt"**: dùng `<CarouselImage fit="contain">` (cùng
+  file) cho ảnh KHÔNG được cắt mất nội dung quan trọng ở rìa — chứng chỉ/
+  tài liệu scan, poster, ảnh không đúng tỉ lệ khung. `fit="cover"` (mặc
+  định) cho ảnh chụp thường (vườn, sản phẩm) không sợ mất chi tiết ở rìa.
+  Không tự chế cách resize/crop ảnh khác.
+- **Nơi đã áp dụng** (tham chiếu khi cần sửa tương tự): `Heritage.tsx`
+  (ảnh vườn sâm), `VideoGallery.tsx` (video thực địa, click ra fanpage).
+- **Danh mục lớn cần phân trang thật vì lý do SEO/crawl** (vd. trang `/blog`
+  đầy đủ 56 bài): carousel chỉ dùng cho phần NỔI BẬT/gợi ý ở đầu trang,
+  phần danh sách đầy đủ bên dưới vẫn giữ phân trang có URL riêng — không bỏ
+  hẳn phân trang trong trường hợp này, chỉ bỏ ở nơi không cần crawl từng
+  trang riêng (sản phẩm liên quan, chứng chỉ, gallery).
+
+## 8. Trước khi thêm bất cứ thứ gì mới
+
+Đọc mục 1–7 ở trên trước. Nếu loại nội dung/section mới không khớp pattern
 nào ở đây, hỏi lại thay vì tự sáng tạo cách làm riêng — mỗi cách làm riêng là
 một chỗ sẽ "lệch chuẩn" lần sau.

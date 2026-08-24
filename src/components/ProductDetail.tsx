@@ -20,6 +20,7 @@ import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
+import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface ProductDetailProps {
   lang: Language;
@@ -494,20 +495,24 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
               <h3 className="font-display text-xl md:text-2xl text-forest-900 mb-6">
                 {lang === 'vi' ? 'Sản phẩm liên quan' : lang === 'en' ? 'You may also like' : lang === 'zh' ? '相关产品' : lang === 'fr' ? 'Produits similaires' : 'منتجات مشابهة'}
               </h3>
-              <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {related.map(rp => (
+              <SwipeCarousel
+                items={related}
+                getKey={rp => rp.sku}
+                slideWidthClassName="w-[200px] md:w-[240px]"
+                ariaLabelPrev={lang === 'vi' ? 'Sản phẩm trước' : 'Prev'}
+                ariaLabelNext={lang === 'vi' ? 'Sản phẩm sau' : 'Next'}
+                renderSlide={rp => (
                   <a
-                    key={rp.sku}
                     href={`/product/${rp.slug}`}
                     onClick={e => { e.preventDefault(); onNavigate('product-detail', rp.slug); }}
-                    className="flex-shrink-0 w-44 md:w-52 group cursor-pointer"
+                    className="group cursor-pointer block"
                   >
                     <div className="aspect-square rounded-2xl overflow-hidden bg-cream-100 mb-3">
-                      <img
+                      <CarouselImage
                         src={rp.image}
                         alt={rp.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
+                        fit="cover"
+                        className="transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
                     <p className="text-sm font-semibold text-forest-900 leading-snug line-clamp-2 mb-1">{rp.name}</p>
@@ -515,8 +520,8 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                       <p className="text-sm text-gold-700 font-bold">{rp.price.toLocaleString('vi-VN')}₫</p>
                     )}
                   </a>
-                ))}
-              </div>
+                )}
+              />
             </div>
           );
         })()}

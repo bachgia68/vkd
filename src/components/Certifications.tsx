@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface CertificationsProps {
   lang: Language;
@@ -79,29 +80,32 @@ export default function Certifications({ lang }: CertificationsProps) {
           <p className="text-forest-500">{t.certifications.subtitle}</p>
         </div>
 
-        {/* Certifications Grid — real scanned certificates, logo-style layout */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
-          {certifications.map((cert, index) => (
+        {/* Certifications Carousel — real scanned certificates, logo-style layout */}
+        <SwipeCarousel
+          items={certifications}
+          getKey={(_cert, index) => String(index)}
+          slideWidthClassName="w-[180px] md:w-[220px]"
+          ariaLabelPrev={lang === 'vi' ? 'Chứng chỉ trước' : 'Previous certificate'}
+          ariaLabelNext={lang === 'vi' ? 'Chứng chỉ sau' : 'Next certificate'}
+          renderSlide={(cert, isActive) => (
             <button
-              key={index}
               onClick={() => setPreview({ src: cert.image, name: cert.name })}
-              className="group flex flex-col items-center text-center"
+              className="group flex flex-col items-center text-center w-full"
             >
-              <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-cream-50">
-                <img
-                  src={cert.image}
-                  alt={cert.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
+              <div
+                className={`relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-cream-50 transition-all duration-500 ease-out ${
+                  isActive ? 'scale-105 shadow-elegant-lg opacity-100' : 'scale-95 opacity-70'
+                }`}
+              >
+                <CarouselImage src={cert.image} alt={cert.name} fit="contain" />
                 <div className="absolute inset-0 bg-forest-900/0 group-hover:bg-forest-900/20 transition-colors duration-300 flex items-center justify-center">
                   <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </div>
               <p className="mt-4 text-forest-900 text-base font-bold leading-snug">{cert.name}</p>
             </button>
-          ))}
-        </div>
+          )}
+        />
       </div>
 
       {/* Lightbox */}

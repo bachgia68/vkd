@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { FlaskConical, Building2, Microscope, Check, X, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FlaskConical, Building2, Microscope, Check, X, MapPin } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
+import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface HeritageProps {
   lang: Language;
@@ -12,52 +13,12 @@ export default function Heritage({ lang }: HeritageProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
   const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     fetchHeritageGalleryImages()
       .then(setGalleryImages)
       .catch(() => setGalleryImages([]));
   }, []);
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track || galleryImages.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const idx = slideRefs.current.findIndex((el) => el === entry.target);
-            if (idx !== -1) setActiveIndex(idx);
-          }
-        });
-      },
-      { root: track, threshold: 0.6 }
-    );
-
-    slideRefs.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [galleryImages]);
-
-  const scrollToSlide = (index: number) => {
-    const slide = slideRefs.current[index];
-    if (!slide) return;
-    slide.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  };
-
-  const scrollByAmount = (direction: 1 | -1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const slide = slideRefs.current[0];
-    const slideWidth = slide ? slide.offsetWidth + 16 : 300;
-    track.scrollBy({ left: direction * slideWidth, behavior: 'smooth' });
-  };
 
   const pillars = [
     {
@@ -187,89 +148,40 @@ export default function Heritage({ lang }: HeritageProps) {
               {t.heritage.galleryLabel}
             </h3>
 
-            <div className="relative">
-              <div
-                ref={trackRef}
-                className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scroll-smooth"
-              >
-                {galleryImages.map((photo, index) => {
-                  const isActive = index === activeIndex;
-                  const caption = lang === 'vi' ? photo.alt_vi : photo.alt_en;
-                  const capturedDate = photo.captured_date
-                    ? new Date(photo.captured_date).toLocaleDateString('vi-VN')
-                    : null;
-
-                  return (
+            <SwipeCarousel
+              items={galleryImages}
+              getKey={(photo) => photo.id}
+              ariaLabelPrev={lang === 'vi' ? 'Ảnh trước' : 'Previous image'}
+              ariaLabelNext={lang === 'vi' ? 'Ảnh sau' : 'Next image'}
+              renderSlide={(photo, isActive) => {
+                const caption = lang === 'vi' ? photo.alt_vi : photo.alt_en;
+                const capturedDate = photo.captured_date
+                  ? new Date(photo.captured_date).toLocaleDateString('vi-VN')
+                  : null;
+                return (
+                  <>
                     <div
-                      key={photo.id}
-                      ref={(el) => {
-                        slideRefs.current[index] = el;
-                      }}
-                      className="snap-center flex-shrink-0 w-[280px] md:w-[360px]"
+                      className={`aspect-square overflow-hidden rounded-2xl transition-all duration-500 ease-out ${
+                        isActive ? 'scale-105 shadow-elegant-lg opacity-100' : 'scale-95 opacity-70'
+                      }`}
                     >
-                      <div
-                        className={`aspect-square overflow-hidden rounded-2xl transition-all duration-500 ease-out ${
-                          isActive
-                            ? 'scale-105 shadow-elegant-lg opacity-100'
-                            : 'scale-95 opacity-70'
-                        }`}
-                      >
-                        <img
-                          src={photo.image_url}
-                          alt={caption || photo.alt_vi}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      {(photo.location || capturedDate) && (
-                        <div className="flex items-center gap-3 mt-2 px-1 text-xs text-forest-500">
-                          {photo.location && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {photo.location}
-                            </span>
-                          )}
-                          {capturedDate && <span>{capturedDate}</span>}
-                        </div>
-                      )}
+                      <CarouselImage src={photo.image_url} alt={caption || photo.alt_vi} fit="cover" />
                     </div>
-                  );
-                })}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => scrollByAmount(-1)}
-                aria-label={lang === 'vi' ? 'Ảnh trước' : 'Previous image'}
-                className="hidden md:flex items-center justify-center absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-white shadow-elegant text-forest-700 hover:bg-gold-100 transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollByAmount(1)}
-                aria-label={lang === 'vi' ? 'Ảnh sau' : 'Next image'}
-                className="hidden md:flex items-center justify-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-white shadow-elegant text-forest-700 hover:bg-gold-100 transition-colors"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            {galleryImages.length > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-4">
-                {galleryImages.map((photo, index) => (
-                  <button
-                    key={photo.id}
-                    type="button"
-                    onClick={() => scrollToSlide(index)}
-                    aria-label={`${lang === 'vi' ? 'Chuyển đến ảnh' : 'Go to image'} ${index + 1}`}
-                    className={`rounded-full transition-all duration-300 ${
-                      index === activeIndex ? 'w-6 h-2 bg-gold-400' : 'w-2 h-2 bg-forest-200'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
+                    {(photo.location || capturedDate) && (
+                      <div className="flex items-center gap-3 mt-2 px-1 text-xs text-forest-500">
+                        {photo.location && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {photo.location}
+                          </span>
+                        )}
+                        {capturedDate && <span>{capturedDate}</span>}
+                      </div>
+                    )}
+                  </>
+                );
+              }}
+            />
           </div>
         )}
 

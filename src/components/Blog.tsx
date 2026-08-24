@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, Clock, ChevronRight } from 'lucide-react';
 import { fetchBlogPosts, type BlogPost } from '../lib/siteContentApi';
+import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface BlogProps {
   onNavigate?: (page: string, slug?: string) => void;
@@ -90,6 +91,46 @@ function PostCard({ post, index, onNavigate }: PostCardProps) {
   );
 }
 
+function FeaturedPostSlide({ post, index, onNavigate }: PostCardProps) {
+  const img = post.featured_image_url || getFallback(index);
+  const category = detectCategory(post);
+  const slug = post.slug;
+
+  return (
+    <a
+      href={`/blog/${slug}`}
+      onClick={(e) => { e.preventDefault(); onNavigate?.('blog-post', slug); }}
+      className="group block bg-white rounded-2xl overflow-hidden shadow-elegant hover:shadow-elegant-lg transition-all duration-500 h-full"
+    >
+      <div className="relative overflow-hidden aspect-[4/3]">
+        <CarouselImage
+          src={img}
+          alt={post.featured_image_alt || post.title}
+          fit="cover"
+          className="transition-transform duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-forest-950/30 to-transparent pointer-events-none" />
+        <span className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-forest-800 text-xs font-semibold rounded-full">
+          {category}
+        </span>
+      </div>
+
+      <div className="p-5">
+        <div className="flex items-center gap-2 text-xs text-forest-400 mb-2">
+          <span>{formatDate(post.created_at)}</span>
+          <span className="w-1 h-1 rounded-full bg-forest-300" />
+          <Clock className="w-3 h-3" />
+          <span>{estimateReadingMinutes(post.body)} phút</span>
+        </div>
+        <h3 className="font-display text-base font-semibold text-forest-900 mb-2 line-clamp-2 leading-snug group-hover:text-forest-700 transition-colors">
+          {post.title}
+        </h3>
+        <p className="text-forest-500 text-sm leading-relaxed line-clamp-2">{post.excerpt}</p>
+      </div>
+    </a>
+  );
+}
+
 function HeroPost({ post, onNavigate }: { post: BlogPost; onNavigate?: (page: string, slug?: string) => void }) {
   const img = post.featured_image_url || getFallback(0);
   const category = detectCategory(post);
@@ -159,6 +200,9 @@ export default function Blog({ onNavigate }: BlogProps) {
     gridPosts = rest.slice(start, start + POSTS_PER_PAGE);
   }
 
+  // Carousel "Bài Viết Nổi Bật" — dùng lại data đã fetch, N bài mới nhất sau hero
+  const featuredPosts = rest.slice(0, 8);
+
   return (
     <section id="blog" className={`${isFullPage ? 'pt-32 pb-16' : 'section-padding'} bg-cream-50`}>
       <div className="container-wide">
@@ -189,6 +233,24 @@ export default function Blog({ onNavigate }: BlogProps) {
         <div className="mb-10">
           <HeroPost post={hero} onNavigate={onNavigate} />
         </div>
+
+        {/* Carousel bài viết nổi bật — vuốt ngang, không thay thế lưới phân trang bên dưới */}
+        {featuredPosts.length > 0 && (
+          <div className="mb-12">
+            <h3 className="font-display text-xl md:text-2xl font-bold text-forest-900 mb-6">
+              Bài Viết Nổi Bật
+            </h3>
+            <SwipeCarousel
+              items={featuredPosts}
+              getKey={(post) => post.id}
+              slideWidthClassName="w-[260px] md:w-[300px]"
+              renderSlide={(post, _isActive) => {
+                const idx = featuredPosts.indexOf(post) + 1;
+                return <FeaturedPostSlide post={post} index={idx} onNavigate={onNavigate} />;
+              }}
+            />
+          </div>
+        )}
 
         {/* Grid posts — bắt đầu từ index 1 để fallback không trùng với hero */}
         {gridPosts.length > 0 && (

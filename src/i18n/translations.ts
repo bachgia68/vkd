@@ -6,7 +6,7 @@ export interface Translation {
     about: string;
     products: string;
     giftSets: string;
-    research: string;
+    blogResearch: string;
     traceability: string;
     b2b: string;
     autoship: string;
@@ -152,7 +152,7 @@ export const translations: Record<Language, Translation> = {
       about: 'Giới thiệu',
       products: 'Sản phẩm',
       giftSets: 'Set Quà Tặng',
-      research: 'Nghiên Cứu',
+      blogResearch: 'Blog & Nghiên Cứu',
       traceability: 'Truy xuất',
       b2b: 'Hợp tác',
       autoship: 'Mua Định Kỳ',
@@ -301,7 +301,7 @@ export const translations: Record<Language, Translation> = {
       about: 'About',
       products: 'Products',
       giftSets: 'Gift Sets',
-      research: 'Research',
+      blogResearch: 'Blog & Research',
       traceability: 'Traceability',
       b2b: 'Partners',
       autoship: 'Subscribe',
@@ -450,7 +450,7 @@ export const translations: Record<Language, Translation> = {
       about: '关于我们',
       products: '产品',
       giftSets: '礼品套装',
-      research: '研究',
+      blogResearch: '博客与研究',
       traceability: '溯源',
       b2b: '合作',
       autoship: '订阅',
@@ -599,7 +599,7 @@ export const translations: Record<Language, Translation> = {
       about: 'À Propos',
       products: 'Produits',
       giftSets: 'Coffrets Cadeaux',
-      research: 'Recherche',
+      blogResearch: 'Blog & Recherche',
       traceability: 'Traçabilité',
       b2b: 'Partenariats',
       autoship: 'Abonnement',
@@ -748,7 +748,7 @@ export const translations: Record<Language, Translation> = {
       about: 'عنا',
       products: 'المنتجات',
       giftSets: 'أطقم الهدايا',
-      research: 'البحث',
+      blogResearch: 'المدونة والبحث',
       traceability: 'التتبع',
       b2b: 'الشراكات',
       autoship: 'اشتراك',
