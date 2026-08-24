@@ -17,6 +17,8 @@ export default function HeritageGalleryPage() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
   const [altVi, setAltVi] = useState('');
+  const [location, setLocation] = useState('');
+  const [capturedDate, setCapturedDate] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -68,9 +70,13 @@ export default function HeritageGalleryPage() {
       await createHeritageGalleryImage({
         image_url,
         alt_vi: altVi.trim(),
+        location: location.trim() || undefined,
+        captured_date: capturedDate || null,
         sort_order: rows.length + 1,
       });
       setAltVi('');
+      setLocation('');
+      setCapturedDate('');
       onPickImage(null);
       load();
       showToast('Đã thêm ảnh — đang hiện trên trang chủ.');
@@ -113,6 +119,24 @@ export default function HeritageGalleryPage() {
             </label>
             {imagePreview && <img src={imagePreview} alt="" className="mt-2 h-20 rounded-lg object-cover" />}
           </div>
+          <div>
+            <label className="block text-xs font-medium text-forest-500 mb-1">Địa điểm</label>
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full border border-cream-300 rounded-lg px-3 py-2 text-sm"
+              placeholder="15°12'N 108°18'E, Trà Linh, Nam Trà My, Quảng Nam"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-forest-500 mb-1">Ngày chụp</label>
+            <input
+              type="date"
+              value={capturedDate}
+              onChange={(e) => setCapturedDate(e.target.value)}
+              className="w-full border border-cream-300 rounded-lg px-3 py-2 text-sm"
+            />
+          </div>
         </div>
         <Button
           onClick={submit}
@@ -143,6 +167,14 @@ export default function HeritageGalleryPage() {
               </div>
               <div className="p-2.5 space-y-2">
                 <p className="text-xs text-forest-600 truncate" title={row.alt_vi}>{row.alt_vi}</p>
+                {row.location && (
+                  <p className="text-[11px] text-forest-400 truncate" title={row.location}>{row.location}</p>
+                )}
+                {row.captured_date && (
+                  <p className="text-[11px] text-forest-400">
+                    {new Date(row.captured_date).toLocaleDateString('vi-VN')}
+                  </p>
+                )}
                 <div className="flex items-center justify-between gap-1">
                   <Button
                     onClick={() => toggle(row)}

@@ -6,6 +6,23 @@ import { useCart } from '../context/CartContext';
 import { productTypes } from '../data/productTypes';
 import { healthGoalLabels } from '../data/mockData';
 import type { HealthGoal } from '../data/mockData';
+import { fetchVisibleLanguages, fetchTextOverrides, type SiteLanguage } from '../lib/siteContentApi';
+
+const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
+  id: key,
+  key,
+  label: languageNames[key],
+  sort_order: i,
+}));
+
+const NAV_OVERRIDE_KEYS: Partial<Record<string, string>> = {
+  home: 'header.nav.home',
+  about: 'header.nav.about',
+  products: 'header.nav.products',
+  traceability: 'header.nav.traceability',
+  blog: 'header.nav.blog',
+  b2b: 'header.nav.partnership',
+};
 
 interface HeaderProps {
   lang: Language;
@@ -24,6 +41,8 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
   const [isMobileProductMenuOpen, setIsMobileProductMenuOpen] = useState(false);
+  const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +51,21 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchVisibleLanguages()
+      .then((rows) => setLanguages(rows.length > 0 ? rows : FALLBACK_LANGUAGES))
+      .catch(() => setLanguages(FALLBACK_LANGUAGES));
+    fetchTextOverrides()
+      .then(setOverrides)
+      .catch(() => setOverrides({}));
+  }, []);
+
+  const navLabel = (key: string) => {
+    const overrideKey = NAV_OVERRIDE_KEYS[key];
+    const fallback = t.nav[key as keyof typeof t.nav] ?? key;
+    return (overrideKey && overrides[overrideKey]) || fallback;
+  };
 
   const navItems = [
     { key: 'home', href: 'home' },
@@ -49,8 +83,6 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const samProductTypes = productTypes.filter((pt) => pt.group === 'sam' && pt.id !== 'set-qua-tang');
   const dacSanProductTypes = productTypes.filter((pt) => pt.group === 'dac-san');
   const healthGoals = Object.keys(healthGoalLabels) as HealthGoal[];
-
-  const languages: Language[] = ['vi', 'en', 'zh', 'fr', 'ar'];
 
   const handleNav = (href: string) => {
     if (href === 'traceability') {
@@ -110,7 +142,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                           : 'text-forest-700 hover:text-forest-900'
                       }`}
                     >
-                      {t.nav.products}
+                      {navLabel('products')}
                       <ChevronDown className="w-3.5 h-3.5" />
                     </button>
                     {isProductMenuOpen && (
@@ -191,7 +223,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                           : 'text-forest-700 hover:text-forest-900'
                       }`}
                     >
-                      {t.nav.about}
+                      {navLabel('about')}
                       <ChevronDown className="w-3.5 h-3.5" />
                     </button>
                     {isAboutMenuOpen && (
@@ -230,7 +262,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                       : 'text-forest-700 hover:text-forest-900'
                   }`}
                 >
-                  {t.nav[item.key as keyof typeof t.nav] || item.key}
+                  {navLabel(item.key)}
                 </button>
               );
             })}
@@ -257,17 +289,17 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                   <div className="absolute top-full right-0 mt-2 w-40 bg-cream-50 rounded-xl shadow-elegant-lg z-50 overflow-hidden animate-fade-in-down">
                     {languages.map((l) => (
                       <button
-                        key={l}
+                        key={l.key}
                         onClick={() => {
-                          onLangChange(l);
+                          onLangChange(l.key as Language);
                           setIsLangMenuOpen(false);
                         }}
                         className={`w-full px-4 py-3 text-left text-sm hover:bg-forest-50 transition-colors ${
-                          l === lang ? 'bg-forest-50 text-forest-700 font-medium' : 'text-forest-600'
-                        } ${l === 'ar' ? 'text-right' : ''}`}
-                        dir={l === 'ar' ? 'rtl' : 'ltr'}
+                          l.key === lang ? 'bg-forest-50 text-forest-700 font-medium' : 'text-forest-600'
+                        } ${l.key === 'ar' ? 'text-right' : ''}`}
+                        dir={l.key === 'ar' ? 'rtl' : 'ltr'}
                       >
-                        {languageNames[l]}
+                        {l.label}
                       </button>
                     ))}
                   </div>
@@ -391,7 +423,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                     onClick={() => handleNav(item.href)}
                     className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
                   >
-                    {t.nav[item.key as keyof typeof t.nav] || item.key}
+                    {navLabel(item.key)}
                   </button>
                 )
               )}
@@ -399,16 +431,16 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                 <div className="flex flex-wrap gap-2 px-4">
                   {languages.map((l) => (
                     <button
-                      key={l}
+                      key={l.key}
                       onClick={() => {
-                        onLangChange(l);
+                        onLangChange(l.key as Language);
                         setIsMobileMenuOpen(false);
                       }}
                       className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
-                        l === lang ? 'bg-forest-100 text-forest-700' : 'bg-cream-100 text-forest-600 hover:bg-forest-50'
+                        l.key === lang ? 'bg-forest-100 text-forest-700' : 'bg-cream-100 text-forest-600 hover:bg-forest-50'
                       }`}
                     >
-                      {languageNames[l]}
+                      {l.label}
                     </button>
                   ))}
                 </div>

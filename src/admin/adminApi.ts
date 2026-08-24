@@ -803,7 +803,7 @@ export async function fetchAllHeritageGalleryImages(): Promise<(HeritageGalleryI
   return throwIfError(
     await supabase
       .from('heritage_gallery_images')
-      .select('id, image_url, alt_vi, alt_en, sort_order, visible')
+      .select('id, image_url, alt_vi, alt_en, location, captured_date, sort_order, visible')
       .order('sort_order')
   );
 }
@@ -812,19 +812,21 @@ export async function createHeritageGalleryImage(input: {
   image_url: string;
   alt_vi: string;
   alt_en?: string;
+  location?: string;
+  captured_date?: string | null;
   sort_order?: number;
 }) {
   const res = await supabase
     .from('heritage_gallery_images')
-    .insert({ alt_en: '', sort_order: 0, ...input, visible: true })
-    .select('id, image_url, alt_vi, alt_en, sort_order, visible')
+    .insert({ alt_en: '', location: '', captured_date: null, sort_order: 0, ...input, visible: true })
+    .select('id, image_url, alt_vi, alt_en, location, captured_date, sort_order, visible')
     .single();
   return throwIfError(res);
 }
 
 export async function updateHeritageGalleryImage(
   id: string,
-  patch: Partial<Pick<HeritageGalleryImage, 'alt_vi' | 'alt_en' | 'sort_order'> & { visible: boolean }>
+  patch: Partial<Pick<HeritageGalleryImage, 'alt_vi' | 'alt_en' | 'location' | 'captured_date' | 'sort_order'> & { visible: boolean }>
 ) {
   const { error } = await supabase
     .from('heritage_gallery_images')
@@ -863,6 +865,62 @@ export async function fetchAllSiteSections(): Promise<(SiteSection & { visible: 
 
 export async function updateSiteSectionVisibility(id: string, visible: boolean) {
   const { error } = await supabase.from('site_sections').update({ visible, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Site Languages (Header/Footer language switcher — cố ý KHÔNG có
+// hàm delete: xóa nhầm 1 ngôn ngữ mất công dịch, chỉ được ẩn/hiện) ----------
+
+export interface AdminSiteLanguage {
+  id: string;
+  key: string;
+  label: string;
+  visible: boolean;
+  sort_order: number;
+}
+
+export async function fetchAllSiteLanguages(): Promise<AdminSiteLanguage[]> {
+  return throwIfError(
+    await supabase.from('site_languages').select('id, key, label, visible, sort_order').order('sort_order')
+  );
+}
+
+export async function createSiteLanguage(input: { key: string; label: string; sort_order?: number }) {
+  const res = await supabase
+    .from('site_languages')
+    .insert({ sort_order: 0, ...input, visible: false })
+    .select('id, key, label, visible, sort_order')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateSiteLanguage(id: string, patch: Partial<Pick<AdminSiteLanguage, 'label' | 'visible' | 'sort_order'>>) {
+  const { error } = await supabase.from('site_languages').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Site Text Overrides (Header/Footer copy — tiếng Việt only) ----------
+
+export interface SiteTextOverride {
+  key: string;
+  value_vi: string;
+}
+
+export async function fetchAllTextOverrides(): Promise<SiteTextOverride[]> {
+  return throwIfError(await supabase.from('site_text_overrides').select('key, value_vi').order('key'));
+}
+
+export async function upsertTextOverride(key: string, value_vi: string) {
+  const res = await supabase
+    .from('site_text_overrides')
+    .upsert({ key, value_vi, updated_at: new Date().toISOString() })
+    .select('key, value_vi')
+    .single();
+  return throwIfError(res);
+}
+
+export async function deleteTextOverride(key: string) {
+  const { error } = await supabase.from('site_text_overrides').delete().eq('key', key);
   if (error) throw new Error(error.message);
 }
 

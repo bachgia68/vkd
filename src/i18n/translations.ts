@@ -285,7 +285,7 @@ export const translations: Record<Language, Translation> = {
       followUs: 'Theo Dõi',
       address: '15°12\'N 108°18\'E, Trà Linh, Nam Trà My, Quảng Nam, Việt Nam',
       phone: 'Zalo / WhatsApp: (84) 984 999 309',
-      email: 'khanh@tasamngoclinh.com',
+      email: 'duyenmoc08@gmail.com',
       copyright: '© 2026 TA — Sàn Giao Dịch Sâm Ngọc Linh Việt Nam. Bảo lưu mọi quyền.',
     },
     policies: {
@@ -434,7 +434,7 @@ export const translations: Record<Language, Translation> = {
       followUs: 'Follow Us',
       address: '15°12\'N 108°18\'E, Tra Linh, Nam Tra My, Quang Nam, Vietnam',
       phone: 'Zalo / WhatsApp: (84) 984 999 309',
-      email: 'khanh@tasamngoclinh.com',
+      email: 'duyenmoc08@gmail.com',
       copyright: '© 2026 TA — Ngoc Linh Ginseng Trading Marketplace. All rights reserved.',
     },
     policies: {
@@ -583,7 +583,7 @@ export const translations: Record<Language, Translation> = {
       followUs: '关注我们',
       address: '15°12\'N 108°18\'E，茶灵，南茶眉，广南省，越南',
       phone: 'Zalo / WhatsApp：(84) 984 999 309',
-      email: 'khanh@tasamngoclinh.com',
+      email: 'duyenmoc08@gmail.com',
       copyright: '© 2026 TA。保留所有权利。',
     },
     policies: {
@@ -732,7 +732,7 @@ export const translations: Record<Language, Translation> = {
       followUs: 'Suivez-nous',
       address: '15°12\'N 108°18\'E, Tra Linh, Nam Tra My, Quang Nam, Vietnam',
       phone: 'Zalo / WhatsApp : (84) 984 999 309',
-      email: 'khanh@tasamngoclinh.com',
+      email: 'duyenmoc08@gmail.com',
       copyright: '© 2026 TA — Place de marché du Ginseng Ngoc Linh. Tous droits réservés.',
     },
     policies: {
@@ -881,7 +881,7 @@ export const translations: Record<Language, Translation> = {
       followUs: 'تابعنا',
       address: '15°12\'N 108°18\'E، ترا لينه، نام ترا مي، كوانغ نام، فيتنام',
       phone: 'Zalo / WhatsApp: (84) 984 999 309',
-      email: 'khanh@tasamngoclinh.com',
+      email: 'duyenmoc08@gmail.com',
       copyright: '© 2026 TA. جميع الحقوق محفوظة.',
     },
     policies: {

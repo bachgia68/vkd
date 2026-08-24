@@ -27,7 +27,6 @@ import ComboOfTheMonth from './components/ComboOfTheMonth';
 import About from './components/About';
 import Blog from './components/Blog';
 import BlogPostDetail from './components/BlogPostDetail';
-import OmniChannel from './components/OmniChannel';
 import VideoGallery from './components/VideoGallery';
 import Showrooms from './components/Showrooms';
 import PolicyPage from './components/PolicyPage';
@@ -171,16 +170,15 @@ function App() {
           {currentPage === 'home' && (
             <>
               <Hero lang={lang} onNavigate={navigate} />
+              {visibleSections.has('heritage') && <Heritage lang={lang} />}
               <Products lang={lang} onNavigate={navigate} />
               <ComboOfTheMonth lang={lang} />
-              {visibleSections.has('heritage') && <Heritage lang={lang} />}
               <EliteTeaser lang={lang} onNavigate={navigate} />
               <ProductAdvisor lang={lang} onNavigate={navigate} />
               <Certifications lang={lang} />
               <TrustProof lang={lang} />
               <B2B lang={lang} />
               {visibleSections.has('video-gallery') && <VideoGallery />}
-              {visibleSections.has('omnichannel') && <OmniChannel lang={lang} onNavigate={navigate} />}
             </>
           )}
 

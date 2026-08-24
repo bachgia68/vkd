@@ -158,13 +158,15 @@ export interface HeritageGalleryImage {
   image_url: string;
   alt_vi: string;
   alt_en: string;
+  location: string;
+  captured_date: string | null;
   sort_order: number;
 }
 
 export async function fetchHeritageGalleryImages(): Promise<HeritageGalleryImage[]> {
   const { data, error } = await supabase
     .from('heritage_gallery_images')
-    .select('id, image_url, alt_vi, alt_en, sort_order')
+    .select('id, image_url, alt_vi, alt_en, location, captured_date, sort_order')
     .eq('visible', true)
     .order('sort_order');
   if (error) throw new Error(error.message);
@@ -179,6 +181,37 @@ export async function fetchVisibleSections(): Promise<SiteSection[]> {
     .order('sort_order');
   if (error) throw new Error(error.message);
   return data ?? [];
+}
+
+// ---------- Languages (which languages show in Header/Footer language switcher) ----------
+
+export interface SiteLanguage {
+  id: string;
+  key: string;
+  label: string;
+  sort_order: number;
+}
+
+export async function fetchVisibleLanguages(): Promise<SiteLanguage[]> {
+  const { data, error } = await supabase
+    .from('site_languages')
+    .select('id, key, label, sort_order')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// ---------- Text overrides (admin-edited Header/Footer copy, fallback to translations.ts) ----------
+
+export async function fetchTextOverrides(): Promise<Record<string, string>> {
+  const { data, error } = await supabase.from('site_text_overrides').select('key, value_vi');
+  if (error) throw new Error(error.message);
+  const map: Record<string, string> = {};
+  (data ?? []).forEach((row) => {
+    map[row.key] = row.value_vi;
+  });
+  return map;
 }
 
 export async function submitCustomerLead(input: {

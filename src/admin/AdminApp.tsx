@@ -29,6 +29,8 @@ import SiteSectionsPage from './pages/SiteSectionsPage';
 import LoyaltyPage from './pages/LoyaltyPage';
 import HeritageGalleryPage from './pages/HeritageGalleryPage';
 import OrdersPage from './pages/OrdersPage';
+import LanguagesPage from './pages/LanguagesPage';
+import HeaderFooterPage from './pages/HeaderFooterPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -60,6 +62,8 @@ export default function AdminApp() {
           <Route path="heritage-gallery" element={<HeritageGalleryPage />} />
           <Route path="combos" element={<CombosPage />} />
           <Route path="site-sections" element={<SiteSectionsPage />} />
+          <Route path="languages" element={<LanguagesPage />} />
+          <Route path="header-footer" element={<HeaderFooterPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

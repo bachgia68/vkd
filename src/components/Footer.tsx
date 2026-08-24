@@ -2,7 +2,30 @@ import { useEffect, useState } from 'react';
 import { MapPin, Phone, Mail, Share2, MessageCircle, Music2, Video, Link2 } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations, languageNames } from '../i18n/translations';
-import { fetchContactPhones, fetchSocialLinks, type ContactPhone, type SocialLink } from '../lib/siteContentApi';
+import {
+  fetchContactPhones,
+  fetchSocialLinks,
+  fetchVisibleLanguages,
+  fetchTextOverrides,
+  type ContactPhone,
+  type SocialLink,
+  type SiteLanguage,
+} from '../lib/siteContentApi';
+
+const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
+  id: key,
+  key,
+  label: languageNames[key],
+  sort_order: i,
+}));
+
+const NAV_OVERRIDE_KEYS: Partial<Record<string, string>> = {
+  home: 'header.nav.home',
+  about: 'header.nav.about',
+  products: 'header.nav.products',
+  traceability: 'header.nav.traceability',
+  b2b: 'header.nav.partnership',
+};
 
 interface FooterProps {
   lang: Language;
@@ -24,11 +47,23 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
   const isRTL = lang === 'ar';
   const [phones, setPhones] = useState<ContactPhone[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchContactPhones().then(setPhones).catch(() => setPhones([]));
     fetchSocialLinks().then(setSocialLinks).catch(() => setSocialLinks([]));
+    fetchVisibleLanguages()
+      .then((rows) => setLanguages(rows.length > 0 ? rows : FALLBACK_LANGUAGES))
+      .catch(() => setLanguages(FALLBACK_LANGUAGES));
+    fetchTextOverrides().then(setOverrides).catch(() => setOverrides({}));
   }, []);
+
+  const navLabel = (key: string) => {
+    const overrideKey = NAV_OVERRIDE_KEYS[key];
+    const fallback = t.nav[key as keyof typeof t.nav] ?? key;
+    return (overrideKey && overrides[overrideKey]) || fallback;
+  };
 
   // "traceability" và "contact" trỏ tới trang/khối còn tồn tại thật;
   // "about" đi tới trang FounderStory chuẩn (không phải anchor #about đã bị
@@ -52,8 +87,6 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
     }
   };
 
-  const languages: Language[] = ['vi', 'en', 'zh', 'fr', 'ar'];
-
   return (
     <footer id="contact" className="bg-forest-950 text-white pt-20 pb-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
@@ -70,7 +103,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
             </div>
 
             <p className="text-forest-300 leading-relaxed mb-6">
-              {t.footer.brandDesc}
+              {overrides['footer.brandDesc'] ?? t.footer.brandDesc}
             </p>
 
             {/* Social Links */}
@@ -95,7 +128,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
 
           {/* Quick Links */}
           <div>
-            <h5 className="font-semibold mb-6 text-gold-400">{t.footer.quickLinks}</h5>
+            <h5 className="font-semibold mb-6 text-gold-400">{overrides['footer.quickLinks'] ?? t.footer.quickLinks}</h5>
             <ul className="space-y-3">
               {navItems.map((item) => (
                 <li key={item.key}>
@@ -103,7 +136,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
                     onClick={() => handleFooterNav(item.page, item.anchor)}
                     className="text-forest-300 hover:text-white transition-colors text-left"
                   >
-                    {t.nav[item.key as keyof typeof t.nav]}
+                    {navLabel(item.key)}
                   </button>
                 </li>
               ))}
@@ -112,7 +145,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
 
           {/* Contact */}
           <div>
-            <h5 className="font-semibold mb-6 text-gold-400">{t.footer.contact}</h5>
+            <h5 className="font-semibold mb-6 text-gold-400">{overrides['footer.contact'] ?? t.footer.contact}</h5>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
@@ -131,12 +164,6 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
               ))}
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
-                <a href="mailto:khanh@tasamngoclinh.com" className="text-forest-300 hover:text-white transition-colors">
-                  khanh@tasamngoclinh.com
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
                 <a href="mailto:duyenmoc08@gmail.com" className="text-forest-300 hover:text-white transition-colors">
                   duyenmoc08@gmail.com
                 </a>
@@ -146,19 +173,19 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
 
           {/* Language Selector */}
           <div>
-            <h5 className="font-semibold mb-6 text-gold-400">{t.footer.followUs}</h5>
+            <h5 className="font-semibold mb-6 text-gold-400">{overrides['footer.followUs'] ?? t.footer.followUs}</h5>
             <div className="grid grid-cols-2 gap-2">
               {languages.map((l) => (
                 <button
-                  key={l}
-                  onClick={() => onLangChange(l)}
+                  key={l.key}
+                  onClick={() => onLangChange(l.key as Language)}
                   className={`px-3 py-2 text-sm rounded-lg transition-all ${
-                    l === lang
+                    l.key === lang
                       ? 'bg-gold-400 text-forest-900 font-medium'
                       : 'bg-forest-800 text-forest-300 hover:bg-forest-700 hover:text-white'
                   }`}
                 >
-                  {languageNames[l]}
+                  {l.label}
                 </button>
               ))}
             </div>

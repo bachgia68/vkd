@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { ArrowLeft, Heart, MapPin, Leaf, ShieldCheck, Phone } from 'lucide-react';
 import type { Language } from '../i18n/translations';
+import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
 
 interface FounderStoryProps {
   lang: Language;
@@ -16,6 +18,13 @@ interface FounderStoryProps {
 export default function FounderStory({ lang, onNavigate }: FounderStoryProps) {
   const isVi = lang === 'vi';
   const isRTL = lang === 'ar';
+  const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
+
+  useEffect(() => {
+    fetchHeritageGalleryImages()
+      .then(setGalleryImages)
+      .catch(() => setGalleryImages([]));
+  }, []);
 
   return (
     <section className="bg-cream-50 min-h-screen" style={{ paddingTop: '6rem', paddingBottom: '6rem' }} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -127,21 +136,33 @@ export default function FounderStory({ lang, onNavigate }: FounderStoryProps) {
               </div>
             </div>
 
-            {/* Mục thị sở thị — ảnh vườn thật */}
-            <div className="not-prose my-10 rounded-2xl overflow-hidden shadow-elegant-lg">
-              <img
-                src="/assets/images/heritage-vuon-sam-1-bo.jpg"
-                alt="Vườn giống Sâm Ngọc Linh tại Trà Linh, Nam Trà My"
-                className="w-full aspect-video object-cover"
-              />
-              <div className="bg-forest-900 p-5 flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
-                <p className="text-cream-100 text-sm">
-                  Vườn giống thật tại Trà Linh, Nam Trà My — nơi Khánh trực tiếp chăm sóc từng luống
-                  sâm dưới tán rừng già hơn 10 năm qua.
-                </p>
+            {/* Mục thị sở thị — ảnh vườn thật, lấy từ heritage_gallery_images (cùng nguồn ảnh
+                với mục "Vườn Sâm Nguyên Sinh" ở trang chủ) */}
+            {galleryImages.length > 0 && (
+              <div className="not-prose my-10">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {galleryImages.slice(0, 3).map((photo) => (
+                    <div
+                      key={photo.id}
+                      className="aspect-square overflow-hidden rounded-2xl shadow-elegant"
+                    >
+                      <img
+                        src={photo.image_url}
+                        alt={(lang === 'vi' ? photo.alt_vi : photo.alt_en) || photo.alt_vi}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-start gap-3 mt-4">
+                  <MapPin className="w-5 h-5 text-gold-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-forest-600 text-sm">
+                    15°12'N 108°18'E, Trà Linh, Nam Trà My, Quảng Nam, Việt Nam
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="bg-forest-950 rounded-2xl p-8 md:p-10 my-10 not-prose">
               <p className="text-cream-100 text-lg italic leading-relaxed">

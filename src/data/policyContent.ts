@@ -52,7 +52,7 @@ const vi: Record<PolicyKey, PolicyContent> = {
       {
         heading: '5. Quyền của khách hàng',
         body: [
-          'Khách hàng có quyền yêu cầu xem, chỉnh sửa, hoặc xoá thông tin cá nhân đã cung cấp bằng cách liên hệ khanh@tasamngoclinh.com.',
+          'Khách hàng có quyền yêu cầu xem, chỉnh sửa, hoặc xoá thông tin cá nhân đã cung cấp bằng cách liên hệ duyenmoc08@gmail.com.',
         ],
       },
       {
@@ -77,7 +77,7 @@ const vi: Record<PolicyKey, PolicyContent> = {
         heading: '2. Thông tin đơn vị vận hành',
         body: [
           'TA — Vườn Sâm Ngọc Linh nhà Khánh, vùng trồng chuẩn GACP-WHO tại Trà Linh, Nam Trà My, Quảng Nam.',
-          'Thông tin đăng ký hộ kinh doanh/giấy phép kinh doanh chính thức: đang cập nhật, sẽ bổ sung tại đây khi hoàn tất thủ tục đăng ký. Mọi thắc mắc pháp lý xin liên hệ trực tiếp khanh@tasamngoclinh.com trong thời gian chờ cập nhật.',
+          'Thông tin đăng ký hộ kinh doanh/giấy phép kinh doanh chính thức: đang cập nhật, sẽ bổ sung tại đây khi hoàn tất thủ tục đăng ký. Mọi thắc mắc pháp lý xin liên hệ trực tiếp duyenmoc08@gmail.com trong thời gian chờ cập nhật.',
         ],
       },
       {
@@ -149,7 +149,7 @@ const vi: Record<PolicyKey, PolicyContent> = {
       {
         heading: '5. Sự cố khi giao hàng',
         body: [
-          'Nếu hàng bị thất lạc hoặc hư hỏng trong quá trình vận chuyển, khách hàng vui lòng liên hệ khanh@tasamngoclinh.com hoặc số Zalo/WhatsApp ở cuối trang trong vòng 48 giờ kể từ khi phát hiện để được hỗ trợ theo Chính Sách Đổi Trả & Hoàn Tiền.',
+          'Nếu hàng bị thất lạc hoặc hư hỏng trong quá trình vận chuyển, khách hàng vui lòng liên hệ duyenmoc08@gmail.com hoặc số Zalo/WhatsApp ở cuối trang trong vòng 48 giờ kể từ khi phát hiện để được hỗ trợ theo Chính Sách Đổi Trả & Hoàn Tiền.',
         ],
       },
     ],
@@ -173,7 +173,7 @@ const vi: Record<PolicyKey, PolicyContent> = {
       {
         heading: '3. Quy trình yêu cầu đổi trả',
         body: [
-          'Liên hệ khanh@tasamngoclinh.com hoặc Zalo/WhatsApp (thông tin ở cuối trang) trong vòng 7 ngày, kèm ảnh/video mở hàng làm bằng chứng. TA xác nhận tình trạng lỗi trong vòng 2 ngày làm việc và hướng dẫn gửi trả/đổi sản phẩm.',
+          'Liên hệ duyenmoc08@gmail.com hoặc Zalo/WhatsApp (thông tin ở cuối trang) trong vòng 7 ngày, kèm ảnh/video mở hàng làm bằng chứng. TA xác nhận tình trạng lỗi trong vòng 2 ngày làm việc và hướng dẫn gửi trả/đổi sản phẩm.',
         ],
       },
       {
@@ -218,7 +218,7 @@ const en: Record<PolicyKey, PolicyContent> = {
       {
         heading: '5. Your Rights',
         body: [
-          'You may request to view, correct, or delete your personal information by contacting khanh@tasamngoclinh.com.',
+          'You may request to view, correct, or delete your personal information by contacting duyenmoc08@gmail.com.',
         ],
       },
       {
@@ -243,7 +243,7 @@ const en: Record<PolicyKey, PolicyContent> = {
         heading: '2. Business Information',
         body: [
           'TA — Vườn Sâm Ngọc Linh nhà Khánh, GACP-WHO certified cultivation region in Tra Linh, Nam Tra My, Quang Nam, Vietnam.',
-          'Formal business registration details are being finalized and will be added here once complete. For any legal inquiries in the meantime, please contact khanh@tasamngoclinh.com directly.',
+          'Formal business registration details are being finalized and will be added here once complete. For any legal inquiries in the meantime, please contact duyenmoc08@gmail.com directly.',
         ],
       },
       {
@@ -315,7 +315,7 @@ const en: Record<PolicyKey, PolicyContent> = {
       {
         heading: '5. Delivery Issues',
         body: [
-          'If your order is lost or damaged in transit, please contact khanh@tasamngoclinh.com or the Zalo/WhatsApp number in the footer within 48 hours of discovery, per our Refund & Return Policy.',
+          'If your order is lost or damaged in transit, please contact duyenmoc08@gmail.com or the Zalo/WhatsApp number in the footer within 48 hours of discovery, per our Refund & Return Policy.',
         ],
       },
     ],
@@ -339,7 +339,7 @@ const en: Record<PolicyKey, PolicyContent> = {
       {
         heading: '3. Return Process',
         body: [
-          'Contact khanh@tasamngoclinh.com or Zalo/WhatsApp (footer) within 7 days with photos/video of the unboxing as evidence. TA will confirm the defect within 2 business days and provide return/exchange instructions.',
+          'Contact duyenmoc08@gmail.com or Zalo/WhatsApp (footer) within 7 days with photos/video of the unboxing as evidence. TA will confirm the defect within 2 business days and provide return/exchange instructions.',
         ],
       },
       {

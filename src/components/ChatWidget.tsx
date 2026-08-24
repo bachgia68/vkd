@@ -36,7 +36,7 @@ type NodeId = 'menu' | 'product_advice' | 'order_status' | 'shipping_policy' | '
 const FB_MESSENGER_URL = 'https://m.me/61592621322828';
 const HOTLINE_TEL = 'tel:+84984999309';
 const HOTLINE_DISPLAY = '(84) 984 999 309';
-const SUPPORT_EMAIL = 'lienhe@samngoclinh-ta.vn';
+const SUPPORT_EMAIL = 'duyenmoc08@gmail.com';
 
 const menuItems: { id: NodeId; icon: typeof ShoppingBag; vi: string; en: string }[] = [
   { id: 'product_advice', icon: ShoppingBag, vi: 'Tư vấn sản phẩm', en: 'Product advice' },
