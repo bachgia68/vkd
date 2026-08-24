@@ -64,7 +64,7 @@ export async function createProduct(input: {
   return throwIfError(res);
 }
 
-export async function updateProduct(id: string, patch: Partial<Pick<DbProduct, 'name_vi' | 'price_vnd' | 'active' | 'stock_qty' | 'category_id'>>) {
+export async function updateProduct(id: string, patch: Partial<Pick<DbProduct, 'name_vi' | 'price_vnd' | 'active' | 'stock_qty' | 'category_id' | 'image_url'>>) {
   const { error } = await supabase.from('products').update(patch).eq('id', id);
   if (error) throw new Error(error.message);
 }

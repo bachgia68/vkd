@@ -1,175 +1,144 @@
 import { useState, useEffect } from 'react';
-
-interface Product {
-  sku: string;
-  name: string;
-  slug: string;
-  price?: number;
-  description?: string;
-  image?: string;
-  category?: string;
-  hidden?: boolean;
-}
+import {
+  fetchProducts,
+  fetchProductCategories,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  type DbProduct,
+  type ProductCategory,
+} from '../adminApi';
 
 export default function ProductsManagePage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<DbProduct[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [form, setForm] = useState({
     sku: '',
-    name: '',
-    price: '',
-    description: '',
-    image: '',
-    category: 'Sâm Ngọc Linh'
+    name_vi: '',
+    price_vnd: '',
+    category_id: '',
+    image_url: '',
   });
-  const [editingSku, setEditingSku] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    fetch('/products-seo.json')
-      .then(r => r.json())
+  const load = () => {
+    fetchProducts()
       .then(setProducts)
-      .catch(err => setMessage('❌ Load products failed: ' + err.message));
-  }, []);
+      .catch((err) => setMessage('❌ Load products failed: ' + (err instanceof Error ? err.message : String(err))));
+    fetchProductCategories()
+      .then(setCategories)
+      .catch((err) => setMessage('❌ Load categories failed: ' + (err instanceof Error ? err.message : String(err))));
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  useEffect(load, []);
+
+  const resetForm = () => {
+    setForm({ sku: '', name_vi: '', price_vnd: '', category_id: '', image_url: '' });
+    setEditingId(null);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAddOrUpdate = async () => {
-    if (!form.sku || !form.name) {
-      setMessage('⚠️ SKU and Name required');
+    if (!form.sku || !form.name_vi) {
+      setMessage('⚠️ SKU và Tên sản phẩm là bắt buộc');
       return;
     }
 
     setLoading(true);
     try {
-      let newProducts = [...products];
+      const category_id = form.category_id ? Number(form.category_id) : null;
+      const price_vnd = form.price_vnd ? Number(form.price_vnd) : null;
 
-      if (editingSku) {
-        newProducts = newProducts.map(p =>
-          p.sku === editingSku
-            ? { ...p, ...form, price: form.price ? parseFloat(form.price) : undefined }
-            : p
-        );
+      if (editingId) {
+        await updateProduct(editingId, {
+          name_vi: form.name_vi,
+          price_vnd,
+          category_id,
+          image_url: form.image_url || null,
+        });
+        setMessage('✅ Đã cập nhật sản phẩm');
       } else {
-        const exists = products.find(p => p.sku === form.sku);
-        if (exists) {
-          setMessage('⚠️ SKU already exists');
+        if (!price_vnd) {
+          setMessage('⚠️ Giá là bắt buộc khi thêm sản phẩm mới');
           setLoading(false);
           return;
         }
-        newProducts.push({
+        const created = await createProduct({
           sku: form.sku,
-          name: form.name,
-          slug: form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          price: form.price ? parseFloat(form.price) : undefined,
-          description: form.description,
-          image: form.image,
-          category: form.category
+          name_vi: form.name_vi,
+          category_id,
+          price_vnd,
         });
+        if (form.image_url) {
+          await updateProduct(created.id, { image_url: form.image_url });
+        }
+        setMessage('✅ Đã thêm sản phẩm mới');
       }
 
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProducts)
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setProducts(newProducts);
-      setForm({ sku: '', name: '', price: '', description: '', image: '', category: 'Sâm Ngọc Linh' });
-      setEditingSku(null);
-      setMessage('✅ ' + (editingSku ? 'Updated' : 'Added') + ' successfully');
+      resetForm();
+      load();
     } catch (err) {
-      setMessage('❌ Error: ' + (err instanceof Error ? err.message : String(err)));
+      setMessage('❌ Lỗi: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = (product: DbProduct) => {
     setForm({
       sku: product.sku,
-      name: product.name,
-      price: product.price?.toString() || '',
-      description: product.description || '',
-      image: product.image || '',
-      category: product.category || 'Sâm Ngọc Linh'
+      name_vi: product.name_vi,
+      price_vnd: product.price_vnd?.toString() ?? '',
+      category_id: product.category_id?.toString() ?? '',
+      image_url: product.image_url ?? '',
     });
-    setEditingSku(product.sku);
+    setEditingId(product.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (sku: string) => {
-    if (!confirm(`Delete ${sku}?`)) return;
+  const handleDelete = async (product: DbProduct) => {
+    if (!window.confirm(`Xoá sản phẩm ${product.sku}?`)) return;
 
     setLoading(true);
     try {
-      const newProducts = products.filter(p => p.sku !== sku);
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProducts)
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setProducts(newProducts);
-      setMessage('✅ Deleted');
+      const res = await deleteProduct(product.id);
+      if (res.error) throw new Error(res.error);
+      setMessage('✅ Đã xoá sản phẩm');
+      load();
     } catch (err) {
-      setMessage('❌ Error: ' + (err instanceof Error ? err.message : String(err)));
+      setMessage('❌ Lỗi: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleHidden = async (sku: string) => {
-    const product = products.find(p => p.sku === sku);
-    if (!product) return;
-
-    const newProducts = products.map(p =>
-      p.sku === sku ? { ...p, hidden: !p.hidden } : p
-    );
-
+  const handleToggleActive = async (product: DbProduct) => {
     try {
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProducts)
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setProducts(newProducts);
-      setMessage('✅ Updated visibility');
+      await updateProduct(product.id, { active: !product.active });
+      setMessage('✅ Đã cập nhật trạng thái hiển thị');
+      load();
     } catch (err) {
-      setMessage('❌ Error: ' + (err instanceof Error ? err.message : String(err)));
+      setMessage('❌ Lỗi: ' + (err instanceof Error ? err.message : String(err)));
     }
   };
 
-  const handleMoveCategory = async (sku: string, newCategory: string) => {
-    const newProducts = products.map(p =>
-      p.sku === sku ? { ...p, category: newCategory } : p
-    );
-
+  const handleMoveCategory = async (product: DbProduct, newCategoryId: string) => {
     try {
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProducts)
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setProducts(newProducts);
-      setMessage(`✅ Moved ${sku} to ${newCategory}`);
+      await updateProduct(product.id, { category_id: newCategoryId ? Number(newCategoryId) : null });
+      setMessage(`✅ Đã chuyển ${product.sku} sang danh mục khác`);
+      load();
     } catch (err) {
-      setMessage('❌ Error: ' + (err instanceof Error ? err.message : String(err)));
+      setMessage('❌ Lỗi: ' + (err instanceof Error ? err.message : String(err)));
     }
   };
+
+  const categoryName = (id: number | null) => categories.find((c) => c.id === id)?.name_vi ?? '—';
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -185,7 +154,7 @@ export default function ProductsManagePage() {
         {/* Form */}
         <div className="lg:col-span-1 bg-white rounded-lg shadow-md p-6 h-fit">
           <h2 className="text-lg font-semibold mb-4">
-            {editingSku ? `✏️ Sửa: ${editingSku}` : '➕ Thêm Sản Phẩm'}
+            {editingId ? `✏️ Sửa: ${form.sku}` : '➕ Thêm Sản Phẩm'}
           </h2>
 
           <div className="space-y-4">
@@ -194,10 +163,10 @@ export default function ProductsManagePage() {
               <input
                 type="text"
                 name="sku"
-                placeholder="VKD-001"
+                placeholder="TA-001"
                 value={form.sku}
                 onChange={handleInputChange}
-                disabled={!!editingSku}
+                disabled={!!editingId}
                 className="w-full px-3 py-2 border rounded-lg text-sm disabled:bg-gray-100"
               />
             </div>
@@ -206,9 +175,9 @@ export default function ProductsManagePage() {
               <label className="block text-sm font-medium mb-1">Tên sản phẩm *</label>
               <input
                 type="text"
-                name="name"
+                name="name_vi"
                 placeholder="Sâm Ngọc Linh..."
-                value={form.name}
+                value={form.name_vi}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
@@ -218,50 +187,38 @@ export default function ProductsManagePage() {
               <label className="block text-sm font-medium mb-1">Giá (VND)</label>
               <input
                 type="number"
-                name="price"
+                name="price_vnd"
                 placeholder="500000"
-                value={form.price}
+                value={form.price_vnd}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">URL Hình</label>
+              <label className="block text-sm font-medium mb-1">URL ảnh sản phẩm</label>
               <input
                 type="text"
-                name="image"
+                name="image_url"
                 placeholder="https://..."
-                value={form.image}
+                value={form.image_url}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Mô tả</label>
-              <textarea
-                name="description"
-                placeholder="Nhập mô tả sản phẩm..."
-                value={form.description}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-                rows={3}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Danh mục</label>
               <select
-                name="category"
-                value={form.category}
+                name="category_id"
+                value={form.category_id}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               >
-                <option>Sâm Ngọc Linh</option>
-                <option>Sâm Nguyên Bản</option>
-                <option>Sâm Xấy Khô</option>
-                <option>Sâm Khác</option>
+                <option value="">— Chưa phân loại —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name_vi}</option>
+                ))}
               </select>
             </div>
 
@@ -271,21 +228,11 @@ export default function ProductsManagePage() {
                 disabled={loading}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg disabled:opacity-50 text-sm"
               >
-                {loading ? '⏳...' : editingSku ? '💾 Cập Nhật' : '➕ Thêm'}
+                {loading ? '⏳...' : editingId ? '💾 Cập Nhật' : '➕ Thêm'}
               </button>
-              {editingSku && (
+              {editingId && (
                 <button
-                  onClick={() => {
-                    setEditingSku(null);
-                    setForm({
-                      sku: '',
-                      name: '',
-                      price: '',
-                      description: '',
-                      image: '',
-                      category: 'Sâm Ngọc Linh'
-                    });
-                  }}
+                  onClick={resetForm}
                   className="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-medium py-2 rounded-lg text-sm"
                 >
                   ✕ Huỷ
@@ -302,18 +249,18 @@ export default function ProductsManagePage() {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {products.map(product => (
+            {products.map((product) => (
               <div
-                key={product.sku}
+                key={product.id}
                 className={`border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition ${
-                  product.hidden ? 'opacity-50 bg-gray-100' : 'bg-white'
+                  !product.active ? 'opacity-50 bg-gray-100' : 'bg-white'
                 }`}
               >
-                {product.image && (
+                {product.image_url && (
                   <div className="h-32 bg-gray-200 overflow-hidden flex items-center justify-center">
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={product.image_url}
+                      alt={product.name_vi}
                       className="h-full w-full object-cover"
                     />
                   </div>
@@ -321,12 +268,14 @@ export default function ProductsManagePage() {
 
                 <div className="p-3 space-y-2">
                   <div className="text-xs font-medium text-gray-500">{product.sku}</div>
-                  <div className="font-semibold text-sm line-clamp-2">{product.name}</div>
-                  {product.price && (
+                  <div className="font-semibold text-sm line-clamp-2">{product.name_vi}</div>
+                  {product.price_vnd != null && (
                     <div className="text-sm text-green-600 font-medium">
-                      {product.price.toLocaleString()}₫
+                      {product.price_vnd.toLocaleString()}₫
                     </div>
                   )}
+                  <div className="text-xs text-gray-400">Tồn kho: {product.stock_qty}</div>
+                  <div className="text-xs text-gray-400">Danh mục hiện tại: {categoryName(product.category_id)}</div>
 
                   <div className="space-y-2 pt-2">
                     <div className="flex gap-2">
@@ -337,27 +286,27 @@ export default function ProductsManagePage() {
                         ✏️ Sửa
                       </button>
                       <button
-                        onClick={() => handleToggleHidden(product.sku)}
+                        onClick={() => handleToggleActive(product)}
                         className="flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-medium py-1 rounded text-xs"
                       >
-                        {product.hidden ? '👁️' : '🚫'}
+                        {!product.active ? '👁️' : '🚫'}
                       </button>
                       <button
-                        onClick={() => handleDelete(product.sku)}
+                        onClick={() => handleDelete(product)}
                         className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 font-medium py-1 rounded text-xs"
                       >
                         🗑️
                       </button>
                     </div>
                     <select
-                      value={product.category || 'Sâm Ngọc Linh'}
-                      onChange={(e) => handleMoveCategory(product.sku, e.target.value)}
+                      value={product.category_id ?? ''}
+                      onChange={(e) => handleMoveCategory(product, e.target.value)}
                       className="w-full px-2 py-1 border border-purple-300 rounded text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 cursor-pointer"
                     >
-                      <option value="Sâm Ngọc Linh">📍 Sâm Ngọc Linh</option>
-                      <option value="Sâm Nguyên Bản">📍 Sâm Nguyên Bản</option>
-                      <option value="Sâm Xấy Khô">📍 Sâm Xấy Khô</option>
-                      <option value="Sâm Khác">📍 Sâm Khác</option>
+                      <option value="">📍 Chưa phân loại</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>📍 {c.name_vi}</option>
+                      ))}
                     </select>
                   </div>
                 </div>

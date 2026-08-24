@@ -37,14 +37,14 @@ export default function AdminLayout() {
             <Leaf className="w-5 h-5 text-gold-400" />
             <span className="font-display text-sm tracking-wide">TA — Control Portal</span>
           </div>
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1 overflow-x-auto max-w-[70vw] scrollbar-thin">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm transition-colors ${
+                  `flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm transition-colors flex-shrink-0 whitespace-nowrap ${
                     isActive ? 'bg-gold-400/15 text-gold-300' : 'text-cream-200/70 hover:bg-white/5 hover:text-cream-50'
                   }`
                 }
