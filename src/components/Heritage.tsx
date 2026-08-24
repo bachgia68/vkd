@@ -4,6 +4,7 @@ import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
+import Reveal from './ui/Reveal';
 
 interface HeritageProps {
   lang: Language;
@@ -192,24 +193,23 @@ export default function Heritage({ lang }: HeritageProps) {
             const isGold = pillar.accent === 'gold';
 
             return (
-              <div
-                key={index}
-                className="group bg-white rounded-2xl p-8 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1"
-              >
-                <div
-                  className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 ${
-                    isGold ? 'bg-gold-100' : 'bg-forest-100'
-                  }`}
-                >
-                  <Icon className={`w-7 h-7 ${isGold ? 'text-gold-600' : 'text-forest-700'}`} />
+              <Reveal key={index} delayMs={index * 120}>
+                <div className="group bg-white rounded-2xl p-8 shadow-elegant hover:shadow-elegant-lg transition-all duration-500 hover:-translate-y-1">
+                  <div
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 ${
+                      isGold ? 'bg-gold-100' : 'bg-forest-100'
+                    }`}
+                  >
+                    <Icon className={`w-7 h-7 ${isGold ? 'text-gold-600' : 'text-forest-700'}`} />
+                  </div>
+                  <h3 className="font-display text-xl font-semibold text-forest-900 mb-3">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-forest-600 leading-relaxed text-sm">
+                    {pillar.desc}
+                  </p>
                 </div>
-                <h3 className="font-display text-xl font-semibold text-forest-900 mb-3">
-                  {pillar.title}
-                </h3>
-                <p className="text-forest-600 leading-relaxed text-sm">
-                  {pillar.desc}
-                </p>
-              </div>
+              </Reveal>
             );
           })}
         </div>
