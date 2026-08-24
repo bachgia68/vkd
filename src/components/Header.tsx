@@ -23,6 +23,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
   const [isAboutMenuOpen, setIsAboutMenuOpen] = useState(false);
+  const [isMobileProductMenuOpen, setIsMobileProductMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -317,7 +318,57 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
           <div className="lg:hidden absolute top-full left-0 right-0 bg-cream-50 shadow-elegant-lg animate-fade-in-down rounded-b-2xl">
             <div className="container-wide py-4 space-y-2">
               {navItems.map((item) =>
-                item.key === 'about' ? (
+                item.key === 'products' ? (
+                  <div key={item.key} className="space-y-1">
+                    <button
+                      onClick={() => setIsMobileProductMenuOpen((v) => !v)}
+                      className="w-full flex items-center justify-between px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                    >
+                      <span>{t.nav.products}</span>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${isMobileProductMenuOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                    {isMobileProductMenuOpen && (
+                      <div className="pl-4 space-y-3 pb-2">
+                        <button
+                          onClick={() => handleNav('catalog')}
+                          className="block w-full text-left px-4 py-2 text-sm font-semibold text-forest-900 hover:bg-forest-50 rounded-lg transition-colors"
+                        >
+                          {lang === 'vi' ? 'Xem tất cả sản phẩm' : 'View all products'}
+                        </button>
+                        <div>
+                          <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                            {lang === 'vi' ? 'Theo loại sản phẩm' : 'By product type'}
+                          </p>
+                          {samProductTypes.map((pt) => (
+                            <button
+                              key={pt.id}
+                              onClick={() => handleNav(`catalog?type=${pt.id}`)}
+                              className="block w-full text-left px-4 py-2 text-sm text-forest-700 hover:bg-forest-50 rounded-lg transition-colors"
+                            >
+                              {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                            </button>
+                          ))}
+                        </div>
+                        <div>
+                          <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                            {lang === 'vi' ? 'Đặc Sản Việt Nam' : 'Vietnamese Specialties'}
+                          </p>
+                          {dacSanProductTypes.map((pt) => (
+                            <button
+                              key={pt.id}
+                              onClick={() => handleNav(`catalog?type=${pt.id}`)}
+                              className="block w-full text-left px-4 py-2 text-sm text-forest-700 hover:bg-forest-50 rounded-lg transition-colors"
+                            >
+                              {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : item.key === 'about' ? (
                   <div key={item.key} className="space-y-1">
                     <button
                       onClick={() => handleNav('about-story')}

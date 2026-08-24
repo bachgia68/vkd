@@ -333,12 +333,6 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                   </span>
                 </div>
               )}
-              {!product.displayOnly18Plus && (
-                <div className="absolute top-5 right-5 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur">
-                  <ShieldCheck className="w-3.5 h-3.5 text-forest-600" />
-                  <span className="text-[11px] font-semibold text-forest-700">{ui.authenticBadge}</span>
-                </div>
-              )}
             </div>
           </div>
 
