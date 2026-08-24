@@ -18,6 +18,7 @@ export interface Product {
   name: string;
   price: number | null;
   image: string;
+  hidden?: boolean; // an khoi trang khach (thieu anh that/chua san sang) - khong xoa data
   productType: ProductTypeId;
   healthGoal: HealthGoal;
   audiences: TargetAudience[];
@@ -39,7 +40,7 @@ export interface Product {
   nameFr?: string; descriptionFr?: string;
 }
 
-export const products: Product[] = [
+const allProducts: Product[] = [
   {
     "sku": "VKD-001",
     "supplierId": "vkd",
@@ -1979,18 +1980,22 @@ export const products: Product[] = [
   {"sku":"SK5-010","supplierId":"samk5","category":"sam-ngoc-linh","slug":"dich-chiet-sam-ngoc-linh-k5-hop-5-chai","name":"Dịch Chiết Sâm Ngọc Linh - Hộp 5 Chai","price":null,"image":"https://samkontumk5.com/uploads/source/san-pham/sam-ngoc-linh/dich-chiet-sam-ngoc-linh-kon-tum-k5-hop-5-chai-(chai-50ml)-1.jpg","productType":"tra-nuoc-uong-sam","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Dịch chiết sâm Ngọc Linh - Hộp 5 chai 50ml","sourceUrl":"https://samkontumk5.com/vi/san-pham"}, // supplier-guard-allow
   {"sku":"SK5-011","supplierId":"samk5","category":"sam-ngoc-linh","slug":"dich-chiet-sam-ngoc-linh-k5-hop-10-chai","name":"Dịch Chiết Sâm Ngọc Linh - Hộp 10 Chai","price":null,"image":"https://samkontumk5.com/uploads/source/san-pham/sam-ngoc-linh/dich-chiet-sam-ngoc-linh-kon-tum-k5-hop-10-chai-3.jpg","productType":"tra-nuoc-uong-sam","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Dịch chiết sâm Ngọc Linh - Hộp 10 chai 50ml","sourceUrl":"https://samkontumk5.com/vi/san-pham"}, // supplier-guard-allow
   {"sku":"TN-001","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-001","name":"Sâm Ngọc Linh Tươi","price":1500000,"image":"https://s3.samngoclinhtruongnhan.com/images/products/15343e64-037d-4561-acc5-f1e066129dd1.jpeg","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh tươi từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-002","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-002","name":"Sâm Ngọc Linh Khô","price":1200000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh khô từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-003","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-003","name":"Sâm Ngọc Linh Xấy","price":1000000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh xấy từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-004","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-004","name":"Cao Sâm Ngọc Linh","price":800000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Cao Sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-002","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-002","name":"Sâm Ngọc Linh Khô","price":1200000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh khô từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-003","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-003","name":"Sâm Ngọc Linh Xấy","price":1000000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh xấy từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-004","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-004","name":"Cao Sâm Ngọc Linh","price":800000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Cao Sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
   {"sku":"TN-005","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-005","name":"Nước Sâm Ngọc Linh","price":500000,"image":"https://s3.samngoclinhtruongnhan.com/images/products/93fb4255-544e-4be2-bdd7-ea07d661d1f6.jpeg","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Nước chiết sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-006","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-006","name":"Sâm Ngọc Linh Ngâm Rượu","price":2000000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":false,"description":"Sâm Ngọc Linh ngâm rượu từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-007","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-007","name":"Sâm Ngọc Linh Mật Ong","price":900000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh mật ong từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-008","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-008","name":"Gây Sâm Ngọc Linh","price":600000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Gây sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-009","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-009","name":"Sâm Ngọc Linh Hạt","price":700000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh hạt từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-006","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-006","name":"Sâm Ngọc Linh Ngâm Rượu","price":2000000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":false,"description":"Sâm Ngọc Linh ngâm rượu từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-007","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-007","name":"Sâm Ngọc Linh Mật Ong","price":900000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh mật ong từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-008","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-008","name":"Gây Sâm Ngọc Linh","price":600000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Gây sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
+  {"sku":"TN-009","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-009","name":"Sâm Ngọc Linh Hạt","price":700000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh hạt từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
   {"sku":"TN-010","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-010","name":"Trà Sâm Ngọc Linh","price":400000,"image":"https://s3.samngoclinhtruongnhan.com/images/products/dc13989d-a53f-4b77-a327-f0a9737eb163.jpeg","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Trà sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
   {"sku":"TN-011","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-011","name":"Viên Sâm Ngọc Linh","price":550000,"image":"https://s3.samngoclinhtruongnhan.com/images/products/2c0a835c-4dcd-4de2-8bb0-70b42928104c.png","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Viên sâm Ngọc Linh từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"},
-  {"sku":"TN-012","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-012","name":"Sâm Ngọc Linh Bột","price":650000,"image":"","productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh bột từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"}
+  {"sku":"TN-012","supplierId":"truongnhan","category":"sam-ngoc-linh","slug":"tn-012","name":"Sâm Ngọc Linh Bột","price":650000,"image":"","hidden":true,"productType":"sam-cu-tuoi-kho","healthGoal":"immunity","audiences":["family"],"familySafe":true,"description":"Sâm Ngọc Linh bột từ Trường Nhân","sourceUrl":"https://samngoclinhtruongnhan.vn/san-pham"}
 ];
+
+// Loc san pham hidden=true (thieu anh that/chua san sang) khoi toan bo trang
+// khach hang - moi noi import { products } deu tu dong loc, khong can sua rieng.
+export const products: Product[] = allProducts.filter((p) => !p.hidden);
 
 export function getProductsByType(id: ProductTypeId): Product[] {
   return products.filter((p) => p.productType === id);

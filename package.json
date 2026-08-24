@@ -8,6 +8,7 @@
     "prebuild": "node scripts/check-no-supplier-names.js && npx tsx scripts/generate-product-slugs.mjs",
     "build": "tsc -b && vite build",
     "check:brand": "node scripts/check-no-supplier-names.js",
+    "check:design": "node scripts/check-no-decorative-gradient.js",
     "lint": "oxlint",
     "preview": "vite preview",
     "payos:confirm-webhook": "node scripts/confirm-payos-webhook.mjs"
