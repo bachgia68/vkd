@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { z } from 'zod';
 import {
   fetchProducts,
   fetchProductCategories,
@@ -8,6 +9,31 @@ import {
   type DbProduct,
   type ProductCategory,
 } from '../adminApi';
+
+// Validate form.* (chuoi tho tu input) truoc khi ep kieu/goi API — trước day
+// chi kiem tra sku/name_vi khong rong, gia chi bat buoc khi tao moi, khong
+// chan duoc SKU co khoang trang, gia am/qua lon, hay ky tu la trong SKU.
+const productFormSchema = z.object({
+  sku: z
+    .string()
+    .trim()
+    .min(1, 'SKU là bắt buộc')
+    .regex(/^[A-Za-z0-9-]+$/, 'SKU chỉ gồm chữ, số và dấu gạch ngang'),
+  name_vi: z.string().trim().min(2, 'Tên sản phẩm tối thiểu 2 ký tự').max(200, 'Tên sản phẩm quá dài'),
+  price_vnd: z
+    .string()
+    .trim()
+    .refine((v) => v === '' || (Number(v) > 0 && Number(v) < 1_000_000_000), {
+      message: 'Giá phải lớn hơn 0 và nhỏ hơn 1 tỷ đ',
+    }),
+  category_id: z.string(),
+  image_url: z
+    .string()
+    .trim()
+    .refine((v) => v === '' || /^https?:\/\//.test(v), { message: 'URL ảnh phải bắt đầu bằng http(s)://' }),
+});
+
+type ProductFormErrors = Partial<Record<keyof typeof productFormSchema.shape, string>>;
 
 export default function ProductsManagePage() {
   const [products, setProducts] = useState<DbProduct[]>([]);
@@ -22,6 +48,7 @@ export default function ProductsManagePage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<ProductFormErrors>({});
 
   const load = () => {
     fetchProducts()
@@ -37,18 +64,33 @@ export default function ProductsManagePage() {
   const resetForm = () => {
     setForm({ sku: '', name_vi: '', price_vnd: '', category_id: '', image_url: '' });
     setEditingId(null);
+    setFieldErrors({});
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => (prev[name as keyof ProductFormErrors] ? { ...prev, [name]: undefined } : prev));
   };
 
   const handleAddOrUpdate = async () => {
-    if (!form.sku || !form.name_vi) {
-      setMessage('⚠️ SKU và Tên sản phẩm là bắt buộc');
+    const result = productFormSchema.safeParse(form);
+    if (!result.success) {
+      const errors: ProductFormErrors = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof ProductFormErrors;
+        if (!errors[key]) errors[key] = issue.message;
+      }
+      setFieldErrors(errors);
+      setMessage('⚠️ Vui lòng sửa các lỗi trong biểu mẫu');
       return;
     }
+    if (!editingId && !form.price_vnd) {
+      setFieldErrors({ price_vnd: 'Giá là bắt buộc khi thêm sản phẩm mới' });
+      setMessage('⚠️ Giá là bắt buộc khi thêm sản phẩm mới');
+      return;
+    }
+    setFieldErrors({});
 
     setLoading(true);
     try {
@@ -167,8 +209,9 @@ export default function ProductsManagePage() {
                 value={form.sku}
                 onChange={handleInputChange}
                 disabled={!!editingId}
-                className="w-full px-3 py-2 border rounded-lg text-sm disabled:bg-gray-100"
+                className={`w-full px-3 py-2 border rounded-lg text-sm disabled:bg-gray-100 ${fieldErrors.sku ? 'border-red-400' : ''}`}
               />
+              {fieldErrors.sku && <p className="text-xs text-red-600 mt-1">{fieldErrors.sku}</p>}
             </div>
 
             <div>
@@ -179,8 +222,9 @@ export default function ProductsManagePage() {
                 placeholder="Sâm Ngọc Linh..."
                 value={form.name_vi}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className={`w-full px-3 py-2 border rounded-lg text-sm ${fieldErrors.name_vi ? 'border-red-400' : ''}`}
               />
+              {fieldErrors.name_vi && <p className="text-xs text-red-600 mt-1">{fieldErrors.name_vi}</p>}
             </div>
 
             <div>
@@ -191,8 +235,9 @@ export default function ProductsManagePage() {
                 placeholder="500000"
                 value={form.price_vnd}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className={`w-full px-3 py-2 border rounded-lg text-sm ${fieldErrors.price_vnd ? 'border-red-400' : ''}`}
               />
+              {fieldErrors.price_vnd && <p className="text-xs text-red-600 mt-1">{fieldErrors.price_vnd}</p>}
             </div>
 
             <div>
@@ -203,8 +248,9 @@ export default function ProductsManagePage() {
                 placeholder="https://..."
                 value={form.image_url}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className={`w-full px-3 py-2 border rounded-lg text-sm ${fieldErrors.image_url ? 'border-red-400' : ''}`}
               />
+              {fieldErrors.image_url && <p className="text-xs text-red-600 mt-1">{fieldErrors.image_url}</p>}
             </div>
 
             <div>
