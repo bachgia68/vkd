@@ -4,6 +4,8 @@ import { fmt } from '../adminMockData';
 import { fetchAgents, createAgent, updateAgent, type Agent } from '../adminApi';
 import { Button } from '../../components/ui/button';
 import { Badge, type BadgeProps } from '../../components/ui/badge';
+import { Input } from '../../components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
 
 const TIER_TONE: Record<Agent['tier'], BadgeProps['tone']> = {
   'Cấp 1': 'neutral',
@@ -136,21 +138,20 @@ export default function AgentsPage() {
         </div>
       )}
 
-      {showAddModal && (
-        <AddAgentModal
-          onClose={() => setShowAddModal(false)}
-          onCreate={async (input) => {
-            try {
-              await createAgent(input);
-              setShowAddModal(false);
-              showToast('Đã thêm đại lý mới');
-              load();
-            } catch (e) {
-              showToast(e instanceof Error ? e.message : 'Lỗi thêm đại lý');
-            }
-          }}
-        />
-      )}
+      <AddAgentModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onCreate={async (input) => {
+          try {
+            await createAgent(input);
+            setShowAddModal(false);
+            showToast('Đã thêm đại lý mới');
+            load();
+          } catch (e) {
+            showToast(e instanceof Error ? e.message : 'Lỗi thêm đại lý');
+          }
+        }}
+      />
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-forest-950 text-cream-50 px-5 py-3 rounded-xl text-sm shadow-elegant-lg z-50 border border-gold-400/30">
@@ -162,9 +163,11 @@ export default function AgentsPage() {
 }
 
 function AddAgentModal({
+  open,
   onClose,
   onCreate,
 }: {
+  open: boolean;
   onClose: () => void;
   onCreate: (input: { code: string; name: string; tier: Agent['tier']; discount_pct: number }) => void;
 }) {
@@ -176,21 +179,22 @@ function AddAgentModal({
   const canSubmit = code.trim() && name.trim();
 
   return (
-    <div className="fixed inset-0 bg-forest-950/50 z-50 flex items-center justify-center p-5" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-        <h3 className="font-display text-lg text-forest-900 mb-4">Thêm đại lý / affiliate mới</h3>
+    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Thêm đại lý / affiliate mới</DialogTitle>
+        </DialogHeader>
         <div className="space-y-3">
-          <input
+          <Input
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="Mã đại lý (VD: DL-050)"
-            className="w-full border border-forest-100 rounded-lg px-3 py-2.5 text-sm font-mono"
+            className="font-mono"
           />
-          <input
+          <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Tên đối tác"
-            className="w-full border border-forest-100 rounded-lg px-3 py-2.5 text-sm"
           />
           <div className="grid grid-cols-2 gap-3">
             <select value={tier} onChange={(e) => setTier(e.target.value as Agent['tier'])} className="border border-forest-100 rounded-lg px-3 py-2.5 text-sm">
@@ -198,12 +202,12 @@ function AddAgentModal({
               <option value="Cấp 2">Cấp 2</option>
               <option value="Affiliate KOL/KOC">Affiliate KOL/KOC</option>
             </select>
-            <input
+            <Input
               value={discountPct}
               onChange={(e) => setDiscountPct(e.target.value)}
               placeholder="% Chiết khấu"
               inputMode="numeric"
-              className="border border-forest-100 rounded-lg px-3 py-2.5 text-sm font-mono"
+              className="font-mono"
             />
           </div>
         </div>
@@ -220,7 +224,7 @@ function AddAgentModal({
             Lưu đại lý
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
