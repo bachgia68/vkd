@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ngân hàng nội dung TA</title>
+<meta name="description" content="160 bài Blog &amp; Nghiên cứu chuẩn SEO cho VKD Group / TA — 8 chủ đề, giọng thương hiệu Quiet Luxury.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F6F2E9; --surface:#EDE7D8; --surface-2:#E4DCC7; --border:#D8CDAE;
+  --text:#1B1E1B; --muted:#5B5A4E;
+  --accent:#0B2F1D; --accent-ink:#F6F2E9;
+  --accent2:#9C7A2E; --accent2-ink:#F6F2E9;
+  --link:#0B2F1D;
+  --shadow: 0 1px 0 rgba(27,30,27,0.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#071A11; --surface:#0B2F1D; --surface-2:#123826; --border:#1F4530;
+    --text:#F6F2E9; --muted:#9FB0A2;
+    --accent:#E4C568; --accent-ink:#071A11;
+    --accent2:#C9A646; --accent2-ink:#071A11;
+    --link:#E4C568;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#071A11; --surface:#0B2F1D; --surface-2:#123826; --border:#1F4530;
+  --text:#F6F2E9; --muted:#9FB0A2;
+  --accent:#E4C568; --accent-ink:#071A11;
+  --accent2:#C9A646; --accent2-ink:#071A11;
+  --link:#E4C568;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Inter", -apple-system, "Segoe UI", sans-serif;
+  font-size:17px; line-height:1.7;
+}
+a{color:var(--link);}
+a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+.site-header{border-bottom:1px solid var(--border); padding:22px 0;}
+.site-header .wrap{display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+.brand{font-family:"Playfair Display", Georgia, serif; font-weight:600; font-size:1.05rem; letter-spacing:0.01em; text-decoration:none; color:var(--text);}
+.brand .mark{color:var(--accent); font-weight:700;}
+.crumbs{font-family:"JetBrains Mono", ui-monospace, monospace; font-size:0.72rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--muted);}
+.crumbs a{color:var(--muted); text-decoration:none; border-bottom:1px dotted var(--muted);}
+.crumbs a:hover{color:var(--accent); border-color:var(--accent);}
+
+.layout{display:grid; grid-template-columns:280px minmax(0,1fr); gap:48px; align-items:start; padding:40px 0 96px;}
+@media (max-width:900px){ .layout{grid-template-columns:1fr;} }
+
+.toc{position:sticky; top:24px; background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:20px 18px; max-height:calc(100vh - 48px); overflow-y:auto;}
+@media (max-width:900px){ .toc{position:static; max-height:none;} }
+.toc h2{font-family:"Playfair Display",serif; font-size:0.95rem; margin:0 0 4px; font-weight:600;}
+.toc .toc-sub{font-family:"JetBrains Mono",monospace; font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 14px;}
+.toc ol{list-style:none; margin:0; padding:0; counter-reset:item;}
+.toc li{margin:0 0 3px;}
+.toc a{display:block; text-decoration:none; color:var(--text); font-size:0.86rem; line-height:1.35; padding:5px 8px; border-radius:2px; border-left:2px solid transparent;}
+.toc a:hover{background:var(--surface-2); border-left-color:var(--accent);}
+.toc .kind-label{font-family:"JetBrains Mono",monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin:14px 0 6px; padding-left:8px;}
+.toc details summary{cursor:pointer; font-family:"JetBrains Mono",monospace; font-size:0.72rem; color:var(--muted); padding:4px 8px; list-style:none;}
+.toc details summary::-webkit-details-marker{display:none;}
+.toc details summary::before{content:"▸ "; color:var(--accent);}
+.toc details[open] summary::before{content:"▾ ";}
+
+.hero{padding:8px 0 6px;}
+.hero .eyebrow{font-family:"JetBrains Mono",monospace; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent);}
+.hero h1{font-family:"Playfair Display",serif; font-weight:600; font-size:clamp(1.9rem,4vw,2.7rem); margin:0.3em 0 0.35em; text-wrap:balance;}
+.hero p.lede{color:var(--muted); font-size:1.05rem; max-width:60ch; margin:0 0 0.4em;}
+.hero .count{font-family:"JetBrains Mono",monospace; font-size:0.78rem; color:var(--muted);}
+
+.divider{border:none; border-top:1px solid var(--border); border-bottom:1px solid var(--border); height:3px; background:var(--bg); margin:52px 0;}
+
+article.piece{scroll-margin-top:20px; margin-bottom:8px;}
+.label{font-family:"JetBrains Mono",monospace; font-size:0.74rem; line-height:1.55; background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:14px 16px; margin:22px 0 28px; color:var(--muted);}
+.label .row{display:flex; gap:8px;}
+.label .k{flex:0 0 auto; text-transform:uppercase; letter-spacing:0.04em; color:var(--text); opacity:0.55;}
+.label .v{color:var(--text);}
+.chip{display:inline-block; font-family:"JetBrains Mono",monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.06em; padding:2px 8px; border-radius:20px; margin-right:8px;}
+.chip.blog{background:var(--accent); color:var(--accent-ink);}
+.chip.research{background:var(--accent2); color:var(--accent2-ink);}
+
+.piece h2.title{font-family:"Playfair Display",serif; font-weight:600; font-size:clamp(1.4rem,2.6vw,1.9rem); margin:0 0 10px; text-wrap:balance;}
+.piece .num{color:var(--muted); font-family:"JetBrains Mono",monospace; font-size:0.8rem; font-weight:400; margin-right:10px;}
+.piece h3{font-family:"Playfair Display",serif; font-weight:600; font-size:1.22rem; margin:1.7em 0 0.55em;}
+.piece h4{font-family:"Playfair Display",serif; font-weight:600; font-size:1.05rem; margin:1.4em 0 0.5em; color:var(--text);}
+.piece p{margin:0 0 1.05em; max-width:68ch;}
+.piece ul{margin:0 0 1.2em; padding-left:1.3em; max-width:68ch;}
+.piece li{margin:0 0 0.5em;}
+.piece strong{color:var(--text);}
+.table-wrap{overflow-x:auto; margin:0 0 1.3em;}
+.piece table{border-collapse:collapse; font-size:0.92rem; min-width:100%;}
+.piece th, .piece td{border:1px solid var(--border); padding:8px 12px; text-align:left; font-variant-numeric:tabular-nums;}
+.piece th{background:var(--surface); font-family:"JetBrains Mono",monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.03em;}
+
+.back-top{font-family:"JetBrains Mono",monospace; font-size:0.72rem; color:var(--muted); text-decoration:none; border-bottom:1px dotted var(--muted);}
+
+.site-footer{border-top:1px solid var(--border); padding:28px 0 60px; color:var(--muted); font-size:0.85rem;}
+
+@media (prefers-reduced-motion:no-preference){
+  article.piece{animation:fade-in 0.4s ease-out both;}
+  @keyframes fade-in{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+}
+
+.index-hero{padding:56px 0 20px;}
+.index-hero .eyebrow{font-family:"JetBrains Mono",monospace; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent);}
+.index-hero h1{font-family:"Playfair Display",serif; font-weight:600; font-size:clamp(2.1rem,5vw,3.2rem); margin:0.3em 0 0.3em; text-wrap:balance; max-width:16ch;}
+.index-hero p{color:var(--muted); font-size:1.08rem; max-width:62ch;}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; padding:24px 0 80px;}
+.card{display:flex; flex-direction:column; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:2px; padding:22px 20px; text-decoration:none; color:var(--text); transition:border-color 0.15s ease, transform 0.15s ease;}
+.card:hover{border-color:var(--accent); transform:translateY(-2px);}
+.card-num{font-family:"JetBrains Mono",monospace; font-size:0.8rem; color:var(--accent);}
+.card h2{font-family:"Playfair Display",serif; font-weight:600; font-size:1.28rem; margin:0.1em 0 0.15em; text-wrap:balance;}
+.card p{color:var(--muted); font-size:0.92rem; margin:0; flex:1;}
+.card-meta{font-family:"JetBrains Mono",monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted); border-top:1px solid var(--border); padding-top:10px; margin-top:4px;}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="mark">TA</span> · Ngân hàng nội dung</a>
+    <div class="crumbs">VKD Group · Sâm Ngọc Linh Việt Nam</div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="index-hero">
+    <div class="eyebrow">Bản thảo nội bộ · 8 chủ đề · 160 bài</div>
+    <h1>Ngân hàng nội dung TA</h1>
+    <p>Mỗi chủ đề gồm 10 bài Blog và 10 bài Nghiên cứu, chuẩn SEO (title tag, meta description, slug, chuyên mục), viết theo giọng thương hiệu Quiet Luxury của VKD Group — dữ liệu khoa học thay cho mỹ từ.</p>
+  </div>
+  <div class="grid">
+    
+<a class="card" href="mr2.html">
+  <span class="card-num">01</span>
+  <h2>Majonoside-R2 (MR2)</h2>
+  <p>Hoạt chất định danh khoa học của sâm Ngọc Linh — cơ chế, kiểm định, phân biệt thật giả.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="nang-luong.html">
+  <span class="card-num">02</span>
+  <h2>Năng Lượng</h2>
+  <p>Cơ chế năng lượng bền từ saponin sâm Ngọc Linh, so với caffeine và các nguồn tăng lực khác.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="giam-stress-tap-trung.html">
+  <span class="card-num">03</span>
+  <h2>Giảm Stress &amp; Tập Trung</h2>
+  <p>Phản ứng của cơ thể trước căng thẳng, giấc ngủ, và vai trò của sâm Ngọc Linh trong công việc trí óc.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="mien-dich-truong-tho.html">
+  <span class="card-num">04</span>
+  <h2>Miễn Dịch &amp; Trường Thọ</h2>
+  <p>Góc nhìn khoa học về hệ miễn dịch, lão hóa tế bào và chăm sóc sức khỏe chủ động.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="tre-hoa.html">
+  <span class="card-num">05</span>
+  <h2>Trẻ Hóa</h2>
+  <p>Chống oxy hóa, làn da, và logic khoa học đằng sau Bộ Trẻ Hóa Combo.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="san-pham-ta.html">
+  <span class="card-num">06</span>
+  <h2>Giới Thiệu Sản Phẩm TA</h2>
+  <p>PanaxX, Rượu Sâm Ngọc Linh, Nước Cốt Sâm Ngọc Linh, Bộ Trẻ Hóa Combo, Tổ Yến Sâm.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="cuoc-song-nui.html">
+  <span class="card-num">07</span>
+  <h2>Cuộc Sống Trên Núi Ngọc Linh</h2>
+  <p>Nhịp sống của người giữ vườn sâm và đồng bào Xơ Đăng trên dãy Ngọc Linh.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+
+<a class="card" href="kham-pha-nui.html">
+  <span class="card-num">08</span>
+  <h2>Khám Phá Núi Ngọc Linh</h2>
+  <p>Địa lý, khí hậu, hành trình lên vườn sâm — điều kiện hiếm có làm nên sâm Ngọc Linh thật.</p>
+  <span class="card-meta">10 Blog · 10 Nghiên cứu</span>
+</a>
+  </div>
+</div>
+<footer class="site-footer"><div class="wrap">Bản nháp nội dung nội bộ — VKD Group / TA (Tập đoàn Y Dược Sâm Ngọc Linh Việt Nam). Chưa xuất bản lên CMS hay mạng xã hội. Vui lòng xác nhận trước khi đăng.</div></footer>
+</body>
+</html>
