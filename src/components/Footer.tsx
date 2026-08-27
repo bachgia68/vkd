@@ -196,7 +196,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
         <div className="border-t border-forest-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-forest-400 text-sm">
-              {t.footer.copyright}
+              {overrides['footer.copyright'] || t.footer.copyright}
             </p>
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-forest-400 text-sm">
@@ -204,25 +204,25 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
                 onClick={() => handleFooterNav('policy-privacy')}
                 className="hover:text-white transition-colors"
               >
-                {t.policies.privacy}
+                {overrides['policies.privacy'] || t.policies.privacy}
               </button>
               <button
                 onClick={() => handleFooterNav('policy-terms')}
                 className="hover:text-white transition-colors"
               >
-                {t.policies.terms}
+                {overrides['policies.terms'] || t.policies.terms}
               </button>
               <button
                 onClick={() => handleFooterNav('policy-shipping')}
                 className="hover:text-white transition-colors"
               >
-                {t.policies.shipping}
+                {overrides['policies.shipping'] || t.policies.shipping}
               </button>
               <button
                 onClick={() => handleFooterNav('policy-refund')}
                 className="hover:text-white transition-colors"
               >
-                {t.policies.refund}
+                {overrides['policies.refund'] || t.policies.refund}
               </button>
             </div>
           </div>

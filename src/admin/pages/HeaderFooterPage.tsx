@@ -44,6 +44,11 @@ const FIELDS: FieldDef[] = [
   { key: 'footer.email', label: 'Email liên hệ (Footer)', placeholder: translations.vi.footer.email },
   { key: 'footer.address', label: 'Địa chỉ (Footer)', placeholder: translations.vi.footer.address, textarea: true },
   { key: 'footer.phone', label: 'Zalo/WhatsApp text (Footer)', placeholder: translations.vi.footer.phone },
+  { key: 'footer.copyright', label: 'Dòng bản quyền (cuối Footer)', placeholder: translations.vi.footer.copyright },
+  { key: 'policies.privacy', label: 'Link chính sách — Bảo Mật', placeholder: translations.vi.policies.privacy },
+  { key: 'policies.terms', label: 'Link chính sách — Điều Khoản', placeholder: translations.vi.policies.terms },
+  { key: 'policies.shipping', label: 'Link chính sách — Vận Chuyển', placeholder: translations.vi.policies.shipping },
+  { key: 'policies.refund', label: 'Link chính sách — Đổi Trả', placeholder: translations.vi.policies.refund },
 ];
 
 export default function HeaderFooterPage() {
