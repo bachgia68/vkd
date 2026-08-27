@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection, NavItem } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection, NavItem, BlogCategory, ProductMenuItem, PolicyPageContent } from '../lib/siteContentApi';
 import type { DbOrder, DbRevenueDaily } from './types/admin';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
@@ -1394,4 +1394,87 @@ export async function createPageSection(section: {
 }): Promise<void> {
   const { error } = await supabase.from('page_sections').insert({ ...section, visible: true });
   if (error) throw new Error(error.message);
+}
+
+// ---------- Blog Categories admin ----------
+
+export async function fetchAllBlogCategories(): Promise<BlogCategory[]> {
+  const { data, error } = await supabase.from('blog_categories').select('*').order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function createBlogCategory(slug: string, name_vi: string, sort_order: number): Promise<void> {
+  const { error } = await supabase.from('blog_categories').insert({ slug, name_vi, sort_order, visible: true });
+  if (error) throw new Error(error.message);
+}
+
+export async function updateBlogCategory(id: string, updates: Partial<Pick<BlogCategory, 'name_vi' | 'slug' | 'visible' | 'sort_order'>>): Promise<void> {
+  const { error } = await supabase.from('blog_categories').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteBlogCategory(id: string): Promise<void> {
+  const { error } = await supabase.from('blog_categories').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function reorderBlogCategories(ids: string[]): Promise<void> {
+  await Promise.all(ids.map((id, i) => supabase.from('blog_categories').update({ sort_order: i }).eq('id', id)));
+}
+
+export async function assignBlogPostCategory(postId: string, categoryId: string | null): Promise<void> {
+  const { error } = await supabase.from('blog_posts').update({ category_id: categoryId }).eq('id', postId);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Product Menu Items admin ----------
+
+export async function fetchAllProductMenuItems(): Promise<ProductMenuItem[]> {
+  const { data, error } = await supabase.from('product_menu_items').select('*').order('section').order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function createProductMenuItem(item: Omit<ProductMenuItem, 'id'>): Promise<void> {
+  const { error } = await supabase.from('product_menu_items').insert(item);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateProductMenuItem(id: string, updates: Partial<Omit<ProductMenuItem, 'id'>>): Promise<void> {
+  const { error } = await supabase.from('product_menu_items').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteProductMenuItem(id: string): Promise<void> {
+  const { error } = await supabase.from('product_menu_items').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Policy Pages admin ----------
+
+export async function fetchAllPolicyPages(): Promise<PolicyPageContent[]> {
+  const { data, error } = await supabase.from('policy_pages').select('*').order('policy_key');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function updatePolicyPage(id: string, updates: Partial<Pick<PolicyPageContent, 'title_vi' | 'body_vi' | 'updated_label'>>): Promise<void> {
+  const { error } = await supabase.from('policy_pages').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Site Settings admin ----------
+
+export async function upsertSiteSetting(key: string, value: string): Promise<void> {
+  const { error } = await supabase.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  if (error) throw new Error(error.message);
+}
+
+export async function fetchAllSiteSettings(): Promise<Record<string, string>> {
+  const { data, error } = await supabase.from('site_settings').select('key, value');
+  if (error) throw new Error(error.message);
+  const map: Record<string, string> = {};
+  (data ?? []).forEach((r) => { map[r.key] = r.value; });
+  return map;
 }

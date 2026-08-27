@@ -350,3 +350,78 @@ export async function fetchPageSections(pageKey: string): Promise<PageSection[]>
   if (error) throw new Error(error.message);
   return data ?? [];
 }
+
+// ---------- Blog Categories ----------
+
+export interface BlogCategory {
+  id: string;
+  slug: string;
+  name_vi: string;
+  sort_order: number;
+  visible: boolean;
+}
+
+export async function fetchBlogCategories(): Promise<BlogCategory[]> {
+  const { data, error } = await supabase
+    .from('blog_categories')
+    .select('id, slug, name_vi, sort_order, visible')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// ---------- Product Menu Items ----------
+
+export interface ProductMenuItem {
+  id: string;
+  section: string;
+  slug: string;
+  label_vi: string;
+  label_en: string;
+  href: string;
+  sort_order: number;
+  visible: boolean;
+}
+
+export async function fetchProductMenuItems(): Promise<ProductMenuItem[]> {
+  const { data, error } = await supabase
+    .from('product_menu_items')
+    .select('id, section, slug, label_vi, label_en, href, sort_order, visible')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// ---------- Policy Pages ----------
+
+export interface PolicyPageContent {
+  id: string;
+  policy_key: string;
+  title_vi: string;
+  body_vi: string;
+  updated_label: string;
+}
+
+export async function fetchPolicyPage(policyKey: string): Promise<PolicyPageContent | null> {
+  const { data, error } = await supabase
+    .from('policy_pages')
+    .select('id, policy_key, title_vi, body_vi, updated_label')
+    .eq('policy_key', policyKey)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+// ---------- Site Settings ----------
+
+export async function fetchSiteSetting(key: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('value')
+    .eq('key', key)
+    .maybeSingle();
+  if (error) return null;
+  return data?.value ?? null;
+}
