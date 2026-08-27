@@ -301,3 +301,31 @@ export async function fetchProductOverrides(): Promise<ProductOverride[]> {
   if (error) throw new Error(error.message);
   return data ?? [];
 }
+
+// ---------- Page Sections (admin-editable blocks for homepage/subpages) ----------
+
+export interface PageSection {
+  id: string;
+  page_key: string;
+  block_type: string;
+  sort_order: number;
+  title_vi: string | null;
+  content_vi: string | null;
+  image_url: string | null;
+  cta_text: string | null;
+  cta_url: string | null;
+  visible: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function fetchPageSections(pageKey: string): Promise<PageSection[]> {
+  const { data, error } = await supabase
+    .from('page_sections')
+    .select('*')
+    .eq('page_key', pageKey)
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}

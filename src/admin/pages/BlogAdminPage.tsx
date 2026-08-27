@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchAllBlogPostsForAdmin } from '../../lib/siteContentApi';
-import { updateBlogPost } from '../adminApi';
+import { updateBlogPostMeta } from '../adminApi';
 import type { BlogPost } from '../../lib/siteContentApi';
 
 export default function BlogAdminPage() {
@@ -19,7 +19,7 @@ export default function BlogAdminPage() {
   const handleToggle = async (post: BlogPost, field: 'featured' | 'pinned' | 'published', value: boolean) => {
     setSaving(post.id);
     try {
-      await updateBlogPost(post.id, { [field]: value });
+      await updateBlogPostMeta(post.id, { [field]: value });
       setPosts(posts.map((p) => p.id === post.id ? { ...p, [field]: value } : p));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Lỗi lưu');
@@ -32,7 +32,7 @@ export default function BlogAdminPage() {
     if (author === (post.author ?? 'TA')) return;
     setSaving(post.id);
     try {
-      await updateBlogPost(post.id, { author });
+      await updateBlogPostMeta(post.id, { author });
       setPosts(posts.map((p) => p.id === post.id ? { ...p, author } : p));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Lỗi lưu');

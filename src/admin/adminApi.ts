@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection } from '../lib/siteContentApi';
 import type { DbOrder, DbRevenueDaily } from './types/admin';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
@@ -1299,20 +1299,69 @@ export async function fetchDashboardKpis(): Promise<DashboardKpis> {
 }
 
 
-export async function updateBlogPost(
+export async function updateBlogPostMeta(
   id: string,
   updates: {
     author?: string;
     featured?: boolean;
     pinned?: boolean;
     published?: boolean;
-    title?: string;
-    excerpt?: string;
   }
 ): Promise<void> {
   const { error } = await supabase
     .from('blog_posts')
     .update(updates)
     .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Page Sections admin API ----------
+
+export async function fetchPageSectionsForAdmin(pageKey: string): Promise<PageSection[]> {
+  const { data, error } = await supabase
+    .from('page_sections')
+    .select('*')
+    .eq('page_key', pageKey)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function updatePageSection(
+  id: string,
+  updates: Partial<Pick<PageSection, 'title_vi' | 'content_vi' | 'image_url' | 'cta_text' | 'cta_url' | 'visible' | 'block_type'>>
+): Promise<void> {
+  const { error } = await supabase
+    .from('page_sections')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deletePageSection(id: string): Promise<void> {
+  const { error } = await supabase.from('page_sections').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function reorderPageSections(ids: string[]): Promise<void> {
+  const updates = ids.map((id, i) =>
+    supabase.from('page_sections').update({ sort_order: i, updated_at: new Date().toISOString() }).eq('id', id)
+  );
+  const results = await Promise.all(updates);
+  const failed = results.find((r) => r.error);
+  if (failed?.error) throw new Error(failed.error.message);
+}
+
+export async function createPageSection(section: {
+  page_key: string;
+  block_type: string;
+  sort_order: number;
+  title_vi?: string;
+  content_vi?: string;
+  image_url?: string;
+  cta_text?: string;
+  cta_url?: string;
+}): Promise<void> {
+  const { error } = await supabase.from('page_sections').insert({ ...section, visible: true });
   if (error) throw new Error(error.message);
 }

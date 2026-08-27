@@ -22,6 +22,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/header-footer', end: false, label: 'Header & Footer', icon: Type },
   { to: '/gate-vkd-control-2026/homepage-text', end: false, label: 'Nội Dung Trang Chủ', icon: Type },
   { to: '/gate-vkd-control-2026/blog-admin', end: false, label: 'Blog Admin', icon: FileText },
+  { to: '/gate-vkd-control-2026/page-builder', end: false, label: 'Page Builder', icon: LayoutGrid },
   { to: '/gate-vkd-control-2026/crm-erp', end: false, label: 'CRM & ERP', icon: Users },
   { to: '/gate-vkd-control-2026/loyalty', end: false, label: 'TA Elite Club', icon: Crown },
   { to: '/gate-vkd-control-2026/inventory-qr', end: false, label: 'Kho hàng & QR', icon: Warehouse },
