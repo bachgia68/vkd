@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext';
 import { productTypes } from '../data/productTypes';
 import { healthGoalLabels } from '../data/mockData';
 import type { HealthGoal } from '../data/mockData';
-import { fetchVisibleLanguages, fetchTextOverrides, fetchVisibleNavItems, type SiteLanguage, type NavItem } from '../lib/siteContentApi';
+import { fetchVisibleLanguages, fetchTextOverrides, fetchVisibleNavItems, fetchProductMenuItems, type SiteLanguage, type NavItem, type ProductMenuItem } from '../lib/siteContentApi';
 
 const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
   id: key,
@@ -45,6 +45,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
   const [dbNavItems, setDbNavItems] = useState<NavItem[]>([]);
+  const [dbProductMenu, setDbProductMenu] = useState<ProductMenuItem[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,6 +65,9 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
     fetchVisibleNavItems()
       .then(setDbNavItems)
       .catch(() => setDbNavItems([]));
+    fetchProductMenuItems()
+      .then(setDbProductMenu)
+      .catch(() => setDbProductMenu([]));
   }, []);
 
   const navLabel = (key: string) => {
@@ -89,6 +93,12 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
 
   const navItemLabel = (item: { key: string; label_vi: string | null }) =>
     item.label_vi || navLabel(item.key);
+
+  // Product dropdown — DB-driven with hardcoded fallback
+  const dbSam = dbProductMenu.filter((i) => i.section === 'sam');
+  const dbDacSan = dbProductMenu.filter((i) => i.section === 'dac_san');
+  const dbHealth = dbProductMenu.filter((i) => i.section === 'health');
+  const useDbMenu = dbProductMenu.length > 0;
 
   const samProductTypes = productTypes.filter((pt) => pt.group === 'sam' && pt.id !== 'set-qua-tang');
   const dacSanProductTypes = productTypes.filter((pt) => pt.group === 'dac-san');
@@ -158,57 +168,97 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                     {isProductMenuOpen && (
                       <div className="absolute top-full left-0 pt-2 w-[640px] z-50">
                         <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-5 px-2 grid grid-cols-3 gap-2">
-                          <div>
-                            <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
-                              {lang === 'vi' ? 'Theo loại sản phẩm' : 'By product type'}
-                            </p>
-                            {samProductTypes.map((pt) => (
-                              <button
-                                key={pt.id}
-                                onClick={() => {
-                                  setIsProductMenuOpen(false);
-                                  onNavigate(`catalog?type=${pt.id}`);
-                                }}
-                                className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
-                              >
-                                {lang === 'vi' ? pt.labelVi : pt.labelEn}
-                              </button>
-                            ))}
-                          </div>
-                          <div>
-                            <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
-                              {lang === 'vi' ? 'Đặc Sản Việt Nam' : 'Vietnamese Specialties'}
-                            </p>
-                            {dacSanProductTypes.map((pt) => (
-                              <button
-                                key={pt.id}
-                                onClick={() => {
-                                  setIsProductMenuOpen(false);
-                                  onNavigate(`catalog?type=${pt.id}`);
-                                }}
-                                className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
-                              >
-                                {lang === 'vi' ? pt.labelVi : pt.labelEn}
-                              </button>
-                            ))}
-                          </div>
-                          <div>
-                            <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
-                              {lang === 'vi' ? 'Theo mục tiêu' : 'By goal'}
-                            </p>
-                            {healthGoals.map((g) => (
-                              <button
-                                key={g}
-                                onClick={() => {
-                                  setIsProductMenuOpen(false);
-                                  onNavigate(`catalog?goal=${g}`);
-                                }}
-                                className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
-                              >
-                                {lang === 'vi' ? healthGoalLabels[g].vi : healthGoalLabels[g].en}
-                              </button>
-                            ))}
-                          </div>
+                          {useDbMenu ? (
+                            <>
+                              <div>
+                                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                                  {lang === 'vi' ? 'Theo loại sản phẩm' : 'By product type'}
+                                </p>
+                                {dbSam.map((item) => (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => { setIsProductMenuOpen(false); onNavigate(item.href); }}
+                                    className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                                  >
+                                    {lang === 'vi' ? item.label_vi : (item.label_en || item.label_vi)}
+                                  </button>
+                                ))}
+                              </div>
+                              <div>
+                                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                                  {lang === 'vi' ? 'Đặc Sản Việt Nam' : 'Vietnamese Specialties'}
+                                </p>
+                                {dbDacSan.map((item) => (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => { setIsProductMenuOpen(false); onNavigate(item.href); }}
+                                    className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                                  >
+                                    {lang === 'vi' ? item.label_vi : (item.label_en || item.label_vi)}
+                                  </button>
+                                ))}
+                              </div>
+                              <div>
+                                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                                  {lang === 'vi' ? 'Theo mục tiêu' : 'By goal'}
+                                </p>
+                                {dbHealth.map((item) => (
+                                  <button
+                                    key={item.id}
+                                    onClick={() => { setIsProductMenuOpen(false); onNavigate(item.href); }}
+                                    className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                                  >
+                                    {lang === 'vi' ? item.label_vi : (item.label_en || item.label_vi)}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                                  {lang === 'vi' ? 'Theo loại sản phẩm' : 'By product type'}
+                                </p>
+                                {samProductTypes.map((pt) => (
+                                  <button
+                                    key={pt.id}
+                                    onClick={() => { setIsProductMenuOpen(false); onNavigate(`catalog?type=${pt.id}`); }}
+                                    className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                                  >
+                                    {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                                  </button>
+                                ))}
+                              </div>
+                              <div>
+                                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                                  {lang === 'vi' ? 'Đặc Sản Việt Nam' : 'Vietnamese Specialties'}
+                                </p>
+                                {dacSanProductTypes.map((pt) => (
+                                  <button
+                                    key={pt.id}
+                                    onClick={() => { setIsProductMenuOpen(false); onNavigate(`catalog?type=${pt.id}`); }}
+                                    className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                                  >
+                                    {lang === 'vi' ? pt.labelVi : pt.labelEn}
+                                  </button>
+                                ))}
+                              </div>
+                              <div>
+                                <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-forest-400">
+                                  {lang === 'vi' ? 'Theo mục tiêu' : 'By goal'}
+                                </p>
+                                {healthGoals.map((g) => (
+                                  <button
+                                    key={g}
+                                    onClick={() => { setIsProductMenuOpen(false); onNavigate(`catalog?goal=${g}`); }}
+                                    className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                                  >
+                                    {lang === 'vi' ? healthGoalLabels[g].vi : healthGoalLabels[g].en}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     )}

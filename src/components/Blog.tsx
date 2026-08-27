@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, Clock, ChevronRight } from 'lucide-react';
-import { fetchBlogPosts, type BlogPost } from '../lib/siteContentApi';
+import { fetchBlogPosts, fetchBlogCategories, fetchSiteSetting, type BlogPost, type BlogCategory } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface BlogProps {
@@ -189,28 +189,38 @@ function setPageInUrl(p: number) {
 
 export default function Blog({ onNavigate }: BlogProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [selectedCat, setSelectedCat] = useState<string>('all');
+  const [postsPerPage, setPostsPerPage] = useState(9);
   const [page, setPage] = useState(() => getPageFromUrl());
-  const POSTS_PER_PAGE = 12;
 
   useEffect(() => {
     fetchBlogPosts().then(setPosts).catch(() => setPosts([]));
+    fetchBlogCategories().then(setCategories).catch(() => {});
+    fetchSiteSetting('posts_per_page').then((v) => {
+      if (v) { const n = parseInt(v, 10); if (!isNaN(n) && n > 2) setPostsPerPage(n); }
+    }).catch(() => {});
   }, []);
 
   if (posts.length === 0) return null;
 
   const [hero, ...rest] = posts;
-  // Full blog page: hiện tất cả với pagination (12/page)
-  // Homepage: hiện chỉ 6 bài (+ hero = 7 tổng) không pagination
   const isFullPage = window.location.pathname === '/blog';
-  const postsToShow = isFullPage ? rest : rest.slice(0, 6);
+
+  // Category filter — only on full /blog page
+  const filteredRest = (isFullPage && selectedCat !== 'all')
+    ? rest.filter((p) => p.category_id === selectedCat)
+    : rest;
+
+  const postsToShow = isFullPage ? filteredRest : rest.slice(0, 6);
 
   // Pagination for full page
   let gridPosts = postsToShow;
   let totalPages = 1;
-  if (isFullPage && rest.length > POSTS_PER_PAGE) {
-    totalPages = Math.ceil(rest.length / POSTS_PER_PAGE);
-    const start = (page - 1) * POSTS_PER_PAGE;
-    gridPosts = rest.slice(start, start + POSTS_PER_PAGE);
+  if (isFullPage && postsToShow.length > postsPerPage) {
+    totalPages = Math.ceil(postsToShow.length / postsPerPage);
+    const start = (page - 1) * postsPerPage;
+    gridPosts = postsToShow.slice(start, start + postsPerPage);
   }
 
   // Carousel "Bài Viết Nổi Bật" — dùng lại data đã fetch, N bài mới nhất sau hero
@@ -241,6 +251,35 @@ export default function Blog({ onNavigate }: BlogProps) {
             </a>
           )}
         </div>
+
+        {/* Category filter tabs — chỉ hiện trên /blog đầy đủ khi có categories từ DB */}
+        {isFullPage && categories.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            <button
+              onClick={() => { setSelectedCat('all'); setPage(1); setPageInUrl(1); }}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                selectedCat === 'all'
+                  ? 'bg-forest-700 text-white'
+                  : 'bg-white border border-cream-300 text-forest-600 hover:border-forest-400 hover:text-forest-900'
+              }`}
+            >
+              Tất cả
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => { setSelectedCat(cat.id); setPage(1); setPageInUrl(1); }}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  selectedCat === cat.id
+                    ? 'bg-forest-700 text-white'
+                    : 'bg-white border border-cream-300 text-forest-600 hover:border-forest-400 hover:text-forest-900'
+                }`}
+              >
+                {cat.name_vi}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Hero post */}
         <div className="mb-10">
