@@ -149,7 +149,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
-                <span className="text-forest-300">{t.footer.address}</span>
+                <span className="text-forest-300">{overrides['footer.address'] || t.footer.address}</span>
               </li>
               {phones.map((phone) => (
                 <li key={phone.id} className="flex items-center gap-3">
@@ -164,8 +164,8 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
               ))}
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
-                <a href="mailto:duyenmoc08@gmail.com" className="text-forest-300 hover:text-white transition-colors">
-                  duyenmoc08@gmail.com
+                <a href={`mailto:${overrides['footer.email'] || t.footer.email}`} className="text-forest-300 hover:text-white transition-colors">
+                  {overrides['footer.email'] || t.footer.email}
                 </a>
               </li>
             </ul>

@@ -1,6 +1,7 @@
 import { MapPin, Check } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 
 interface AboutProps {
   lang: Language;
@@ -10,6 +11,7 @@ interface AboutProps {
 export default function About({ lang, onNavigate }: AboutProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'about');
 
   const region = { name: t.about.region2Name, desc: t.about.region2Desc, coords: '15°12\'N 108°18\'E' };
 
@@ -38,16 +40,22 @@ export default function About({ lang, onNavigate }: AboutProps) {
             </div>
 
             <h2 className="font-display text-display-sm md:text-display-md text-forest-900">
-              {t.about.title}
-              {t.about.titleHighlight && (
+              {cms?.title_vi || t.about.title}
+              {!cms?.title_vi && t.about.titleHighlight && (
                 <span className="text-gradient-primary block mt-2">{t.about.titleHighlight}</span>
               )}
             </h2>
 
             <div className="space-y-4 text-forest-600 leading-relaxed">
-              <p className="text-lg">{t.about.description1}</p>
-              <p>{t.about.description2}</p>
-              <p>{t.about.description3}</p>
+              {cms?.content_vi ? (
+                <p className="text-lg">{cms.content_vi}</p>
+              ) : (
+                <>
+                  <p className="text-lg">{t.about.description1}</p>
+                  <p>{t.about.description2}</p>
+                  <p>{t.about.description3}</p>
+                </>
+              )}
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">

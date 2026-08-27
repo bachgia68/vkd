@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection, NavItem } from '../lib/siteContentApi';
 import type { DbOrder, DbRevenueDaily } from './types/admin';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
@@ -1313,6 +1313,36 @@ export async function updateBlogPostMeta(
     .update(updates)
     .eq('id', id);
   if (error) throw new Error(error.message);
+}
+
+// ---------- Nav Items admin API ----------
+
+export async function fetchAllNavItems(): Promise<NavItem[]> {
+  const { data, error } = await supabase
+    .from('nav_items')
+    .select('id, key, label_vi, href, sort_order, visible')
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function updateNavItem(id: string, updates: Partial<Pick<NavItem, 'label_vi' | 'href' | 'visible' | 'sort_order'>>): Promise<void> {
+  const { error } = await supabase.from('nav_items').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function createNavItem(item: { key: string; label_vi: string; href: string; sort_order: number }): Promise<void> {
+  const { error } = await supabase.from('nav_items').insert({ ...item, visible: true });
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteNavItem(id: string): Promise<void> {
+  const { error } = await supabase.from('nav_items').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function reorderNavItems(ids: string[]): Promise<void> {
+  await Promise.all(ids.map((id, i) => supabase.from('nav_items').update({ sort_order: i }).eq('id', id)));
 }
 
 // ---------- Page Sections admin API ----------

@@ -19,6 +19,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/field-videos', end: false, label: 'Video Thực Địa', icon: Clapperboard },
   { to: '/gate-vkd-control-2026/site-sections', end: false, label: 'Quản lý Trang', icon: Eye },
   { to: '/gate-vkd-control-2026/languages', end: false, label: 'Ngôn ngữ', icon: Languages },
+  { to: '/gate-vkd-control-2026/nav-items', end: false, label: 'Menu Điều Hướng', icon: Menu },
   { to: '/gate-vkd-control-2026/header-footer', end: false, label: 'Header & Footer', icon: Type },
   { to: '/gate-vkd-control-2026/homepage-text', end: false, label: 'Nội Dung Trang Chủ', icon: Type },
   { to: '/gate-vkd-control-2026/blog-admin', end: false, label: 'Blog Admin', icon: FileText },

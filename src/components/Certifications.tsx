@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface CertificationsProps {
@@ -57,6 +58,7 @@ const certDesc: Record<Language, string> = {
 export default function Certifications({ lang }: CertificationsProps) {
   const t = translations[lang];
   const names = certNames[lang];
+  const cms = usePageSection('home', 'certifications');
   const [preview, setPreview] = useState<{ src: string; name: string } | null>(null);
 
   const certifications = [
@@ -75,9 +77,9 @@ export default function Certifications({ lang }: CertificationsProps) {
         {/* Header */}
         <div className="text-center mb-12">
           <h3 className="font-display text-3xl md:text-4xl uppercase tracking-wide text-forest-900 mb-3">
-            {t.certifications.title}
+            {cms?.title_vi || t.certifications.title}
           </h3>
-          <p className="text-forest-500">{t.certifications.subtitle}</p>
+          <p className="text-forest-500">{cms?.content_vi || t.certifications.subtitle}</p>
         </div>
 
         {/* Certifications Carousel — real scanned certificates, logo-style layout */}

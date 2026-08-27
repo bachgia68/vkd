@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Building2, TrendingUp, Package, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 import PartnerRegisterModal from './PartnerRegisterModal';
 import type { B2BLeadType } from '../lib/siteContentApi';
 
@@ -12,6 +13,7 @@ interface B2BProps {
 export default function B2B({ lang }: B2BProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'b2b');
   const [openType, setOpenType] = useState<B2BLeadType | null>(null);
 
   const partnershipTypes: { icon: typeof Building2; title: string; desc: string; color: string; type: B2BLeadType }[] = [
@@ -51,10 +53,10 @@ export default function B2B({ lang }: B2BProps) {
           </div>
 
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {t.b2b.title}
+            {cms?.title_vi || t.b2b.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {t.b2b.subtitle}
+            {cms?.content_vi || t.b2b.subtitle}
           </p>
         </div>
 

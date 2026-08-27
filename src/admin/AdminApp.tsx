@@ -35,6 +35,7 @@ import HeaderFooterPage from './pages/HeaderFooterPage';
 import HomepageTextPage from './pages/HomepageTextPage';
 import BlogAdminPage from './pages/BlogAdminPage';
 import PageBuilderPage from './pages/PageBuilderPage';
+import NavItemsPage from './pages/NavItemsPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -72,6 +73,7 @@ export default function AdminApp() {
           <Route path="homepage-text" element={<HomepageTextPage />} />
           <Route path="blog-admin" element={<BlogAdminPage />} />
           <Route path="page-builder" element={<PageBuilderPage />} />
+          <Route path="nav-items" element={<NavItemsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

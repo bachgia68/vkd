@@ -3,6 +3,7 @@ import { MapPin, Clock, Phone, ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import { fetchSiteAddresses, type SiteAddress } from '../lib/siteContentApi';
+import { usePageSection } from '../lib/usePageSection';
 
 interface ShowroomsProps {
   lang: Language;
@@ -11,6 +12,7 @@ interface ShowroomsProps {
 export default function Showrooms({ lang }: ShowroomsProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'showrooms');
   const [locations, setLocations] = useState<SiteAddress[]>([]);
 
   useEffect(() => {
@@ -29,10 +31,10 @@ export default function Showrooms({ lang }: ShowroomsProps) {
             </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {t.showrooms.title}
+            {cms?.title_vi || t.showrooms.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {t.showrooms.subtitle}
+            {cms?.content_vi || t.showrooms.subtitle}
           </p>
         </div>
 

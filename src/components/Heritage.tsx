@@ -3,6 +3,7 @@ import { FlaskConical, Building2, Microscope, Check, X, MapPin } from 'lucide-re
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
+import { usePageSection } from '../lib/usePageSection';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 import Reveal from './ui/Reveal';
 
@@ -13,7 +14,9 @@ interface HeritageProps {
 export default function Heritage({ lang }: HeritageProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'heritage');
   const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchHeritageGalleryImages()
@@ -21,23 +24,37 @@ export default function Heritage({ lang }: HeritageProps) {
       .catch(() => setGalleryImages([]));
   }, []);
 
+  useEffect(() => {
+    import('../admin/adminApi').then(({ fetchAllTextOverrides }) =>
+      fetchAllTextOverrides()
+        .then((rows) => {
+          const map: Record<string, string> = {};
+          rows.forEach((r) => { map[r.key] = r.value_vi; });
+          setOverrides(map);
+        })
+        .catch(() => {})
+    );
+  }, []);
+
+  const o = (key: string, fallback: string) => overrides[key] || fallback;
+
   const pillars = [
     {
       icon: Building2,
-      title: t.heritage.scaleTitle,
-      desc: t.heritage.scaleDesc,
+      title: o('heritage.pillar1.title', t.heritage.scaleTitle),
+      desc: o('heritage.pillar1.desc', t.heritage.scaleDesc),
       accent: 'forest',
     },
     {
       icon: Microscope,
-      title: t.heritage.authorityTitle,
-      desc: t.heritage.authorityDesc,
+      title: o('heritage.pillar2.title', t.heritage.authorityTitle),
+      desc: o('heritage.pillar2.desc', t.heritage.authorityDesc),
       accent: 'gold',
     },
     {
       icon: FlaskConical,
-      title: t.heritage.saponinTitle,
-      desc: t.heritage.saponinDesc,
+      title: o('heritage.pillar3.title', t.heritage.saponinTitle),
+      desc: o('heritage.pillar3.desc', t.heritage.saponinDesc),
       accent: 'forest',
     },
   ];
@@ -54,10 +71,10 @@ export default function Heritage({ lang }: HeritageProps) {
             </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {t.heritage.title}
+            {cms?.title_vi || t.heritage.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {t.heritage.subtitle}
+            {cms?.content_vi || t.heritage.subtitle}
           </p>
         </div>
 

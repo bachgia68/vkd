@@ -41,6 +41,9 @@ const FIELDS: FieldDef[] = [
   { key: 'footer.quickLinks', label: 'Tiêu đề cột — Liên Kết Nhanh', placeholder: translations.vi.footer.quickLinks },
   { key: 'footer.contact', label: 'Tiêu đề cột — Liên Hệ', placeholder: translations.vi.footer.contact },
   { key: 'footer.followUs', label: 'Tiêu đề cột — Theo Dõi', placeholder: translations.vi.footer.followUs },
+  { key: 'footer.email', label: 'Email liên hệ (Footer)', placeholder: translations.vi.footer.email },
+  { key: 'footer.address', label: 'Địa chỉ (Footer)', placeholder: translations.vi.footer.address, textarea: true },
+  { key: 'footer.phone', label: 'Zalo/WhatsApp text (Footer)', placeholder: translations.vi.footer.phone },
 ];
 
 export default function HeaderFooterPage() {

@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext';
 import { productTypes } from '../data/productTypes';
 import { healthGoalLabels } from '../data/mockData';
 import type { HealthGoal } from '../data/mockData';
-import { fetchVisibleLanguages, fetchTextOverrides, type SiteLanguage } from '../lib/siteContentApi';
+import { fetchVisibleLanguages, fetchTextOverrides, fetchVisibleNavItems, type SiteLanguage, type NavItem } from '../lib/siteContentApi';
 
 const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
   id: key,
@@ -44,6 +44,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const [isMobileProductMenuOpen, setIsMobileProductMenuOpen] = useState(false);
   const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
+  const [dbNavItems, setDbNavItems] = useState<NavItem[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,6 +61,9 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
     fetchTextOverrides()
       .then(setOverrides)
       .catch(() => setOverrides({}));
+    fetchVisibleNavItems()
+      .then(setDbNavItems)
+      .catch(() => setDbNavItems([]));
   }, []);
 
   const navLabel = (key: string) => {
@@ -68,17 +72,23 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
     return (overrideKey && overrides[overrideKey]) || fallback;
   };
 
-  const navItems = [
-    { key: 'home', href: 'home' },
-    { key: 'about', href: 'about' },
-    { key: 'products', href: 'catalog' }, // render dropdown riêng, xem desktop nav
-    { key: 'giftSets', href: 'catalog?type=set-qua-tang' },
-    { key: 'traceability', href: 'traceability' },
-    ...(visibleSections.has('showrooms') ? [{ key: 'showrooms', href: 'showrooms' }] : []),
-    ...(visibleSections.has('blog') ? [{ key: 'blogResearch', href: 'blog' }] : []),
-    { key: 'b2b', href: 'b2b' },
-    { key: 'autoship', href: 'autoship' },
+  const FALLBACK_NAV = [
+    { key: 'home', href: 'home', label_vi: null },
+    { key: 'about', href: 'about', label_vi: null },
+    { key: 'products', href: 'catalog', label_vi: null },
+    { key: 'giftSets', href: 'catalog?type=set-qua-tang', label_vi: null },
+    { key: 'traceability', href: 'traceability', label_vi: null },
+    ...(visibleSections.has('showrooms') ? [{ key: 'showrooms', href: 'showrooms', label_vi: null }] : []),
+    ...(visibleSections.has('blog') ? [{ key: 'blogResearch', href: 'blog', label_vi: null }] : []),
+    { key: 'b2b', href: 'b2b', label_vi: null },
+    { key: 'autoship', href: 'autoship', label_vi: null },
   ];
+  const navItems = dbNavItems.length > 0
+    ? dbNavItems.map((i) => ({ key: i.key, href: i.href, label_vi: i.label_vi }))
+    : FALLBACK_NAV;
+
+  const navItemLabel = (item: { key: string; label_vi: string | null }) =>
+    item.label_vi || navLabel(item.key);
 
   const samProductTypes = productTypes.filter((pt) => pt.group === 'sam' && pt.id !== 'set-qua-tang');
   const dacSanProductTypes = productTypes.filter((pt) => pt.group === 'dac-san');
@@ -304,7 +314,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                       : 'text-forest-700 hover:text-forest-900'
                   }`}
                 >
-                  {navLabel(item.key)}
+                  {navItemLabel(item)}
                 </button>
               );
             })}
@@ -483,7 +493,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                     onClick={() => handleNav(item.href)}
                     className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
                   >
-                    {navLabel(item.key)}
+                    {navItemLabel(item)}
                   </button>
                 )
               )}

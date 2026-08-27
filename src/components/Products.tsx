@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 import { products as staticProducts } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { getFeaturedProducts } from '../data/featuredProducts';
@@ -16,6 +17,7 @@ interface ProductsProps {
 export default function Products({ lang, onNavigate }: ProductsProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'products');
   const liveProducts = useLiveProducts(staticProducts);
   const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
 
@@ -33,10 +35,10 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
           </div>
 
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {t.products.title}
+            {cms?.title_vi || t.products.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {t.products.subtitle}
+            {cms?.content_vi || t.products.subtitle}
           </p>
         </div>
 

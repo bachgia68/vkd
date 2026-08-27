@@ -1,6 +1,7 @@
 import { ArrowRight, Leaf } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 
 interface HeroProps {
   lang: Language;
@@ -10,6 +11,11 @@ interface HeroProps {
 export default function Hero({ lang }: HeroProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'hero');
+  const [cmsLine1, cmsLine2] = cms?.title_vi
+    ? cms.title_vi.split('—').map((s) => s.trim())
+    : [t.hero.titleLine1, t.hero.titleLine2];
+  const cmsBg = cms?.image_url || '/assets/images/cay-sam-ngoc-linh.png';
 
   return (
     <section
@@ -22,7 +28,7 @@ export default function Hero({ lang }: HeroProps) {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/assets/images/cay-sam-ngoc-linh.png')`,
+            backgroundImage: `url('${cmsBg}')`,
             backgroundPosition: 'center 30%',
           }}
         />
@@ -77,23 +83,17 @@ export default function Hero({ lang }: HeroProps) {
         {/* Main Title */}
         <h1 className="font-display mb-6 animate-fade-in-up">
           <span className="block text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-2">
-            {t.hero.titleLine1}
+            {cmsLine1 || t.hero.titleLine1}
           </span>
           <span className="block text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gradient-gold">
-            {t.hero.titleLine2}
+            {cmsLine2 || t.hero.titleLine2}
           </span>
         </h1>
 
         {/* Subtitle */}
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-white/80 leading-relaxed mb-10 animate-fade-in-up animation-delay-200">
-          {t.hero.subtitle}
+          {cms?.content_vi || t.hero.subtitle}
         </p>
-
-        {/* Saponin claim */}
-        <div className="inline-flex items-center gap-3 px-5 py-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 mb-10 animate-fade-in-up animation-delay-400">
-          <span className="font-display text-3xl text-gold-400">{t.heritage.saponinCount}</span>
-          <span className="text-sm text-white/80 text-left leading-snug">{t.heritage.saponinTypes}</span>
-        </div>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-600">
@@ -105,7 +105,7 @@ export default function Hero({ lang }: HeroProps) {
             }}
             className="btn-gold group"
           >
-            {t.hero.cta}
+            {cms?.cta_text || t.hero.cta}
             <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'} transition-transform`} />
           </a>
           <a
@@ -117,12 +117,6 @@ export default function Hero({ lang }: HeroProps) {
             {t.hero.ctaSecondary}
           </a>
         </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in animation-delay-600">
-        <span className="text-white/60 text-xs tracking-widest uppercase">{t.hero.scrollText}</span>
-        <div className="scroll-indicator" />
       </div>
 
       {/* Bottom gradient fade */}

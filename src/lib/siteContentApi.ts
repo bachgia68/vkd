@@ -319,6 +319,27 @@ export interface PageSection {
   updated_at: string;
 }
 
+// ---------- Nav Items ----------
+
+export interface NavItem {
+  id: string;
+  key: string;
+  label_vi: string;
+  href: string;
+  sort_order: number;
+  visible: boolean;
+}
+
+export async function fetchVisibleNavItems(): Promise<NavItem[]> {
+  const { data, error } = await supabase
+    .from('nav_items')
+    .select('id, key, label_vi, href, sort_order, visible')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function fetchPageSections(pageKey: string): Promise<PageSection[]> {
   const { data, error } = await supabase
     .from('page_sections')
