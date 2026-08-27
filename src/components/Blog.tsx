@@ -174,9 +174,22 @@ function HeroPost({ post, onNavigate }: { post: BlogPost; onNavigate?: (page: st
   );
 }
 
+function getPageFromUrl(): number {
+  const p = new URLSearchParams(window.location.search).get('page');
+  const n = parseInt(p ?? '1', 10);
+  return isNaN(n) || n < 1 ? 1 : n;
+}
+
+function setPageInUrl(p: number) {
+  const url = new URL(window.location.href);
+  if (p === 1) url.searchParams.delete('page');
+  else url.searchParams.set('page', String(p));
+  window.history.replaceState(null, '', url.toString());
+}
+
 export default function Blog({ onNavigate }: BlogProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(() => getPageFromUrl());
   const POSTS_PER_PAGE = 12;
 
   useEffect(() => {
@@ -266,7 +279,7 @@ export default function Blog({ onNavigate }: BlogProps) {
           <div className="mt-12 flex items-center justify-center gap-2">
             {page > 1 && (
               <button
-                onClick={() => { setPage(page - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { setPageInUrl(page - 1); setPage(page - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="px-4 py-2 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 transition-colors text-sm font-medium"
               >
                 ← Trước
@@ -276,7 +289,7 @@ export default function Blog({ onNavigate }: BlogProps) {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
-                  onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setPageInUrl(p); setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                     p === page
                       ? 'bg-forest-600 text-white'
@@ -289,7 +302,7 @@ export default function Blog({ onNavigate }: BlogProps) {
             </div>
             {page < totalPages && (
               <button
-                onClick={() => { setPage(page + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { setPageInUrl(page + 1); setPage(page + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className="px-4 py-2 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 transition-colors text-sm font-medium"
               >
                 Sau →
