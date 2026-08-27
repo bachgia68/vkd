@@ -1297,3 +1297,22 @@ export async function fetchDashboardKpis(): Promise<DashboardKpis> {
     suspectScans: scansRes.count ?? 0,
   };
 }
+
+
+export async function updateBlogPost(
+  id: string,
+  updates: {
+    author?: string;
+    featured?: boolean;
+    pinned?: boolean;
+    published?: boolean;
+    title?: string;
+    excerpt?: string;
+  }
+): Promise<void> {
+  const { error } = await supabase
+    .from('blog_posts')
+    .update(updates)
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}

@@ -20,6 +20,8 @@ const NAV = [
   { to: '/gate-vkd-control-2026/site-sections', end: false, label: 'Quản lý Trang', icon: Eye },
   { to: '/gate-vkd-control-2026/languages', end: false, label: 'Ngôn ngữ', icon: Languages },
   { to: '/gate-vkd-control-2026/header-footer', end: false, label: 'Header & Footer', icon: Type },
+  { to: '/gate-vkd-control-2026/homepage-text', end: false, label: 'Nội Dung Trang Chủ', icon: Type },
+  { to: '/gate-vkd-control-2026/blog-admin', end: false, label: 'Blog Admin', icon: FileText },
   { to: '/gate-vkd-control-2026/crm-erp', end: false, label: 'CRM & ERP', icon: Users },
   { to: '/gate-vkd-control-2026/loyalty', end: false, label: 'TA Elite Club', icon: Crown },
   { to: '/gate-vkd-control-2026/inventory-qr', end: false, label: 'Kho hàng & QR', icon: Warehouse },

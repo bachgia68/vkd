@@ -32,6 +32,8 @@ import FieldVideosPage from './pages/FieldVideosPage';
 import OrdersPage from './pages/OrdersPage';
 import LanguagesPage from './pages/LanguagesPage';
 import HeaderFooterPage from './pages/HeaderFooterPage';
+import HomepageTextPage from './pages/HomepageTextPage';
+import BlogAdminPage from './pages/BlogAdminPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -66,6 +68,8 @@ export default function AdminApp() {
           <Route path="site-sections" element={<SiteSectionsPage />} />
           <Route path="languages" element={<LanguagesPage />} />
           <Route path="header-footer" element={<HeaderFooterPage />} />
+          <Route path="homepage-text" element={<HomepageTextPage />} />
+          <Route path="blog-admin" element={<BlogAdminPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
