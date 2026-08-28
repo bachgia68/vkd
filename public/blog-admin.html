@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Admin — TA Sâm Ngọc Linh</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0f0a; color: #e5e7eb; font-family: system-ui, sans-serif; font-size: 14px; }
+header { background: #111827; border-bottom: 1px solid #1f2937; padding: 12px 20px; display: flex; align-items: center; gap: 16px; }
+header h1 { color: #4ade80; font-size: 16px; font-weight: 700; }
+header span { color: #6b7280; font-size: 12px; }
+.cats { display: flex; gap: 8px; padding: 12px 20px; background: #0f172a; border-bottom: 1px solid #1f2937; flex-wrap: wrap; }
+.cat-btn { padding: 5px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 500; background: #1f2937; color: #9ca3af; transition: all .15s; }
+.cat-btn.active { background: #4ade80; color: #000; }
+.cat-btn:hover:not(.active) { background: #374151; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: #111827; }
+th { padding: 10px 12px; text-align: left; color: #6b7280; font-weight: 500; border-bottom: 1px solid #1f2937; white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #111827; vertical-align: middle; }
+tr:hover td { background: #111827; }
+.title-cell { max-width: 320px; }
+.title-main { color: #f3f4f6; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.title-slug { color: #4b5563; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; cursor: pointer; border: none; }
+.badge.published { background: #052e16; color: #4ade80; }
+.badge.draft { background: #1f2937; color: #6b7280; }
+.badge.published:hover { background: #14532d; }
+.badge.draft:hover { background: #374151; }
+.cat-tag { background: #1e293b; color: #94a3b8; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+.comp-pass { color: #4ade80; font-size: 11px; }
+.comp-fail { color: #f59e0b; font-size: 11px; }
+.date-cell { color: #6b7280; font-size: 11px; white-space: nowrap; }
+.actions { display: flex; gap: 6px; }
+.btn-preview { padding: 3px 10px; border-radius: 4px; font-size: 11px; background: #1e3a5f; color: #60a5fa; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-delete { padding: 3px 10px; border-radius: 4px; font-size: 11px; background: #450a0a; color: #f87171; border: none; cursor: pointer; }
+.btn-preview:hover { background: #1e40af; }
+.btn-delete:hover { background: #7f1d1d; }
+.pagination { display: flex; gap: 8px; padding: 12px 20px; align-items: center; justify-content: center; }
+.pag-btn { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; background: #1f2937; color: #9ca3af; font-size: 12px; }
+.pag-btn:hover:not(:disabled) { background: #374151; }
+.pag-btn:disabled { opacity: 0.4; cursor: default; }
+.pag-info { color: #6b7280; font-size: 12px; }
+.loading { text-align: center; padding: 48px; color: #6b7280; }
+.error-msg { background: #1f0f0f; border: 1px solid #7f1d1d; color: #f87171; padding: 12px 20px; margin: 12px; border-radius: 6px; }
+#total-info { margin-left: auto; color: #6b7280; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Blog Admin</h1>
+  <span>TA Sâm Ngọc Linh</span>
+  <span id="total-info"></span>
+</header>
+
+<div class="cats">
+  <button class="cat-btn active" onclick="setCategory('all')">Tất cả</button>
+  <button class="cat-btn" onclick="setCategory('science')">Science</button>
+  <button class="cat-btn" onclick="setCategory('lifestyle')">Lifestyle</button>
+  <button class="cat-btn" onclick="setCategory('heritage')">Heritage</button>
+  <button class="cat-btn" onclick="setCategory('kgc')">KGC</button>
+</div>
+
+<div id="error-container"></div>
+
+<div id="table-container">
+  <div class="loading">Đang tải...</div>
+</div>
+
+<div class="pagination">
+  <button class="pag-btn" id="btn-prev" onclick="prevPage()" disabled>← Trước</button>
+  <span class="pag-info" id="pag-info">Trang 1</span>
+  <button class="pag-btn" id="btn-next" onclick="nextPage()" disabled>Sau →</button>
+</div>
+
+<script>
+const SUPA_URL = 'https://xcwirgrlnibnjmseglee.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhj' +
+  'd2lyZ3Jsbmlibjltc2VnbGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3OTU2MjQsImV4cCI6MjA2OTM3MTYyNH0.' +
+  'Iuu0iQmQkxNEIHcbWW4XqPrDG4rRfCcuCDhYhsHzd4o';
+
+const PAGE = 20;
+let page = 0, total = 0, cat = 'all';
+
+const headers = { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', Prefer: 'count=exact' };
+
+function setCategory(c) {
+  cat = c; page = 0;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase() === (c === 'all' ? 'tất cả' : c)));
+  load();
+}
+function prevPage() { if (page > 0) { page--; load(); } }
+function nextPage() { if ((page+1)*PAGE < total) { page++; load(); } }
+
+async function load() {
+  document.getElementById('table-container').innerHTML = '<div class="loading">Đang tải...</div>';
+  document.getElementById('error-container').innerHTML = '';
+  try {
+    const from = page * PAGE, to = from + PAGE - 1;
+    let url = `${SUPA_URL}/rest/v1/blog_posts?select=id,title_vi,title,slug_vi,slug,excerpt_vi,category,published,created_at,compliance_check&order=created_at.desc&limit=${PAGE}&offset=${from}`;
+    if (cat !== 'all') url += `&category=eq.${cat}`;
+
+    const res = await fetch(url, { headers: { ...headers, Range: `${from}-${to}`, 'Range-Unit': 'items' } });
+    const cr = res.headers.get('content-range');
+    if (cr) total = parseInt(cr.split('/')[1] || '0');
+    if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+    const posts = await res.json();
+
+    document.getElementById('total-info').textContent = `${total} bài`;
+    document.getElementById('pag-info').textContent = `Trang ${page+1}/${Math.max(1,Math.ceil(total/PAGE))}`;
+    document.getElementById('btn-prev').disabled = page === 0;
+    document.getElementById('btn-next').disabled = (page+1)*PAGE >= total;
+
+    if (!posts.length) {
+      document.getElementById('table-container').innerHTML = '<div class="loading">Không có bài viết.</div>';
+      return;
+    }
+
+    let html = `<table><thead><tr>
+      <th style="width:35%">Tiêu đề</th>
+      <th style="width:90px">Category</th>
+      <th style="width:80px">Trạng thái</th>
+      <th style="width:120px">Compliance</th>
+      <th style="width:90px">Ngày tạo</th>
+      <th style="width:120px">Thao tác</th>
+    </tr></thead><tbody>`;
+
+    for (const p of posts) {
+      const titleVi = p.title_vi || p.title || '(no title)';
+      const slugVi = p.slug_vi || p.slug || '';
+      const excerptVi = p.excerpt_vi || '';
+      const comp = p.compliance_check || '';
+      const compCls = comp.startsWith('PASS') ? 'comp-pass' : 'comp-fail';
+      const pubCls = p.published ? 'published' : 'draft';
+      const pubLabel = p.published ? 'Published' : 'Draft';
+      const date = p.created_at ? new Date(p.created_at).toLocaleDateString('vi-VN') : '';
+
+      html += `<tr id="row-${p.id}">
+        <td class="title-cell"><div class="title-main" title="${titleVi}">${titleVi}</div><div class="title-slug">${slugVi}</div></td>
+        <td><span class="cat-tag">${p.category || ''}</span></td>
+        <td><button class="badge ${pubCls}" onclick="togglePub('${p.id}', ${p.published})">${pubLabel}</button></td>
+        <td><span class="${compCls}" title="${comp}">${comp.substring(0,30)}</span></td>
+        <td class="date-cell">${date}</td>
+        <td class="actions">
+          <a class="btn-preview" href="/blog/${slugVi}" target="_blank">Preview</a>
+          ${!p.published ? `<button class="btn-delete" onclick="delPost('${p.id}','${titleVi.replace(/'/g,"\\'")}')">Xóa</button>` : ''}
+        </td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('table-container').innerHTML = html;
+  } catch(e) {
+    document.getElementById('error-container').innerHTML = `<div class="error-msg">Lỗi: ${e.message}</div>`;
+    document.getElementById('table-container').innerHTML = '';
+  }
+}
+
+async function togglePub(id, current) {
+  const btn = document.querySelector(`#row-${id} .badge`);
+  if (btn) btn.textContent = '...';
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/blog_posts?id=eq.${id}`, {
+      method: 'PATCH', headers,
+      body: JSON.stringify({ published: !current })
+    });
+    if (!r.ok) throw new Error(r.status);
+    if (btn) { btn.textContent = !current ? 'Published' : 'Draft'; btn.className = 'badge ' + (!current ? 'published' : 'draft'); btn.onclick = () => togglePub(id, !current); }
+  } catch(e) { alert('Toggle lỗi: ' + e.message); if (btn) btn.textContent = current ? 'Published' : 'Draft'; }
+}
+
+async function delPost(id, title) {
+  if (!confirm(`Xóa draft "${title}"?`)) return;
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/blog_posts?id=eq.${id}`, { method: 'DELETE', headers });
+    if (!r.ok) throw new Error(r.status);
+    document.getElementById('row-' + id)?.remove();
+    total--;
+    document.getElementById('total-info').textContent = `${total} bài`;
+  } catch(e) { alert('Xóa lỗi: ' + e.message); }
+}
+
+load();
+</script>
+</body>
+</html>
