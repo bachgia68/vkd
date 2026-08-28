@@ -1,0 +1,143 @@
+{
+  "name": "TA Sam Ngoc Linh — Auto Blog Publish (Supabase Direct)",
+  "nodes": [
+    {
+      "id": "n1-webhook",
+      "name": "Webhook - Nhan yeu cau",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 460],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sam-ngoc-linh-publish",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "n2-build-prompt",
+      "name": "Xay dung Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 460],
+      "parameters": {
+        "jsCode": "const body = ($json.body) ? $json.body : $json;\nconst topic = body.topic || 'Majonoside-R2: Hoat chat doc quyen cua Sam Ngoc Linh Viet Nam';\nconst category = body.category || 'science';\n\nconst prompt = `Ban la chuyen gia duoc lieu hoc va content SEO cho thuong hieu TA Sam Ngoc Linh.\n\nViet bai blog chuan SEO bang tieng Viet, 2500+ tu, chu de: \"${topic}\".\nCategory: ${category}\n\nYeu cau bat buoc:\n1. Cau truc: H1 tieu de -> H2 intro (150-200 tu) -> 5-7 H2 sections -> FAQs (6-8 Q&A) -> CTA\n2. Moi H2 co 2-3 H3 sub-sections, bullet points 3-5 diem\n3. TUYET DOI KHONG dung: dieu tri, chua khoi, cong dung (y hoc), het benh\n4. Dung: ho tro, cai thien, giup duy tri, theo nghien cuu, du lieu cho thay\n5. Cite peer-reviewed khi dung so lieu\n6. Author: \"Doi Ngu Nghien Cuu TA\" - KHONG bia ten bac si\n7. Cuoi bai: CTA \"Kham pha san pham TA Sam Ngoc Linh\"\n\nOutput PHAI la JSON hop le (khong markdown code block):\n{\"title_vi\":\"...\",\"body_md\":\"## H2...\\n\\n### H3...\\n\\nbullet\\n\\n...\",\"excerpt_vi\":\"150-160 ky tu, khong copy tieu de\",\"slug_vi\":\"kebab-case-slug-60-chars\",\"faq_list\":[{\"q\":\"?\",\"a\":\"100-150 tu\"}],\"meta_description\":\"155-160 ky tu\",\"compliance_check\":\"PASS\"}`;\n\nreturn [{ json: { topic, category, prompt } }];"
+      }
+    },
+    {
+      "id": "n3-gemini",
+      "name": "AI - Gemini 2.0 Flash",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 460],
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [ { parts: [ { text: $json.prompt } ] } ] }, null, 0) }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "n4-normalize",
+      "name": "Chuan hoa Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 460],
+      "parameters": {
+        "jsCode": "const resp = $input.first().json;\nconst rawText = (resp?.candidates?.[0]?.content?.parts?.[0]?.text) || '';\nconst topic = $('Xay dung Prompt').first().json.topic;\nconst category = $('Xay dung Prompt').first().json.category;\n\nlet post = {};\ntry {\n  let clean = rawText.trim();\n  clean = clean.replace(/^```json\\s*/i, '').replace(/```\\s*$/i, '').trim();\n  post = JSON.parse(clean);\n} catch(e) {\n  // Extract via regex fallback\n  const titleMatch = rawText.match(/\"title_vi\"\\s*:\\s*\"([^\"]+)\"/);\n  const excerptMatch = rawText.match(/\"excerpt_vi\"\\s*:\\s*\"([^\"]+)\"/);\n  post = {\n    title_vi: titleMatch ? titleMatch[1] : topic,\n    body_md: rawText.substring(0, 5000),\n    excerpt_vi: excerptMatch ? excerptMatch[1] : topic.substring(0, 155),\n    slug_vi: '',\n    faq_list: [],\n    meta_description: topic.substring(0, 160),\n    compliance_check: 'PARSE_FALLBACK'\n  };\n}\n\n// Generate slug if missing\nif (!post.slug_vi) {\n  let s = (post.title_vi || topic).toLowerCase();\n  const map = {'à':'a','á':'a','ả':'a','ã':'a','ạ':'a','ă':'a','ắ':'a','ặ':'a','ẳ':'a','ẵ':'a','ầ':'a','ấ':'a','ẩ':'a','ẫ':'a','ậ':'a','â':'a','è':'e','é':'e','ẻ':'e','ẽ':'e','ẹ':'e','ê':'e','ề':'e','ế':'e','ể':'e','ễ':'e','ệ':'e','ì':'i','í':'i','ỉ':'i','ĩ':'i','ị':'i','ò':'o','ó':'o','ỏ':'o','õ':'o','ọ':'o','ô':'o','ồ':'o','ố':'o','ổ':'o','ỗ':'o','ộ':'o','ơ':'o','ờ':'o','ớ':'o','ở':'o','ỡ':'o','ợ':'o','ù':'u','ú':'u','ủ':'u','ũ':'u','ụ':'u','ư':'u','ừ':'u','ứ':'u','ử':'u','ữ':'u','ự':'u','ỳ':'y','ý':'y','ỷ':'y','ỹ':'y','ỵ':'y','đ':'d'};\n  s = s.split('').map(c => map[c] || c).join('');\n  s = s.replace(/[^a-z0-9\\s-]/g,'').replace(/\\s+/g,'-').replace(/-{2,}/g,'-').replace(/^-|-$/g,'');\n  post.slug_vi = s.substring(0, 60).replace(/-$/,'');\n}\n\n// Compliance check\nconst forbidden = ['điều trị','chữa khỏi','cong dung (y hoc)','het benh'];\nconst body = (post.body_md || '').toLowerCase();\nconst found = forbidden.filter(w => body.includes(w));\nif (found.length) post.compliance_check = `FAIL: ${found.join(', ')}`;\nif (!post.compliance_check) post.compliance_check = 'PASS';\n\nreturn [{ json: { ...post, category, raw_topic: topic } }];"
+      }
+    },
+    {
+      "id": "n5-supabase-insert",
+      "name": "Insert Supabase blog_posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 460],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/blog_posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ id: $now.toMillis().toString() + '-auto', title_vi: $json.title_vi, slug_vi: $json.slug_vi, body: $json.body_md, excerpt_vi: ($json.excerpt_vi || '').substring(0,160), featured_image_url: '', category: $json.category, published: false, created_at: new Date().toISOString(), meta_description: ($json.meta_description || '').substring(0,160), compliance_check: $json.compliance_check }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=representation" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "n6-telegram",
+      "name": "Telegram - Bao cao",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 460],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_BOT_TOKEN }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $env.TELEGRAM_CHAT_ID, text: '✅ BÀI VIẾT MỚI (n8n)\\n\\n📌 ' + $('Chuan hoa Response').first().json.title_vi + '\\n🏷️ ' + $('Chuan hoa Response').first().json.category + '\\n🆔 Slug: ' + $('Chuan hoa Response').first().json.slug_vi + '\\n📋 Compliance: ' + $('Chuan hoa Response').first().json.compliance_check + '\\n\\n🔗 Preview: https://tasamngoclinh.com/blog/' + $('Chuan hoa Response').first().json.slug_vi + '\\n🔗 Admin: https://tasamngoclinh.com/gate-vkd-control-2026/cms\\n\\n⏳ Đợi Joe duyệt → publish\\n---\\nn8n AutoBlog | ' + new Date().toLocaleString('vi-VN') }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "n7-respond",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1540, 460],
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, slug: $('Chuan hoa Response').first().json.slug_vi, compliance: $('Chuan hoa Response').first().json.compliance_check }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Nhan yeu cau": {
+      "main": [[ { "node": "Xay dung Prompt", "type": "main", "index": 0 } ]]
+    },
+    "Xay dung Prompt": {
+      "main": [[ { "node": "AI - Gemini 2.0 Flash", "type": "main", "index": 0 } ]]
+    },
+    "AI - Gemini 2.0 Flash": {
+      "main": [[ { "node": "Chuan hoa Response", "type": "main", "index": 0 } ]]
+    },
+    "Chuan hoa Response": {
+      "main": [[ { "node": "Insert Supabase blog_posts", "type": "main", "index": 0 } ]]
+    },
+    "Insert Supabase blog_posts": {
+      "main": [[ { "node": "Telegram - Bao cao", "type": "main", "index": 0 } ]]
+    },
+    "Telegram - Bao cao": {
+      "main": [[ { "node": "Respond OK", "type": "main", "index": 0 } ]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {}
+}
