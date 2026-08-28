@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
-import { fetchAllBlogPostsForAdmin } from '../../lib/siteContentApi';
+import { fetchAllBlogPostsForAdmin, fetchBlogCategories } from '../../lib/siteContentApi';
 import { updateBlogPostMeta } from '../adminApi';
-import type { BlogPost } from '../../lib/siteContentApi';
+import type { BlogPost, BlogCategory } from '../../lib/siteContentApi';
 
 export default function BlogAdminPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAllBlogPostsForAdmin()
-      .then(setPosts)
+    Promise.all([
+      fetchAllBlogPostsForAdmin(),
+      fetchBlogCategories(),
+    ]).then(([p, c]) => { setPosts(p); setCategories(c); })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -21,6 +24,20 @@ export default function BlogAdminPage() {
     try {
       await updateBlogPostMeta(post.id, { [field]: value });
       setPosts(posts.map((p) => p.id === post.id ? { ...p, [field]: value } : p));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Lỗi lưu');
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const handleCategory = async (post: BlogPost, category_id: string) => {
+    const val = category_id === '' ? null : category_id;
+    if (val === (post.category_id ?? null)) return;
+    setSaving(post.id);
+    try {
+      await updateBlogPostMeta(post.id, { category_id: val });
+      setPosts(posts.map((p) => p.id === post.id ? { ...p, category_id: val } : p));
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Lỗi lưu');
     } finally {
@@ -60,6 +77,7 @@ export default function BlogAdminPage() {
           <thead className="bg-forest-50">
             <tr>
               <th className="px-4 py-3 text-left font-semibold text-forest-700 min-w-[200px]">Tiêu đề</th>
+              <th className="px-4 py-3 text-left font-semibold text-forest-700">Danh mục</th>
               <th className="px-4 py-3 text-left font-semibold text-forest-700">Tác giả</th>
               <th className="px-4 py-3 text-center font-semibold text-forest-700">Nổi bật</th>
               <th className="px-4 py-3 text-center font-semibold text-forest-700">Ghim</th>
@@ -77,6 +95,18 @@ export default function BlogAdminPage() {
                   <span className="font-medium text-forest-900 line-clamp-2 block max-w-xs">
                     {post.title}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  <select
+                    value={post.category_id ?? ''}
+                    onChange={(e) => handleCategory(post, e.target.value)}
+                    className="w-40 px-2 py-1 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500 bg-white"
+                  >
+                    <option value="">-- Chưa phân loại --</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name_vi}</option>
+                    ))}
+                  </select>
                 </td>
                 <td className="px-4 py-3">
                   <input

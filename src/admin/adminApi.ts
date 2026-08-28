@@ -1306,6 +1306,7 @@ export async function updateBlogPostMeta(
     featured?: boolean;
     pinned?: boolean;
     published?: boolean;
+    category_id?: string | null;
   }
 ): Promise<void> {
   const { error } = await supabase
