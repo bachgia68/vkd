@@ -207,9 +207,25 @@ export default function Blog({ onNavigate }: BlogProps) {
   const [hero, ...rest] = posts;
   const isFullPage = window.location.pathname === '/blog';
 
+  // Slug → detectCategory label map (fallback for posts without category_id)
+  const SLUG_TO_DETECT: Record<string, string[]> = {
+    'khoa-hoc-nghien-cuu': ['Khoa học'],
+    'cau-chuyen-vung-trong': ['Câu chuyện', 'Vùng trồng'],
+    'suc-khoe-dinh-duong': ['Sức khoẻ'],
+    'cuoc-song-nui-rung': ['Vùng trồng'],
+    'huong-dan-su-dung': ['Kiến thức'],
+    'cong-thuc-bai-thuoc': ['Kiến thức'],
+    'tin-tuc-ta': ['Kiến thức'],
+  };
+
   // Category filter — only on full /blog page
   const filteredRest = (isFullPage && selectedCat !== 'all')
-    ? rest.filter((p) => p.category_id === selectedCat)
+    ? rest.filter((p) => {
+        if (p.category_id) return p.category_id === selectedCat;
+        const cat = categories.find((c) => c.id === selectedCat);
+        if (!cat) return false;
+        return (SLUG_TO_DETECT[cat.slug] ?? []).includes(detectCategory(p));
+      })
     : rest;
 
   const postsToShow = isFullPage ? filteredRest : rest.slice(0, 6);
@@ -236,10 +252,9 @@ export default function Blog({ onNavigate }: BlogProps) {
               <span className="w-2 h-2 bg-forest-500 rounded-full" />
               <span className="text-xs font-semibold tracking-wider uppercase text-forest-700">Tin Tức &amp; Kiến Thức</span>
             </div>
-            <h2 className="font-display text-display-sm md:text-display-md text-forest-900">
-              {isFullPage ? 'Tất Cả Bài Viết' : 'Bài Viết Từ TA'}
-            </h2>
-            {isFullPage && <p className="text-forest-600 text-sm mt-2">{rest.length} bài viết</p>}
+            {!isFullPage && (
+              <h2 className="font-display text-display-sm md:text-display-md text-forest-900">Bài Viết Từ TA</h2>
+            )}
           </div>
           {!isFullPage && posts.length > 4 && (
             <a
