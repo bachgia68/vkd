@@ -347,9 +347,9 @@ Topic: {topic}
 ...
 ---
 
-## 🔬 [Section 1 — H2 có icon]{#s1}
+## 🔬 [Section 1 — H2 có icon]
 ### [Sub-section 1.1]
-[Tối đa 4 dòng/đoạn. Bôi đậm **thuật ngữ khoa học**.]
+Nội dung 100-150 từ, đoạn tối đa 4 dòng. Bôi đậm thuật ngữ khoa học.
 
 > 💡 **Lưu ý chuyên gia:** [1 câu insight thực — không bịa số]
 
@@ -358,8 +358,8 @@ Topic: {topic}
 - Điểm 2
 - Điểm 3
 
-## 📊 [Section 2 — Bảng so sánh nếu phù hợp]{#s2}
-| Tiêu chí | Sâm Ngọc Linh TA | ... |
+## 📊 [Section 2 — Bảng so sánh nếu phù hợp]
+| Tiêu chí | Sâm Ngọc Linh TA | So sánh |
 |---|---|---|
 | ... | ... | ... |
 
