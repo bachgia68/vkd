@@ -70,6 +70,16 @@ TOPICS = {
         ("Nhân Sâm Ngọc Linh Xanh vs Sơ Chế: Sự Khác Biệt Hoạt Chất", "sam-ngoc-linh-xanh-vs-so-che-khac-biet-hoat-chat"),
         ("Thẩm Định Sâm Ngọc Linh: 7 Tiêu Chuẩn Phân Loại Chất Lượng", "tham-dinh-sam-ngoc-linh-7-tieu-chuan-chat-luong"),
         ("Sâm Ngọc Linh và Năng Suất Lao Động: Dữ Liệu Từ Nghiên Cứu", "sam-ngoc-linh-nang-suat-lao-dong-nghien-cuu"),
+        # Mở rộng 2025–2026
+        ("Chỉ Số ORAC Của Sâm Ngọc Linh: Sức Chống Oxy Hoá Đo Được", "orac-sam-ngoc-linh-suc-chong-oxy-hoa"),
+        ("Ginsenoside Rb1 Và Rg1: Hai Hoạt Chất Nền Trong Sâm Việt", "ginsenoside-rb1-rg1-sam-ngoc-linh-viet"),
+        ("Bioavailability Của Saponin Sâm Ngọc Linh Sau Hấp Thu Đường Uống", "bioavailability-saponin-sam-ngoc-linh-duong-uong"),
+        ("Quy Trình VietGAP Áp Dụng Cho Vùng Trồng Sâm Ngọc Linh", "vietgap-vung-trong-sam-ngoc-linh-tieu-chuan"),
+        ("Phân Tích HPLC Định Lượng Saponin Sâm Ngọc Linh: Phương Pháp Chuẩn", "hplc-dinh-luong-saponin-sam-ngoc-linh"),
+        ("Sâm Ngọc Linh Và Căng Thẳng Oxy Hoá: Cơ Chế Phân Tử", "sam-ngoc-linh-can-thang-oxy-hoa-co-che-phan-tu"),
+        ("Hàm Lượng Saponin Theo Tuổi Củ: Sâm 5 Năm vs 10 Năm", "ham-luong-saponin-tuoi-cu-sam-ngoc-linh"),
+        ("Tương Tác Của Sâm Ngọc Linh Với Hệ Vi Sinh Đường Ruột", "sam-ngoc-linh-he-vi-sinh-duong-ruot-nghien-cuu"),
+        ("Nghiên Cứu Adaptogen: Sâm Ngọc Linh Trong Danh Mục Thực Vật Bổ Sung", "sam-ngoc-linh-adaptogen-thuc-vat-bo-sung"),
     ],
     "lifestyle": [
         ("Sâm Ngọc Linh Trong Đời Sống Hàng Ngày Của Người Việt", "sam-ngoc-linh-doi-song-hang-ngay-nguoi-viet"),
@@ -82,6 +92,15 @@ TOPICS = {
         ("Quà Tặng Ý Nghĩa: Tặng Sâm Ngọc Linh Cho Người Thân", "qua-tang-sam-ngoc-linh-y-nghia-nguoi-than"),
         ("Sâm Ngọc Linh trong Du Lịch: Mang Theo Hay Mua Tại Chỗ?", "sam-ngoc-linh-du-lich-mang-theo-hay-mua-tai-cho"),
         ("Cộng Đồng Người Dùng Sâm TA: Câu Chuyện Thực", "cong-dong-nguoi-dung-sam-ta-cau-chuyen-thuc"),
+        # Mở rộng
+        ("Sâm Ngọc Linh Sau Sinh: Những Điều Mẹ Cần Biết", "sam-ngoc-linh-sau-sinh-me-can-biet"),
+        ("Kết Hợp Sâm Ngọc Linh Với Chế Độ Ăn Plant-Based", "sam-ngoc-linh-ket-hop-che-do-an-plant-based"),
+        ("Uống Sâm Ngọc Linh Buổi Sáng vs Tối: Khoa Học Giải Thích", "uong-sam-ngoc-linh-buoi-sang-vs-toi-khoa-hoc"),
+        ("Sâm Ngọc Linh Và Thể Thao: Hỗ Trợ Phục Hồi Cơ Bắp", "sam-ngoc-linh-the-thao-ho-tro-phuc-hoi-co-bap"),
+        ("Lịch Uống Sâm Ngọc Linh Theo Mùa: Xuân Hạ Thu Đông", "lich-uong-sam-ngoc-linh-theo-mua-xuan-ha-thu-dong"),
+        ("Sâm Ngọc Linh Cho Người Trung Niên 40–60 Tuổi", "sam-ngoc-linh-nguoi-trung-nien-40-60-tuoi"),
+        ("Cách Pha Trà Sâm Ngọc Linh Chuẩn Vị Không Mất Hoạt Chất", "pha-tra-sam-ngoc-linh-chuan-vi-khong-mat-hoat-chat"),
+        ("Set Quà Sâm Ngọc Linh Doanh Nghiệp: Lựa Chọn Cho Đối Tác", "set-qua-sam-ngoc-linh-doanh-nghiep-doi-tac"),
     ],
     "heritage": [
         ("Núi Ngọc Linh: Địa Lý Kỳ Diệu Tạo Ra Sâm Quý Nhất Thế Giới", "nui-ngoc-linh-dia-ly-ky-dieu-sam-quy-nhat"),
@@ -94,6 +113,25 @@ TOPICS = {
         ("Tác Động Của Biến Đổi Khí Hậu Lên Vùng Ngọc Linh", "bien-doi-khi-hau-vung-ngoc-linh-giai-phap-ben-vung"),
         ("Tuyến Đường Sâm Ngọc Linh: Từ Vườn Đến Bàn Ăn Khách Hàng", "tuyen-duong-sam-ngoc-linh-vuon-den-ban-an"),
         ("Khám Phá Trà Linh: Hướng Dẫn Du Lịch & Mua Sâm Ngọc Linh Thật", "kham-pha-tra-linh-huong-dan-du-lich-mua-sam-that"),
+        # Mở rộng
+        ("Mưa Rừng Ngọc Linh: Khí Hậu Đặc Thù Nuôi Dưỡng Củ Sâm", "mua-rung-ngoc-linh-khi-hau-dac-thu-nuoi-duong-sam"),
+        ("Độ Cao 1500m: Tại Sao Sâm Ngọc Linh Không Thể Trồng Nơi Khác", "do-cao-1500m-sam-ngoc-linh-khong-the-trong-noi-khac"),
+        ("Người Xơ Đăng Và Bí Quyết Bảo Tồn Sâm Rừng Qua Thế Kỷ", "nguoi-xo-dang-bi-quyet-bao-ton-sam-rung"),
+        ("Câu Chuyện 40 Năm Nhân Giống Sâm Ngọc Linh Ở Kon Tum", "40-nam-nhan-giong-sam-ngoc-linh-kon-tum"),
+        ("Khổng Lồ Dưới Rễ Núi: Củ Sâm 20 Năm Tuổi Trị Giá Bao Nhiêu?", "cu-sam-ngoc-linh-20-nam-tuoi-tri-gia"),
+        ("Những Tháng Mùa Mưa Tây Nguyên: Mùa Vàng Của Sâm Ngọc Linh", "mua-mua-tay-nguyen-mua-vang-sam-ngoc-linh"),
+    ],
+    "kgc": [
+        ("Sâm Ngọc Linh TA vs KGC Hàn Quốc: So Sánh Khách Quan", "sam-ngoc-linh-ta-vs-kgc-han-quoc-so-sanh"),
+        ("Tiêu Chuẩn Premium Sâm Việt: Học Từ Quy Trình KGC Hàn Quốc", "tieu-chuan-premium-sam-viet-hoc-tu-kgc-han-quoc"),
+        ("Certificate of Origin Sâm Ngọc Linh TA: Pháp Lý & Truy Xuất", "certificate-of-origin-sam-ngoc-linh-ta-phap-ly"),
+        ("Đóng Gói Cao Cấp Sâm Ngọc Linh: Từ Vỏ Hộp Đến Tem Hologram", "dong-goi-cao-cap-sam-ngoc-linh-tem-hologram"),
+        ("Sâm Ngọc Linh Dạng Viên Nén vs Tươi Nguyên Củ: Đâu Là Tốt Hơn", "sam-ngoc-linh-vien-nen-vs-tuoi-nguyen-cu"),
+        ("Chuỗi Cung Ứng Sâm Ngọc Linh TA: Farm-to-Table Minh Bạch", "chuoi-cung-ung-sam-ngoc-linh-ta-farm-to-table"),
+        ("QR Code Truy Xuất Nguồn Gốc: Cách TA Bảo Vệ Người Mua", "qr-code-truy-xuat-nguon-goc-sam-ngoc-linh-ta"),
+        ("Sâm Ngọc Linh Xuất Khẩu: Tiêu Chuẩn Và Thị Trường Tiềm Năng", "sam-ngoc-linh-xuat-khau-tieu-chuan-thi-truong"),
+        ("Từ Vườn Ngọc Linh Đến Hộp Quà Premium: Hành Trình Kiểm Soát Chất Lượng", "vuon-ngoc-linh-hop-qua-premium-kiem-soat-chat-luong"),
+        ("Thị Trường Sâm Cao Cấp 2025: Người Mua Thông Minh Cần Biết Gì", "thi-truong-sam-cao-cap-2025-nguoi-mua-thong-minh"),
     ],
 }
 
@@ -233,13 +271,46 @@ def _build_post(title_vi, raw_md, topic):
 
 def generate_content(title_vi, topic, trend_context=""):
     # ── 1. Ollama (primary — local, free, always available) ──────────────────
+    INTERNAL_LINKS = {
+        "science":   "[Xem sản phẩm sâm tươi TA](https://tasamngoclinh.com/san-pham)",
+        "lifestyle": "[Tham khảo set quà TA](https://tasamngoclinh.com/qua-tang)",
+        "heritage":  "[Tìm hiểu vườn sâm Nhà Khánh](https://tasamngoclinh.com/gioi-thieu)",
+        "kgc":       "[So sánh sản phẩm TA](https://tasamngoclinh.com/san-pham)",
+    }
+    link_hint = INTERNAL_LINKS.get(topic, "")
+
     try:
         log.info("[Ollama] Generating (primary)...")
-        ollama_prompt = f"""Viết bài blog tiếng Việt 1500 từ về chủ đề: "{title_vi}"
-Liên quan đến sâm Ngọc Linh, thành phần saponin MR2 Majonoside-R2, hoạt chất quý.
-KHÔNG dùng: điều trị, chữa khỏi, hết bệnh, hiệu quả 100%.
-Dùng: hỗ trợ, cải thiện, nghiên cứu cho thấy, dữ liệu khoa học.
-Viết bằng markdown: ## H2, ### H3, bullet -. Chỉ viết nội dung bài, không giải thích thêm."""
+        ollama_prompt = f"""Viết bài blog tiếng Việt 1500–2000 từ về chủ đề: "{title_vi}"
+Thương hiệu: TA Sâm Ngọc Linh — vườn hữu cơ Trà Linh, Kon Tum.
+
+CẤU TRÚC BẮT BUỘC (markdown):
+## [Tên section 1]
+### [Sub-section 1.1]
+Nội dung 120–150 từ...
+> **Lưu ý khoa học:** [1 câu dữ liệu nghiên cứu thực — không bịa số]
+
+### [Sub-section 1.2]
+- Điểm 1
+- Điểm 2
+- Điểm 3
+
+## [Tên section 2]
+...
+
+## Câu Hỏi Thường Gặp
+**Q: Câu hỏi 1?**
+A: Trả lời...
+
+## Kết Luận
+[2–3 câu tổng kết + CTA nhẹ]
+{link_hint}
+
+QUY TẮC:
+- KHÔNG dùng: điều trị, chữa khỏi, hết bệnh, hiệu quả 100%
+- DÙNG: hỗ trợ, cải thiện, theo nghiên cứu, dữ liệu cho thấy
+- Ít nhất 4 section H2, mỗi section có 2 H3
+- Chỉ viết nội dung bài, không giải thích gì thêm"""
         raw_md = _call_ollama(ollama_prompt).strip()
         raw_md = ''.join(c if ord(c) >= 32 or c in '\n\t' else ' ' for c in raw_md)
         if len(raw_md) < 300:
@@ -252,17 +323,67 @@ Viết bằng markdown: ## H2, ### H3, bullet -. Chỉ viết nội dung bài, k
 
     # ── 2. Gemini (cloud fallback — needs valid API key) ──────────────────────
     context_block = f"\nBối cảnh xu hướng mới nhất: {trend_context}" if trend_context else ""
-    prompt = f"""Bạn là chuyên gia dược liệu học và content SEO chuyên nghiệp cho thương hiệu TA Sâm Ngọc Linh.{context_block}
+    prompt = f"""Bạn là Chuyên gia Biên tập Cao cấp cho thương hiệu TA Sâm Ngọc Linh (vườn hữu cơ Trà Linh, Kon Tum).{context_block}
 
-Viết bài blog chuẩn SEO bằng tiếng Việt, 2500+ từ, chủ đề: "{title_vi}"
-Topic category: {topic}
+Viết bài blog tiếng Việt 2500+ từ, chuẩn SEO, chủ đề: "{title_vi}"
+Topic: {topic}
 
-Yêu cầu bắt buộc:
-1. Cấu trúc: H1 → H2 intro hook (150-200 từ) → 5-7 H2 sections → FAQs (6-8 Q&A) → CTA
-2. Mỗi H2 có 2-3 H3 sub-sections, bullet points 3-5 điểm/section
-3. TUYỆT ĐỐI KHÔNG dùng: điều trị, chữa khỏi, công dụng (y học), hết bệnh
-4. Dùng: hỗ trợ, cải thiện, giúp duy trì, theo nghiên cứu, dữ liệu cho thấy
-5. Cite peer-reviewed khi dùng số liệu. Author: "Đội Ngũ Nghiên Cứu TA" — KHÔNG bịa tên bác sĩ
+═══ CHUẨN ĐỊNH DẠNG BẮT BUỘC ═══
+
+**METADATA ĐẦU BÀI:**
+- Title SEO (55–65 ký tự, chứa từ khoá chính)
+- Excerpt 2–3 câu đắt giá
+- Reading time (ước tính)
+
+**CẤU TRÚC:**
+# [Title H1]
+
+[Đoạn intro hook 150–200 từ — giá trị lớn nhất độc giả nhận được]
+
+---
+📋 **Mục lục**
+- [Tên section 1](#s1)
+- [Tên section 2](#s2)
+...
+---
+
+## 🔬 [Section 1 — H2 có icon]{#s1}
+### [Sub-section 1.1]
+[Tối đa 4 dòng/đoạn. Bôi đậm **thuật ngữ khoa học**.]
+
+> 💡 **Lưu ý chuyên gia:** [1 câu insight thực — không bịa số]
+
+### [Sub-section 1.2]
+- Điểm 1
+- Điểm 2
+- Điểm 3
+
+## 📊 [Section 2 — Bảng so sánh nếu phù hợp]{#s2}
+| Tiêu chí | Sâm Ngọc Linh TA | ... |
+|---|---|---|
+| ... | ... | ... |
+
+[Lặp lại 5–7 H2 sections]
+
+---
+> ⚠️ **Phân biệt sâm thật:** [1–2 câu cảnh báo nếu topic phù hợp]
+---
+
+## ❓ Câu Hỏi Thường Gặp
+**Q: Câu hỏi 1?**
+A: Trả lời ngắn gọn...
+
+## ✅ Kết Luận
+[2–3 câu tổng kết ngắn]
+
+🛒 **Xem sản phẩm sâm Ngọc Linh TA:** [link sản phẩm phù hợp theo topic {topic}]
+
+═══ QUY TẮC NỘI DUNG ═══
+- TUYỆT ĐỐI KHÔNG: điều trị, chữa khỏi, hết bệnh, hiệu quả 100%, bảo đảm khỏi
+- DÙNG: hỗ trợ, cải thiện, theo nghiên cứu, dữ liệu cho thấy, nghiên cứu khoa học ghi nhận
+- Số liệu phải có cơ sở thực (không bịa) — cite nguồn rõ ràng
+- Không bịa tên bác sĩ/chuyên gia. Dùng "nghiên cứu viên", "Đội Ngũ Nghiên Cứu TA"
+- Mỗi đoạn văn ≤ 4 dòng
 
 Output PHẢI là JSON hợp lệ (không markdown code block):
 {{"title_vi":"...","body_md":"...","excerpt_vi":"...","faq_list":[{{"q":"...","a":"..."}}],"meta_description":"...","image_prompt":"...","compliance_check":"PASS hoặc FAIL: lý do"}}"""
@@ -508,10 +629,25 @@ Auto Blog | {datetime.now().strftime('%d/%m %H:%M')}"""
 # ─── MAIN ─────────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser(description="Auto Blog Generator — TA Sâm Ngọc Linh")
-    parser.add_argument("--topic", choices=["science","lifestyle","heritage"], default="science")
+    parser.add_argument("--topic", choices=["science","lifestyle","heritage","kgc"], default="science")
     parser.add_argument("--title", default="", help="Override title (optional)")
-    parser.add_argument("--scrape", action="store_true", help="Try to scrape trending topic first")
+    parser.add_argument("--scrape", action="store_true", help="Scrape trending topic then generate")
+    parser.add_argument("--auto", action="store_true", help="Round-robin across all categories automatically")
     args = parser.parse_args()
+
+    # --auto: pick next category round-robin
+    if args.auto:
+        _all_cats = ["science", "lifestyle", "heritage", "kgc"]
+        _state = {}
+        if STATE_FILE.exists():
+            with open(STATE_FILE, encoding="utf-8") as _sf:
+                _state = json.load(_sf)
+        _auto_idx = _state.get("__auto_cat__", 0)
+        args.topic = _all_cats[_auto_idx % len(_all_cats)]
+        _state["__auto_cat__"] = (_auto_idx + 1) % len(_all_cats)
+        with open(STATE_FILE, "w", encoding="utf-8") as _sf:
+            json.dump(_state, _sf)
+        log.info(f"[Auto] Round-robin category: {args.topic}")
 
     log.info("=" * 60)
     log.info(f"AUTO BLOG — topic={args.topic} | {datetime.now().strftime('%Y-%m-%d %H:%M')}")
