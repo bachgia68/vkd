@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ArrowRight, Clock, ChevronRight } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
+import { ArrowRight, Clock, ChevronRight, Search, X } from 'lucide-react';
 import { fetchBlogPosts, fetchBlogCategories, fetchSiteSetting, type BlogPost, type BlogCategory } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
@@ -193,6 +193,7 @@ export default function Blog({ onNavigate }: BlogProps) {
   const [selectedCat, setSelectedCat] = useState<string>('all');
   const [postsPerPage, setPostsPerPage] = useState(9);
   const [page, setPage] = useState(() => getPageFromUrl());
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchBlogPosts().then(setPosts).catch(() => setPosts([]));
@@ -204,8 +205,22 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   if (posts.length === 0) return null;
 
-  const [hero, ...rest] = posts;
   const isFullPage = window.location.pathname === '/blog';
+
+  // Search filter applied before category filter
+  const searchFiltered = useMemo(() => {
+    if (!searchQuery.trim()) return posts;
+    const q = searchQuery.toLowerCase();
+    return posts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      (p.excerpt || '').toLowerCase().includes(q)
+    );
+  }, [posts, searchQuery]);
+
+  const [hero, ...rest] = searchFiltered.length > 0 ? searchFiltered : posts;
+
+  // Category filter uses searchFiltered base when search is active
+  const baseForFilter = searchQuery.trim() ? searchFiltered.slice(1) : rest;
 
   // Slug → detectCategory label map (fallback for posts without category_id)
   const SLUG_TO_DETECT: Record<string, string[]> = {
@@ -220,15 +235,15 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   // Category filter — only on full /blog page
   const filteredRest = (isFullPage && selectedCat !== 'all')
-    ? rest.filter((p) => {
+    ? baseForFilter.filter((p) => {
         if (p.category_id) return p.category_id === selectedCat;
         const cat = categories.find((c) => c.id === selectedCat);
         if (!cat) return false;
         return (SLUG_TO_DETECT[cat.slug] ?? []).includes(detectCategory(p));
       })
-    : rest;
+    : baseForFilter;
 
-  const postsToShow = isFullPage ? filteredRest : rest.slice(0, 6);
+  const postsToShow = isFullPage ? filteredRest : (searchQuery.trim() ? searchFiltered.slice(0, 6) : rest.slice(0, 6));
 
   // Pagination for full page
   let gridPosts = postsToShow;
@@ -266,6 +281,25 @@ export default function Blog({ onNavigate }: BlogProps) {
             </a>
           )}
         </div>
+
+        {/* Search bar — chỉ hiện trên /blog đầy đủ */}
+        {isFullPage && (
+          <div className="relative mb-6 max-w-lg">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-forest-400 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm bài viết..."
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1); setPageInUrl(1); }}
+              className="w-full pl-11 pr-10 py-2.5 rounded-full border border-cream-300 bg-white text-forest-900 text-sm placeholder:text-forest-400 focus:outline-none focus:ring-2 focus:ring-forest-400 focus:border-transparent transition"
+            />
+            {searchQuery && (
+              <button onClick={() => { setSearchQuery(''); setPage(1); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-forest-400 hover:text-forest-700">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Category filter tabs — chỉ hiện trên /blog đầy đủ khi có categories từ DB */}
         {isFullPage && categories.length > 0 && (
@@ -316,6 +350,14 @@ export default function Blog({ onNavigate }: BlogProps) {
                 return <FeaturedPostSlide post={post} index={idx} onNavigate={onNavigate} />;
               }}
             />
+          </div>
+        )}
+
+        {/* No results state */}
+        {isFullPage && searchQuery.trim() && searchFiltered.length === 0 && (
+          <div className="py-16 text-center text-forest-400">
+            <Search className="w-10 h-10 mx-auto mb-4 opacity-40" />
+            <p className="text-lg font-medium">Không tìm thấy bài viết cho "<span className="text-forest-700">{searchQuery}</span>"</p>
           </div>
         )}
 
