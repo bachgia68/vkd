@@ -257,6 +257,11 @@ def _vi_slug(text):
     s = re.sub(r'\s+', '-', s)[:60].rstrip('-')
     return s
 
+def _reading_time(md_text):
+    words = len(re.findall(r'\w+', md_text))
+    mins = max(1, round(words / 250))
+    return f"{mins} phút đọc"
+
 def _build_post(title_vi, raw_md, topic):
     return {
         "title_vi": title_vi,
@@ -266,7 +271,8 @@ def _build_post(title_vi, raw_md, topic):
         "faq_list": [],
         "meta_description": f"{title_vi} - Tìm hiểu về sâm Ngọc Linh TA, saponin MR2."[:160],
         "image_prompt": f"Macro cinematic photo of Ngoc Linh Vietnamese ginseng root, {topic} theme, dark forest, Hasselblad 8K",
-        "compliance_check": "PASS (Ollama)"
+        "compliance_check": "PASS (Ollama)",
+        "reading_time": _reading_time(raw_md),
     }
 
 def generate_content(title_vi, topic, trend_context=""):
@@ -279,38 +285,96 @@ def generate_content(title_vi, topic, trend_context=""):
     }
     link_hint = INTERNAL_LINKS.get(topic, "")
 
+    CATEGORY_LABELS = {
+        "science": "Tri Thức Sâm",
+        "lifestyle": "Đời Sống Sâm",
+        "heritage": "Di Sản Ngọc Linh",
+        "kgc": "Tiêu Chuẩn Cao Cấp",
+    }
+    cat_label = CATEGORY_LABELS.get(topic, topic.title())
+    CTA_BLOCKS = {
+        "science":   "🛒 **Xem sản phẩm:** [Sâm Ngọc Linh TA chính hãng](https://tasamngoclinh.com/san-pham) — kiểm định HPLC đầy đủ.",
+        "lifestyle": "🛒 **Đặt ngay:** [Set quà sâm Ngọc Linh TA](https://tasamngoclinh.com/qua-tang) — đóng gói cao cấp.",
+        "heritage":  "🌿 **Tìm hiểu thêm:** [Vườn Sâm Nhà Khánh](https://tasamngoclinh.com/gioi-thieu) — canh tác hữu cơ chuẩn rừng.",
+        "kgc":       "📦 **So sánh sản phẩm:** [TA vs KGC](https://tasamngoclinh.com/san-pham) — minh bạch nguồn gốc.",
+    }
+    cta_mid = CTA_BLOCKS.get(topic, CTA_BLOCKS["science"])
+
     try:
         log.info("[Ollama] Generating (primary)...")
         ollama_prompt = f"""Viết bài blog tiếng Việt 1500–2000 từ về chủ đề: "{title_vi}"
 Thương hiệu: TA Sâm Ngọc Linh — vườn hữu cơ Trà Linh, Kon Tum.
+Category: {cat_label}
 
-CẤU TRÚC BẮT BUỘC (markdown):
-## [Tên section 1]
+CẤU TRÚC BẮT BUỘC (viết đúng format markdown này):
+
+# [Tiêu đề H1 — giống title]
+
+[Đoạn intro 100–150 từ, câu hook mở đầu ấn tượng, nêu giá trị độc giả nhận được]
+
+---
+📋 **Mục lục**
+- [Tên section 1](#s1)
+- [Tên section 2](#s2)
+- [Tên section 3](#s3)
+- [Câu Hỏi Thường Gặp](#faq)
+- [Kết Luận](#ketluan)
+---
+
+## 🔬 [Tên Section 1] {{#s1}}
+
 ### [Sub-section 1.1]
-Nội dung 120–150 từ...
-> **Lưu ý khoa học:** [1 câu dữ liệu nghiên cứu thực — không bịa số]
+Nội dung 80–120 từ. Đoạn không quá 4 dòng. Bôi đậm **thuật ngữ khoa học**.
+
+> 💡 **Lưu ý chuyên gia:** [1 câu insight thực — không bịa số]
 
 ### [Sub-section 1.2]
-- Điểm 1
-- Điểm 2
-- Điểm 3
+- Điểm chính 1
+- Điểm chính 2
+- Điểm chính 3
 
-## [Tên section 2]
-...
+## 📊 [Tên Section 2 — có bảng so sánh] {{#s2}}
 
-## Câu Hỏi Thường Gặp
-**Q: Câu hỏi 1?**
-A: Trả lời...
+| Tiêu chí | Sâm Ngọc Linh TA | So sánh |
+|---|---|---|
+| Saponin | Cao hơn | ... |
+| Đặc hữu | Majonoside-R2 | Không có |
 
-## Kết Luận
-[2–3 câu tổng kết + CTA nhẹ]
+## 🌿 [Tên Section 3] {{#s3}}
+
+### [Sub-section]
+Nội dung...
+
+> ⚠️ **Phân biệt sâm thật:** [1–2 câu cảnh báo hàng giả — nếu topic phù hợp]
+
+---
+{cta_mid}
+---
+
+## ❓ Câu Hỏi Thường Gặp {{#faq}}
+
+**Q: Câu hỏi thực tế 1?**
+A: Trả lời ngắn gọn, thực tế.
+
+**Q: Câu hỏi 2?**
+A: Trả lời.
+
+## ✅ Kết Luận {{#ketluan}}
+
+[2–3 câu tổng kết giá trị cốt lõi]
+
+📞 **Tư vấn chuyên sâu:** [Zalo Vườn Sâm Nhà Khánh](https://tasamngoclinh.com/hop-tac)
 {link_hint}
 
-QUY TẮC:
-- KHÔNG dùng: điều trị, chữa khỏi, hết bệnh, hiệu quả 100%
+---
+*Bài viết được biên soạn bởi Đội Ngũ Nghiên Cứu TA. Không thay thế tư vấn y tế chuyên nghiệp.*
+
+QUY TẮC TUYỆT ĐỐI:
+- KHÔNG dùng: điều trị, chữa khỏi, hết bệnh, hiệu quả 100%, bảo đảm khỏi
 - DÙNG: hỗ trợ, cải thiện, theo nghiên cứu, dữ liệu cho thấy
-- Ít nhất 4 section H2, mỗi section có 2 H3
-- Chỉ viết nội dung bài, không giải thích gì thêm"""
+- Mỗi H2 phải có ít nhất 2 H3 hoặc nội dung đủ dài
+- Số liệu phải có cơ sở — không bịa tên bác sĩ
+- Chỉ viết nội dung bài, không thêm giải thích ngoài"""
         raw_md = _call_ollama(ollama_prompt).strip()
         raw_md = ''.join(c if ord(c) >= 32 or c in '\n\t' else ' ' for c in raw_md)
         if len(raw_md) < 300:
@@ -386,7 +450,7 @@ A: Trả lời ngắn gọn...
 - Mỗi đoạn văn ≤ 4 dòng
 
 Output PHẢI là JSON hợp lệ (không markdown code block):
-{{"title_vi":"...","body_md":"...","excerpt_vi":"...","faq_list":[{{"q":"...","a":"..."}}],"meta_description":"...","image_prompt":"...","compliance_check":"PASS hoặc FAIL: lý do"}}"""
+{{"title_vi":"...","body_md":"...","excerpt_vi":"...","reading_time":"X phút đọc","faq_list":[{{"q":"...","a":"..."}}],"meta_description":"...","image_prompt":"...","compliance_check":"PASS hoặc FAIL: lý do"}}"""
 
     try:
         from google import genai
@@ -551,6 +615,7 @@ def insert_supabase(post_data, slug, topic, featured_image_url, compliance):
         "meta_description": post_data.get("meta_description", "")[:160],
         "compliance_check": compliance,
         "author": "Đội Ngũ Nghiên Cứu TA",
+        "reading_time": post_data.get("reading_time", _reading_time(post_data.get("body_md", ""))),
     }
 
     headers = {
