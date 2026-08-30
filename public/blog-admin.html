@@ -33,9 +33,27 @@ tr:hover td { background: #111827; }
 .date-cell { color: #6b7280; font-size: 11px; white-space: nowrap; }
 .actions { display: flex; gap: 6px; }
 .btn-preview { padding: 3px 10px; border-radius: 4px; font-size: 11px; background: #1e3a5f; color: #60a5fa; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn-share { padding: 3px 10px; border-radius: 4px; font-size: 11px; background: #1a3a1a; color: #4ade80; border: none; cursor: pointer; }
 .btn-delete { padding: 3px 10px; border-radius: 4px; font-size: 11px; background: #450a0a; color: #f87171; border: none; cursor: pointer; }
 .btn-preview:hover { background: #1e40af; }
+.btn-share:hover { background: #14532d; }
 .btn-delete:hover { background: #7f1d1d; }
+/* Share modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:100; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:24px; width:360px; max-width:94vw; }
+.modal h3 { color:#4ade80; font-size:14px; margin-bottom:16px; }
+.modal-title { color:#e5e7eb; font-size:12px; margin-bottom:12px; line-height:1.4; word-break:break-all; }
+.share-btns { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.share-btn { display:block; padding:9px 14px; border-radius:8px; font-size:12px; font-weight:600; text-align:center; cursor:pointer; border:none; text-decoration:none; }
+.sb-fb { background:#1877F2; color:#fff; }
+.sb-zalo { background:#0068FF; color:#fff; }
+.sb-copy { background:#374151; color:#e5e7eb; }
+.share-btn:hover { opacity:.88; }
+.qr-wrap { text-align:center; margin-bottom:12px; }
+.qr-wrap img { border-radius:8px; background:#fff; padding:4px; }
+.modal-close { width:100%; padding:8px; background:#1f2937; color:#9ca3af; border:none; border-radius:6px; cursor:pointer; font-size:12px; }
+.modal-close:hover { background:#374151; }
 .pagination { display: flex; gap: 8px; padding: 12px 20px; align-items: center; justify-content: center; }
 .pag-btn { padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; background: #1f2937; color: #9ca3af; font-size: 12px; }
 .pag-btn:hover:not(:disabled) { background: #374151; }
@@ -60,6 +78,21 @@ tr:hover td { background: #111827; }
   <button class="cat-btn" onclick="setCategory('lifestyle')">Lifestyle</button>
   <button class="cat-btn" onclick="setCategory('heritage')">Heritage</button>
   <button class="cat-btn" onclick="setCategory('kgc')">KGC</button>
+</div>
+
+<!-- Share modal -->
+<div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeShare()">
+  <div class="modal">
+    <h3>Chia sẻ bài viết</h3>
+    <div class="modal-title" id="share-title"></div>
+    <div class="share-btns">
+      <a class="share-btn sb-fb" id="share-fb" target="_blank" rel="noopener">Chia sẻ lên Facebook</a>
+      <a class="share-btn sb-zalo" id="share-zalo" target="_blank" rel="noopener">Chia sẻ qua Zalo</a>
+      <button class="share-btn sb-copy" id="share-copy" onclick="copyShareLink()">Sao chép Link</button>
+    </div>
+    <div class="qr-wrap"><img id="share-qr" src="" width="150" height="150" alt="QR"></div>
+    <button class="modal-close" onclick="closeShare()">Đóng</button>
+  </div>
 </div>
 
 <div id="error-container"></div>
@@ -142,6 +175,7 @@ async function load() {
         <td class="date-cell">${date}</td>
         <td class="actions">
           <a class="btn-preview" href="/blog/${slugVi}" target="_blank">Preview</a>
+          <button class="btn-share" onclick="openShare('${slugVi}','${titleVi.replace(/'/g,"\\'")}')">Share</button>
           ${!p.published ? `<button class="btn-delete" onclick="delPost('${p.id}','${titleVi.replace(/'/g,"\\'")}')">Xóa</button>` : ''}
         </td>
       </tr>`;
@@ -176,6 +210,27 @@ async function delPost(id, title) {
     total--;
     document.getElementById('total-info').textContent = `${total} bài`;
   } catch(e) { alert('Xóa lỗi: ' + e.message); }
+}
+
+let _shareUrl = '';
+function openShare(slug, title) {
+  _shareUrl = `https://tasamngoclinh.com/blog/${slug}`;
+  const enc = encodeURIComponent(_shareUrl);
+  document.getElementById('share-title').textContent = title;
+  document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${enc}`;
+  document.getElementById('share-zalo').href = `https://zalo.me/share?url=${enc}`;
+  document.getElementById('share-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${enc}`;
+  document.getElementById('share-modal').classList.add('open');
+}
+function closeShare() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+function copyShareLink() {
+  navigator.clipboard.writeText(_shareUrl).then(() => {
+    const btn = document.getElementById('share-copy');
+    btn.textContent = 'Đã sao chép!';
+    setTimeout(() => { btn.textContent = 'Sao chép Link'; }, 1800);
+  });
 }
 
 load();
