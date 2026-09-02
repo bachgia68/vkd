@@ -37,7 +37,7 @@ function fmtPrice(amount: number, region: Region) {
   return `${symbol}${amount.toFixed(2)}`;
 }
 
-export default function Checkout({ lang, onNavigate }: CheckoutProps) {
+export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutProps) {
   const { items, subtotalVND } = useCart();
   const isVi = lang === 'vi';
 
@@ -143,7 +143,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
           });
           const result = await res.json() as { success: boolean; paypalOrderId: string };
           if (result.success) {
-            setPaymentState('success');
+            onOrderSuccess(`PAYPAL-${result.paypalOrderId}`);
           } else {
             setPaymentState('failed');
           }
