@@ -210,6 +210,20 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   const isFullPage = window.location.pathname === '/blog';
 
+  // Rules of Hooks: mọi hook phải chạy vô điều kiện, trước bất kỳ early
+  // return nào (loading/empty) — trước đây useMemo nằm sau các return sớm,
+  // khiến số lượng hooks đổi giữa các lần render (7 useState+1 useEffect lúc
+  // loading vs +1 useMemo lúc có data) → React throw "Rendered more hooks
+  // than during the previous render" và crash toàn bộ trang trắng.
+  const searchFiltered = useMemo(() => {
+    if (!searchQuery.trim()) return posts;
+    const q = searchQuery.toLowerCase();
+    return posts.filter(p =>
+      (p.title || '').toLowerCase().includes(q) ||
+      (p.excerpt || '').toLowerCase().includes(q)
+    );
+  }, [posts, searchQuery]);
+
   if (loading) return (
     <section className={`${isFullPage ? 'pt-32 pb-16' : 'section-padding'} bg-cream-50`}>
       <div className="container-wide">
@@ -237,16 +251,6 @@ export default function Blog({ onNavigate }: BlogProps) {
       </div>
     </section>
   );
-
-  // Search filter applied before category filter
-  const searchFiltered = useMemo(() => {
-    if (!searchQuery.trim()) return posts;
-    const q = searchQuery.toLowerCase();
-    return posts.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      (p.excerpt || '').toLowerCase().includes(q)
-    );
-  }, [posts, searchQuery]);
 
   const [hero, ...rest] = searchFiltered.length > 0 ? searchFiltered : posts;
 
