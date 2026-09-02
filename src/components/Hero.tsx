@@ -15,7 +15,7 @@ export default function Hero({ lang }: HeroProps) {
   const [cmsLine1, cmsLine2] = cms?.title_vi
     ? cms.title_vi.split('—').map((s) => s.trim())
     : [t.hero.titleLine1, t.hero.titleLine2];
-  const cmsBg = cms?.image_url || '/assets/images/cay-sam-ngoc-linh.png';
+  const cmsBg = cms?.image_url || '/assets/images/cay-sam-ngoc-linh.webp';
 
   return (
     <section

@@ -94,9 +94,11 @@ export default function About({ lang, onNavigate }: AboutProps) {
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden shadow-elegant-lg">
               <img
-                src="/assets/images/sam-ngoc-linh-plant.png"
+                src="/assets/images/sam-ngoc-linh-plant.webp"
                 alt="Panax Vietnamensis"
                 className="w-full aspect-[4/5] object-cover"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-forest-950/80 via-forest-900/20 to-transparent" />
 

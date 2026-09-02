@@ -14,9 +14,9 @@ const FALLBACK_IMAGES = [
   '/assets/images/heritage-la-sam.jpg',
   '/assets/images/heritage-hat-sam-1.jpg',
   '/assets/images/heritage-cu-sam-3.jpg',
-  '/assets/images/sam-ngoc-linh-plant.png',
+  '/assets/images/sam-ngoc-linh-plant.webp',
   '/assets/images/heritage-vuon-khanh-nhieu-cay.jpg',
-  '/assets/images/cay-sam-ngoc-linh.png',
+  '/assets/images/cay-sam-ngoc-linh.webp',
 ];
 
 function getFallback(index: number): string {
