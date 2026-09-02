@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, ArrowRight, CreditCard, Truck, ShieldCheck, CheckCircle, Loader, AlertCircle, DollarSign, Crown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
@@ -42,7 +42,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
   const isVi = lang === 'vi';
 
   const [region, setRegion] = useState<Region>(isVi ? 'vn' : 'us');
-  const [paymentMethod] = useState<PaymentMethod>('payos');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('payos');
   const [paymentState, setPaymentState] = useState<PaymentState>('idle');
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', country: 'Vietnam' });
@@ -50,6 +50,9 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
 
   // Chỉ tra điểm khi email hợp lệ và đã rời khỏi ô nhập (blur) — tránh gọi
   // RPC theo từng phím gõ.
+  const paypalContainerRef = useRef<HTMLDivElement>(null);
+  const paypalRendered = useRef(false);
+
   const [lookupEmail, setLookupEmail] = useState<string | null>(null);
   const { data: loyaltyData } = useLoyaltyData(lookupEmail);
   const pointsBalance = loyaltyData?.totalPoints ?? 0;
@@ -100,6 +103,59 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
     }
   };
 
+  // Render PayPal Smart Buttons when PayPal tab selected
+  useEffect(() => {
+    if (paymentMethod !== 'paypal') return;
+    if (!paypalContainerRef.current) return;
+    if (paypalRendered.current) return;
+
+    const PPID = import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined;
+    if (!PPID) return;
+
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PPID}&currency=USD`;
+    script.onload = () => {
+      if (!paypalContainerRef.current) return;
+      paypalRendered.current = true;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).paypal.Buttons({
+        createOrder: async () => {
+          const amountUSD = regionConfig.us.priceKey === 'priceUSD'
+            ? items.reduce((s, i) => s + i.priceUSD * i.quantity, 0) * (1 + regionConfig.us.taxRate)
+            : subtotalVND / 25000;
+          const res = await fetch('/api/create-paypal-order', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              amountUSD: Math.max(1, parseFloat(amountUSD.toFixed(2))),
+              description: `TA Sâm Ngọc Linh — ${items.length} sản phẩm`,
+            }),
+          });
+          const data = await res.json() as { orderID: string };
+          return data.orderID;
+        },
+        onApprove: async (data: { orderID: string }) => {
+          setPaymentState('verifying');
+          const res = await fetch('/api/capture-paypal-order', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ orderID: data.orderID }),
+          });
+          const result = await res.json() as { success: boolean; paypalOrderId: string };
+          if (result.success) {
+            setPaymentState('success');
+          } else {
+            setPaymentState('failed');
+          }
+        },
+        onError: () => setPaymentState('failed'),
+        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
+      }).render(paypalContainerRef.current);
+    };
+    document.body.appendChild(script);
+    return () => { script.remove(); };
+  }, [paymentMethod, items, subtotalVND]);
+
   const handlePlaceOrder = async () => {
     if (!form.name || !form.email || !form.address) {
       setFormError(
@@ -116,8 +172,8 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
 
   const paymentOptions: { key: PaymentMethod; label: string; logo: string; type: string; comingSoon?: boolean }[] = [
     { key: 'payos',   label: 'PayOS · Chuyển khoản QR', logo: '🏦', type: 'VietQR Napas 24/7' },
+    { key: 'paypal',  label: 'PayPal',              logo: '🅿',  type: 'International (USD)' },
     { key: 'stripe',  label: 'Credit / Debit Card', logo: '💳', type: 'International', comingSoon: true },
-    { key: 'paypal',  label: 'PayPal',              logo: '🅿',  type: 'International', comingSoon: true },
     { key: 'vnpay',   label: 'VNPAY',               logo: '🇻🇳', type: 'Domestic (VN)', comingSoon: true },
     { key: 'momo',    label: 'MoMo Wallet',         logo: '💜', type: 'Domestic (VN)', comingSoon: true },
   ];
@@ -252,6 +308,7 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                   <button
                     key={opt.key}
                     disabled={opt.comingSoon}
+                    onClick={() => { if (!opt.comingSoon) { setPaymentMethod(opt.key); paypalRendered.current = false; } }}
                     className={`relative p-4 rounded-xl border-2 text-left transition-all ${
                       opt.comingSoon
                         ? 'border-cream-200 opacity-50 cursor-not-allowed'
@@ -271,17 +328,26 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                   </button>
                 ))}
               </div>
-              <div className="p-4 rounded-xl bg-forest-50 border border-forest-100 text-sm text-forest-700 space-y-1">
-                <p className="font-semibold text-forest-900">Thanh toán bằng mã VietQR</p>
-                <p>
-                  Bấm “Đặt Hàng” để mở trang thanh toán an toàn của PayOS. Quét mã QR bằng app
-                  ngân hàng để chuyển khoản — đơn hàng xác nhận tự động ngay khi chuyển khoản
-                  thành công.
-                </p>
-                <p className="text-forest-500 text-xs pt-1">
-                  Số tiền thanh toán qua PayOS: <span className="font-semibold">{fmtPrice(payosTotal, 'vn')}</span> (VND)
-                </p>
-              </div>
+
+              {paymentMethod === 'payos' && (
+                <div className="p-4 rounded-xl bg-forest-50 border border-forest-100 text-sm text-forest-700 space-y-1">
+                  <p className="font-semibold text-forest-900">Thanh toán bằng mã VietQR</p>
+                  <p>Bấm "Đặt Hàng" để mở trang thanh toán an toàn của PayOS. Quét mã QR bằng app ngân hàng — đơn hàng xác nhận tự động ngay khi chuyển khoản thành công.</p>
+                  <p className="text-forest-500 text-xs pt-1">
+                    Số tiền: <span className="font-semibold">{fmtPrice(payosTotal, 'vn')}</span> (VND)
+                  </p>
+                </div>
+              )}
+
+              {paymentMethod === 'paypal' && (
+                <div className="space-y-3">
+                  <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-sm text-blue-800">
+                    <p className="font-semibold mb-1">PayPal — International Payment (USD)</p>
+                    <p className="text-xs text-blue-600">Thanh toán bảo mật qua PayPal. Click nút PayPal bên dưới để hoàn tất.</p>
+                  </div>
+                  <div ref={paypalContainerRef} className="min-h-[50px]" />
+                </div>
+              )}
               <div className="flex items-center gap-2 mt-4 p-3 rounded-xl bg-forest-50">
                 <ShieldCheck className="w-4 h-4 text-forest-600 flex-shrink-0" />
                 <p className="text-forest-600 text-xs">{isVi ? 'Thanh toán được mã hóa 256-bit SSL. TA không lưu thông tin thẻ của bạn.' : '256-bit SSL encrypted. TA never stores your card details.'}</p>
@@ -377,15 +443,17 @@ export default function Checkout({ lang, onNavigate }: CheckoutProps) {
                   </div>
                 )}
 
-                <button
-                  onClick={handlePlaceOrder}
-                  disabled={items.length === 0}
-                  className="btn-gold w-full justify-center mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <CheckCircle className="w-5 h-5" />
-                  {isVi ? 'Đặt Hàng' : 'Place Order'}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                {paymentMethod !== 'paypal' && (
+                  <button
+                    onClick={handlePlaceOrder}
+                    disabled={items.length === 0}
+                    className="btn-gold w-full justify-center mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    {isVi ? 'Đặt Hàng' : 'Place Order'}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
 
                 {formError && (
                   <p className="text-center text-red-600 text-xs mt-3">{formError}</p>
