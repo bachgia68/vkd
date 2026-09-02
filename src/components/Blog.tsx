@@ -194,18 +194,45 @@ export default function Blog({ onNavigate }: BlogProps) {
   const [postsPerPage, setPostsPerPage] = useState(9);
   const [page, setPage] = useState(() => getPageFromUrl());
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchBlogPosts().then(setPosts).catch(() => setPosts([]));
+    fetchBlogPosts().then(setPosts).catch(() => setPosts([])).finally(() => setLoading(false));
     fetchBlogCategories().then(setCategories).catch(() => {});
     fetchSiteSetting('posts_per_page').then((v) => {
       if (v) { const n = parseInt(v, 10); if (!isNaN(n) && n > 2) setPostsPerPage(n); }
     }).catch(() => {});
   }, []);
 
-  if (posts.length === 0) return null;
-
   const isFullPage = window.location.pathname === '/blog';
+
+  if (loading) return (
+    <section className={`${isFullPage ? 'pt-32 pb-16' : 'section-padding'} bg-cream-50`}>
+      <div className="container-wide">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[1,2,3].map(i => (
+            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-elegant animate-pulse">
+              <div className="aspect-[16/9] bg-forest-100" />
+              <div className="p-6 space-y-3">
+                <div className="h-4 bg-forest-100 rounded w-3/4" />
+                <div className="h-3 bg-forest-100 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  if (posts.length === 0 && !isFullPage) return null;
+
+  if (posts.length === 0 && isFullPage) return (
+    <section className="pt-32 pb-16 bg-cream-50 min-h-screen">
+      <div className="container-wide text-center py-24">
+        <p className="text-forest-600 text-lg">Chưa có bài viết nào. Vui lòng quay lại sau.</p>
+      </div>
+    </section>
+  );
 
   // Search filter applied before category filter
   const searchFiltered = useMemo(() => {
