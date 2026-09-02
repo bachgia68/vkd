@@ -1,6 +1,8 @@
 export const config = { runtime: 'nodejs' };
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { IncomingMessage, ServerResponse } from 'http';
+type VercelRequest = IncomingMessage & { body: unknown; query: Record<string, string> };
+type VercelResponse = ServerResponse & { status: (code: number) => VercelResponse; json: (data: unknown) => void; end: () => void };
 
 const PAYPAL_API = 'https://api-m.paypal.com';
 
