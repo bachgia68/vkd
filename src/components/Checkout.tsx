@@ -52,6 +52,8 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
   // RPC theo từng phím gõ.
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const paypalRendered = useRef(false);
+  const [paypalLoading, setPaypalLoading] = useState(false);
+  const [paypalError, setPaypalError] = useState<string | null>(null);
 
   const [lookupEmail, setLookupEmail] = useState<string | null>(null);
   const { data: loyaltyData } = useLoyaltyData(lookupEmail);
@@ -110,11 +112,18 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
     if (paypalRendered.current) return;
 
     const PPID = import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined;
-    if (!PPID) return;
+    if (!PPID) {
+      setPaypalError('PayPal chưa được cấu hình. Vui lòng chọn phương thức khác.');
+      return;
+    }
 
+    setPaypalLoading(true);
+    setPaypalError(null);
     const script = document.createElement('script');
     script.src = `https://www.paypal.com/sdk/js?client-id=${PPID}&currency=USD`;
+    script.onerror = () => { setPaypalLoading(false); setPaypalError('Không tải được PayPal SDK. Kiểm tra kết nối mạng.'); };
     script.onload = () => {
+      setPaypalLoading(false);
       if (!paypalContainerRef.current) return;
       paypalRendered.current = true;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -345,6 +354,18 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
                     <p className="font-semibold mb-1">PayPal — International Payment (USD)</p>
                     <p className="text-xs text-blue-600">Thanh toán bảo mật qua PayPal. Click nút PayPal bên dưới để hoàn tất.</p>
                   </div>
+                  {paypalLoading && (
+                    <div className="flex items-center justify-center py-4 text-forest-500 text-sm gap-2">
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Đang tải PayPal...
+                    </div>
+                  )}
+                  {paypalError && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 text-red-700 text-sm">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      {paypalError}
+                    </div>
+                  )}
                   <div ref={paypalContainerRef} className="min-h-[50px]" />
                 </div>
               )}

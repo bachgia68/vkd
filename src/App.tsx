@@ -189,19 +189,19 @@ function App() {
             <Traceability lang={lang} />
           )}
 
-          {currentPage === 'about' && visibleSections.has('about') && (
+          {currentPage === 'about' && (
             <About lang={lang} onNavigate={navigate} />
           )}
 
-          {currentPage === 'blog' && visibleSections.has('blog') && (
+          {currentPage === 'blog' && (
             <Blog onNavigate={navigate} />
           )}
 
-          {currentPage === 'blog-post' && visibleSections.has('blog') && (
+          {currentPage === 'blog-post' && (
             <BlogPostDetail slug={selectedSlug} lang={lang} onNavigate={navigate} />
           )}
 
-          {currentPage === 'showrooms' && visibleSections.has('showrooms') && (
+          {currentPage === 'showrooms' && (
             <Showrooms lang={lang} />
           )}
 
