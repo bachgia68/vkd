@@ -25,7 +25,7 @@ function getFallback(index: number): string {
 
 // Tự detect category từ title/body
 function detectCategory(post: BlogPost): string {
-  const text = (post.title + ' ' + (post.excerpt || '')).toLowerCase();
+  const text = ((post.title || '') + ' ' + (post.excerpt || '')).toLowerCase();
   if (/mr2|majonoside|saponin|hoạt chất|dược chất|enzyme|vi sinh/i.test(text)) return 'Khoa học';
   if (/vùng trồng|ngọc linh|núi|vườn|canh tác|bảo tồn/i.test(text)) return 'Vùng trồng';
   if (/dinh dưỡng|sức khỏe|miễn dịch|tăng cường|bổ sung/i.test(text)) return 'Sức khoẻ';
@@ -33,11 +33,15 @@ function detectCategory(post: BlogPost): string {
   return 'Kiến thức';
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('vi-VN');
+function formatDate(iso: string | null | undefined) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('vi-VN');
 }
 
-function estimateReadingMinutes(body: string) {
+function estimateReadingMinutes(body: string | null | undefined) {
+  if (!body) return 1;
   const words = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 }

@@ -16,17 +16,21 @@ interface BlogPostDetailProps {
   onNavigate?: (page: string, slug?: string) => void;
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('vi-VN');
+function formatDate(iso: string | null | undefined) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('vi-VN');
 }
 
 function slugifyHeading(text: string, index: number) {
-  const base = slugify(text);
+  const base = slugify(text || '');
   return `${base || 'section'}-${index}`;
 }
 
 // Ước lượng thời gian đọc kiểu tiếng Việt (~200 từ/phút), làm tròn lên phút gần nhất.
-function estimateReadingMinutes(body: string) {
+function estimateReadingMinutes(body: string | null | undefined) {
+  if (!body) return 1;
   const words = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 }
@@ -41,8 +45,8 @@ interface TocEntry {
 // parser nhỏ tự viết là đủ. Thêm hỗ trợ "> " (blockquote) để tác giả có thể
 // tự đánh dấu khối số liệu/trích dẫn nổi bật (Key Stat / Social Proof) chỉ
 // bằng cú pháp markdown, không cần trường dữ liệu riêng.
-function renderMarkdown(body: string): { blocks: ReactElement[]; toc: TocEntry[] } {
-  const lines = body.split('\n');
+function renderMarkdown(body: string | null | undefined): { blocks: ReactElement[]; toc: TocEntry[] } {
+  const lines = (body || '').split('\n');
   const blocks: ReactElement[] = [];
   const toc: TocEntry[] = [];
   let listItems: string[] = [];
