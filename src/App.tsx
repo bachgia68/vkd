@@ -69,6 +69,7 @@ function App() {
       if (pathname === '/blog' || pathname === '/blog/') return { page: 'blog' };
       const productMatch = pathname.match(/^\/product\/([^/]+)\/?$/);
       if (productMatch) return { page: 'product-detail', slug: productMatch[1] };
+      if (pathname === '/products' || pathname === '/products/') return { page: 'catalog' };
       return { page: 'home' };
     };
 
@@ -142,6 +143,8 @@ function App() {
         ? `/product/${slug}`
         : page === 'blog'
         ? '/blog'
+        : page === 'catalog'
+        ? '/products'
         : '/';
     window.history.pushState({ page, slug: slug ?? selectedSlug }, '', pathname + window.location.search);
   };
