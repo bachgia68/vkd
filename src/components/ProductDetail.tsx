@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Check,
   ChevronRight,
@@ -187,6 +187,7 @@ function formatPrice(price: number | null, lang: Language): string {
 export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailProps) {
   const [qty, setQty] = useState(1);
   const [liked, setLiked] = useState(false);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
   const { addToCart } = useCart();
 
   const ui = detailUi[lang];
@@ -201,6 +202,10 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
     path: `/product/${slug}`,
     image: product?.image,
   });
+
+  useEffect(() => {
+    setActiveImage(null);
+  }, [slug]);
 
   useJsonLd(
     product && product.price !== null
@@ -312,7 +317,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
             <div className="relative bg-white rounded-3xl overflow-hidden border border-cream-200 shadow-elegant">
               <div className="aspect-[4/5] overflow-hidden bg-cream-100">
                 <img
-                  src={product.image}
+                  src={activeImage ?? product.image}
                   alt={displayName}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -335,6 +340,20 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                 </div>
               )}
             </div>
+
+            {product.galleryImages && product.galleryImages.length > 0 && (
+              <div className="grid grid-cols-4 gap-3 mt-3">
+                {product.galleryImages.map((url, i) => (
+                  <button
+                    key={url}
+                    onClick={() => setActiveImage(url)}
+                    className="aspect-square rounded-xl overflow-hidden border border-cream-200 hover:border-gold-400 transition-colors"
+                  >
+                    <img src={url} alt={`${displayName} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -455,6 +474,31 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                 <Phone className="w-4 h-4" />
                 {ui.contactCta}
               </a>
+            )}
+
+            {(product.ctaZaloUrl || product.ctaShopeeUrl) && (
+              <div className="flex gap-3 flex-wrap mb-4">
+                {product.ctaZaloUrl && (
+                  <a
+                    href={product.ctaZaloUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 border border-forest-300 hover:border-forest-500 text-forest-700 text-sm font-semibold py-3 px-5 rounded-full transition-colors"
+                  >
+                    <Phone className="w-4 h-4" /> Tư Vấn Qua Zalo
+                  </a>
+                )}
+                {product.ctaShopeeUrl && (
+                  <a
+                    href={product.ctaShopeeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 border border-forest-300 hover:border-forest-500 text-forest-700 text-sm font-semibold py-3 px-5 rounded-full transition-colors"
+                  >
+                    <ShoppingBag className="w-4 h-4" /> Mua Trên Shopee
+                  </a>
+                )}
+              </div>
             )}
 
             <p className="text-xs text-forest-400 flex items-center gap-1.5">

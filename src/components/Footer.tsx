@@ -11,6 +11,7 @@ import {
   type SocialLink,
   type SiteLanguage,
 } from '../lib/siteContentApi';
+import NewsletterCTA from './NewsletterCTA';
 
 const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
   id: key,
@@ -90,6 +91,11 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
   return (
     <footer id="contact" className="bg-forest-950 text-white pt-20 pb-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
+        {/* Widget CRO "Nhận Cẩm Nang" — nổi bật ngay đầu footer, mọi trang đều thấy */}
+        <div className="mb-16">
+          <NewsletterCTA />
+        </div>
+
         {/* Main Footer Content */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Column */}

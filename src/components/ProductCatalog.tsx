@@ -61,6 +61,7 @@ const productTypeIcons: Record<ProductTypeId, typeof Leaf> = {
 };
 
 const descriptionFor = (product: Product): string => {
+  if (product.descriptionShort) return product.descriptionShort;
   return product.activeIngredient
     ? `${product.description} · ${product.activeIngredient}.`
     : product.description;

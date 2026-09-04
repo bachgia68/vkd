@@ -1,8 +1,9 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, Fragment } from 'react';
 import { ArrowRight, Clock, ChevronRight, Search, X } from 'lucide-react';
 import { fetchBlogPosts, fetchBlogCategories, fetchSiteSetting, type BlogPost, type BlogCategory } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import NewsletterCTA from './NewsletterCTA';
 
 interface BlogProps {
   onNavigate?: (page: string, slug?: string) => void;
@@ -291,13 +292,14 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   const postsToShow = isFullPage ? filteredRest : (searchQuery.trim() ? searchFiltered.slice(0, 6) : rest.slice(0, 6));
 
-  // Pagination for full page
+  // "Xem thêm" (load-more) thay phân trang truyền thống — vẫn cộng dồn bài
+  // theo ?page=N trong URL (giữ canonical/deep-link/nút back hoạt động đúng)
+  // thay vì infinite-scroll tự động, tránh rủi ro SEO của auto-scroll thật.
   let gridPosts = postsToShow;
   let totalPages = 1;
   if (isFullPage && postsToShow.length > postsPerPage) {
     totalPages = Math.ceil(postsToShow.length / postsPerPage);
-    const start = (page - 1) * postsPerPage;
-    gridPosts = postsToShow.slice(start, start + postsPerPage);
+    gridPosts = postsToShow.slice(0, page * postsPerPage);
   }
 
   // Carousel "Bài Viết Nổi Bật" — dùng lại data đã fetch, N bài mới nhất sau hero
@@ -407,49 +409,37 @@ export default function Blog({ onNavigate }: BlogProps) {
           </div>
         )}
 
-        {/* Grid posts — bắt đầu từ index 1 để fallback không trùng với hero */}
+        {/* Grid posts — bắt đầu từ index 1 để fallback không trùng với hero, chèn
+            widget CRO "Nhận Cẩm Nang" ở giữa danh sách (sau hàng bài đầu tiên) */}
         {gridPosts.length > 0 && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {gridPosts.map((post, i) => (
-              <PostCard key={post.id} post={post} index={i + 1} onNavigate={onNavigate} />
+              <Fragment key={post.id}>
+                <PostCard post={post} index={i + 1} onNavigate={onNavigate} />
+                {isFullPage && i === 2 && (
+                  <div className="md:col-span-2 lg:col-span-3">
+                    <NewsletterCTA />
+                  </div>
+                )}
+              </Fragment>
             ))}
           </div>
         )}
+        {isFullPage && gridPosts.length > 0 && gridPosts.length <= 3 && (
+          <div className="mt-6">
+            <NewsletterCTA />
+          </div>
+        )}
 
-        {/* Pagination — hiển thị trên trang /blog đầy đủ */}
-        {isFullPage && totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-2">
-            {page > 1 && (
-              <button
-                onClick={() => { setPageInUrl(page - 1); setPage(page - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="px-4 py-2 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 transition-colors text-sm font-medium"
-              >
-                ← Trước
-              </button>
-            )}
-            <div className="flex gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => { setPageInUrl(p); setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                    p === page
-                      ? 'bg-forest-600 text-white'
-                      : 'border border-forest-300 text-forest-700 hover:bg-forest-50'
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-            {page < totalPages && (
-              <button
-                onClick={() => { setPageInUrl(page + 1); setPage(page + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="px-4 py-2 border border-forest-300 text-forest-700 rounded-lg hover:bg-forest-50 transition-colors text-sm font-medium"
-              >
-                Sau →
-              </button>
-            )}
+        {/* Xem thêm — load-more, cộng dồn bài viết, vẫn cập nhật ?page=N */}
+        {isFullPage && page < totalPages && (
+          <div className="mt-12 flex justify-center">
+            <button
+              onClick={() => { setPageInUrl(page + 1); setPage(page + 1); }}
+              className="inline-flex items-center gap-2 px-8 py-3 border border-forest-300 text-forest-700 rounded-full text-sm font-medium hover:border-forest-500 hover:bg-forest-50 transition-colors"
+            >
+              Xem thêm bài viết <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         )}
 

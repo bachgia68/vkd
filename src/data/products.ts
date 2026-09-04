@@ -38,6 +38,12 @@ export interface Product {
   nameEn?: string; descriptionEn?: string;
   nameZh?: string; descriptionZh?: string;
   nameFr?: string; descriptionFr?: string;
+  // Override-only fields — không có trong catalog tĩnh, chỉ đổ vào khi admin
+  // set ở "Sản phẩm & Kho" qua get_product_overrides() (useLiveProducts).
+  galleryImages?: string[];
+  descriptionShort?: string;
+  ctaZaloUrl?: string;
+  ctaShopeeUrl?: string;
 }
 
 const allProducts: Product[] = [

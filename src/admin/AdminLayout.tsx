@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye, Crown, Images, Languages, Type, Clapperboard } from 'lucide-react';
+import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye, Crown, Images, Languages, Type, Clapperboard, Mail } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 import { Button } from '../components/ui/button';
 
@@ -32,6 +32,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/loyalty', end: false, label: 'TA Elite Club', icon: Crown },
   { to: '/gate-vkd-control-2026/inventory-qr', end: false, label: 'Kho hàng & QR', icon: Warehouse },
   { to: '/gate-vkd-control-2026/settings', end: false, label: 'Địa chỉ & Liên hệ', icon: Settings },
+  { to: '/gate-vkd-control-2026/leads', end: false, label: 'Đăng Ký Nhận Cẩm Nang', icon: Mail },
 ];
 
 export default function AdminLayout() {

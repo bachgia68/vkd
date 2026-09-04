@@ -76,7 +76,31 @@ export const CONSENT_LOG: [string, string, string, string][] = [
   ['02/06/2026', 'Yêu cầu xem dữ liệu cá nhân', 'Email hỗ trợ', 'Đã xử lý'],
 ];
 
-export const BANNED_KEYWORDS = ['đặc trị', 'chữa khỏi hoàn toàn', 'chữa khỏi', 'thần dược', 'thay thế thuốc chữa bệnh'];
+export const BANNED_KEYWORDS = [
+  'đặc trị',
+  'chữa khỏi hoàn toàn',
+  'chữa khỏi',
+  'chữa dứt điểm',
+  'chữa tận gốc',
+  'thần dược',
+  'thuốc tiên',
+  'thay thế thuốc chữa bệnh',
+  'cam kết 100%',
+  'hiệu quả 100%',
+  'khỏi bệnh 100%',
+  'cam kết khỏi',
+  'điều trị dứt điểm',
+  'trị dứt điểm',
+  'công dụng thần kỳ',
+  'thuốc chữa ung thư',
+  'chữa ung thư',
+  'chữa bách bệnh',
+  'khỏi hẳn',
+  'không tác dụng phụ',
+  'an toàn tuyệt đối',
+  'hiệu quả tức thì',
+  'khỏi ngay',
+];
 export const MANDATORY_DISCLAIMER =
   'Sản phẩm này không phải là thuốc và không có tác dụng thay thế thuốc chữa bệnh. Hiệu quả có thể khác nhau tùy cơ địa mỗi người.';
 

@@ -10,6 +10,7 @@ import Traceability from './components/Traceability';
 import B2B from './components/B2B';
 import Certifications from './components/Certifications';
 import Footer from './components/Footer';
+import NewsletterCTA from './components/NewsletterCTA';
 import ProductCatalog from './components/ProductCatalog';
 import ProductDetail from './components/ProductDetail';
 import ProductAdvisor from './components/ProductAdvisor';
@@ -184,6 +185,11 @@ function App() {
               <Certifications lang={lang} />
               <TrustProof lang={lang} />
               <B2B lang={lang} />
+              <section className="section-padding bg-cream-50">
+                <div className="container-wide max-w-3xl">
+                  <NewsletterCTA />
+                </div>
+              </section>
               {visibleSections.has('video-gallery') && <VideoGallery />}
             </>
           )}

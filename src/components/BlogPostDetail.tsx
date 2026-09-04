@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement, type ReactNode } from 'react';
 import { ArrowLeft, Clock, UserRound, Quote, List } from 'lucide-react';
 import type { Language } from '../i18n/translations';
-import { fetchBlogPost, type BlogPost } from '../lib/siteContentApi';
+import { fetchBlogPost, fetchBlogLinkKeywords, type BlogPost, type BlogLinkKeyword } from '../lib/siteContentApi';
 import { products as staticProducts } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { getFeaturedProducts } from '../data/featuredProducts';
@@ -45,7 +45,46 @@ interface TocEntry {
 // parser nhỏ tự viết là đủ. Thêm hỗ trợ "> " (blockquote) để tác giả có thể
 // tự đánh dấu khối số liệu/trích dẫn nổi bật (Key Stat / Social Proof) chỉ
 // bằng cú pháp markdown, không cần trường dữ liệu riêng.
-function renderMarkdown(body: string | null | undefined): { blocks: ReactElement[]; toc: TocEntry[] } {
+// Thay 1 lần xuất hiện đầu tiên của mỗi từ khoá (chưa dùng) bằng link nội bộ,
+// ưu tiên vị trí sớm nhất trong đoạn văn giữa các từ khoá đang cạnh tranh.
+function autoLinkSegment(
+  text: string,
+  keywords: BlogLinkKeyword[],
+  used: Set<string>,
+  keyPrefix: string
+): ReactNode[] {
+  if (!text) return [];
+  let best: { idx: number; kw: BlogLinkKeyword } | null = null;
+  const lower = text.toLowerCase();
+  for (const kw of keywords) {
+    if (used.has(kw.id)) continue;
+    const idx = lower.indexOf(kw.keyword.toLowerCase());
+    if (idx !== -1 && (best === null || idx < best.idx)) best = { idx, kw };
+  }
+  if (!best) return [text];
+  used.add(best.kw.id);
+  const before = text.slice(0, best.idx);
+  const matchText = text.slice(best.idx, best.idx + best.kw.keyword.length);
+  const after = text.slice(best.idx + best.kw.keyword.length);
+  return [
+    ...autoLinkSegment(before, keywords, used, `${keyPrefix}a`),
+    <a
+      key={`${keyPrefix}link`}
+      href={best.kw.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="auto-internal-link text-gold-700 underline decoration-gold-400/60 underline-offset-2 hover:text-gold-800 hover:decoration-gold-600 font-medium"
+    >
+      {matchText}
+    </a>,
+    ...autoLinkSegment(after, keywords, used, `${keyPrefix}z`),
+  ];
+}
+
+function renderMarkdown(
+  body: string | null | undefined,
+  keywords: BlogLinkKeyword[]
+): { blocks: ReactElement[]; toc: TocEntry[] } {
   const lines = (body || '').split('\n');
   const blocks: ReactElement[] = [];
   const toc: TocEntry[] = [];
@@ -55,16 +94,20 @@ function renderMarkdown(body: string | null | undefined): { blocks: ReactElement
   let quoteLines: string[] = [];
   let key = 0;
   let headingIndex = 0;
+  const usedKeywordIds = new Set<string>();
 
-  const renderInline = (text: string) =>
-    text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
+  const renderInline = (text: string, autoLink = false): ReactNode[] =>
+    text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).flatMap((part, i): ReactNode[] => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i}>{part.slice(2, -2)}</strong>;
+        return [<strong key={i}>{part.slice(2, -2)}</strong>];
       }
       if (part.startsWith('*') && part.endsWith('*')) {
-        return <em key={i}>{part.slice(1, -1)}</em>;
+        return [<em key={i}>{part.slice(1, -1)}</em>];
       }
-      return part;
+      if (autoLink && keywords.length) {
+        return autoLinkSegment(part, keywords, usedKeywordIds, `il${i}`);
+      }
+      return [part];
     });
 
   const parseTableRow = (line: string) =>
@@ -85,7 +128,7 @@ function renderMarkdown(body: string | null | undefined): { blocks: ReactElement
       blocks.push(
         <Tag key={key++} className={`${listClass} pl-5 space-y-1.5 text-forest-700 leading-relaxed mb-4`}>
           {listItems.map((item, i) => (
-            <li key={i}>{renderInline(item)}</li>
+            <li key={i}>{renderInline(item, true)}</li>
           ))}
         </Tag>
       );
@@ -98,7 +141,7 @@ function renderMarkdown(body: string | null | undefined): { blocks: ReactElement
     if (paragraph.length) {
       blocks.push(
         <p key={key++} className="text-forest-700 leading-relaxed mb-4">
-          {renderInline(paragraph.join(' '))}
+          {renderInline(paragraph.join(' '), true)}
         </p>
       );
       paragraph = [];
@@ -259,6 +302,7 @@ function renderMarkdown(body: string | null | undefined): { blocks: ReactElement
 
 export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetailProps) {
   const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
+  const [linkKeywords, setLinkKeywords] = useState<BlogLinkKeyword[]>([]);
   const liveProducts = useLiveProducts(staticProducts);
   const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
   const featuredTitle = lang === 'vi' ? 'Tiếp Tục Khám Phá' : 'Keep Exploring';
@@ -270,6 +314,21 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
       .then(setPost)
       .catch(() => setPost(null));
   }, [slug]);
+
+  useEffect(() => {
+    fetchBlogLinkKeywords().then(setLinkKeywords).catch(() => setLinkKeywords([]));
+  }, []);
+
+  const [readProgress, setReadProgress] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setReadProgress(scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [post]);
 
   useDocumentMeta({
     title: post ? `${post.title} — TA Sâm Ngọc Linh` : 'TA Sâm Ngọc Linh',
@@ -312,11 +371,23 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
       : null
   );
 
-  const { blocks, toc } = useMemo(() => (post ? renderMarkdown(post.body) : { blocks: [], toc: [] }), [post]);
+  const { blocks, toc } = useMemo(
+    () => (post ? renderMarkdown(post.body, linkKeywords) : { blocks: [], toc: [] }),
+    [post, linkKeywords]
+  );
   const readingMinutes = useMemo(() => (post ? estimateReadingMinutes(post.body) : 0), [post]);
 
   return (
     <section className="bg-cream-50 min-h-screen">
+      {post && (
+        <div className="fixed top-0 left-0 right-0 h-[3px] bg-forest-100/40 z-50">
+          <div
+            className="h-full bg-gold-400 transition-[width] duration-150 ease-out"
+            style={{ width: `${readProgress}%` }}
+          />
+        </div>
+      )}
+
       <div className="container-wide max-w-3xl pt-8">
         <button
           onClick={() => onNavigate?.('blog')}

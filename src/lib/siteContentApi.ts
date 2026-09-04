@@ -98,8 +98,11 @@ export interface BlogPost {
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published, meta_description, category_id')
+    .select('id, slug, title, excerpt, body, featured_image_url, featured_image_alt, created_at, published, meta_description, category_id, pinned')
     .eq('published', true)
+    // Bài đã ghim (admin bật "Ghim" ở Quản Lý Blog) luôn nổi lên đầu — không bị
+    // bài mới đăng đẩy xuống — rồi mới xếp theo ngày mới nhất trong từng nhóm.
+    .order('pinned', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
@@ -261,6 +264,22 @@ export async function submitCustomerLead(input: {
   if (error) throw new Error(error.message);
 }
 
+// Widget "Nhận Cẩm Nang Phân Biệt Sâm Ngọc Linh" chèn giữa danh sách blog —
+// khách để lại email và/hoặc SĐT Zalo, đi qua RPC SECURITY DEFINER (anon
+// không có quyền ghi bảng trực tiếp), cùng pattern submit_b2b_lead().
+export async function submitNewsletterSignup(input: {
+  email?: string;
+  zaloPhone?: string;
+  source?: string;
+}) {
+  const { error } = await supabase.rpc('submit_newsletter_signup', {
+    p_email: input.email || null,
+    p_zalo_phone: input.zaloPhone || null,
+    p_source: input.source || 'blog_cta',
+  });
+  if (error) throw new Error(error.message);
+}
+
 export type B2BLeadType = 'distributor' | 'investor' | 'oem';
 
 export async function submitB2BLead(input: {
@@ -295,6 +314,11 @@ export interface ProductOverride {
   price_vnd: number | null;
   active: boolean;
   stock_qty: number;
+  image_url: string | null;
+  gallery_images: string[] | null;
+  description_short: string | null;
+  cta_zalo_url: string | null;
+  cta_shopee_url: string | null;
 }
 
 export async function fetchProductOverrides(): Promise<ProductOverride[]> {
@@ -425,4 +449,25 @@ export async function fetchSiteSetting(key: string): Promise<string | null> {
     .maybeSingle();
   if (error) return null;
   return data?.value ?? null;
+}
+
+// ---------- Blog Auto-Link Keywords ----------
+
+export interface BlogLinkKeyword {
+  id: string;
+  keyword: string;
+  url: string;
+  sort_order: number;
+}
+
+export async function fetchBlogLinkKeywords(): Promise<BlogLinkKeyword[]> {
+  const { data, error } = await supabase
+    .from('blog_link_keywords')
+    .select('id, keyword, url, sort_order')
+    .eq('active', true)
+    .order('sort_order');
+  if (error) return [];
+  // Từ khoá dài xét trước để "Majonoside-R2" không bị nuốt mất bởi 1 từ khoá
+  // ngắn hơn (vd "Sâm") khớp sớm hơn trong cùng đoạn văn.
+  return (data ?? []).sort((a, b) => b.keyword.length - a.keyword.length);
 }

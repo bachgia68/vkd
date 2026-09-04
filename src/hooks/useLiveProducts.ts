@@ -17,12 +17,13 @@ function getOverrides(): Promise<ProductOverride[]> {
 }
 
 // Merges the static catalog (source of truth for content: name, description,
-// images, taxonomy) with live price/stock/visibility overrides admins set in
-// "Sản phẩm & Kho". A SKU admins mark inactive is dropped from the list a SKU
-// with a different price in Supabase shows that price instead. SKUs with no
-// matching override row (not yet tracked in Supabase) pass through unchanged.
-// Fails open: if the override fetch errors (offline, RLS misconfig), returns
-// the static list untouched rather than breaking the storefront.
+// taxonomy) with live price/stock/visibility/image overrides admins set in
+// "Sản phẩm & Kho". A SKU admins mark inactive is dropped from the list, a SKU
+// with a different price or a newly-uploaded image in Supabase shows that
+// instead. SKUs with no matching override row (not yet tracked in Supabase)
+// pass through unchanged. Fails open: if the override fetch errors (offline,
+// RLS misconfig), returns the static list untouched rather than breaking the
+// storefront.
 export function useLiveProducts(staticProducts: Product[]): Product[] {
   const [merged, setMerged] = useState(staticProducts);
 
@@ -36,7 +37,16 @@ export function useLiveProducts(staticProducts: Product[]): Product[] {
           .filter((p) => bySku.get(p.sku)?.active !== false)
           .map((p) => {
             const o = bySku.get(p.sku);
-            return o && o.price_vnd !== null ? { ...p, price: Number(o.price_vnd) } : p;
+            if (!o) return p;
+            return {
+              ...p,
+              ...(o.price_vnd !== null ? { price: Number(o.price_vnd) } : {}),
+              ...(o.image_url ? { image: o.image_url } : {}),
+              ...(o.gallery_images && o.gallery_images.length > 0 ? { galleryImages: o.gallery_images } : {}),
+              ...(o.description_short ? { descriptionShort: o.description_short } : {}),
+              ...(o.cta_zalo_url ? { ctaZaloUrl: o.cta_zalo_url } : {}),
+              ...(o.cta_shopee_url ? { ctaShopeeUrl: o.cta_shopee_url } : {}),
+            };
           });
         setMerged(next);
       })

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Trash2, Plus, Eye, EyeOff, Save } from 'lucide-react';
 import { Button } from '../../components/ui/button';
-import { fetchPageSectionsForAdmin, updatePageSection, deletePageSection, reorderPageSections, createPageSection } from '../adminApi';
+import { fetchPageSectionsForAdmin, updatePageSection, deletePageSection, reorderPageSections, createPageSection, uploadPageSectionImage } from '../adminApi';
 import type { PageSection } from '../../lib/siteContentApi';
 
 const PAGE_OPTIONS = [
@@ -34,6 +34,8 @@ export default function PageBuilderPage() {
   const [editState, setEditState] = useState<EditState>({ title_vi: '', content_vi: '', image_url: '', cta_text: '', cta_url: '', block_type: 'text' });
   const [adding, setAdding] = useState(false);
   const [newBlock, setNewBlock] = useState<EditState>({ title_vi: '', content_vi: '', image_url: '', cta_text: '', cta_url: '', block_type: 'text' });
+  const [uploadingEdit, setUploadingEdit] = useState(false);
+  const [uploadingNew, setUploadingNew] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -98,6 +100,32 @@ export default function PageBuilderPage() {
       setError(e instanceof Error ? e.message : 'Lỗi xóa');
     } finally {
       setSaving(null);
+    }
+  };
+
+  const pickEditImage = async (file: File | null) => {
+    if (!file) return;
+    setUploadingEdit(true);
+    try {
+      const url = await uploadPageSectionImage(file);
+      setEditState((s) => ({ ...s, image_url: url }));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Lỗi tải ảnh lên');
+    } finally {
+      setUploadingEdit(false);
+    }
+  };
+
+  const pickNewImage = async (file: File | null) => {
+    if (!file) return;
+    setUploadingNew(true);
+    try {
+      const url = await uploadPageSectionImage(file);
+      setNewBlock((s) => ({ ...s, image_url: url }));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Lỗi tải ảnh lên');
+    } finally {
+      setUploadingNew(false);
     }
   };
 
@@ -200,8 +228,14 @@ export default function PageBuilderPage() {
                     <textarea value={editState.content_vi} onChange={(e) => setEditState({ ...editState, content_vi: e.target.value })} rows={3} className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500 resize-y" />
                   </div>
                   <div>
-                    <label className="block text-xs text-forest-600 mb-1">URL ảnh</label>
-                    <input type="text" value={editState.image_url} onChange={(e) => setEditState({ ...editState, image_url: e.target.value })} placeholder="https://..." className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500" />
+                    <label className="block text-xs text-forest-600 mb-1">Ảnh</label>
+                    <label className="flex items-center gap-2 border border-dashed border-forest-200 rounded px-2 py-1.5 text-sm text-forest-500 cursor-pointer hover:border-forest-400">
+                      {uploadingEdit ? 'Đang tải ảnh lên...' : '📷 Chọn ảnh (tự resize & WebP)'}
+                      <input type="file" accept="image/*" className="hidden" disabled={uploadingEdit} onChange={(e) => pickEditImage(e.target.files?.[0] ?? null)} />
+                    </label>
+                    {editState.image_url && (
+                      <img src={editState.image_url} alt="" className="mt-2 h-20 w-32 object-cover rounded border border-forest-100" />
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -243,8 +277,14 @@ export default function PageBuilderPage() {
                 <textarea value={newBlock.content_vi} onChange={(e) => setNewBlock({ ...newBlock, content_vi: e.target.value })} rows={2} className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500 resize-y" />
               </div>
               <div>
-                <label className="block text-xs text-forest-600 mb-1">URL ảnh</label>
-                <input type="text" value={newBlock.image_url} onChange={(e) => setNewBlock({ ...newBlock, image_url: e.target.value })} placeholder="https://..." className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500" />
+                <label className="block text-xs text-forest-600 mb-1">Ảnh</label>
+                <label className="flex items-center gap-2 border border-dashed border-forest-200 rounded px-2 py-1.5 text-sm text-forest-500 cursor-pointer hover:border-forest-400">
+                  {uploadingNew ? 'Đang tải ảnh lên...' : '📷 Chọn ảnh (tự resize & WebP)'}
+                  <input type="file" accept="image/*" className="hidden" disabled={uploadingNew} onChange={(e) => pickNewImage(e.target.files?.[0] ?? null)} />
+                </label>
+                {newBlock.image_url && (
+                  <img src={newBlock.image_url} alt="" className="mt-2 h-20 w-32 object-cover rounded border border-forest-100" />
+                )}
               </div>
               <div className="flex gap-2 justify-end">
                 <Button variant="outline" onClick={() => setAdding(false)} className="text-sm">Hủy</Button>

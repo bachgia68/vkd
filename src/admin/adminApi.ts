@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
+import { resizeImageToWebp } from '../lib/imageResize';
 import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection, NavItem, BlogCategory, ProductMenuItem, PolicyPageContent } from '../lib/siteContentApi';
 import type { DbOrder, DbRevenueDaily } from './types/admin';
 
@@ -29,6 +30,13 @@ export interface DbProduct {
   stock_qty: number;
   low_stock_threshold: number;
   image_url: string | null;
+  slug: string | null;
+  compare_at_price_vnd: number | null;
+  description_short: string | null;
+  description_vi: string | null;
+  gallery_images: string[];
+  cta_zalo_url: string | null;
+  cta_shopee_url: string | null;
 }
 
 export interface ProductCategory {
@@ -37,11 +45,14 @@ export interface ProductCategory {
   name_vi: string;
 }
 
+const PRODUCT_COLUMNS =
+  'id, sku, name_vi, category_id, price_vnd, active, stock_qty, low_stock_threshold, image_url, slug, compare_at_price_vnd, description_short, description_vi, gallery_images, cta_zalo_url, cta_shopee_url';
+
 export async function fetchProducts(): Promise<DbProduct[]> {
   return throwIfError(
     await supabase
       .from('products')
-      .select('id, sku, name_vi, category_id, price_vnd, active, stock_qty, low_stock_threshold, image_url')
+      .select(PRODUCT_COLUMNS)
       .order('sku')
   );
 }
@@ -50,21 +61,60 @@ export async function fetchProductCategories(): Promise<ProductCategory[]> {
   return throwIfError(await supabase.from('product_categories').select('id, code, name_vi').order('id'));
 }
 
+export async function createProductCategory(code: string, name_vi: string): Promise<ProductCategory> {
+  return throwIfError(
+    await supabase.from('product_categories').insert({ code, name_vi }).select('id, code, name_vi').single()
+  );
+}
+
+export async function uploadProductImage(file: File): Promise<string> {
+  const resized = await resizeImageToWebp(file, 1600, 0.85);
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  const { error } = await supabase.storage.from('product-images').upload(path, resized, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
 export async function createProduct(input: {
   sku: string;
   name_vi: string;
   category_id: number | null;
   price_vnd: number;
+  slug?: string | null;
 }): Promise<DbProduct> {
   const res = await supabase
     .from('products')
     .insert({ ...input, active: true, stock_qty: 0 })
-    .select('id, sku, name_vi, category_id, price_vnd, active, stock_qty, low_stock_threshold, image_url')
+    .select(PRODUCT_COLUMNS)
     .single();
   return throwIfError(res);
 }
 
-export async function updateProduct(id: string, patch: Partial<Pick<DbProduct, 'name_vi' | 'price_vnd' | 'active' | 'stock_qty' | 'category_id' | 'image_url'>>) {
+export async function updateProduct(
+  id: string,
+  patch: Partial<
+    Pick<
+      DbProduct,
+      | 'name_vi'
+      | 'price_vnd'
+      | 'active'
+      | 'stock_qty'
+      | 'category_id'
+      | 'image_url'
+      | 'slug'
+      | 'compare_at_price_vnd'
+      | 'description_short'
+      | 'description_vi'
+      | 'gallery_images'
+      | 'cta_zalo_url'
+      | 'cta_shopee_url'
+    >
+  >
+) {
   const { error } = await supabase.from('products').update(patch).eq('id', id);
   if (error) throw new Error(error.message);
 }
@@ -769,10 +819,14 @@ export async function setBlogPostPublished(id: string, published: boolean) {
 
 // Uploads a featured image to the public `blog-images` storage bucket and
 // returns its public URL. Admin-only (RLS on storage.objects gates the insert).
-export async function uploadBlogImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop() || 'jpg';
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from('blog-images').upload(path, file, {
+// Ảnh luôn được resize (max 1200px, chuẩn Retina) + convert WebP trước khi lên
+// storage — nhẹ trang, đỡ tốn dung lượng. Tên file theo slug tiêu đề bài viết
+// (chuẩn SEO) khi có, không thì fallback về timestamp.
+export async function uploadBlogImage(file: File, postTitle?: string): Promise<string> {
+  const resized = await resizeImageToWebp(file, 1200, 0.85);
+  const base = postTitle ? slugify(postTitle) : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const path = `${base}-${Math.random().toString(36).slice(2, 6)}.webp`;
+  const { error } = await supabase.storage.from('blog-images').upload(path, resized, {
     cacheControl: '3600',
     upsert: false,
   });
@@ -821,9 +875,9 @@ export async function deleteTrustProofItem(id: string) {
 }
 
 export async function uploadTrustProofImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop() || 'jpg';
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from('trust-proof-images').upload(path, file, {
+  const resized = await resizeImageToWebp(file, 1200, 0.85);
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  const { error } = await supabase.storage.from('trust-proof-images').upload(path, resized, {
     cacheControl: '3600',
     upsert: false,
   });
@@ -875,9 +929,9 @@ export async function deleteComboSet(id: string) {
 }
 
 export async function uploadComboImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop() || 'jpg';
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from('combo-images').upload(path, file, {
+  const resized = await resizeImageToWebp(file, 1200, 0.85);
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  const { error } = await supabase.storage.from('combo-images').upload(path, resized, {
     cacheControl: '3600',
     upsert: false,
   });
@@ -930,9 +984,9 @@ export async function deleteHeritageGalleryImage(id: string) {
 }
 
 export async function uploadHeritageGalleryImage(file: File): Promise<string> {
-  const ext = file.name.split('.').pop() || 'jpg';
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await supabase.storage.from('heritage-images').upload(path, file, {
+  const resized = await resizeImageToWebp(file, 1600, 0.85);
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  const { error } = await supabase.storage.from('heritage-images').upload(path, resized, {
     cacheControl: '3600',
     upsert: false,
   });
@@ -1225,6 +1279,30 @@ export async function deleteCustomerLead(id: string) {
   if (error) throw new Error(error.message);
 }
 
+// ---------- Newsletter/CRO signups (widget "Nhận Cẩm Nang" trên Blog) ----------
+
+export interface NewsletterSignup {
+  id: string;
+  email: string | null;
+  zalo_phone: string | null;
+  source: string;
+  created_at: string;
+}
+
+export async function fetchNewsletterSignups(): Promise<NewsletterSignup[]> {
+  return throwIfError(
+    await supabase
+      .from('newsletter_signups')
+      .select('id, email, zalo_phone, source, created_at')
+      .order('created_at', { ascending: false })
+  );
+}
+
+export async function deleteNewsletterSignup(id: string) {
+  const { error } = await supabase.from('newsletter_signups').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
 // ---------- Orders (realtime) ----------
 
 export async function fetchOrders(): Promise<DbOrder[]> {
@@ -1374,6 +1452,18 @@ export async function deletePageSection(id: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function uploadPageSectionImage(file: File): Promise<string> {
+  const resized = await resizeImageToWebp(file, 1920, 0.85);
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  const { error } = await supabase.storage.from('page-sections-images').upload(path, resized, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('page-sections-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
 export async function reorderPageSections(ids: string[]): Promise<void> {
   const updates = ids.map((id, i) =>
     supabase.from('page_sections').update({ sort_order: i, updated_at: new Date().toISOString() }).eq('id', id)
@@ -1426,6 +1516,45 @@ export async function reorderBlogCategories(ids: string[]): Promise<void> {
 
 export async function assignBlogPostCategory(postId: string, categoryId: string | null): Promise<void> {
   const { error } = await supabase.from('blog_posts').update({ category_id: categoryId }).eq('id', postId);
+  if (error) throw new Error(error.message);
+}
+
+// ---------- Blog Auto-Link Keywords admin ----------
+
+export interface AdminLinkKeyword {
+  id: string;
+  keyword: string;
+  url: string;
+  sort_order: number;
+  active: boolean;
+}
+
+export async function fetchAllLinkKeywords(): Promise<AdminLinkKeyword[]> {
+  return throwIfError(
+    await supabase.from('blog_link_keywords').select('id, keyword, url, sort_order, active').order('sort_order')
+  );
+}
+
+export async function createLinkKeyword(keyword: string, url: string): Promise<AdminLinkKeyword> {
+  return throwIfError(
+    await supabase
+      .from('blog_link_keywords')
+      .insert({ keyword, url, sort_order: Date.now() })
+      .select('id, keyword, url, sort_order, active')
+      .single()
+  );
+}
+
+export async function updateLinkKeyword(
+  id: string,
+  updates: Partial<Pick<AdminLinkKeyword, 'keyword' | 'url' | 'active'>>
+): Promise<void> {
+  const { error } = await supabase.from('blog_link_keywords').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteLinkKeyword(id: string): Promise<void> {
+  const { error } = await supabase.from('blog_link_keywords').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
 

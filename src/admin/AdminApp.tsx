@@ -38,6 +38,7 @@ import PageBuilderPage from './pages/PageBuilderPage';
 import NavItemsPage from './pages/NavItemsPage';
 import BlogCategoryPage from './pages/BlogCategoryPage';
 import ProductMenuPage from './pages/ProductMenuPage';
+import LeadsPage from './pages/LeadsPage';
 import PolicyContentPage from './pages/PolicyContentPage';
 import SiteConfigPage from './pages/SiteConfigPage';
 
@@ -83,6 +84,7 @@ export default function AdminApp() {
           <Route path="policy-content" element={<PolicyContentPage />} />
           <Route path="site-config" element={<SiteConfigPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="leads" element={<LeadsPage />} />
         </Route>
       </Routes>
       </AdminAuthProvider>

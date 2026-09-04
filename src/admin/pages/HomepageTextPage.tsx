@@ -20,6 +20,22 @@ const FIELDS: FieldDef[] = [
   { key: 'heritage.pillar2.desc', label: 'Pillar 2 — Mô tả', placeholder: t.heritage.authorityDesc, textarea: true },
   { key: 'heritage.pillar3.title', label: 'Pillar 3 — Tiêu đề', placeholder: t.heritage.saponinTitle },
   { key: 'heritage.pillar3.desc', label: 'Pillar 3 — Mô tả', placeholder: t.heritage.saponinDesc, textarea: true },
+  {
+    key: 'newsletter_cta.title',
+    label: 'Widget Blog — Tiêu đề (đổi được vd: "Nhận ngay 5% khi đăng ký")',
+    placeholder: 'Nhận Cẩm Nang Phân Biệt Sâm Ngọc Linh — Miễn Phí',
+  },
+  {
+    key: 'newsletter_cta.desc',
+    label: 'Widget Blog — Mô tả',
+    placeholder: 'Cách nhận diện sâm thật, chỉ dấu khoa học Majonoside-R2, dấu hiệu cảnh giác khi mua sâm.',
+    textarea: true,
+  },
+  {
+    key: 'newsletter_cta.button',
+    label: 'Widget Blog — Chữ trên nút',
+    placeholder: 'Nhận cẩm nang',
+  },
 ];
 
 export default function HomepageTextPage() {

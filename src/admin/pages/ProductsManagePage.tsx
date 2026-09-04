@@ -4,11 +4,14 @@ import {
   fetchProducts,
   fetchProductCategories,
   createProduct,
+  createProductCategory,
   updateProduct,
   deleteProduct,
+  uploadProductImage,
   type DbProduct,
   type ProductCategory,
 } from '../adminApi';
+import { slugify } from '../../lib/slugify';
 
 // Validate form.* (chuoi tho tu input) truoc khi ep kieu/goi API — trước day
 // chi kiem tra sku/name_vi khong rong, gia chi bat buoc khi tao moi, khong
@@ -31,6 +34,15 @@ const productFormSchema = z.object({
     .string()
     .trim()
     .refine((v) => v === '' || /^https?:\/\//.test(v), { message: 'URL ảnh phải bắt đầu bằng http(s)://' }),
+  slug: z.string().trim(),
+  compare_at_price_vnd: z
+    .string()
+    .trim()
+    .refine((v) => v === '' || Number(v) > 0, { message: 'Giá niêm yết phải lớn hơn 0' }),
+  description_short: z.string().trim().max(300, 'Mô tả ngắn tối đa 300 ký tự'),
+  description_vi: z.string().trim(),
+  cta_zalo_url: z.string().trim(),
+  cta_shopee_url: z.string().trim(),
 });
 
 type ProductFormErrors = Partial<Record<keyof typeof productFormSchema.shape, string>>;
@@ -44,11 +56,22 @@ export default function ProductsManagePage() {
     price_vnd: '',
     category_id: '',
     image_url: '',
+    slug: '',
+    compare_at_price_vnd: '',
+    description_short: '',
+    description_vi: '',
+    cta_zalo_url: '',
+    cta_shopee_url: '',
   });
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<ProductFormErrors>({});
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const load = () => {
     fetchProducts()
@@ -62,15 +85,51 @@ export default function ProductsManagePage() {
   useEffect(load, []);
 
   const resetForm = () => {
-    setForm({ sku: '', name_vi: '', price_vnd: '', category_id: '', image_url: '' });
+    setForm({
+      sku: '', name_vi: '', price_vnd: '', category_id: '', image_url: '',
+      slug: '', compare_at_price_vnd: '', description_short: '', description_vi: '',
+      cta_zalo_url: '', cta_shopee_url: '',
+    });
+    setGallery([]);
     setEditingId(null);
     setFieldErrors({});
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setFieldErrors((prev) => (prev[name as keyof ProductFormErrors] ? { ...prev, [name]: undefined } : prev));
+  };
+
+  const handlePickImage = async (file: File | null) => {
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadProductImage(file);
+      setForm((prev) => ({ ...prev, image_url: url }));
+      setFieldErrors((prev) => ({ ...prev, image_url: undefined }));
+    } catch (err) {
+      setMessage('❌ Lỗi tải ảnh lên: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handlePickGalleryFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingGallery(true);
+    try {
+      const urls = await Promise.all(Array.from(files).map((f) => uploadProductImage(f)));
+      setGallery((prev) => [...prev, ...urls]);
+    } catch (err) {
+      setMessage('❌ Lỗi tải ảnh gallery: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
+  const removeGalleryImage = (url: string) => {
+    setGallery((prev) => prev.filter((u) => u !== url));
   };
 
   const handleAddOrUpdate = async () => {
@@ -96,6 +155,17 @@ export default function ProductsManagePage() {
     try {
       const category_id = form.category_id ? Number(form.category_id) : null;
       const price_vnd = form.price_vnd ? Number(form.price_vnd) : null;
+      const compare_at_price_vnd = form.compare_at_price_vnd ? Number(form.compare_at_price_vnd) : null;
+      const slug = form.slug.trim() || slugify(form.name_vi);
+      const extraFields = {
+        slug,
+        compare_at_price_vnd,
+        description_short: form.description_short.trim() || null,
+        description_vi: form.description_vi.trim() || null,
+        gallery_images: gallery,
+        cta_zalo_url: form.cta_zalo_url.trim() || null,
+        cta_shopee_url: form.cta_shopee_url.trim() || null,
+      };
 
       if (editingId) {
         await updateProduct(editingId, {
@@ -103,6 +173,7 @@ export default function ProductsManagePage() {
           price_vnd,
           category_id,
           image_url: form.image_url || null,
+          ...extraFields,
         });
         setMessage('✅ Đã cập nhật sản phẩm');
       } else {
@@ -116,10 +187,9 @@ export default function ProductsManagePage() {
           name_vi: form.name_vi,
           category_id,
           price_vnd,
+          slug,
         });
-        if (form.image_url) {
-          await updateProduct(created.id, { image_url: form.image_url });
-        }
+        await updateProduct(created.id, { image_url: form.image_url || null, ...extraFields });
         setMessage('✅ Đã thêm sản phẩm mới');
       }
 
@@ -139,7 +209,14 @@ export default function ProductsManagePage() {
       price_vnd: product.price_vnd?.toString() ?? '',
       category_id: product.category_id?.toString() ?? '',
       image_url: product.image_url ?? '',
+      slug: product.slug ?? '',
+      compare_at_price_vnd: product.compare_at_price_vnd?.toString() ?? '',
+      description_short: product.description_short ?? '',
+      description_vi: product.description_vi ?? '',
+      cta_zalo_url: product.cta_zalo_url ?? '',
+      cta_shopee_url: product.cta_shopee_url ?? '',
     });
+    setGallery(product.gallery_images ?? []);
     setEditingId(product.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -181,6 +258,23 @@ export default function ProductsManagePage() {
   };
 
   const categoryName = (id: number | null) => categories.find((c) => c.id === id)?.name_vi ?? '—';
+
+  const handleAddCategory = async () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    setAddingCategory(true);
+    try {
+      const created = await createProductCategory(slugify(name), name);
+      setCategories((prev) => [...prev, created]);
+      setForm((prev) => ({ ...prev, category_id: created.id.toString() }));
+      setNewCategoryName('');
+      setMessage('✅ Đã thêm danh mục mới');
+    } catch (err) {
+      setMessage('❌ Lỗi: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setAddingCategory(false);
+    }
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -241,15 +335,135 @@ export default function ProductsManagePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">URL ảnh sản phẩm</label>
+              <label className="block text-sm font-medium mb-1">Giá niêm yết (VND) — để trống nếu không giảm giá</label>
+              <input
+                type="number"
+                name="compare_at_price_vnd"
+                placeholder="700000"
+                value={form.compare_at_price_vnd}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-lg text-sm ${fieldErrors.compare_at_price_vnd ? 'border-red-400' : ''}`}
+              />
+              {fieldErrors.compare_at_price_vnd && <p className="text-xs text-red-600 mt-1">{fieldErrors.compare_at_price_vnd}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Slug (URL) — để trống để tự sinh từ tên</label>
               <input
                 type="text"
-                name="image_url"
-                placeholder="https://..."
-                value={form.image_url}
+                name="slug"
+                placeholder="sam-ngoc-linh-tuoi"
+                value={form.slug}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg text-sm ${fieldErrors.image_url ? 'border-red-400' : ''}`}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Mô tả ngắn</label>
+              <input
+                type="text"
+                name="description_short"
+                placeholder="Hiện ở thẻ sản phẩm/danh sách"
+                value={form.description_short}
+                onChange={handleInputChange}
+                maxLength={300}
+                className={`w-full px-3 py-2 border rounded-lg text-sm ${fieldErrors.description_short ? 'border-red-400' : ''}`}
+              />
+              {fieldErrors.description_short && <p className="text-xs text-red-600 mt-1">{fieldErrors.description_short}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Mô tả chi tiết</label>
+              <textarea
+                name="description_vi"
+                placeholder="Mô tả đầy đủ hiển thị ở trang chi tiết sản phẩm"
+                value={form.description_vi}
+                onChange={handleInputChange}
+                rows={4}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Link CTA Zalo</label>
+              <input
+                type="text"
+                name="cta_zalo_url"
+                placeholder="https://zalo.me/..."
+                value={form.cta_zalo_url}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Link CTA Shopee</label>
+              <input
+                type="text"
+                name="cta_shopee_url"
+                placeholder="https://shopee.vn/..."
+                value={form.cta_shopee_url}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Gallery ảnh (nhiều ảnh)</label>
+              <label className="flex items-center gap-2 border border-dashed rounded-lg px-3 py-2.5 text-sm text-gray-500 cursor-pointer hover:border-purple-400 hover:text-gray-700">
+                {uploadingGallery ? '⏳ Đang tải ảnh lên...' : '🖼️ Chọn nhiều ảnh (tự resize & nén WebP)'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  disabled={uploadingGallery}
+                  onChange={(e) => handlePickGalleryFiles(e.target.files)}
+                />
+              </label>
+              {gallery.length > 0 && (
+                <div className="mt-2 grid grid-cols-4 gap-2">
+                  {gallery.map((url) => (
+                    <div key={url} className="relative">
+                      <img src={url} alt="" className="h-16 w-16 object-cover rounded-lg border" />
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(url)}
+                        className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] leading-4"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Ảnh sản phẩm</label>
+              <label className="flex items-center gap-2 border border-dashed rounded-lg px-3 py-2.5 text-sm text-gray-500 cursor-pointer hover:border-purple-400 hover:text-gray-700">
+                {uploadingImage ? '⏳ Đang tải ảnh lên...' : '📷 Chọn ảnh (tự resize & nén WebP)'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingImage}
+                  onChange={(e) => handlePickImage(e.target.files?.[0] ?? null)}
+                />
+              </label>
+              {form.image_url && (
+                <div className="mt-2 flex items-center gap-2">
+                  <img src={form.image_url} alt="Xem trước" className="h-16 w-16 object-cover rounded-lg border" />
+                  <button
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, image_url: '' }))}
+                    className="text-xs text-red-500 hover:text-red-700"
+                  >
+                    Xoá ảnh
+                  </button>
+                </div>
+              )}
               {fieldErrors.image_url && <p className="text-xs text-red-600 mt-1">{fieldErrors.image_url}</p>}
             </div>
 
@@ -266,6 +480,24 @@ export default function ProductsManagePage() {
                   <option key={c.id} value={c.id}>{c.name_vi}</option>
                 ))}
               </select>
+              <div className="flex gap-2 mt-2">
+                <input
+                  type="text"
+                  placeholder="Tên danh mục mới..."
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCategory(); } }}
+                  className="flex-1 px-3 py-1.5 border rounded-lg text-xs"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  disabled={addingCategory || !newCategoryName.trim()}
+                  className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 font-medium rounded-lg text-xs disabled:opacity-50"
+                >
+                  {addingCategory ? '⏳' : '➕ Thêm danh mục'}
+                </button>
+              </div>
             </div>
 
             <div className="flex gap-2">
