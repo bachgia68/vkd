@@ -76,10 +76,13 @@ function App() {
     const initial = matchPathname(window.location.pathname);
     if (initial.slug) setSelectedSlug(initial.slug);
     if (initial.page !== 'home') setCurrentPage(initial.page);
+    // Query string (vd. /blog?page=4) phải giữ nguyên cho mọi trang, không chỉ
+    // 'home' — trước đây bị drop trên mọi route khác, khiến Blog.tsx đọc lại
+    // ?page= = null khi load thẳng URL và luôn rơi về trang 1.
     window.history.replaceState(
       { page: initial.page, slug: initial.slug },
       '',
-      initial.page === 'home' ? window.location.pathname + window.location.search : window.location.pathname,
+      window.location.pathname + window.location.search,
     );
 
     const onPopState = (event: PopStateEvent) => {

@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { ArrowRight, Clock, ChevronRight, Search, X } from 'lucide-react';
 import { fetchBlogPosts, fetchBlogCategories, fetchSiteSetting, type BlogPost, type BlogCategory } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 interface BlogProps {
   onNavigate?: (page: string, slug?: string) => void;
@@ -209,6 +210,16 @@ export default function Blog({ onNavigate }: BlogProps) {
   }, []);
 
   const isFullPage = window.location.pathname === '/blog';
+
+  // Canonical/title riêng cho từng trang phân trang (/blog?page=2, /blog?page=3...)
+  // — trước đây trang /blog không gọi hook này nên canonical kẹt ở URL trang chủ,
+  // Google không có tín hiệu index riêng cho từng trang blog.
+  useDocumentMeta({
+    title: page === 1 ? 'Blog Sâm Ngọc Linh — Kiến Thức & Câu Chuyện' : `Blog Sâm Ngọc Linh — Trang ${page}`,
+    description: 'Kiến thức, khoa học và câu chuyện về Sâm Ngọc Linh Việt Nam.',
+    path: page === 1 ? '/blog' : `/blog?page=${page}`,
+    enabled: isFullPage,
+  });
 
   // Rules of Hooks: mọi hook phải chạy vô điều kiện, trước bất kỳ early
   // return nào (loading/empty) — trước đây useMemo nằm sau các return sớm,

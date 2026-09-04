@@ -5,6 +5,11 @@ interface DocumentMeta {
   description?: string;
   path: string;
   image?: string;
+  // Cho phép component gọi hook này vô điều kiện (Rules of Hooks) nhưng chỉ
+  // thực sự ghi đè meta khi đang ở trang đầy đủ — vd. Blog.tsx dùng chung cho
+  // cả section preview trên trang chủ lẫn trang /blog riêng, chỉ trang /blog
+  // mới cần đổi canonical.
+  enabled?: boolean;
 }
 
 function setMetaContent(selector: string, content: string) {
@@ -17,8 +22,9 @@ function setMetaContent(selector: string, content: string) {
 // khi route đã đổi (/blog/<id>, /product/<slug>). Hook này ghi đè các thẻ đó
 // khi vào trang chi tiết, trả lại giá trị gốc khi rời trang, để mỗi URL có
 // tiêu đề/mô tả riêng trên kết quả tìm kiếm thay vì trùng lặp.
-export function useDocumentMeta({ title, description, path, image }: DocumentMeta) {
+export function useDocumentMeta({ title, description, path, image, enabled = true }: DocumentMeta) {
   useEffect(() => {
+    if (!enabled) return;
     const originalTitle = document.title;
     const canonicalEl = document.querySelector('link[rel="canonical"]');
     const originalCanonical = canonicalEl?.getAttribute('href') ?? null;
@@ -36,5 +42,5 @@ export function useDocumentMeta({ title, description, path, image }: DocumentMet
       document.title = originalTitle;
       if (originalCanonical) canonicalEl?.setAttribute('href', originalCanonical);
     };
-  }, [title, description, path, image]);
+  }, [title, description, path, image, enabled]);
 }

@@ -28,7 +28,7 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
   // a mouse user (desktop, no touchscreen) has no way to "swipe" it at all without
   // this. Tracks click-vs-drag via total pointer movement so a drag that ends on
   // top of a card doesn't also fire its navigation.
-  const dragState = useRef<{ startX: number; startScrollLeft: number; moved: number } | null>(null);
+  const dragState = useRef<{ startX: number; startScrollLeft: number; moved: number; startTime: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const updateArrows = useCallback(() => {
@@ -54,7 +54,7 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
     if (e.pointerType !== 'mouse') return;
     const el = trackRef.current;
     if (!el) return;
-    dragState.current = { startX: e.clientX, startScrollLeft: el.scrollLeft, moved: 0 };
+    dragState.current = { startX: e.clientX, startScrollLeft: el.scrollLeft, moved: 0, startTime: Date.now() };
     setIsDragging(true);
     el.setPointerCapture(e.pointerId);
   };
@@ -77,8 +77,16 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
     }, 0);
   };
 
+  // Chặn navigate chỉ khi đúng là đang kéo carousel để cuộn (di chuyển ngang
+  // rõ rệt, kéo dài hơn một cú click tức thời) — trước đây ngưỡng 6px quá
+  // thấp, tay rung nhẹ lúc bấm chuột cũng vượt ngưỡng khiến mọi click vào
+  // thẻ sản phẩm bị chặn, link luôn "chết" trên desktop.
   const onCardClick = (e: MouseEvent) => {
-    if ((dragState.current?.moved ?? 0) > 6) {
+    const drag = dragState.current;
+    if (!drag) return;
+    const duration = Date.now() - drag.startTime;
+    const isRealDrag = drag.moved > 10 && duration > 150;
+    if (isRealDrag) {
       e.preventDefault();
     }
   };
