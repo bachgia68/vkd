@@ -15,6 +15,8 @@ import {
   Video,
   VideoOff,
   HelpCircle,
+  Pin,
+  PinOff,
 } from 'lucide-react';
 import { BANNED_KEYWORDS, MANDATORY_DISCLAIMER, ADMIN_IMAGES } from '../adminMockData';
 import {
@@ -25,6 +27,7 @@ import {
   updateBlogPost,
   deleteBlogPost,
   setBlogPostPublished,
+  updateBlogPostMeta,
   fetchAllBlogPostsForAdmin,
   uploadBlogImage,
   fetchChannels,
@@ -33,10 +36,15 @@ import {
   publishCaption,
   uploadCaptionVideo,
   deleteCaptionVideo,
+  fetchAllLinkKeywords,
+  createLinkKeyword,
+  updateLinkKeyword,
+  deleteLinkKeyword,
   type CmsArticle,
   type BlogPost,
   type Channel,
   type PostCaption,
+  type AdminLinkKeyword,
 } from '../adminApi';
 import { Button } from '../../components/ui/button';
 
@@ -107,6 +115,7 @@ export default function CmsPage() {
   const [newBody, setNewBody] = useState('');
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [newImagePreview, setNewImagePreview] = useState<string | null>(null);
+  const [newPinned, setNewPinned] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -163,7 +172,7 @@ export default function CmsPage() {
       let featured_image_url: string | null = null;
       if (newImageFile) {
         setUploadingImage(true);
-        featured_image_url = await uploadBlogImage(newImageFile);
+        featured_image_url = await uploadBlogImage(newImageFile, newTitle.trim());
         setUploadingImage(false);
       }
       const created = await createBlogPost({
@@ -173,9 +182,13 @@ export default function CmsPage() {
         featured_image_url,
         featured_image_alt: newTitle.trim(),
       });
+      if (newPinned) {
+        await updateBlogPostMeta(created.id, { pinned: true });
+      }
       setNewTitle('');
       setNewExcerpt('');
       setNewBody('');
+      setNewPinned(false);
       onPickImage(null);
       loadPosts();
       openCaptions(created);
@@ -223,13 +236,14 @@ export default function CmsPage() {
     try {
       let featured_image_url = editingPost.featured_image_url;
       if (editImageFile) {
-        featured_image_url = await uploadBlogImage(editImageFile);
+        featured_image_url = await uploadBlogImage(editImageFile, editTitle.trim());
       }
       await updateBlogPost(editingPost.id, {
         title: editTitle.trim(),
         excerpt: editExcerpt.trim() || editBody.trim().slice(0, 140),
         body: editBody.trim(),
         featured_image_url,
+        featured_image_alt: editTitle.trim(),
       });
       showToast('Đã lưu thay đổi — cập nhật ngay trên trang chủ');
       closeEdit();
@@ -607,6 +621,16 @@ export default function CmsPage() {
                 <img src={newImagePreview} alt="Xem trước ảnh" className="mt-2 w-full h-32 object-cover rounded-lg" />
               )}
             </div>
+            <label className="flex items-center gap-2 text-sm text-forest-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={newPinned}
+                onChange={(e) => setNewPinned(e.target.checked)}
+                className="w-4 h-4 accent-gold-500"
+              />
+              <Pin className="w-3.5 h-3.5 text-gold-600" />
+              Ghim bài viết này lên đầu trang Blog
+            </label>
             <Button onClick={publishPost} disabled={uploadingImage} variant="gold" size="sm">
               {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               {uploadingImage ? 'Đang tải ảnh lên...' : 'Đăng bài lên trang chủ'}
@@ -634,14 +658,39 @@ export default function CmsPage() {
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-forest-900 truncate">{p.title}</p>
                       <p className="text-xs text-forest-500 mt-0.5">{new Date(p.created_at).toLocaleDateString('vi-VN')}</p>
-                      {!p.published && (
-                        <span className="inline-block mt-1 text-[10px] uppercase tracking-wide font-medium text-gold-700 bg-gold-100 px-1.5 py-0.5 rounded">
-                          Nháp — chưa công khai
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5 mt-1">
+                        {!p.published && (
+                          <span className="inline-block text-[10px] uppercase tracking-wide font-medium text-gold-700 bg-gold-100 px-1.5 py-0.5 rounded">
+                            Nháp — chưa công khai
+                          </span>
+                        )}
+                        {p.pinned && (
+                          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wide font-medium text-forest-700 bg-forest-100 px-1.5 py-0.5 rounded">
+                            <Pin className="w-2.5 h-2.5" /> Đã ghim
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await updateBlogPostMeta(p.id, { pinned: !p.pinned });
+                          loadPosts();
+                        } catch (err) {
+                          showToast(err instanceof Error ? err.message : 'Lỗi ghim bài viết');
+                        }
+                      }}
+                      aria-label={p.pinned ? 'Bỏ ghim' : 'Ghim lên đầu Blog'}
+                      title={p.pinned ? 'Đang ghim — bấm để bỏ ghim' : 'Ghim bài viết này lên đầu trang Blog'}
+                      className={p.pinned ? 'text-gold-600 hover:text-gold-800' : 'text-forest-400 hover:text-gold-700'}
+                    >
+                      {p.pinned ? <Pin className="w-4 h-4 fill-current" /> : <PinOff className="w-4 h-4" />}
+                    </span>
                     <span
                       role="button"
                       tabIndex={0}
@@ -705,6 +754,8 @@ export default function CmsPage() {
           />
         )}
       </div>
+
+      <AutoLinkKeywordsPanel />
 
       {editingPost && (
         <div
@@ -1015,6 +1066,118 @@ function CaptionPanel({
             })}
           </div>
         </>
+      )}
+    </div>
+  );
+}
+
+// Bảng ánh xạ từ khoá → link nội bộ (Sâm Ngọc Linh -> /san-pham, Majonoside-R2
+// -> bài viết giải thích...). Trang chi tiết bài viết (BlogPostDetail.tsx) tự
+// gắn thẻ <a auto-internal-link> vào lần xuất hiện đầu tiên của mỗi từ khoá
+// trong nội dung — không cần admin tự chèn link tay khi viết bài.
+function AutoLinkKeywordsPanel() {
+  const [items, setItems] = useState<AdminLinkKeyword[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newKeyword, setNewKeyword] = useState('');
+  const [newUrl, setNewUrl] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const load = () => {
+    fetchAllLinkKeywords().then(setItems).catch(() => {}).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { if (open) load(); }, [open]);
+
+  const add = async () => {
+    if (!newKeyword.trim() || !newUrl.trim()) return;
+    setSaving(true);
+    try {
+      const created = await createLinkKeyword(newKeyword.trim(), newUrl.trim());
+      setItems((prev) => [...prev, created]);
+      setNewKeyword('');
+      setNewUrl('');
+    } catch {
+      // im lặng — danh sách vẫn giữ nguyên, admin thử lại
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleActive = async (item: AdminLinkKeyword) => {
+    await updateLinkKeyword(item.id, { active: !item.active });
+    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, active: !i.active } : i)));
+  };
+
+  const remove = async (id: string) => {
+    await deleteLinkKeyword(id);
+    setItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-forest-100 p-6 shadow-elegant">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center justify-between w-full text-left"
+      >
+        <div>
+          <h3 className="font-display text-lg text-forest-900">🔗 Auto-Link Nội Bộ (Từ Khoá → Link)</h3>
+          <p className="text-xs text-forest-500 mt-1">
+            Lần xuất hiện đầu tiên của mỗi từ khoá trong bài viết SEO sẽ tự động thành link — không cần chèn tay.
+          </p>
+        </div>
+        <span className="text-forest-400 text-sm">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div className="mt-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              value={newKeyword}
+              onChange={(e) => setNewKeyword(e.target.value)}
+              placeholder="Từ khoá, vd: Majonoside-R2"
+              className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm"
+            />
+            <input
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              placeholder="Link, vd: /product/sam-ngoc-linh"
+              className="flex-1 border border-forest-100 rounded-lg px-3 py-2 text-sm"
+            />
+            <Button onClick={add} disabled={saving || !newKeyword.trim() || !newUrl.trim()} variant="gold" size="sm">
+              <Plus className="w-4 h-4" /> Thêm
+            </Button>
+          </div>
+
+          {loading ? (
+            <p className="text-sm text-forest-400">Đang tải...</p>
+          ) : items.length === 0 ? (
+            <p className="text-sm text-forest-400">Chưa có từ khoá nào.</p>
+          ) : (
+            <div className="divide-y divide-forest-100 border border-forest-100 rounded-xl overflow-hidden">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+                  <span className={`font-medium flex-shrink-0 ${item.active ? 'text-forest-900' : 'text-forest-300 line-through'}`}>
+                    {item.keyword}
+                  </span>
+                  <span className="text-forest-400 truncate flex-1">{item.url}</span>
+                  <button
+                    onClick={() => toggleActive(item)}
+                    className="text-xs text-gold-700 hover:text-gold-800 flex-shrink-0"
+                  >
+                    {item.active ? 'Tắt' : 'Bật'}
+                  </button>
+                  <button
+                    onClick={() => remove(item.id)}
+                    className="text-forest-400 hover:text-red-600 flex-shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
