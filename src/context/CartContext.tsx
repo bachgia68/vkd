@@ -1,9 +1,20 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { Product } from '../data/mockData';
 
 export interface CartItem extends Product {
   quantity: number;
+}
+
+const STORAGE_KEY = 'ta_cart_items';
+
+function loadStoredItems(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
 }
 
 interface CartContextType {
@@ -23,8 +34,20 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(loadStoredItems);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Giỏ hàng trước đây chỉ sống trong React state — khách rời trang giữa
+  // chừng (đóng tab, mất mạng lúc đang xem) là mất hết, đặc biệt bất lợi khi
+  // bắt đầu chạy ads trả phí đổ traffic vào site.
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Quota đầy hoặc localStorage bị chặn (chế độ ẩn danh) — bỏ qua, giỏ
+      // hàng vẫn hoạt động trong phiên hiện tại, chỉ không persist được.
+    }
+  }, [items]);
 
   const addToCart = useCallback((product: Product) => {
     setItems((prev) => {

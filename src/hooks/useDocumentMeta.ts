@@ -10,6 +10,11 @@ interface DocumentMeta {
   // cả section preview trên trang chủ lẫn trang /blog riêng, chỉ trang /blog
   // mới cần đổi canonical.
   enabled?: boolean;
+  // Path (không kèm domain) của trang phân trang trước/sau, vd. '/blog?page=1'
+  // — bỏ trống ở trang đầu/cuối. Google không dùng tín hiệu này để rank nữa
+  // nhưng Bing và vài crawler khác vẫn đọc, chi phí thêm gần như 0.
+  prevPath?: string;
+  nextPath?: string;
 }
 
 function setMetaContent(selector: string, content: string) {
@@ -17,12 +22,24 @@ function setMetaContent(selector: string, content: string) {
   if (el) el.setAttribute('content', content);
 }
 
+function setOrRemoveLink(rel: string, path: string | undefined) {
+  const existing = document.querySelector(`link[rel="${rel}"]`);
+  if (!path) {
+    existing?.remove();
+    return;
+  }
+  const el = existing ?? document.createElement('link');
+  el.setAttribute('rel', rel);
+  el.setAttribute('href', `https://tasamngoclinh.com${path}`);
+  if (!existing) document.head.appendChild(el);
+}
+
 // SPA không có SSR/prerender, nên mọi trang mặc định dùng chung title/meta
 // description/canonical/OG tag đặt tĩnh trong index.html (trang chủ) — kể cả
 // khi route đã đổi (/blog/<id>, /product/<slug>). Hook này ghi đè các thẻ đó
 // khi vào trang chi tiết, trả lại giá trị gốc khi rời trang, để mỗi URL có
 // tiêu đề/mô tả riêng trên kết quả tìm kiếm thay vì trùng lặp.
-export function useDocumentMeta({ title, description, path, image, enabled = true }: DocumentMeta) {
+export function useDocumentMeta({ title, description, path, image, enabled = true, prevPath, nextPath }: DocumentMeta) {
   useEffect(() => {
     if (!enabled) return;
     const originalTitle = document.title;
@@ -37,10 +54,14 @@ export function useDocumentMeta({ title, description, path, image, enabled = tru
     setMetaContent('meta[property="og:url"]', url);
     if (description) setMetaContent('meta[property="og:description"]', description);
     if (image) setMetaContent('meta[property="og:image"]', image);
+    setOrRemoveLink('prev', prevPath);
+    setOrRemoveLink('next', nextPath);
 
     return () => {
       document.title = originalTitle;
       if (originalCanonical) canonicalEl?.setAttribute('href', originalCanonical);
+      setOrRemoveLink('prev', undefined);
+      setOrRemoveLink('next', undefined);
     };
-  }, [title, description, path, image, enabled]);
+  }, [title, description, path, image, enabled, prevPath, nextPath]);
 }

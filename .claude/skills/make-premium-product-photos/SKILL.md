@@ -1,10 +1,51 @@
 # Xử lý ảnh sản phẩm chuẩn premium (kiểu KGC) — quy trình chuẩn
 
-Dùng skill này bất cứ khi nào cần biến ảnh sản phẩm chụp nền trắng phẳng
-(studio, chưa xử lý) thành ảnh nền premium để đăng site/carousel/social —
-thay cho việc tự nghĩ cách mới mỗi lần. Đúc kết sau 2 lần chỉnh sửa thật
-(2026-08-14): lần đầu nền quá đậm/màu phẳng bị Joe chê "hơi giả, không
-sang", lần 2 sửa theo đúng nguyên tắc KGC bên dưới thì được duyệt.
+## ⚠️ CẬP NHẬT 2026-09-04 — script ở mục 4 (`batch_premium_bg_alternate.py`) ĐÃ NGƯNG DÙNG
+
+Joe báo 3 lỗi thật trên site sau khi dùng script đó: (1) logo TA + chữ
+"tasamngoclinh.com" stamp lên ảnh bị **lệch/méo** — do script dùng font
+path Linux (`/usr/share/fonts/...`) không tồn tại trên máy Windows, PIL âm
+thầm fallback về font mặc định cực nhỏ, toạ độ tính theo font đúng nhưng vẽ
+bằng font sai kích thước; (2) flood-fill theo ngưỡng màu xoá nhầm cả sản
+phẩm nếu sản phẩm chính là màu trắng/nhạt (vd. `28-men-kim-boi.png` — bao
+ni-lông trắng — bị xoá gần hết); (3) Joe yêu cầu **bỏ hẳn** watermark
+logo/URL, không sửa lại.
+
+**Script chuẩn hiện tại: `scripts/regen_premium_bg_rembg.py`** — thay
+flood-fill bằng `rembg` (model AI cắt nền thật, đã cài sẵn), KHÔNG stamp
+logo/URL, tự động chọn 1 trong 3 tông nền theo từ khoá trong đường dẫn file
+(`ivory` mặc định, `sage` cho trà/mật ong/lá sâm, `gold-dark` cho rượu/men),
+và tự phát hiện sản phẩm màu nhạt (đo độ sáng trung bình vùng giữ lại sau
+cắt nền, ngưỡng `PALE_PRODUCT_BRIGHTNESS`) để chuyển sang nền `gold-dark`
+sâu hơn thay vì nền sáng khiến sản phẩm "biến mất" vì cùng độ sáng nền.
+Ánh sáng hắt chếch trên-trái (softbox thật) thay vì gradient tỏa tròn từ
+tâm — gradient tâm-tỏa-tròn bị Joe chê "trong mờ, xấu, như in phẳng".
+
+Chạy:
+```bash
+python scripts/regen_premium_bg_rembg.py --files <rel_path...>   # xem mẫu trước, ghi vào premium-bg-sample/
+python scripts/regen_premium_bg_rembg.py --all                    # ghi đè premium-bg/ toàn bộ, chỉ chạy khi Joe đã duyệt mẫu
+```
+Luôn chạy `--files` với vài ảnh đại diện (1 chai/hộp thường, 1 sản phẩm
+màu nhạt/trắng, 1 ảnh có nền gốc phức tạp như trimico) và gửi Joe duyệt
+trước — đừng tự ý `--all` khi chưa hỏi.
+
+**Trần thật của cách này**: đây là ghép nền + gradient ánh sáng giả lập,
+KHÔNG phải ảnh do AI sinh (generative) — sẽ không đạt độ chân thực có phản
+chiếu/bokeh/độ sâu trường ảnh thật như ảnh mẫu kiểu GPT-image/Flux mà Joe
+có thể đưa làm tham khảo. Muốn mức đó cần gọi model sinh ảnh thật (Gemini
+image, Flux, GPT-image) — đã thử `VITE_GEMINI_API_KEY` trong `.env` phiên
+2026-09-04, bị chặn (`API_KEY_SERVICE_BLOCKED`, lỗi 403 từ Google) — chưa
+xác nhận sửa được, đừng giả định key này dùng được cho tới khi kiểm tra lại.
+
+Ảnh có logo/URL nhà cung cấp in **trực tiếp trên vỏ hộp thật** (vd. loạt
+ảnh `trimico/` có "www.trietminh.com" + logo TM) — đây LÀ MỘT PHẦN ảnh gốc,
+không phải watermark do site chèn, không script xử lý nền nào xoá được.
+Cần ảnh sạch từ NCC hoặc retouch tay từng ảnh nếu muốn bỏ.
+
+Nội dung bên dưới (mục 1-5) là quy trình CŨ (2026-08-14), giữ lại để tham
+khảo lịch sử màu KGC gốc — bảng màu ở mục 1 đậm hơn giá trị hiện dùng trong
+`regen_premium_bg_rembg.py` (đã nhạt thêm theo phản hồi 2026-09-04).
 
 ## 1. Nguyên tắc màu — học đúng kiểu KGC, không tự sáng tạo
 
