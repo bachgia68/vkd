@@ -36,7 +36,9 @@ export default function Heritage({ lang }: HeritageProps) {
     );
   }, []);
 
-  const o = (key: string, fallback: string) => overrides[key] || fallback;
+  // site_text_overrides chỉ lưu 1 ngôn ngữ (value_vi) — chỉ áp dụng khi lang='vi',
+  // ngôn ngữ khác luôn dùng bản dịch có sẵn thay vì hiện tiếng Việt lẫn vào.
+  const o = (key: string, fallback: string) => (lang === 'vi' ? overrides[key] : undefined) || fallback;
 
   const pillars = [
     {
@@ -71,10 +73,10 @@ export default function Heritage({ lang }: HeritageProps) {
             </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {cms?.title_vi || t.heritage.title}
+            {(lang === 'vi' ? cms?.title_vi : undefined) || t.heritage.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {cms?.content_vi || t.heritage.subtitle}
+            {(lang === 'vi' ? cms?.content_vi : undefined) || t.heritage.subtitle}
           </p>
         </div>
 

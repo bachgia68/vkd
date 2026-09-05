@@ -26,8 +26,8 @@ const productFormSchema = z.object({
   price_vnd: z
     .string()
     .trim()
-    .refine((v) => v === '' || (Number(v) > 0 && Number(v) < 1_000_000_000), {
-      message: 'Giá phải lớn hơn 0 và nhỏ hơn 1 tỷ đ',
+    .refine((v) => v === '' || v === '0' || (Number(v) > 0 && Number(v) < 1_000_000_000), {
+      message: 'Giá phải lớn hơn 0 và nhỏ hơn 1 tỷ đ (hoặc để 0/trống = "Liên hệ")',
     }),
   category_id: z.string(),
   image_url: z
@@ -154,7 +154,9 @@ export default function ProductsManagePage() {
     setLoading(true);
     try {
       const category_id = form.category_id ? Number(form.category_id) : null;
-      const price_vnd = form.price_vnd ? Number(form.price_vnd) : null;
+      // "0" nghĩa là "Liên hệ / Theo thời giá" — lưu thành NULL, không lưu số 0 nghĩa đen
+      // (0đ trên site sẽ hiểu là hàng miễn phí, sai hoàn toàn với ý định của admin).
+      const price_vnd = form.price_vnd && form.price_vnd !== '0' ? Number(form.price_vnd) : null;
       const compare_at_price_vnd = form.compare_at_price_vnd ? Number(form.compare_at_price_vnd) : null;
       const slug = form.slug.trim() || slugify(form.name_vi);
       const extraFields = {
@@ -547,9 +549,13 @@ export default function ProductsManagePage() {
                 <div className="p-3 space-y-2">
                   <div className="text-xs font-medium text-gray-500">{product.sku}</div>
                   <div className="font-semibold text-sm line-clamp-2">{product.name_vi}</div>
-                  {product.price_vnd != null && (
+                  {product.price_vnd != null ? (
                     <div className="text-sm text-green-600 font-medium">
                       {product.price_vnd.toLocaleString()}₫
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gold-700 font-medium">
+                      Liên hệ / Theo thời giá — hiện nút Chat Messenger
                     </div>
                   )}
                   <div className="text-xs text-gray-400">Tồn kho: {product.stock_qty}</div>

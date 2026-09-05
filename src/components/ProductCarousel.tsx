@@ -12,6 +12,13 @@ interface ProductCarouselProps {
 
 const VND_PER_USD = 25000;
 
+function nameFor(product: Product, lang: Language): string {
+  if (lang === 'en') return product.nameEn || product.name;
+  if (lang === 'zh') return product.nameZh || product.name;
+  if (lang === 'fr') return product.nameFr || product.name;
+  return product.name;
+}
+
 function formatPrice(price: number | null, lang: Language): string {
   if (price === null) return lang === 'vi' ? 'Liên hệ' : 'Contact us';
   if (lang === 'vi') return price.toLocaleString('vi-VN') + '₫';
@@ -133,7 +140,7 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
             <div className="relative aspect-ginseng overflow-hidden">
               <img
                 src={product.image}
-                alt={product.name}
+                alt={nameFor(product, lang)}
                 className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                 loading="lazy"
               />
@@ -147,7 +154,7 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
             </div>
             <div className="p-6">
               <h3 className="font-display text-lg font-semibold text-forest-900 mb-2 line-clamp-2">
-                {product.name}
+                {nameFor(product, lang)}
               </h3>
               <div className="text-base font-display font-bold text-forest-900">
                 {formatPrice(product.price, lang)}

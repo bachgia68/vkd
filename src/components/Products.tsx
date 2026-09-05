@@ -35,10 +35,10 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
           </div>
 
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {cms?.title_vi || t.products.title}
+            {(lang === 'vi' ? cms?.title_vi : undefined) || t.products.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {cms?.content_vi || t.products.subtitle}
+            {(lang === 'vi' ? cms?.content_vi : undefined) || t.products.subtitle}
           </p>
         </div>
 

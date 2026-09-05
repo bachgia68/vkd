@@ -40,14 +40,14 @@ export default function About({ lang, onNavigate }: AboutProps) {
             </div>
 
             <h2 className="font-display text-display-sm md:text-display-md text-forest-900">
-              {cms?.title_vi || t.about.title}
-              {!cms?.title_vi && t.about.titleHighlight && (
+              {(lang === 'vi' && cms?.title_vi) || t.about.title}
+              {!(lang === 'vi' && cms?.title_vi) && t.about.titleHighlight && (
                 <span className="text-gradient-primary block mt-2">{t.about.titleHighlight}</span>
               )}
             </h2>
 
             <div className="space-y-4 text-forest-600 leading-relaxed">
-              {cms?.content_vi ? (
+              {lang === 'vi' && cms?.content_vi ? (
                 <p className="text-lg">{cms.content_vi}</p>
               ) : (
                 <>

@@ -208,6 +208,24 @@ export async function fetchHeritageGalleryImages(): Promise<HeritageGalleryImage
   return data ?? [];
 }
 
+export interface CertificationImage {
+  id: string;
+  image_url: string;
+  name_vi: string;
+  name_en: string;
+  sort_order: number;
+}
+
+export async function fetchCertificationImages(): Promise<CertificationImage[]> {
+  const { data, error } = await supabase
+    .from('certification_images')
+    .select('id, image_url, name_vi, name_en, sort_order')
+    .eq('visible', true)
+    .order('sort_order');
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function fetchVisibleSections(): Promise<SiteSection[]> {
   const { data, error } = await supabase
     .from('site_sections')

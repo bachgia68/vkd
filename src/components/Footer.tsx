@@ -50,6 +50,10 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
+  // site_text_overrides chỉ lưu 1 ngôn ngữ (value_vi) — admin sửa footer chỉ nhập
+  // được tiếng Việt, nên override CHỈ áp dụng khi lang='vi', các ngôn ngữ khác
+  // luôn dùng bản dịch t.footer.* đã có sẵn thay vì hiện tiếng Việt lẫn vào.
+  const activeOverrides = lang === 'vi' ? overrides : {};
 
   useEffect(() => {
     fetchContactPhones().then(setPhones).catch(() => setPhones([]));
@@ -63,7 +67,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
   const navLabel = (key: string) => {
     const overrideKey = NAV_OVERRIDE_KEYS[key];
     const fallback = t.nav[key as keyof typeof t.nav] ?? key;
-    return (overrideKey && overrides[overrideKey]) || fallback;
+    return (overrideKey && activeOverrides[overrideKey]) || fallback;
   };
 
   // "traceability" và "contact" trỏ tới trang/khối còn tồn tại thật;
@@ -109,7 +113,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
             </div>
 
             <p className="text-forest-300 leading-relaxed mb-6">
-              {overrides['footer.brandDesc'] ?? t.footer.brandDesc}
+              {activeOverrides['footer.brandDesc'] ?? t.footer.brandDesc}
             </p>
 
             {/* Social Links */}
@@ -134,7 +138,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
 
           {/* Quick Links */}
           <div>
-            <h5 className="font-semibold mb-6 text-gold-400">{overrides['footer.quickLinks'] ?? t.footer.quickLinks}</h5>
+            <h5 className="font-semibold mb-6 text-gold-400">{activeOverrides['footer.quickLinks'] ?? t.footer.quickLinks}</h5>
             <ul className="space-y-3">
               {navItems.map((item) => (
                 <li key={item.key}>
@@ -151,11 +155,11 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
 
           {/* Contact */}
           <div>
-            <h5 className="font-semibold mb-6 text-gold-400">{overrides['footer.contact'] ?? t.footer.contact}</h5>
+            <h5 className="font-semibold mb-6 text-gold-400">{activeOverrides['footer.contact'] ?? t.footer.contact}</h5>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
-                <span className="text-forest-300">{overrides['footer.address'] || t.footer.address}</span>
+                <span className="text-forest-300">{activeOverrides['footer.address'] || t.footer.address}</span>
               </li>
               {phones.map((phone) => (
                 <li key={phone.id} className="flex items-center gap-3">
@@ -170,8 +174,8 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
               ))}
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-gold-400 flex-shrink-0" />
-                <a href={`mailto:${overrides['footer.email'] || t.footer.email}`} className="text-forest-300 hover:text-white transition-colors">
-                  {overrides['footer.email'] || t.footer.email}
+                <a href={`mailto:${activeOverrides['footer.email'] || t.footer.email}`} className="text-forest-300 hover:text-white transition-colors">
+                  {activeOverrides['footer.email'] || t.footer.email}
                 </a>
               </li>
             </ul>
@@ -179,7 +183,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
 
           {/* Language Selector */}
           <div>
-            <h5 className="font-semibold mb-6 text-gold-400">{overrides['footer.followUs'] ?? t.footer.followUs}</h5>
+            <h5 className="font-semibold mb-6 text-gold-400">{activeOverrides['footer.followUs'] ?? t.footer.followUs}</h5>
             <div className="grid grid-cols-2 gap-2">
               {languages.map((l) => (
                 <button
@@ -202,7 +206,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
         <div className="border-t border-forest-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-forest-400 text-sm">
-              {overrides['footer.copyright'] || t.footer.copyright}
+              {activeOverrides['footer.copyright'] || t.footer.copyright}
             </p>
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-forest-400 text-sm">
@@ -210,25 +214,25 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
                 onClick={() => handleFooterNav('policy-privacy')}
                 className="hover:text-white transition-colors"
               >
-                {overrides['policies.privacy'] || t.policies.privacy}
+                {activeOverrides['policies.privacy'] || t.policies.privacy}
               </button>
               <button
                 onClick={() => handleFooterNav('policy-terms')}
                 className="hover:text-white transition-colors"
               >
-                {overrides['policies.terms'] || t.policies.terms}
+                {activeOverrides['policies.terms'] || t.policies.terms}
               </button>
               <button
                 onClick={() => handleFooterNav('policy-shipping')}
                 className="hover:text-white transition-colors"
               >
-                {overrides['policies.shipping'] || t.policies.shipping}
+                {activeOverrides['policies.shipping'] || t.policies.shipping}
               </button>
               <button
                 onClick={() => handleFooterNav('policy-refund')}
                 className="hover:text-white transition-colors"
               >
-                {overrides['policies.refund'] || t.policies.refund}
+                {activeOverrides['policies.refund'] || t.policies.refund}
               </button>
             </div>
           </div>

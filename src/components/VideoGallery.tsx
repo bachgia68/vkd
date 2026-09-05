@@ -2,15 +2,37 @@ import { useEffect, useState } from 'react';
 import { Play, ExternalLink } from 'lucide-react';
 import { fetchFieldVideos, type FieldVideo } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
+import type { Language } from '../i18n/translations';
 
-export default function VideoGallery() {
+interface VideoGalleryProps {
+  lang: Language;
+}
+
+export default function VideoGallery({ lang }: VideoGalleryProps) {
   const [videos, setVideos] = useState<FieldVideo[]>([]);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchFieldVideos()
       .then(setVideos)
       .catch(() => setVideos([]));
   }, []);
+
+  useEffect(() => {
+    import('../admin/adminApi').then(({ fetchAllTextOverrides }) =>
+      fetchAllTextOverrides()
+        .then((rows) => {
+          const map: Record<string, string> = {};
+          rows.forEach((r) => { map[r.key] = r.value_vi; });
+          setOverrides(map);
+        })
+        .catch(() => {})
+    );
+  }, []);
+
+  // site_text_overrides chỉ lưu 1 ngôn ngữ (value_vi) — chỉ áp dụng khi lang='vi',
+  // ngôn ngữ khác luôn dùng bản dịch có sẵn thay vì hiện tiếng Việt lẫn vào.
+  const o = (key: string, fallback: string) => (lang === 'vi' ? overrides[key] : undefined) || fallback;
 
   if (videos.length === 0) return null;
 
@@ -21,13 +43,15 @@ export default function VideoGallery() {
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-forest-800 rounded-full mb-4">
             <Play className="w-3 h-3 text-gold-400 fill-gold-400" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-gold-300">Câu Chuyện Thực Địa</span>
+            <span className="text-xs font-semibold tracking-wider uppercase text-gold-300">
+              {o('video_gallery.badge', 'Câu Chuyện Thực Địa')}
+            </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-white mb-4">
-            Nhìn Tận Mắt — Tin Tận Tâm
+            {o('video_gallery.title', 'Nhìn Tận Mắt — Tin Tận Tâm')}
           </h2>
           <p className="text-forest-300 text-base leading-relaxed">
-            Từng thước phim quay thẳng tại vườn sâm nhà Khánh, Trà Linh — không dàn dựng, không chỉnh sửa.
+            {o('video_gallery.desc', 'Từng thước phim quay thẳng tại vườn sâm nhà Khánh, Trà Linh — không dàn dựng, không chỉnh sửa.')}
           </p>
         </div>
 

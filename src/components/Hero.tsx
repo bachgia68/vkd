@@ -12,7 +12,9 @@ export default function Hero({ lang }: HeroProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
   const cms = usePageSection('home', 'hero');
-  const [cmsLine1, cmsLine2] = cms?.title_vi
+  // page_sections chỉ lưu tiêu đề tiếng Việt (title_vi) — chỉ dùng khi lang='vi',
+  // ngôn ngữ khác luôn dùng bản dịch t.hero.* đã có sẵn.
+  const [cmsLine1, cmsLine2] = lang === 'vi' && cms?.title_vi
     ? cms.title_vi.split('—').map((s) => s.trim())
     : [t.hero.titleLine1, t.hero.titleLine2];
   const cmsBg = cms?.image_url || '/assets/images/cay-sam-ngoc-linh.webp';
@@ -92,7 +94,7 @@ export default function Hero({ lang }: HeroProps) {
 
         {/* Subtitle */}
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-white/80 leading-relaxed mb-10 animate-fade-in-up animation-delay-200">
-          {cms?.content_vi || t.hero.subtitle}
+          {(lang === 'vi' ? cms?.content_vi : undefined) || t.hero.subtitle}
         </p>
 
         {/* CTAs */}
@@ -105,7 +107,7 @@ export default function Hero({ lang }: HeroProps) {
             }}
             className="btn-gold group"
           >
-            {cms?.cta_text || t.hero.cta}
+            {(lang === 'vi' ? cms?.cta_text : undefined) || t.hero.cta}
             <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'} transition-transform`} />
           </a>
           <a

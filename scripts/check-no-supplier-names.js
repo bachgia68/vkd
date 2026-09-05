@@ -55,6 +55,12 @@ const BANNED_PATTERNS = [
   /\bK5\b/i,
   /samk5/i,
   /X[oơ]\s*Đ[aă]ng/i,
+  /Samtramy/i,
+  /Tumorong/i,
+  /Tum[ơo]r[ôo]ng/i,
+  /Atuagin/i,
+  /Khánh\s*Thành/i,
+  /Khanh\s*Thanh/i,
 ];
 
 // Dòng chứa các chuỗi này được phép (dùng cho comment giải thích rule, tên biến kỹ thuật, v.v.)
@@ -94,6 +100,17 @@ const TYPE_DECLARATION = /:\s*string;\s*$/;
 // (vd "tra-sam-ngoc-linh-trimico") — bản thân các slug này có thể cần dọn lại khi làm
 // routing trang chi tiết sản phẩm sau này; việc đó nằm ngoài phạm vi guard này.
 const PRODUCTS_JSON_ID_FIELD = /^\s*"(sku|supplierId|sourceUrl|image|slug)"\s*:/;
+// products.ts giờ có 2 định dạng entry: pretty-printed nhiều dòng (cũ) VÀ 1 dòng/sản phẩm
+// (single-line JSON.stringify, dùng cho NCC mới + sau khi script dịch tự động gộp lại). Ở
+// định dạng 1-dòng, field định danh nội bộ (sku/supplierId/sourceUrl/image/slug) nằm CHUNG
+// dòng với field hiển thị (name/description/...) — PRODUCTS_JSON_ID_FIELD (yêu cầu dòng bắt
+// đầu bằng field đó) không còn đúng nữa vì dòng thực tế bắt đầu bằng "{". Xoá hẳn phần GIÁ
+// TRỊ của 5 field định danh nội bộ này khỏi dòng trước khi test BANNED_PATTERNS, để tên NCC
+// hợp lệ trong sourceUrl/image/supplierId không bị hiểu nhầm là lộ ra field hiển thị.
+const INTERNAL_ID_FIELD_VALUE = /"(sku|supplierId|sourceUrl|image|slug)"\s*:\s*"(?:[^"\\]|\\.)*"/g;
+function stripInternalIdFieldValues(line) {
+  return line.replace(INTERNAL_ID_FIELD_VALUE, `"$1":""`);
+}
 // Khai báo type nội bộ (vd: export type SupplierId = 'vkd' | 'trimico';) không phải
 // text hiển thị cho khách — cần thiết để code phân loại NCC ở tầng data.
 const SUPPLIER_TYPE_ALIAS = /^\s*export\s+type\s+SupplierId\s*=/;
@@ -130,8 +147,9 @@ for (const file of allFiles) {
     if (TYPE_DECLARATION.test(line)) return;
     if (PRODUCTS_JSON_ID_FIELD.test(line)) return;
     if (SUPPLIER_TYPE_ALIAS.test(line)) return;
+    const testLine = isProductsDataFile ? stripInternalIdFieldValues(line) : line;
     for (const pattern of BANNED_PATTERNS) {
-      if (pattern.test(line)) {
+      if (pattern.test(testLine)) {
         violations.push({ file: path.relative(root, file), lineNo: i + 1, text: line.trim(), pattern: pattern.source });
         break;
       }

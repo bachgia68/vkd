@@ -12,6 +12,7 @@ import {
   Users,
   ShieldAlert,
   Phone,
+  MessageCircle,
 } from 'lucide-react';
 import { products as staticProducts, toCartProduct, type Product } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
@@ -21,6 +22,13 @@ import { useCart } from '../context/CartContext';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
+
+function nameForLang(p: Product, lang: Language): string {
+  if (lang === 'en') return p.nameEn || p.name;
+  if (lang === 'zh') return p.nameZh || p.name;
+  if (lang === 'fr') return p.nameFr || p.name;
+  return p.name;
+}
 
 interface ProductDetailProps {
   lang: Language;
@@ -170,25 +178,48 @@ const detailUi: Record<Language, DetailUiStrings> = {
   },
 };
 
-function formatVND(price: number | null): string {
-  if (price == null) return 'Liên hệ';
+function formatVND(price: number | null, marketPrice?: boolean): string {
+  if (price == null) return marketPrice ? 'Theo thời giá' : 'Liên hệ';
   return price.toLocaleString('vi-VN') + '₫';
 }
 
 const VND_PER_USD = 25000;
 
-function formatPrice(price: number | null, lang: Language): string {
-  if (lang === 'vi') return formatVND(price);
-  if (price == null) return 'Contact us';
+function formatPrice(price: number | null, lang: Language, marketPrice?: boolean): string {
+  if (lang === 'vi') return formatVND(price, marketPrice);
+  if (price == null) return marketPrice ? 'Market price' : 'Contact us';
   const usd = Math.round((price / VND_PER_USD) * 100) / 100;
   return `$${usd.toFixed(2)}`;
+}
+
+function contactUrl(lang: Language): string {
+  return lang === 'vi' ? 'https://zalo.me/0984999309' : 'https://wa.me/84984999309';
+}
+
+// Trang sản phẩm mở kèm ?ref=<slug> để trợ lý Mai biết ngay khách đang hỏi
+// về sản phẩm nào — page id thật của fanpage TA, đã dùng sẵn ở ChatWidget.tsx.
+function messengerUrl(slug: string): string {
+  return `https://m.me/61592621322828?ref=${slug}`;
 }
 
 export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailProps) {
   const [qty, setQty] = useState(1);
   const [liked, setLiked] = useState(false);
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
   const { addToCart } = useCart();
+
+  // Messenger (m.me) không hỗ trợ điền sẵn tin nhắn qua URL như WhatsApp/Zalo —
+  // "ref" chỉ đọc được bởi bot tự động (chưa setup). Copy link sản phẩm vào
+  // clipboard trước khi mở Messenger để khách tự dán, Mai biết ngay đang hỏi
+  // sản phẩm nào cho tới khi có bot tự động đọc ref.
+  const handleMessengerClick = () => {
+    const url = `https://tasamngoclinh.com/product/${slug}`;
+    navigator.clipboard?.writeText(url).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 4000);
+    }).catch(() => {});
+  };
 
   const ui = detailUi[lang];
   const isRTL = lang === 'ar';
@@ -263,17 +294,19 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
   const categoryMeta = productTypes.find((t) => t.id === product.productType);
   const categoryLabel = categoryMeta ? (lang === 'en' ? categoryMeta.labelEn : categoryMeta.labelVi) : undefined;
 
-  const displayName =
-    lang === 'en' ? (product.nameEn || product.name) :
-    lang === 'zh' ? (product.nameZh || product.name) :
-    lang === 'fr' ? (product.nameFr || product.name) :
-    product.name;
+  const displayName = nameForLang(product, lang);
 
   const displayDescription =
     lang === 'en' ? (product.descriptionEn || product.description) :
     lang === 'zh' ? (product.descriptionZh || product.description) :
     lang === 'fr' ? (product.descriptionFr || product.description) :
     product.description;
+
+  const displayActiveIngredient =
+    lang === 'en' ? (product.activeIngredientEn || product.activeIngredient) :
+    lang === 'zh' ? (product.activeIngredientZh || product.activeIngredient) :
+    lang === 'fr' ? (product.activeIngredientFr || product.activeIngredient) :
+    product.activeIngredient;
 
   const canOrder = product.price != null && !product.displayOnly18Plus;
 
@@ -371,7 +404,18 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
             </h1>
 
             <div className="text-3xl font-display font-bold text-forest-900 mb-6 pb-6 border-b border-cream-200">
-              {formatPrice(product.price, lang)}
+              {product.price === null ? (
+                <a
+                  href={contactUrl(lang)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-dotted hover:text-gold-600"
+                >
+                  {formatPrice(product.price, lang, product.marketPrice)}
+                </a>
+              ) : (
+                formatPrice(product.price, lang, product.marketPrice)
+              )}
               {product.volume && (
                 <span className="text-sm font-normal text-forest-400 ml-2">· {product.volume}</span>
               )}
@@ -392,9 +436,36 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
             )}
 
             {product.price == null && !product.displayOnly18Plus && (
-              <div className="inline-flex items-start gap-2 mb-6 p-4 rounded-2xl bg-forest-50 border border-forest-100">
-                <Phone className="w-5 h-5 text-forest-600 mt-0.5 shrink-0" />
-                <p className="text-sm text-forest-700">{ui.contactText}</p>
+              <div className="mb-6 p-4 rounded-2xl bg-forest-50 border border-forest-100">
+                <p className="text-sm text-forest-700 mb-3">{ui.contactText}</p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <a
+                    href={contactUrl(lang)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-forest-900 text-white text-sm font-semibold hover:bg-forest-800 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    {lang === 'vi' ? 'Chat Zalo với Mai' : 'Chat via WhatsApp'}
+                  </a>
+                  <a
+                    href={messengerUrl(slug)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleMessengerClick}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0084FF] text-white text-sm font-semibold hover:bg-[#0074e0] transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    {lang === 'vi' ? 'Chat Messenger với Mai' : 'Chat on Messenger'}
+                  </a>
+                </div>
+                {linkCopied && (
+                  <p className="text-xs text-forest-600 mt-2">
+                    {lang === 'vi'
+                      ? '✓ Đã copy link sản phẩm — dán vào khung chat để Mai biết bạn đang hỏi sản phẩm nào.'
+                      : '✓ Product link copied — paste it in the chat so Mai knows which product you mean.'}
+                  </p>
+                )}
               </div>
             )}
 
@@ -417,7 +488,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                   <p className="text-xs font-semibold uppercase tracking-wider text-forest-500 mb-1">
                     {ui.activeIngredientLabel}
                   </p>
-                  <p className="text-sm text-forest-800 font-medium">{product.activeIngredient}</p>
+                  <p className="text-sm text-forest-800 font-medium">{displayActiveIngredient}</p>
                 </div>
               </div>
             )}
@@ -466,7 +537,31 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                   <Heart className={`w-5 h-5 ${liked ? 'fill-gold-400' : ''}`} />
                 </button>
               </div>
-            ) : (
+            ) : null}
+
+            {canOrder && (
+              <>
+                <a
+                  href={messengerUrl(slug)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleMessengerClick}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#0084FF] text-white text-sm font-bold hover:bg-[#0074e0] hover:shadow-elegant-lg transition-all active:scale-95 mb-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  {lang === 'vi' ? 'Cần tư vấn thêm? Chat với Mai qua Messenger' : 'Need advice? Chat with Mai on Messenger'}
+                </a>
+                {linkCopied && (
+                  <p className="text-xs text-forest-600 mb-2">
+                    {lang === 'vi'
+                      ? '✓ Đã copy link sản phẩm — dán vào khung chat để Mai biết bạn đang hỏi sản phẩm nào.'
+                      : '✓ Product link copied — paste it in the chat so Mai knows which product you mean.'}
+                  </p>
+                )}
+              </>
+            )}
+
+            {!canOrder && (
               <a
                 href="tel:0984999309"
                 className="inline-flex items-center justify-center gap-2 bg-forest-900 hover:bg-forest-800 text-cream-50 text-sm font-bold py-4 px-6 rounded-full uppercase tracking-wider transition-all w-full sm:w-auto mb-4"
@@ -554,12 +649,12 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                     <div className="aspect-square rounded-2xl overflow-hidden bg-cream-100 mb-3">
                       <CarouselImage
                         src={rp.image}
-                        alt={rp.name}
+                        alt={nameForLang(rp, lang)}
                         fit="cover"
                         className="transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
-                    <p className="text-sm font-semibold text-forest-900 leading-snug line-clamp-2 mb-1">{rp.name}</p>
+                    <p className="text-sm font-semibold text-forest-900 leading-snug line-clamp-2 mb-1">{nameForLang(rp, lang)}</p>
                     {rp.price != null && (
                       <p className="text-sm text-gold-700 font-bold">{rp.price.toLocaleString('vi-VN')}₫</p>
                     )}

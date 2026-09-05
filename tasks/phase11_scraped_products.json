@@ -1,0 +1,598 @@
+{
+  "_meta": {
+    "scraped_at": "2026-09-05",
+    "scraped_by": "Claude (WebFetch trực tiếp từng trang chi tiết, không bịa dữ liệu)",
+    "note": "File trung gian cho Qwen/Ox — Task B Phase 11 trong tasks/todo.md. Mỗi entry là 1 sản phẩm THẬT đã verify từ trang gốc. Qwen/Ox: dùng field description_vi làm nguồn viết description, KHÔNG bịa thêm công dụng không có trong đây. image_url là ảnh gốc trên site NCC — tải về public/products/<supplierId>/ rồi mới gán vào products.ts, KHÔNG trỏ thẳng ra domain ngoài (trừ khi Joe nói khác). Sản phẩm nào ghi hidden_reason thì set hidden:true.",
+    "sku_prefix_by_supplier": { "samtramy": "STM", "tumorong": "TMR", "tumorongshop": "TMS", "khanhthanh": "KT" },
+    "duplicate_note": "tumorongshop chỉ giữ 3 SKU thực sự không trùng tumorong.com.vn (ATUAGIN 500ml thường, ATUAGIN Gold 750ml, Dragon) — 7 sản phẩm còn lại của tumorongshop là cùng 1 công ty/sản phẩm vật lý với tumorong.com.vn nên KHÔNG lặp lại ở đây, chỉ cần dùng giá tumorongshop để bổ sung nếu tumorong.com.vn không có giá (đã ghi chú price_alt trong entry TMR tương ứng)."
+  },
+  "samtramy": [
+    {
+      "name_vi": "Bia Tươi Sâm Ngọc Linh lon 1L",
+      "price_vnd": 208000,
+      "description_vi": "Sâm Ngọc Linh Bia Tươi Samtramy là dòng bia mang dấu ấn riêng của thương hiệu Samtramy, kết hợp phong cách Craft Beer với hình ảnh đặc trưng của Sâm Ngọc Linh. Nồng độ cồn 4.3% Vol, đóng lon nhôm 1000ml.",
+      "usage_vi": null,
+      "warnings_vi": "Đây là sản phẩm đồ uống có cồn. Vui lòng sử dụng có trách nhiệm.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2026/08/Bia-tuoi-lon-1L-e1788487934591.jpg",
+      "source_url": "https://samtramy.com/san-pham/bia-tuoi-sam-ngoc-linh-lon-1l/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Bia Tươi Sâm Ngọc Linh Két 6 chai",
+      "price_vnd": 588000,
+      "description_vi": "Sâm Ngọc Linh Bia Tươi Samtramy là dòng bia mang dấu ấn riêng của thương hiệu Samtramy, kết hợp phong cách Craft Beer, có sẵn dạng chai 330ml và lon 1000ml, nồng độ cồn 4.3% Vol.",
+      "usage_vi": null,
+      "warnings_vi": "Đây là sản phẩm đồ uống có cồn. Vui lòng sử dụng có trách nhiệm và tuân thủ các quy định hiện hành đối với đồ uống có cồn.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2026/08/bia-tuoi-sam-ngoc-linh-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/bia-tuoi-sam-ngoc-linh/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Dầu Thảo Dược Sâm Ngọc Linh",
+      "price_vnd": 150000,
+      "description_vi": "Dầu Thảo Dược Sâm Ngọc Linh SAMTRAMY là sản phẩm mỹ phẩm dùng ngoài da, kết hợp các thành phần thảo dược và tinh dầu thiên nhiên, mang lại cảm giác mát dịu, hương thảo dược dễ chịu, thấm nhanh không nhờn rít.",
+      "ingredients_vi": "Ethanol, Methyl Salicylate, Menthol Crystals, tinh dầu bạc hà (Mentha Piperita), củ Sâm Ngọc Linh khô, nụ Sâm Ngọc Linh khô, Phenoxyethanol",
+      "usage_vi": "Lấy một lượng vừa đủ, thoa lên vùng da cần dùng, massage nhẹ nhàng đến khi dầu thẩm thấu.",
+      "warnings_vi": "Chỉ dùng ngoài da. Tránh tiếp xúc trực tiếp với mắt. Không dùng lên vết thương hở. Ngừng dùng nếu bị kích ứng. Để xa tầm tay trẻ em.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2026/07/dau-thao-duoc-sam-ngoc-linh-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/dau-thao-duoc-sam-ngoc-linh/",
+      "suggested_productType": "nam-lim-duoc-lieu"
+    },
+    {
+      "name_vi": "Thạch Sâm Ngọc Linh Collagen Samtramy",
+      "price_vnd": 324000,
+      "description_vi": "Kết hợp Sâm Ngọc Linh và Collagen chăm sóc da và sức khỏe, dạng thạch mềm đóng gói từng gói tiện dùng. Mỗi gói 20g gồm Phức hợp Sâm Ngọc Linh 700mg (dây sâm 400mg, củ sâm 300mg), Nano Collagen 100mg, chất xơ từ lúa mì và vỏ hạt mã đề.",
+      "usage_vi": "Dùng trực tiếp sau khi mở gói, ngon hơn khi để lạnh. Không dùng nếu bao bì hư hỏng hoặc sản phẩm hết hạn.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/thach-sam-ngoc-linh-collagen-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/thach-sam-ngoc-linh-collagen-samtramy/",
+      "suggested_productType": "my-pham-sam"
+    },
+    {
+      "name_vi": "Rượu Whisky Sâm Ngọc Linh 500ml",
+      "price_vnd": 1539000,
+      "description_vi": "Kết hợp tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên, 100% chiết xuất sâm thật, không cồn công nghiệp, không phụ gia, đóng chai thủy tinh cao cấp phù hợp làm quà biếu.",
+      "ingredients_vi": "Rượu nếp 90%, Sâm Ngọc Linh 10%",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2026/01/ruou-whisky-sam-ngoc-linh-1-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/ruou-whisky-sam-ngoc-linh-500ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Samy - Rượu Sâm Ngọc Linh vị trái cây lên men",
+      "price_vnd": 649000,
+      "description_vi": "Sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và men rượu trái cây tự nhiên mang đến một sản phẩm vừa bổ dưỡng vừa hiện đại.",
+      "ingredients_vi": "Rượu sâm ngọc linh 50%, nước cốt trái cây 5%, chất điều chỉnh độ acid (INS 330), chất bảo quản (INS 202)",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót để hòa quyện hương vị.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2026/01/22221-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/samy-ruou-trai-cay-len-men/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Set 6 Hũ Yến Sâm Ngọc Linh Đường Phèn",
+      "price_vnd": 648000,
+      "description_vi": "Kết hợp yến sào và Sâm Ngọc Linh, mang đến thức uống vừa ngon vừa bổ, giúp duy trì năng lượng và tăng cường đề kháng mỗi ngày.",
+      "ingredients_vi": "Nước RO, yến sào 1.840mg/chai 70ml, đường phèn 7%, tinh chất sâm 750mg/70ml, củ Sâm Ngọc Linh 500mg/70ml, chất làm đặc (INS418, INS415, INS327), chất ổn định (INS401), hương yến tổng hợp",
+      "usage_vi": "Lắc đều trước khi uống. Uống trực tiếp, ngon hơn khi dùng lạnh.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/set-6-yen-sam-ngoc-linh-1-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/set-6-hu-yen-sam-ngoc-linh/",
+      "suggested_productType": "tra-nuoc-uong-sam"
+    },
+    {
+      "name_vi": "Yến Sâm Ngọc Linh Đường Phèn",
+      "price_vnd": 92000,
+      "description_vi": "Kết hợp tinh túy giữa Yến Sào quý giá và Sâm Ngọc Linh, mang đến thức uống vừa ngon vừa bổ, giúp duy trì năng lượng và tăng cường đề kháng mỗi ngày.",
+      "ingredients_vi": "Nước RO, yến sào 1.840mg/70ml, đường phèn 7%, tinh chất sâm 750mg/70ml, củ Sâm Ngọc Linh 500mg/70ml, chất làm đặc (INS418, INS415, INS327), chất ổn định (INS401), hương yến tổng hợp",
+      "usage_vi": "Lắc đều trước khi uống. Uống trực tiếp, ngon hơn khi dùng lạnh.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/yen-sam-ngoc-linh-1-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/yen-sam-ngoc-linh/",
+      "suggested_productType": "tra-nuoc-uong-sam"
+    },
+    {
+      "name_vi": "Trà Túi Lọc Sâm Ngọc Linh Samtramy",
+      "price_vnd": 1070000,
+      "description_vi": "Sự kết hợp giữa di sản y học cổ truyền và công nghệ hiện đại, biểu tượng cho sự trường thọ và minh mẫn.",
+      "ingredients_vi": "Sâm Nam Ngọc Linh 55%, củ sâm Ngọc Linh 40%, lá sâm Ngọc Linh 5%. Hộp 20 gói lọc x 2g.",
+      "usage_vi": "Hãm 1 gói trà với 100-150ml nước sôi trong 5-7 phút, uống nóng, ngày 1-2 lần sau bữa ăn hoặc trước hoạt động căng thẳng.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/tra-sam-ngoc-linh-1-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/tra-sam-ngoc-linh/",
+      "suggested_productType": "tra-nuoc-uong-sam"
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh VIP 750ml",
+      "price_vnd": null,
+      "description_vi": "Rượu Sâm Ngọc Linh là sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên.",
+      "ingredients_vi": "Rượu Whisky 90%, Sâm Ngọc Linh 10%",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/ruou-sam-ngoc-linh-vip-750ml-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/ruou-sam-ngoc-linh-vip-750ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true,
+      "hidden_reason": "Giá 'Liên hệ' trên site gốc, không có giá cố định — cân nhắc ẩn hoặc để price:null chờ Joe báo giá"
+    },
+    {
+      "name_vi": "Combo 3 Chai Rượu Whisky Sâm Ngọc Linh",
+      "price_vnd": 1089000,
+      "description_vi": "Rượu Whisky Sâm Ngọc Linh là sự kết hợp giữa whisky đậm vị, chất lượng cao và tinh chất từ củ sâm Ngọc Linh lâu năm.",
+      "ingredients_vi": "Rượu Whisky 90%, Sâm Ngọc Linh 10%, nồng độ cồn 32%, chai 100ml/chai (bộ 3 chai)",
+      "usage_vi": "Dùng trực tiếp 1–2 ly nhỏ (20–30ml) mỗi ngày, tốt nhất sau bữa ăn tối. Lắc nhẹ trước khi rót nếu có cặn sâm.",
+      "warnings_vi": "Không khuyến khích cho người dưới 18 tuổi, phụ nữ có thai, hoặc người có vấn đề về gan.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/combo-3-whisky-sam-ngoc-linh-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/combo-3-chai-ruou-sam-ngoc-linh-ruou-sam-ngoc-linh/",
+      "suggested_productType": "set-qua-tang",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Cây Sâm Ngọc Linh 1000ml",
+      "price_vnd": null,
+      "description_vi": "Sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên, mang lại một sản phẩm vừa bổ dưỡng vừa sang trọng.",
+      "ingredients_vi": "Rượu nếp 90%, Sâm Ngọc Linh 10%",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/ruou-cay-sam-ngoc-linh-100ml-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/ruou-cay-sam-ngoc-linh-1000ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true,
+      "hidden_reason": "Giá 'Liên hệ' trên site gốc"
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh 187ml Lốc 6",
+      "price_vnd": 1913000,
+      "description_vi": "Sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên, mang lại một sản phẩm vừa bổ dưỡng vừa sang trọng.",
+      "ingredients_vi": "Rượu nếp 90%, Sâm Ngọc Linh 10%",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/ruou-sam-ngoc-linh-187ml-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/ruou-sam-ngoc-linh-187ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Chai Premium",
+      "price_vnd": 1375000,
+      "description_vi": "Sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên, sản phẩm bồi bổ sức khỏe kiêm quà biếu cao cấp.",
+      "ingredients_vi": "Rượu nếp 90%, Sâm Ngọc Linh 10%",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/ruou-premium-sam-ngoc-linh-1-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/ruou-sam-ngoc-linh-chai-premium/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Chai Classic",
+      "price_vnd": 1155000,
+      "description_vi": "Sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên, mang lại một sản phẩm vừa bổ dưỡng vừa sang trọng.",
+      "ingredients_vi": "Rượu nếp 90%, Sâm Ngọc Linh 10%. Thể tích 500ml.",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/ruou-classic-sam-ngoc-linh-1-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/ruou-sam-ngoc-linh-chai-classic/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Combo 3 Chai Rượu Sâm Ngọc Linh",
+      "price_vnd": 935000,
+      "description_vi": "Sự kết hợp giữa tinh chất Sâm Ngọc Linh quý hiếm và rượu nếp truyền thống lên men tự nhiên — quà biếu cao cấp.",
+      "ingredients_vi": "Rượu nếp 90%, Sâm Ngọc Linh 10%. Thể tích 100ml/chai.",
+      "usage_vi": "Uống 1–2 ly nhỏ mỗi ngày sau bữa ăn tối. Lắc nhẹ trước khi rót.",
+      "warnings_vi": "Không dùng cho người dưới 18 tuổi, phụ nữ có thai hoặc người dị ứng với rượu thuốc.",
+      "image_url": "https://samtramy.com/wp-content/uploads/2025/07/combo-3-ruou-sam-ngoc-linh-1024x1024.png",
+      "source_url": "https://samtramy.com/san-pham/combo-3-chai-ruou-sam-ngoc-linh/",
+      "suggested_productType": "set-qua-tang",
+      "displayOnly18Plus": true
+    }
+  ],
+  "tumorong": [
+    {
+      "name_vi": "Cà Phê Sâm Ngọc Linh",
+      "price_vnd": 250000,
+      "description_vi": "Cà phê sâm Ngọc Linh giữ nguyên dưỡng chất vốn có của sâm Ngọc Linh; cà phê đại ngàn kết hợp với sâm Ngọc Linh tạo ra cảm giác mới lạ. Hỗ trợ tăng cường trí nhớ, hô hấp, sản sinh hồng cầu, tăng đề kháng, chống oxy hóa.",
+      "warnings_vi": "Thực phẩm bảo vệ sức khỏe. Thực phẩm này không phải là thuốc và không có tác dụng thay thế thuốc chữa bệnh.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2021/02/3-300x300.jpg",
+      "source_url": "https://tumorong.com.vn/san-pham/ca-phe-sam-ngoc-linh/",
+      "suggested_productType": "tra-nuoc-uong-sam",
+      "price_alt_note": "shop.tumorong.com bán sản phẩm tương tự 'Cà phê hòa tan Sâm Ngọc Linh' giá 348.000đ — có thể là cùng sản phẩm, khác domain"
+    },
+    {
+      "name_vi": "Dầu Gió Thượng Đảng Nhân Sâm",
+      "price_vnd": 90000,
+      "description_vi": "Dầu gió Thượng đảng nhân sâm là một loại dầu gió đặc biệt, chiết xuất từ tinh dầu nhiều loại thảo dược, mùi thơm dễ chịu, không gắt.",
+      "ingredients_vi": "Thượng đảng nhân sâm, bạc hà, đại hồi, đinh hương",
+      "usage_vi": "Phòng cảm gió, giảm đau đầu do viêm xoang, kháng khuẩn, hỗ trợ cảm cúm theo mùa, giảm đau nhức xương khớp, giảm ngứa côn trùng cắn, khử mùi giày.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2021/02/z2681477280899_48e9c8f68c697dc7d712cb731ff9d572-300x300.png",
+      "source_url": "https://tumorong.com.vn/san-pham/dau-gio-thuong-dang-nhan-sam/",
+      "suggested_productType": "nam-lim-duoc-lieu"
+    },
+    {
+      "name_vi": "Dưỡng Chất Sâm Ngọc Linh Mật Ong",
+      "price_vnd": 2500000,
+      "description_vi": "Sự kết hợp hoàn hảo giữa củ Sâm Ngọc Linh quý hiếm và Mật ong thiên nhiên. Sâm khô được làm sạch bằng cồn, sấy chân không, nghiền bột, phối trộn cùng mật ong đã lọc ở nhiệt độ phòng mát, ủ đủ thời gian trước khi đóng hũ.",
+      "usage_vi": "Ngậm trực tiếp lát sâm hoặc uống sâm Ngọc Linh mật ong với nước ấm. Dùng 1-2 lần/ngày, mỗi lần 2-3 thìa (8-12g), tốt nhất buổi sáng sau ăn. Người tiểu đường không quá 10g/ngày.",
+      "warnings_vi": "Thực phẩm bảo vệ sức khỏe, không phải là thuốc và không có tác dụng thay thế thuốc chữa bệnh.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2021/12/sam-ngoc-linh-mat-ong-1.png",
+      "source_url": "https://tumorong.com.vn/san-pham/duong-chat-sam-ngoc-linh-mat-ong/",
+      "suggested_productType": "sam-ngam-mat-ong"
+    },
+    {
+      "name_vi": "Rượu Đẳng Sâm Ngũ Vị Tử 500ml (chai vuông)",
+      "price_vnd": null,
+      "description_vi": "Kết hợp tinh chất Sâm Ngọc Linh với hai dược liệu quý là đẳng sâm và ngũ vị tử, sản xuất bởi Công ty Sâm Ngọc Linh Tu Mơ Rông Kon Tum. Tăng cường thể lực, minh mẫn tinh thần, giảm mệt mỏi, hỗ trợ giấc ngủ, tăng cường miễn dịch.",
+      "usage_vi": "Dùng 20-30ml/ngày sau bữa tối. Phù hợp người trên 30 tuổi cần bồi bổ năng lượng.",
+      "warnings_vi": "Không phải là thuốc, không thay thế thuốc chữa bệnh. Không bán cho người dưới 18 tuổi. Sản phẩm rượu đang chờ xác nhận của Bộ Công Thương.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2022/11/3.png",
+      "source_url": "https://tumorong.com.vn/san-pham/ruou-dang-sam-ngu-vi-tu-500ml-chai-vuong/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true,
+      "price_alt_note": "shop.tumorong.com bán 'Rượu đẳng sâm ngũ vị 500ml' giá 780.000đ — dùng giá này nếu cần giá cụ thể"
+    },
+    {
+      "name_vi": "Rượu Ngọc Linh Đẳng Sâm Ngũ Vị Tử (chai tròn 500ml)",
+      "price_vnd": null,
+      "description_vi": "Kết hợp sâm Ngọc Linh với đẳng sâm ngũ vị tử, giúp tăng cường bảo vệ chức năng gan thận, hỗ trợ giảm huyết áp và cholesterol.",
+      "usage_vi": "Cần ngâm từ 6 tháng trở lên trước khi dùng để đạt hiệu quả tốt nhất.",
+      "warnings_vi": "Thực phẩm này không phải là thuốc, không có tác dụng thay thế thuốc chữa bệnh. Không bán cho người dưới 18 tuổi.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2021/12/ruou-dnag-sma-ngu-vi-tu.jpg",
+      "source_url": "https://tumorong.com.vn/san-pham/ruou-ngoc-linh-dang-sam-ngu-vi-tu-chai-tron-500ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Atuagin Black 500ml",
+      "price_vnd": 1200000,
+      "price_alt_source": "https://shop.tumorong.com/san-pham/ruou-sam-ngoc-linh-atuagin-black-500ml/ (giá xác nhận 1.200.000đ)",
+      "description_vi": "Rượu nếp kết hợp Sâm Ngọc Linh qua quá trình lên men cẩn thận, giữ trọn tinh chất từ nguyên liệu chính. Hỗ trợ miễn dịch, giảm stress mệt mỏi, cải thiện ăn uống.",
+      "usage_vi": "100ml/ngày, dùng kèm bữa ăn, mỗi lần một ly nhỏ.",
+      "warnings_vi": "Không phải là thuốc, không thay thế thuốc chữa bệnh. Không bán cho người dưới 18 tuổi.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2022/11/5.png",
+      "source_url": "https://tumorong.com.vn/san-pham/ruou-sam-ngoc-linh-atuagin-chai-tron-500ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Atuagin Green 500ml",
+      "price_vnd": 780000,
+      "price_alt_source": "https://shop.tumorong.com/san-pham/ruou-sam-ngoc-linh-atuagin-green-500ml/ (giá xác nhận 780.000đ)",
+      "description_vi": "Rượu nếp cẩm kết hợp Sâm Ngọc Linh, màu vàng óng mượt mà, vị đắng nhẹ hậu ngọt, chứa 84 loại saponin và dưỡng chất từ sâm Ngọc Linh tự nhiên ngâm 10-150 năm tuổi với rượu trắng 40-55 độ.",
+      "usage_vi": null,
+      "warnings_vi": "Không phải là thuốc, không thay thế thuốc chữa bệnh. Không bán cho người dưới 18 tuổi.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2022/11/4.png",
+      "source_url": "https://tumorong.com.vn/san-pham/r-u-o-u-sam-ngoc-linh/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Tumorong Blue Label 500ml",
+      "price_vnd": 990000,
+      "description_vi": "Rượu thuốc cao cấp ngâm từ củ Sâm Ngọc Linh tự nhiên, hàm lượng saponin cao, tăng cường sinh lực, hỗ trợ chức năng gan, điều hòa tim mạch, giảm cholesterol xấu.",
+      "usage_vi": "20-30ml/ngày (sau mỗi bữa ăn).",
+      "warnings_vi": "Không khuyến nghị cho phụ nữ mang thai, đang cho con bú, người rối loạn giấc ngủ hoặc vấn đề tiêu hóa.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2022/11/6.png",
+      "source_url": "https://tumorong.com.vn/san-pham/ruou-sam-ngoc-linh-chai-bau-vip-500ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Tumorong Gold Label 750ml",
+      "price_vnd": 1500000,
+      "description_vi": "Rượu thuốc cao cấp ngâm từ củ Sâm Ngọc Linh quý hiếm, hàm lượng saponin cao giúp tăng cường sức đề kháng, cải thiện sinh lực — quà biếu sang trọng dịp lễ Tết.",
+      "usage_vi": "20-30ml/ngày sau bữa ăn, không quá 100ml/ngày.",
+      "warnings_vi": "Dùng quá liều có thể ảnh hưởng dạ dày, ruột, gan, thận. Chứa cồn, không dùng cho người dưới 18 tuổi.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2022/11/1.png",
+      "source_url": "https://tumorong.com.vn/san-pham/ruou-sam-ngoc-linh-chai-bau-750ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Ngâm Mật Ong",
+      "price_vnd": 5000000,
+      "price_alt_note": "shop.tumorong.com bán từ 6.400.000đ (có thể là dung tích/hàm lượng lớn hơn)",
+      "description_vi": "Kết hợp củ sâm Ngọc Linh và mật ong rừng nguyên chất, hỗ trợ miễn dịch, lành vết thương, chống mệt mỏi, tốt cho da.",
+      "ingredients_vi": "Củ sâm Ngọc Linh, mật ong rừng nguyên chất",
+      "usage_vi": "Cách 1: ngậm trực tiếp 1-2 lát/ngày. Cách 2: hòa 10-20g (dùng thường) hoặc 20-30g (dùng bồi bổ) với 200ml nước ấm 50-60°C, uống buổi sáng trước ăn.",
+      "image_url_note": "URL gốc trên trang bị lỗi domain (tumorong.com.com) — verify lại domain thật trước khi tải ảnh, khả năng đúng là tumorong.com.vn",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2019/10/sam-ngoc-linh-ngam-mat-ong.png",
+      "source_url": "https://tumorong.com.vn/san-pham/sam-ngoc-linh-ngam-mat-ong/",
+      "suggested_productType": "sam-ngam-mat-ong"
+    },
+    {
+      "name_vi": "Thạch Collagen Sâm Ngọc Linh",
+      "price_vnd": 890000,
+      "description_vi": "Sản xuất bằng công nghệ thủy phân nội sinh thế hệ mới, bổ sung Collagen cho cơ thể, kết hợp Sâm Ngọc Linh và Collagen thủy phân dạng thạch mềm.",
+      "usage_vi": "Dùng trực tiếp như món tráng miệng hoặc bổ sung dinh dưỡng hàng ngày, có thể kết hợp sữa chua, sinh tố, nước ép.",
+      "warnings_vi": "Thực phẩm bảo vệ sức khỏe, không phải thuốc, không thay thế thuốc chữa bệnh.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2019/10/thach-collagen-sam-ngoc-linh-2.png",
+      "source_url": "https://tumorong.com.vn/san-pham/collagen-sam-ngoc-linh/",
+      "suggested_productType": "my-pham-sam"
+    },
+    {
+      "name_vi": "Trà Ô Long Sâm Ngọc Linh",
+      "price_vnd": 300000,
+      "price_alt_note": "shop.tumorong.com bán từ 211.000đ",
+      "description_vi": "Kết hợp trà ô long thượng hạng với sâm Ngọc Linh, tinh túy Tây Nguyên, hương vị độc đáo, vị chát nhẹ của ô long hòa cùng vị ngọt dịu của sâm.",
+      "usage_vi": "1 gói với 200ml nước sôi. Hộp 20 gói x 3g.",
+      "warnings_vi": "Thực phẩm bảo vệ sức khỏe, không có tác dụng thay thế thuốc chữa bệnh.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2024/09/tra-o-long-sam-ngoc-linh.png",
+      "source_url": "https://tumorong.com.vn/san-pham/tra-o-long-sam-ngoc-linh/",
+      "suggested_productType": "tra-nuoc-uong-sam"
+    },
+    {
+      "name_vi": "Trà Sâm Ngọc Linh Tumorong",
+      "price_vnd": 500000,
+      "price_alt_note": "shop.tumorong.com bán 'Trà hòa tan Sâm Ngọc Linh' 693.000đ — có thể cùng loại",
+      "description_vi": "Trà hòa tan chiết xuất nguyên chất từ củ Sâm Ngọc Linh, hương vị nhẹ nhàng dễ chịu, phù hợp người bận rộn, trung niên, cao tuổi cần bồi bổ tự nhiên hàng ngày. Sản xuất bởi Công ty Cổ phần Sâm Ngọc Linh Tumơrông Kon Tum.",
+      "usage_vi": "Hãm 1 gói với 150-200ml nước nóng 80-90°C, khuấy đều. Dùng nóng hoặc lạnh, nên dùng buổi sáng hoặc đầu giờ chiều. Hộp 50 gói x 3g.",
+      "image_url": "https://tumorong.com.vn/wp-content/uploads/2019/10/tra-sam-ngoc-linh-tumorong-2.jpg",
+      "source_url": "https://tumorong.com.vn/san-pham/tra-sam-ngoc-linh/",
+      "suggested_productType": "tra-nuoc-uong-sam"
+    }
+  ],
+  "tumorongshop": [
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Atuagin 500ml",
+      "price_vnd": 1980000,
+      "description_vi": "Giữ trọn vẹn nét truyền thống và hương vị nguyên bản của Sâm Ngọc Linh, rượu nếp chưng cất tinh luyện kết hợp sâm nguyên củ/lát để giữ trọn hình dạng và hoạt chất.",
+      "usage_vi": "Uống trực tiếp 20-30ml mỗi lần, dùng trong bữa ăn hoặc trước khi ngủ.",
+      "warnings_vi": "Chỉ bán cho người từ 18 tuổi trở lên.",
+      "image_url": "https://shop.tumorong.com/wp-content/uploads/2026/05/vip2-600x600.png",
+      "source_url": "https://shop.tumorong.com/san-pham/ruou-sam-ngoc-linh-atuagin-500ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Atuagin Gold 750ml",
+      "price_vnd": 2700000,
+      "description_vi": "Hội tụ tinh hoa núi rừng Kon Tum, kết hợp dược liệu quý với phương pháp lên men truyền thống, quà biếu sang trọng cho đối tác và người thân.",
+      "ingredients_vi": "Sâm Ngọc Linh, rượu nếp lọc theo phương pháp truyền thống",
+      "usage_vi": "Uống trực tiếp 20-30ml mỗi lần, dùng trong bữa ăn hoặc trước khi ngủ.",
+      "warnings_vi": "Chỉ bán cho người từ 18 tuổi trở lên.",
+      "image_url": "https://shop.tumorong.com/wp-content/uploads/2026/05/3_ae03ed71fce44fda83317f421997438f_master-600x600.png",
+      "source_url": "https://shop.tumorong.com/san-pham/ruou-sam-ngoc-linh-atuagin-gold-750ml/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Dragon",
+      "price_vnd": 12800000,
+      "description_vi": "Phiên bản giới hạn, bình gốm chạm khắc rồng tinh xảo, ngâm ủ 4 năm từ sâm Ngọc Linh 8-12 năm tuổi, hàm lượng sâm 18g/lít. Bình gốm Bát Tràng dát vàng 24K, hộp gỗ sơn mài thủ công, phụ kiện inox mạ vàng.",
+      "usage_vi": null,
+      "warnings_vi": "Chỉ bán cho người từ 18 tuổi trở lên.",
+      "image_url": "https://shop.tumorong.com/wp-content/uploads/2026/05/470690328_1104272951699009_7931154083511958383_n_3688c978e1c9471089771e95debe20bb_master-1.jpg",
+      "source_url": "https://shop.tumorong.com/san-pham/ruou-sam-ngoc-linh-dragon/",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true,
+      "note": "Sản phẩm cao cấp giá rất cao (12.8tr) — xác nhận với Joe có muốn niêm yết công khai hay chỉ 'liên hệ' trước khi lên site"
+    }
+  ],
+  "khanhthanh": [
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Ngâm Lá 750ml",
+      "price_vnd": 1560000,
+      "description_vi": "Ngâm từ lá Sâm Ngọc Linh tự nhiên kết hợp rượu nếp truyền thống, hương thơm dịu, hậu ngọt, dễ uống.",
+      "ingredients_vi": "Lá Sâm Ngọc Linh tuyển chọn, rượu nếp thủ công, không chất bảo quản/phụ gia",
+      "usage_vi": "Uống 20-30ml/ngày sau bữa ăn, nên dùng buổi tối, không lạm dụng.",
+      "warnings_vi": "Tác dụng mang tính hỗ trợ, không thay thế thuốc chữa bệnh.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__2__e6b1c3a6c1b04bdc84e3a4c2fc0568ac_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-la-750ml-1",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Ngâm Củ Tươi Trên 8 Năm Tuổi",
+      "price_vnd": 14910000,
+      "description_vi": "Ngâm nguyên cây Sâm Ngọc Linh, hình thức sang trọng độc đáo, phù hợp trưng bày/quà biếu dịp Tết, khai trương, sinh nhật, họp mặt kinh doanh.",
+      "ingredients_vi": "Sâm Ngọc Linh nguyên cây, rượu",
+      "warnings_vi": "Sản phẩm có chứa cồn. Không dùng cho người chưa đủ tuổi, phụ nữ mang thai hoặc người được khuyến cáo không dùng rượu bia.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__23__8e3541d3cc174a07adf6bc936572aef7_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-cu-tuoi-tren-8-nam-tuoi",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Phong Thủy 12 Con Giáp",
+      "price_vnd": 3640000,
+      "description_vi": "Món quà độc đáo kết hợp giá trị Sâm Ngọc Linh và ý nghĩa phong thủy 12 con giáp, tạo hình 12 con giáp từ lá Sâm Ngọc Linh và mật ong.",
+      "ingredients_vi": "Lá Sâm Ngọc Linh, mật ong",
+      "usage_vi": "Phù hợp làm quà sinh nhật, tân gia, khai trương, Tết, biếu đối tác/khách hàng.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/574565538_122095083177110425_6103043079322583024_n_cad75e9fd6734f7dbf2017a9ad872223_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngoc-linh-phong-thuy-12-con-giap",
+      "suggested_productType": "set-qua-tang"
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Ngâm Mật Ong 1g",
+      "price_vnd": 280000,
+      "description_vi": "Kết hợp 1g Sâm Ngọc Linh tuyển chọn với mật ong nguyên chất, nhỏ gọn tiện mang theo đi làm, đi học, đi xa.",
+      "usage_vi": "Dùng trực tiếp, ngon hơn khi uống mát. Bảo quản nơi khô ráo, tránh ánh nắng trực tiếp.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__3__1fb2effcad0c4599a93429dc3fb74093_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngoc-linh-ngam-mat-ong-1g",
+      "suggested_productType": "sam-ngam-mat-ong",
+      "hidden_reason": "Hết hàng trên site gốc tại thời điểm cào (2026-09-05)"
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Ngâm Lá 500ml (Set ly hoàng gia)",
+      "price_vnd": 2400000,
+      "description_vi": "Set rượu ngâm lá Sâm Ngọc Linh 500ml kèm ly hoàng gia, quà biếu cao cấp.",
+      "ingredients_vi": "Lá Sâm Ngọc Linh tuyển chọn, rượu nếp thủ công",
+      "usage_vi": "Uống 20-30ml/ngày sau bữa ăn, nên dùng buổi tối.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__82__dd663ab1350848acab02a68b6e3dbd77_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-la-500-ml",
+      "suggested_productType": "set-qua-tang",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Ngâm Lá 500ml",
+      "price_vnd": 1170000,
+      "description_vi": "Ngâm lá Sâm Ngọc Linh trong rượu nếp truyền thống, màu vàng nâu tự nhiên, hương nhẹ, vị êm hậu ngọt.",
+      "ingredients_vi": "Lá Sâm Ngọc Linh tuyển chọn, rượu nếp thủ công, không chất bảo quản/phụ gia",
+      "usage_vi": "Uống 20-30ml/ngày sau bữa ăn, nên dùng buổi tối, không lạm dụng.",
+      "warnings_vi": "Tác dụng mang tính hỗ trợ, không thay thế thuốc chữa bệnh.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__82__dd663ab1350848acab02a68b6e3dbd77_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-la-500ml-1",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Set Rượu Sâm Ngọc Linh Ngâm Lá 500ml + 1 Ngâm Mật Ong 1g + 4 Ly Hoàng Gia",
+      "price_vnd": 4200000,
+      "description_vi": "Set quà biếu gồm rượu ngâm lá sâm Ngọc Linh 500ml, 1 hũ sâm ngâm mật ong 1g, kèm 4 ly hoàng gia.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__82__dd663ab1350848acab02a68b6e3dbd77_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-la-500ml",
+      "suggested_productType": "set-qua-tang",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Ngâm Lá 750ml (bản 2)",
+      "price_vnd": 2500000,
+      "description_vi": "Ngâm từ lá Sâm Ngọc Linh tự nhiên kết hợp rượu nếp truyền thống, màu nâu vàng tự nhiên, hương lá sâm nhẹ, vị êm không gắt, hậu ngọt thanh mát.",
+      "ingredients_vi": "Lá Sâm Ngọc Linh tuyển chọn, rượu nếp thủ công, không chất bảo quản/phụ gia",
+      "usage_vi": "Uống 20-30ml/ngày sau bữa ăn, nên dùng buổi tối, không lạm dụng.",
+      "warnings_vi": "Tác dụng mang tính hỗ trợ, không thay thế thuốc chữa bệnh.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__4__bcfbe42974dd44b78d809454f92b1bcd_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-la-750ml",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true,
+      "note": "Trùng tên hiển thị với entry đầu tiên (slug khác: ...-750ml-1 vs ...-750ml) — verify lại trên site xem có phải 2 SKU thật khác nhau (ảnh khác nhau, giá khác nhau 1.560.000 vs 2.500.000) trước khi thêm cả 2"
+    },
+    {
+      "name_vi": "Rượu Sâm Ngọc Linh Ngâm Lá 3.95L",
+      "price_vnd": 7410000,
+      "description_vi": "Lá sâm Ngọc Linh tuyển chọn ngâm theo phương pháp truyền thống, không phụ gia, không tạo màu, màu tự nhiên trong không cặn, hương nhẹ vị dịu.",
+      "warnings_vi": "Không dùng cho phụ nữ mang thai, trẻ em, người mẫn cảm với thành phần sâm.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__20__2974ffc8f4ff4b1caaf955a46ae015c8_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/ruou-sam-ngoc-linh-ngam-la-3-95l",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Ngâm Lá 1L",
+      "price_vnd": 2171000,
+      "description_vi": "Lá sâm Ngọc Linh tuyển chọn ngâm rượu trắng chất lượng theo phương pháp truyền thống, màu xanh vàng tự nhiên, hương lá nhẹ, vị êm.",
+      "ingredients_vi": "Lá sâm Ngọc Linh tuyển chọn, rượu trắng",
+      "usage_vi": "Uống 15-30ml/lần, ngày 1-2 lần, nên dùng trong hoặc sau bữa ăn, không lạm dụng.",
+      "warnings_vi": "Không dùng cho phụ nữ mang thai, người huyết áp cao, người mẫn cảm với rượu. Không dùng khi lái xe.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__19__760acdaeec354c5aaf0a98fdd1e66867_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngoc-linh-ngam-la-1l",
+      "suggested_productType": "ruou-sam",
+      "displayOnly18Plus": true
+    },
+    {
+      "name_vi": "Lá Sâm Ngọc Linh Khô",
+      "price_vnd": 8000000,
+      "description_vi": "Lá và Hoa Sâm Ngọc Linh thương hiệu Khánh Thành, thu hái từ cây sâm lâu năm trồng tại vùng núi Ngọc Linh, giữ nguyên dược tính, giàu saponin và vi chất dinh dưỡng. Giúp thanh lọc cơ thể, hỗ trợ tiêu hóa, giảm mệt mỏi, tăng đề kháng.",
+      "image_url": "https://product.hstatic.net/200000939375/product/la-sam-ngoc-linh-kho_ced1212108a0475c96b40c7c2aa0640c_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/la-sam-ngoc-linh-kho",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Lá Sâm Ngọc Linh Tươi",
+      "price_vnd": 12000000,
+      "description_vi": "Lá và Hoa Sâm Ngọc Linh thương hiệu Khánh Thành, thu hái từ cây sâm lâu năm trồng tại vùng núi Ngọc Linh, giữ nguyên dược tính, giàu saponin và vi chất dinh dưỡng, hỗ trợ thanh lọc cơ thể, tiêu hóa, giảm mệt mỏi, tăng đề kháng.",
+      "note": "Site gốc có 2 biến thể: lá lớn 12.000.000đ, lá nhỏ 8.000.000đ — chọn 1 hoặc thêm 2 SKU riêng, xác nhận Joe",
+      "image_url": "https://product.hstatic.net/200000939375/product/la-sam-ngoc-linh-tuoi-loai-nho_931fd24ef7a944138d6ca39ef47dfd60_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/la-sam-ngoc-linh-tuoi",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Sâm Ngâm Mật Ong 500ml (50g sâm)",
+      "price_vnd": 9900000,
+      "description_vi": "Sự kết hợp tinh túy giữa Sâm Ngọc Linh quý hiếm và mật ong nguyên chất, chứa 50g sâm tươi trong 500ml.",
+      "ingredients_vi": "Sâm Ngọc Linh chọn lọc, mật ong nguyên chất",
+      "usage_vi": "Uống trực tiếp 1-2 thìa cà phê mỗi ngày hoặc pha loãng với nước ấm trước bữa sáng.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__38__61321c7962d741639d37dd3c71c6308b_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngam-mat-ong-500ml-50g-sam-1",
+      "suggested_productType": "sam-ngam-mat-ong"
+    },
+    {
+      "name_vi": "Sâm Ngâm Mật Ong 50ml (4g sâm)",
+      "price_vnd": 910000,
+      "description_vi": "Sâm Ngọc Linh quý hiếm kết hợp mật ong nguyên chất, chai mini 50ml chứa 4g sâm, nhỏ gọn tiện mang theo, không chất bảo quản/phụ gia.",
+      "usage_vi": "Uống trực tiếp ½-1 thìa cà phê mỗi ngày hoặc pha với nước ấm, tốt nhất buổi sáng.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__3__16d43dd4905b44c99c3e73c85783ca07_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngam-mat-ong-50ml-4g-sam",
+      "suggested_productType": "sam-ngam-mat-ong"
+    },
+    {
+      "name_vi": "Sâm Ngâm Mật Ong 150ml (12.5g sâm)",
+      "price_vnd": 2950000,
+      "description_vi": "Sâm Ngọc Linh quý hiếm kết hợp mật ong nguyên chất, chai 150ml chứa 12.5g sâm, hỗ trợ phục hồi thể lực, tăng cường miễn dịch, giảm mệt mỏi, cải thiện ăn ngủ.",
+      "usage_vi": "Dùng 1 thìa cà phê mỗi ngày, trực tiếp hoặc pha nước ấm, tốt nhất trước bữa sáng.",
+      "image_url": "https://cdn.hstatic.net/products/200000939375/poster_c__i_d_ng_vu_ng__41__9e5a01fbb3d545618a8bdda3d3d70939_master.png",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngam-mat-ong-150ml-12-5g",
+      "suggested_productType": "sam-ngam-mat-ong"
+    },
+    {
+      "name_vi": "Củ Sâm Ngọc Linh Tươi Loại Vụn",
+      "price_vnd": 80000000,
+      "description_vi": "Sâm Ngọc Linh tươi là thảo dược quý hiếm, mệnh danh 'Quốc Bảo' Việt Nam, trồng tại Trà Linh, Nam Trà My, Quảng Nam. Hàm lượng saponin cao, hỗ trợ tăng đề kháng, giảm stress, cải thiện giấc ngủ, hỗ trợ phòng ngừa ung thư.",
+      "image_url": "https://product.hstatic.net/200000939375/product/sam-ngoc-linh-vun_281412b5c5274cb2b06b4432e9199adb_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/cu-sam-ngoc-linh-tuoi-loai-vun",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Củ Sâm Ngọc Linh Tươi Loại 4 (TB 40 củ/kg)",
+      "price_vnd": 110000000,
+      "description_vi": "Sâm Ngọc Linh tươi là thảo dược quý hiếm, mệnh danh 'Quốc Bảo' Việt Nam, trồng tại Nam Trà My, Quảng Nam. Hàm lượng saponin cao, hỗ trợ tăng đề kháng, giảm stress, cải thiện giấc ngủ, hỗ trợ phòng ngừa ung thư.",
+      "image_url": "https://product.hstatic.net/200000939375/product/cu-sam-ngoc-linh-tuoi-loai-4_158609c77524496b94e76b53d24db554_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/cu-sam-ngoc-linh-tuoi-loai-4",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Củ Sâm Ngọc Linh Tươi Loại 3 (TB 30 củ/kg)",
+      "price_vnd": 190000000,
+      "description_vi": "Sâm Ngọc Linh tươi là thảo dược quý hiếm, mệnh danh 'Quốc Bảo' Việt Nam, trồng tại Nam Trà My, Quảng Nam. Hàm lượng saponin cao, hỗ trợ tăng đề kháng, giảm stress, cải thiện giấc ngủ, hỗ trợ phòng ngừa ung thư.",
+      "image_url": "https://product.hstatic.net/200000939375/product/cu-sam-ngoc-linh-tuoi-loai-3_c63db1a415be4a2fb6f8396343d9d6b6_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/cu-sam-ngoc-linh-tuoi-loai-3",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Củ Sâm Ngọc Linh Tươi Loại 2 (TB 20 củ/kg)",
+      "price_vnd": 230000000,
+      "description_vi": "Sâm Ngọc Linh tươi là thảo dược quý hiếm, mệnh danh 'Quốc Bảo' Việt Nam, trồng tại Nam Trà My, Quảng Nam. Hàm lượng saponin cao, hỗ trợ tăng đề kháng, giảm stress, cải thiện giấc ngủ, hỗ trợ phòng ngừa ung thư.",
+      "image_url": "https://product.hstatic.net/200000939375/product/cu-sam-ngoc-linh-tuoi-loai-2_58acee842c974c42b2133bbec495c8fb_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/cu-sam-ngoc-linh-tuoi-loai-2",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Củ Sâm Ngọc Linh Tươi Loại 1 (TB 10 củ/kg)",
+      "price_vnd": 290000000,
+      "description_vi": "Sâm Ngọc Linh tươi là thảo dược quý hiếm, mệnh danh 'Quốc Bảo' Việt Nam, trồng tại Nam Trà My, Quảng Nam — giá thật trên site gốc, sâm nguyên củ cực hiếm, KHÔNG phải lỗi nhập liệu.",
+      "image_url": "https://product.hstatic.net/200000939375/product/cu-sam-ngoc-linh-tuoi-loai-1_5ad1a2ca86974b5796ddb0c1c235a838_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/cu-sam-ngoc-linh-tuoi-loai-1",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Nguyên Cây Loại 3",
+      "price_vnd": 190000000,
+      "description_vi": "Sâm nguyên cây cao cấp, giữ nguyên giá trị dược tính từ củ, rễ, thân đến lá, thu hái từ cây sâm trưởng thành tại núi Ngọc Linh, Nam Trà My, Quảng Nam. Tăng cường miễn dịch, phục hồi thể lực, giảm stress mệt mỏi, hỗ trợ phòng ngừa ung thư, ổn định huyết áp/đường huyết.",
+      "usage_vi": "Phù hợp ngâm rượu, pha trà, hoặc chế biến món ăn bổ dưỡng.",
+      "image_url": "https://product.hstatic.net/200000939375/product/sam-ngoc-linh-khanh-thanh-nguyen-cay-2_ccada17181244a8986e79378529fb3e3_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngoc-linh-nguyen-cay-loai-3",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Nguyên Cây Loại 2",
+      "price_vnd": 230000000,
+      "description_vi": "Sâm nguyên cây thương hiệu Khánh Thành, giữ nguyên toàn bộ giá trị dược tính từ củ, rễ, thân đến lá, hàm lượng saponin cao và chất chống oxy hóa, thu hái từ núi Ngọc Linh, Nam Trà My, Quảng Nam.",
+      "usage_vi": "Có thể ngâm rượu, pha trà, hoặc chế biến món ăn bổ dưỡng.",
+      "image_url": "https://product.hstatic.net/200000939375/product/sam-ngoc-linh-khanh-thanh-nguyen-cay-3_2bbc79efc5334da78d319cc1f458c9a8_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngoc-linh-nguyen-cay-loai-2",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    },
+    {
+      "name_vi": "Sâm Ngọc Linh Nguyên Cây Loại 1",
+      "price_vnd": 260000000,
+      "description_vi": "Sâm nguyên cây giữ nguyên toàn bộ giá trị dược tính từ củ, rễ, thân đến lá, thu hái từ cây sâm trưởng thành tại núi Ngọc Linh, Quảng Nam, hàm lượng saponin cao và chất chống oxy hóa.",
+      "usage_vi": "Phù hợp ngâm rượu, pha trà, hoặc chế biến món ăn bổ dưỡng.",
+      "image_url": "https://product.hstatic.net/200000939375/product/sam-ngoc-linh-khanh-thanh-nguyen-cay-1_02f216ce999743599d69eba9960ba447_master.jpg",
+      "source_url": "https://samngoclinhkhanhthanh.com.vn/products/sam-ngoc-linh-nguyen-cay-khanh-thanh-loai-1",
+      "suggested_productType": "sam-cu-tuoi-kho"
+    }
+  ]
+}

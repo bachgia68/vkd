@@ -1,0 +1,407 @@
+[
+  {
+    "sku": "VKD-002",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Honey Concentrate",
+      "name_zh": "玉琳参蜂蜜浓缩液",
+      "name_fr": "Ginseng Ngoc Linh à la Miel Concentré",
+      "description_en": "Concentrated Ngoc Linh Ginseng combined with pure honey, enhancing the body's absorption of nutrients.",
+      "description_zh": "玉琳参浓缩液与纯蜂蜜结合，增强身体对营养成分的吸收。",
+      "description_fr": "Ginseng Ngoc Linh concentré avec du miel pur, améliorant l'absorption des nutriments par le corps.",
+      "active_ingredient_en": "70% Concentrate + Saponin MR2",
+      "active_ingredient_zh": "70% 浓缩液 + Saponin MR2",
+      "active_ingredient_fr": "70% Concentré + Saponine MR2"
+    }
+  },
+  {
+    "sku": "VKD-004",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Detox Gan Panaxx Naturis",
+      "name_zh": "TA解毒肝Panaxx Naturis",
+      "name_fr": "TA Détox Gan Panaxx Naturis",
+      "description_en": "Processed from 8-10 year old Ngoc Linh Ginseng combined with precious herbs, helps protect the liver and reduce the harm of alcohol.",
+      "description_zh": "由8-10年Ngoclinh参制成，结合珍贵草药，帮助保护肝脏并减少酒精的危害。",
+      "description_fr": "Fabriqué à partir de ginseng Ngoc Linh de 8 à 10 ans, combiné à des herbes précieuses, il aide à protéger le foie et réduit les dommages dus à l'alcool.",
+      "active_ingredient_en": "MR2 + Chinese Milkvetch + Chinese Trumpet Vine",
+      "active_ingredient_zh": "MR2 + 蒙古黄芪 + 中国牵牛花",
+      "active_ingredient_fr": "MR2 + Moutong + Trumpet Vine"
+    }
+  },
+  {
+    "sku": "VKD-027",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Rượu Kim Bôi",
+      "name_zh": "金bibēi酒",
+      "name_fr": "Rượu Kim Bôi",
+      "description_en": "Ngoc Linh Ginseng wine is fragrant and rich in flavor, supporting the regulation of brain function.",
+      "description_zh": "玉琳参酒香而味浓，支持脑部功能的调节。",
+      "description_fr": "Le vin de ginseng Ngoc Linh est parfumé et savoureux, soutenant la régulation des fonctions cérébrales.",
+      "active_ingredient_en": "Traditional rice wine + Ngoc Linh Ginseng",
+      "active_ingredient_zh": "传统米酒+玉琳参",
+      "active_ingredient_fr": "Vin de riz traditionnel + Ginseng Ngoc Linh"
+    }
+  },
+  {
+    "sku": "VKD-029",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Anti-Aging Combo (Big Size)",
+      "name_zh": "抗衰老组合（大包装）",
+      "name_fr": "Combinaison Anti-Âge (Taille Grande)",
+      "description_en": "Provides and maintains skin hydration, rejuvenates skin — a set of 4 full-size products from Pn’s Choice.",
+      "description_zh": "提供和维持皮肤保湿，重塑肌肤，帮助肌肤年轻化——Pn’s Choice系列全尺寸四件套产品",
+      "description_fr": "Fournit et maintient l'hydratation de la peau, réjuvene la peau — un ensemble de 4 produits de taille complète de la ligne Pn’s Choice.",
+      "active_ingredient_en": "Ngoc Linh Ginseng + PCG (Codonopsis + Cordyceps + Reishi)",
+      "active_ingredient_zh": "玉琳参 + PCG（党参 + 虫草 + 灵芝）",
+      "active_ingredient_fr": "Ginseng Ngoc Linh + PCG (党参 + 虫草 + 灵芝)"
+    }
+  },
+  {
+    "sku": "VKD-030",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Skin Recovery Set",
+      "name_zh": "护肤修复套装",
+      "name_fr": "Ensemble de réparation de la peau",
+      "description_en": "Pn’s Choice Skin Recovery Set is designed to repair damaged skin caused by acne, sunburn, chemicals, or after treatments such as laser or microneedling.",
+      "description_zh": "Pn’s Choice护肤修复套装用于修复由痤疮、晒伤、化学物质或激光、微针治疗等引起的受损皮肤。",
+      "description_fr": "L'ensemble de réparation de la peau Pn’s Choice est conçu pour réparer la peau endommagée causée par l'acné, le brûlure solaire, les chimiques ou après des traitements tels que la laser ou la microrésonnance.",
+      "active_ingredient_en": "Pn’s Choice Ngoc Linh Ginseng Extract",
+      "active_ingredient_zh": "Pn’s Choice玉琳参提取物",
+      "active_ingredient_fr": "Extraits de Ginseng Ngoc Linh Pn’s Choice"
+    }
+  },
+  {
+    "sku": "VKD-032",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Anti-Aging Skin Care Combo (Mini Size)",
+      "name_zh": "抗衰老护肤组合（迷你装）",
+      "name_fr": "Combinaison de Soins Anti-Âge (Taille Miniature)",
+      "description_en": "Provides and maintains skin moisture, rejuvenates skin, helps in skin aging — convenient mini version.",
+      "description_zh": "提供和维持肌肤水分，恢复肌肤活力，帮助延缓肌肤衰老——便携迷你装",
+      "description_fr": "Fournit et maintient l'hydratation de la peau, révèle la beauté de la peau, aide à rajeunir la peau — version miniaturisée pratique",
+      "active_ingredient_en": "4 products from Pn’s Choice",
+      "active_ingredient_zh": "4款Pn’s Choice产品",
+      "active_ingredient_fr": "4 produits de la gamme Pn’s Choice"
+    }
+  },
+  {
+    "sku": "VKD-038",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Daily UV Sunscreen",
+      "name_zh": "每日UV防晒霜",
+      "name_fr": "Crème solaire UV quotidienne",
+      "description_en": "Daily UV Rejuvenation Sunscreen with SPF 50 PA++++, prevents damage from sunlight, suitable for water contact/going to the beach.",
+      "description_zh": "每日UV修复防晒霜，SPF 50 PA++++，防止阳光伤害，适合水上活动/去海滩使用。",
+      "description_fr": "Crème solaire UV quotidienne avec SPF 50 PA++++, prévient les dommages causés par les rayons du soleil, convient aux activités aquatiques/aller à la plage.",
+      "active_ingredient_en": "SPF 50 PA++++ + Ngoc Linh Ginseng",
+      "active_ingredient_zh": "SPF 50 PA++++ + 玉琳参",
+      "active_ingredient_fr": "SPF 50 PA++++ + Ginseng Ngoc Linh"
+    }
+  },
+  {
+    "sku": "TRM-001",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Sangoli Crackers - Brown Rice Sprout Ginseng Ngoc Linh Biscuits",
+      "name_zh": "桑哥利脆饼干 - 糙米芽参玉琳饼干",
+      "name_fr": "Biscuits Sangoli - Croûtons de Germe de Riz Brown Ginseng Ngoc Linh",
+      "description_en": "Sangoli Crackers are made by combining Ginseng Ngoc Linh with brown rice sprout, featuring a naturally sweet taste from coconut honey and sesame. Produced according to ISO standard production process. Designed as a daily health supplement for busy individuals and seniors.",
+      "description_zh": "桑哥利脆饼干由人参玉琳和糙米芽制成，带有天然椰糖和芝麻的甜味。按照ISO标准生产。专为忙碌人士和老年人设计的日常保健品。",
+      "description_fr": "Les biscuits Sangoli sont faits en combinant le Ginseng Ngoc Linh et les sprouts de riz brun, avec un goût naturellement doux de miel de coco et de sésame. Produits selon un processus de production conforme au standard ISO. Conçus comme un complément alimentaire quotidien pour les personnes occupées et les personnes âgées."
+    }
+  },
+  {
+    "sku": "TRM-002",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Premium Ngoc Linh Ginseng Tea",
+      "name_zh": "玉琳参上等茶",
+      "name_fr": "TA Premium Ginseng Ngoc Linh",
+      "description_en": "Concentrated from precious Ngoc Linh Ginseng leaves and cool决明草, TA Tea helps nourish the blood and qi, enhance health, and boost immunity. Produced according to GMP standards, no preservatives or artificial flavors. Convenient tea bag.",
+      "description_zh": "浓缩自珍贵玉琳参叶片和清凉决明草，TA茶帮助滋养气血，增强健康，提高免疫力。按照GMP标准生产，无防腐剂和人工香料。方便茶包。",
+      "description_fr": "Concentré à partir de feuilles de ginseng Ngoc Linh précieux et de决明草，le thé TA aide à nourrir le sang et l’énergie, à renforcer la santé et à améliorer l’immunité. Produit selon les normes GMP, sans conservateurs ni arômes artificiels. Sachet de thé pratique."
+    }
+  },
+  {
+    "sku": "TRM-003",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Tea Bag",
+      "name_zh": "玉琳参茶袋",
+      "name_fr": "Thé en Sachet de Ginseng Ngoc Linh",
+      "description_en": "Combines the 'National Treasure' Ngoc Linh Ginseng with precious herbs: Muong seeds,绞股蓝, Chinese milkvetch. No preservatives, no artificial flavors. Achieves the Golden Product Award for community health and OCOP.",
+      "description_zh": "结合‘国宝’玉琳参与珍贵草药：木香种子、绞股蓝、刺五加。无防腐剂，无人工香料。获得社区健康金质产品奖和OCOP认证",
+      "description_fr": "CombineTransformChinese milkvetch合‘国宝’玉琳参和珍贵草药：木香种子、绞股蓝、刺五加。无防腐剂，无人工香料。获得社区健康金质产品奖和OCOP认证"
+    }
+  },
+  {
+    "sku": "TRM-014",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Fresh Ngoc Linh Ginseng Leaves",
+      "name_zh": "玉琳人参鲜叶",
+      "name_fr": "Feuilles fraîches de ginseng Ngoc Linh",
+      "description_en": "Fresh leaves harvested from cultivated ginseng plants at over 1,500m in Ngoc Linh mountain (Quảng Nam). Closed model, 30 hectares of forest plantation, direct supply without intermediaries.",
+      "description_zh": "玉琳参鲜叶，采自广 Nam省玉琳山海拔1500米以上的人参种植园。封闭种植模式，30公顷森林种植园，直接供应，无中间商。",
+      "description_fr": "Feuilles fraîches de ginseng Ngoc Linh issues de plantations cultivées à plus de 1 500m d'altitude dans la montagne Ngoc Linh (Quảng Nam). Modèle fermé, 30 hectares de forêt de plantation, approvisionnement direct sans intermédiaires."
+    }
+  },
+  {
+    "sku": "TRM-016",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Green Oyster Mushroom Tea",
+      "name_zh": "玉琳灵芝茶",
+      "name_fr": "TA Mushu de Corail Vert",
+      "description_en": "Combines natural Green Oyster Mushroom with other natural herbal ingredients. Supports detoxification, liver support, blood pressure/blood sugar regulation, weight control. Contains 5-7 times more germanium than ginseng, polysaccharides, and Ling Zhi-8 protein.",
+      "description_zh": "结合天然绿芝菇和其他天然草药成分。支持排毒，肝脏支持，血压/血糖调节，体重控制。含有的 germanium 是人参的5-7倍，多糖和灵芝-8蛋白质。",
+      "description_fr": "Combinez des champignons de la mer vert naturels avec d'autres ingrédients végétaux naturels. Favorise le détoxification, soutient le foie, régule la pression artérielle/sucre du sang, contrôle le poids. Contient 5-7 fois plus de germanium que la ginseng, polysaccharides et protéine Ling Zhi-8."
+    }
+  },
+  {
+    "sku": "TRM-017",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Forest Greenwood Fungus Sliced 100g",
+      "name_zh": "泰阿森林绿木菌菇片100g",
+      "name_fr": "TA Forêt Vert Fungus Tranché 100g",
+      "description_en": "Greenwood Fungus (Ganoderma lucidum) grows on the dead lim trees in the deep forest, containing 5-7 times more Germanium than ginseng, enhancing the immune system. Dried and vacuum-sealed to preserve nutrients.",
+      "description_zh": "绿木灵芝（赤芝）生于深林中枯死的林木上，其 germanium 含量比人参高出5-7倍，增强免疫力。经过干燥和真空包装以保存营养成分。",
+      "description_fr": "Le champignon de la forêt verte (Ganoderma lucidum) pousse sur les arbres de lin morts dans la forêt profonde, contenant 5-7 fois plus de germanium que la ginseng, renforçant le système immunitaire. Sec et emballé sous vide pour préserver les nutriments."
+    }
+  },
+  {
+    "sku": "TRM-018",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ta Forest Green Oyster Mushroom Sliced 500g",
+      "name_zh": "森林绿松茸切片500g",
+      "name_fr": "Ta Forêt Châtaigne de la Forêt Slicée 500g",
+      "description_en": "Natural forest green oyster mushroom, contains 5-7 times more Germanium than ginseng, supports immune system enhancement, blood circulation, and detoxification. Dried according to advanced process, vacuum packed.",
+      "description_zh": "森林绿松茸，含 germanium 为人参的5-7倍，增强免疫系统，促进血液循环，解毒。采用先进工艺干燥，真空包装。",
+      "description_fr": "Châtaigne de la forêt verte naturelle, contient 5-7 fois plus de germanium que la ginseng, soutient l'immunité, favorise la circulation sanguine et détoxifie. Secouée selon un processus avancé, emballée sous vide."
+    }
+  },
+  {
+    "sku": "TRM-023",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Premium Ginseng Ngoc Linh 500ml Liquor",
+      "name_zh": "玉琳参上 hạng 500ml酒",
+      "name_fr": "TA Premium Ginseng Ngoc Linh 500ml Liquor",
+      "description_en": "Ngoc Linh Ginseng from the原始森林 of Guang Nam combined with glutinous rice fermented with traditional methods, distilled six times, dehydrated twice, and aged twice. Accompanied by a high-grade glass tumbler and a luxurious gift box.",
+      "description_zh": "玉琳参来自广 Nam原始森林，结合糯米传统发酵，六次蒸馏，两次脱水和两次窖藏。附带高級玻璃杯和豪华礼盒。",
+      "description_fr": "Ngoc Linh Ginseng de la forêt primitive de Guang Nam combiné avec du riz glutineux fermenté selon des méthodes traditionnelles, distillé six fois, déshydraté deux fois et vieilli deux fois. Accompanied by un verre en verre de haute qualité et une boîte de cadeau luxueuse."
+    }
+  },
+  {
+    "sku": "TRM-030",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Wine 1 Liter",
+      "name_zh": "玉琳参花酒1升",
+      "name_fr": "Vin de Ginseng Ngoc Linh 1 Litre",
+      "description_en": "Hua sâm Ngoc Linh grown at over 1,500m, with ginsenosides 5-6 times higher in the flower part, supporting immune function and liver function, aged with filtered Golden Flower Rice wine.",
+      "description_zh": "玉琳参花生长于海拔1500米以上，花部 Ginsenoside 含量比根部高5-6倍，支持免疫功能和肝脏功能，与过滤后的金花米酒一同陈酿。",
+      "description_fr": "Le hua sâm Ngoc Linh, cultivé à une altitude supérieure à 1 500m, avec des ginsenosides 5-6 fois plus élevés dans la partie fleurie, soutient la fonction immunitaire et le foie, vieilli avec du vin de riz Golden Flower filtré."
+    }
+  },
+  {
+    "sku": "SK5-005",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Ngoc Linh Ginseng Bird's Nest for Kids",
+      "name_zh": "TA 玉琳参鸟巢儿童",
+      "name_fr": "TA Ginseng Ngoc Linh de Pélicans pour Enfants",
+      "description_en": "Specialized Ngoc Linh Ginseng Bird's Nest for children, combining pure Bird's Nest, DHA, Omega, Taurine, and other comprehensive development nutrients.",
+      "description_zh": "专为儿童配制的玉琳参鸟巢，结合纯正鸟巢、DHA、Omega、牛磺酸及其他全面发育营养成分。",
+      "description_fr": "Ginseng Ngoc Linh de Pélicans spécial pour enfants, combinant du nid d'hirondelle pur, DHA, Oméga, Taurine et d'autres composants nutritifs pour le développement complet."
+    }
+  },
+  {
+    "sku": "TN-003",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Dried",
+      "name_zh": "玉琳参干燥",
+      "name_fr": "Ginseng Ngoc Linh Secréché",
+      "description_en": "Ngoc Linh Ginseng dried from Truong Nhan",
+      "description_zh": "玉琳参来自 Trường Nhân的干燥品",
+      "description_fr": "Ginseng Ngoc Linh séché à partir de Trường Nhân"
+    }
+  },
+  {
+    "sku": "TN-004",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Extract",
+      "name_zh": "玉琳参提取物",
+      "name_fr": "Extraits de Ginseng Ngoc Linh",
+      "description_en": "Ngoc Linh Ginseng Extract from Tran Nhan",
+      "description_zh": "来自trandânNam的玉琳参提取物",
+      "description_fr": "Extraits de Ginseng Ngoc Linh de Tran Nhan"
+    }
+  },
+  {
+    "sku": "TN-008",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng",
+      "name_zh": "玉琳参",
+      "name_fr": "Ginseng Ngoc Linh",
+      "description_en": "Ngoc Linh Ginseng from Truong Nhan",
+      "description_zh": "出自 Trường Nhân的玉琳参",
+      "description_fr": "Ginseng Ngoc Linh de Truong Nhan"
+    }
+  },
+  {
+    "sku": "STM-001",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Fresh Ginseng Ngoc Linh Beer 1L can",
+      "name_zh": "TA 玉琳参鲜啤酒1L易拉罐",
+      "name_fr": "TA Bière Fraîche Ginseng Ngoc Linh 1L canette",
+      "description_en": "TA Fresh Ginseng Ngoc Linh Beer is a distinctive craft beer featuring the unique image of Ngoc Linh Ginseng. ABV 4.3% Vol, aluminum can 1000ml.",
+      "description_zh": "TA 玉琳参鲜啤酒是具有玉琳参独特形象的手工啤酒。酒精度4.3% Vol，铝罐1000ml。",
+      "description_fr": "TA Bière Fraîche Ginseng Ngoc Linh est une bière artisanale distinctive mettant en avant l'image distinctive du Ginseng Ngoc Linh. Teneur en alcool 4.3% Vol, canette en aluminium 1000ml."
+    }
+  },
+  {
+    "sku": "STM-002",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Fresh Ginseng Ngoc Linh Beer 6 Bottles",
+      "name_zh": "TA玉琳参鲜啤酒6瓶",
+      "name_fr": "TA Ginseng Ngoc Linh Bière Fraîche 6 Bouteilles",
+      "description_en": "TA Fresh Ginseng Ngoc Linh Beer is a distinctive craft beer, available in 330ml bottles and 1000ml cans, with an alcohol content of 4.3% Vol.",
+      "description_zh": "TA玉琳参鲜啤酒是一款独特的精酿啤酒，提供330毫升瓶装和1000毫升罐装，酒精度为4.3%vol。",
+      "description_fr": "TA Ginseng Ngoc Linh Bière Fraîche est une bière artisanale distinctive, disponible en bouteilles de 330ml et en canettes de 1000ml, avec une teneur en alcool de 4.3% Vol."
+    }
+  },
+  {
+    "sku": "STM-005",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Whisky 500ml",
+      "name_zh": "玉琳参威士忌500ml",
+      "name_fr": "Ginseng Ngoc Linh Whisky 500ml",
+      "description_en": "Combines rare Ngoc Linh Ginseng essence and traditional naturally fermented rice wine, 100% genuine ginseng extract, no industrial alcohol, no additives, packaged in high-grade glass suitable for gift-giving.",
+      "description_zh": "结合稀有玉琳参精华和传统自然发酵米酒，100% genuine人参提取物，不含工业酒精，不含添加剂，采用高级玻璃瓶包装，适合作为礼品。",
+      "description_fr": "Combinez l'essence rare de ginseng Ngoc Linh et le vin de riz traditionnelment fermenté, 100% extract de ginseng authentique, sans alcool industriel, sans additifs, emballé dans du verre de haute qualité adapté aux cadeaux."
+    }
+  },
+  {
+    "sku": "STM-010",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "TA Ngoc Linh Ginseng VIP 750ml",
+      "name_zh": "TA 玉琳参 VIP 750ml",
+      "name_fr": "TA Ginseng Ngoc Linh VIP 750ml",
+      "description_en": "Ngoc Linh Ginseng酒 is a combination of rare Ngoc Linh Ginseng essence and traditional glutinous rice wine fermented naturally.",
+      "description_zh": "玉琳参酒是珍贵玉琳参精华与传统糯米酒自然发酵的结合。",
+      "description_fr": "Le vin de ginseng Ngoc Linh est une combinaison d'essence de ginseng Ngoc Linh précieuse et de vin de riz glutineux traditionnel fermenté naturellement."
+    }
+  },
+  {
+    "sku": "TMR-004",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ta Ginseng Ngoc Linh Quintuple Flavor 500ml (Square Bottle)",
+      "name_zh": "Ta 玉琳参五味子酒 500ml（方形瓶）",
+      "name_fr": "TA Ginseng Ngoc Linh Quintuple Saveur 500ml (Bouteille Carrée)",
+      "description_en": "Combines the essence of Ngoc Linh Ginseng with two precious herbs, dangshen and wuweizi, produced by Ngoc Linh Ginseng Tu Mơ Rông Kon Tum Company. Enhances physical strength, sharpens mental clarity, reduces fatigue, promotes better sleep, and boosts immunity.",
+      "description_zh": "结合玉琳参、党参和五味子的精华，由玉琳参Tu Mơ Rông Kon Tum公司生产。增强体力，提高精神集中度，减轻疲劳，改善睡眠，增强免疫力。",
+      "description_fr": "Combinant l'essence de ginseng Ngoc Linh avec deux herbes précieuses, dangshen et wuweizi, produit par la Société de ginseng Ngoc Linh Tu Mơ Rông Kon Tum. Renforce la force physique, améliore la clarté mentale, réduit la fatigue, favorise un meilleur sommeil et renforce l'immunité."
+    }
+  },
+  {
+    "sku": "TMR-013",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Tea",
+      "name_zh": "玉琳参茶",
+      "name_fr": "Thé Ginseng Ngoc Linh",
+      "description_en": "Soluble tea extracted from pure Ngoc Linh Ginseng, mild and pleasant taste, suitable for busy people, middle-aged and elderly who need natural nourishment daily. Produced by Kon Tum Ngoc Linh Ginseng Joint Stock Company.",
+      "description_zh": "从纯玉琳参提取的速溶茶，口感温和宜人，适合忙碌人士、中老年人及老年人日常自然滋补。由 Kon Tum 玉琳参股份公司生产。",
+      "description_fr": "Thé soluble issu d'une extraction pure de Ginseng Ngoc Linh, goût doux et agréable, adapté aux personnes occupées, aux personnes de la moyenne âge et aux personnes âgées qui ont besoin de renforcement naturel quotidien. Produit par la Société Anonyme de Ginseng Ngoc Linh Kon Tum."
+    }
+  },
+  {
+    "sku": "TMS-002",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Gold 750ml",
+      "name_zh": "玉琳参金 750ml",
+      "name_fr": "Ginseng Ngoc Linh Gold 750ml",
+      "description_en": "Concentrates the essence of the forests and mountains of Kon Tum, combining precious herbs with traditional fermentation methods, a sophisticated gift for partners and family.",
+      "description_zh": "汇聚 Kontum 山林精华，结合珍贵草药与传统发酵工艺，送给合作伙伴和家人的高端礼品。",
+      "description_fr": "Concède l'essence des forêts et montagnes de Kon Tum, combinant des herbes précieuses avec des méthodes de fermentation traditionnelles, un cadeau élégant pour les partenaires et la famille."
+    }
+  },
+  {
+    "sku": "KT-016",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Fresh TA Ginseng Pieces",
+      "name_zh": "新鲜TA山参碎片",
+      "name_fr": "Pièces de Ginseng TA Fraîches",
+      "description_en": "Fresh Ngoc Linh Ginseng is a rare and precious herbal medicine, known as the 'National Treasure' of Vietnam, cultivated in Trà Linh, Nam Trà My, Quảng Nam. It contains high levels of saponin, which supports enhanced immunity, reduces stress, improves sleep, and supports cancer prevention.",
+      "description_zh": "新鲜玉琳参是珍贵的草药，被誉为越南的‘国宝’，种植于广南省南 trà美县 trà林。它含有高浓度的皂苷，有助于增强免疫力，减轻压力，改善睡眠，并支持防癌。",
+      "description_fr": "Le ginseng fraîchement récolté de Ngoc Linh est une herboristerie précieuse et rare, surnommée le 'Trésor National' du Vietnam, cultivé dans Trà Linh, Nam Trà My, Quảng Nam. Il contient une forte teneur en saponine, qui soutient l'immunité, réduit le stress, améliore le sommeil et soutient la prévention du cancer."
+    }
+  },
+  {
+    "sku": "KT-017",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Fresh TA Ginseng from Ngoc Linh 4 (40 roots/kg)",
+      "name_zh": "玉琳参鲜品 TA 4（每公斤40株）",
+      "name_fr": "TA Ginseng Ngoc Linh frais 4 (40 racines/kg)",
+      "description_en": "Fresh Ngoc Linh Ginseng is a rare and precious medicinal herb, known as the 'National Treasure' of Vietnam, cultivated in Nam Tra My, Quang Nam. It contains high levels of saponins, supporting enhanced resistance, reducing stress, improving sleep, and supporting cancer prevention.",
+      "description_zh": "玉琳参鲜品是珍贵的药草，被誉为越南的‘国宝’，种植于广南省南 trà美县。它含有高含量的皂苷，支持增强抵抗力，减轻压力，改善睡眠，并支持防癌。",
+      "description_fr": "Le ginseng frais Ngoc Linh est une herbe médicinale précieuse, surnommé le 'Trésor national' du Vietnam, cultivé dans Nam Tra My, Quang Nam. Il contient de hautes concentrations d'acides sapigérés, soutenant une résistance améliorée, réduisant le stress, améliorant le sommeil et soutenant la prévention du cancer."
+    }
+  },
+  {
+    "sku": "KT-018",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Fresh TA Ginseng from Ngoc Linh 3 Grade",
+      "name_zh": "玉琳参TA鲜品3级",
+      "name_fr": "TA Ginseng Ngoc Linh Frais Grade 3",
+      "description_en": "Fresh Ngoc Linh Ginseng is a rare and precious medicinal herb, known as the 'National Treasure' of Vietnam, cultivated in Nam Tra My, Guang Nam. High saponin content, supports enhanced resistance, reduces stress, improves sleep, supports cancer prevention.",
+      "description_zh": "玉琳参鲜品是珍贵的药草，被誉为越南的‘国宝’，种植于广南南 trà迷。皂苷含量高，增强抵抗力，减轻压力，改善睡眠，支持防癌。",
+      "description_fr": "Le ginseng frais de Ngoc Linh est une herbe médicinale précieuse, surnommé le 'Trésor national' du Vietnam, cultivé dans Nam Tra My, Guang Nam. Contient une forte teneur en saponine, soutient l'augmentation de la résistance, réduit le stress, améliore le sommeil, soutient la prévention du cancer."
+    }
+  },
+  {
+    "sku": "KT-019",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Fresh TA Ginseng from Ngoc Linh (Grade 2, 20 roots/kg)",
+      "name_zh": "玉琳参（TA牌，二级，每千克20根）",
+      "name_fr": "Ginseng Ngoc Linh TA (Grade 2, 20 racines/kg)",
+      "description_en": "Fresh Ngoc Linh Ginseng is a rare and precious medicinal herb, known as the 'National Treasure' of Vietnam, cultivated in Nam Tra My, Quang Nam. It contains high levels of saponins, which support enhanced immunity, reduce stress, improve sleep, and support cancer prevention.",
+      "description_zh": "玉琳参（鲜品）是珍贵的药用植物，被誉为越南的‘国宝’，种植于广南省南 trà美县。其含有高量的皂苷，有助于增强免疫力、减轻压力、改善睡眠以及预防癌症。",
+      "description_fr": "Le ginseng frais Ngoc Linh est une herbe médicinale précieuse, surnommé le 'Trésor National' du Vietnam, cultivé dans le Nam Tra My, Quang Nam. Il contient des niveaux élevés d'acides sapophylliques, qui soutiennent une meilleure immunité, réduisent le stress, améliorent le sommeil et soutiennent la prévention du cancer."
+    }
+  },
+  {
+    "sku": "KT-021",
+    "reason": "zh_output_lan_chu_latin",
+    "raw": {
+      "name_en": "Ngoc Linh Ginseng Whole Plant Grade 3",
+      "name_zh": "玉琳参原株3级",
+      "name_fr": "Ginseng Ngoc Linh Whole Plant Grade 3",
+      "description_en": "High-grade whole plant ginseng, preserving the medicinal properties from the root, stem, trunk to the leaves, harvested from mature ginseng plants on Mount Ngoc Linh, Nam Trà My, Quảng Nam. Enhances immune function, restores physical strength, reduces stress and fatigue, supports prevention of cancer, stabilizes blood pressure/glucose levels.",
+      "description_zh": "高级全株人参，保留根、茎、干、叶的药性，采自广南省南 trà美县玉琳山成熟人参植株。增强免疫功能，恢复体力，减轻压力和疲劳，支持防癌，稳定血压/血糖水平。",
+      "description_fr": "Ginseng Ngoc Linh de haute qualité, préservant les propriétés médicinales de la racine, du tige, du tronc et des feuilles, récolté sur des plantes de ginseng matures dans les montagnes de Ngoc Linh, Nam Trà My, Quảng Nam. Améliore la fonction immunitaire, restaure la force physique, réduit le stress et la fatigue, soutient la prévention du cancer, stabilise la pression artérielle/sucre du sang."
+    }
+  }
+]

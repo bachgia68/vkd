@@ -15,6 +15,33 @@ const PAGE_OPTIONS = [
 
 const BLOCK_TYPES = ['hero', 'text', 'image', 'image-text', 'cta', 'gallery', 'testimonial', 'faq'];
 
+// "Block type" chỉ là NHÃN GHI CHÚ nội bộ — hệ thống hiện KHÔNG có bộ hiển thị
+// chung đọc mọi block theo type để render tự động lên site. Chỉ những trang/vị
+// trí đã lập trình sẵn để đọc đúng page_key + 1 block_type cụ thể (bảng dưới)
+// mới thật sự hiện nội dung sửa ở đây lên site khách. Sửa/thêm 1 block khác
+// (page_key hoặc block_type không khớp bảng này) sẽ lưu vào Supabase nhưng
+// KHÔNG hiện ở đâu cả trên site — tránh mất công sửa nhầm chỗ vô tác dụng.
+const LIVE_WIRED_BLOCKS: { page_key: string; block_type: string; note: string }[] = [
+  { page_key: 'home', block_type: 'hero', note: 'Banner đầu trang chủ (tiêu đề lớn, ảnh nền, nút CTA)' },
+  { page_key: 'home', block_type: 'about', note: 'Khối "Giới thiệu TA" trên trang chủ' },
+  { page_key: 'home', block_type: 'heritage', note: 'Khối "Vùng Trồng / Di sản" trên trang chủ' },
+  { page_key: 'home', block_type: 'products', note: 'Tiêu đề + mô tả khối sản phẩm nổi bật trang chủ' },
+  { page_key: 'home', block_type: 'b2b', note: 'Khối "Hợp tác B2B" trên trang chủ' },
+  { page_key: 'home', block_type: 'certifications', note: 'Tiêu đề + mô tả carousel chứng nhận (ảnh chứng nhận sửa ở trang "Giấy Chứng Nhận" riêng, không phải ở đây)' },
+  { page_key: 'home', block_type: 'showrooms', note: 'Khối "Hệ Thống Điểm Kết Nối TA"' },
+];
+
+const BLOCK_TYPE_HELP: Record<string, string> = {
+  hero: 'Banner lớn đầu trang — tiêu đề, ảnh nền, 1 nút bấm (CTA). Chỉ thật sự hiện nếu page="Trang Chủ".',
+  text: 'Khối chữ đơn giản (tiêu đề + đoạn văn), không có ảnh — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+  image: 'Khối chỉ có 1 ảnh — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+  'image-text': 'Ảnh + chữ song song — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+  cta: 'Khối kêu gọi hành động: 1 dòng chữ + 1 nút bấm dẫn tới link (VD: "Đăng ký hợp tác ngay" → /hop-tac) — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+  gallery: 'Nhiều ảnh trưng bày — LƯU Ý: mỗi block chỉ lưu được 1 ảnh (image_url), chưa hỗ trợ nhiều ảnh/1 block. Muốn thêm nhiều ảnh, dùng trang "Ảnh Vườn Sâm" hoặc "Giấy Chứng Nhận" (đã hỗ trợ nhiều ảnh thật).',
+  testimonial: 'Trích dẫn/đánh giá khách hàng — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+  faq: 'Câu hỏi thường gặp — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+};
+
 interface EditState {
   title_vi: string;
   content_vi: string;
@@ -159,6 +186,16 @@ export default function PageBuilderPage() {
         </select>
       </div>
 
+      <div className="mb-4 p-4 bg-forest-50 border border-forest-100 rounded-xl text-xs text-forest-700 leading-relaxed">
+        <p className="font-semibold text-forest-800 mb-2">⚠️ Chỉ các mục sau thật sự hiện lên site khi sửa ở đây (page = "Trang Chủ"):</p>
+        <ul className="space-y-0.5 mb-2">
+          {LIVE_WIRED_BLOCKS.map((b) => (
+            <li key={b.block_type}><code className="bg-forest-100 px-1 rounded">{b.block_type}</code> — {b.note}</li>
+          ))}
+        </ul>
+        <p>Block type khác (text/image/image-text/gallery/testimonial/faq) hoặc trang khác ("Giới Thiệu", "Sản Phẩm"...) hiện <strong>lưu được nhưng chưa hiện ở đâu trên site</strong> — hệ thống chưa có bộ hiển thị chung cho block tuỳ ý. Cần dự án riêng để làm phần này nếu Joe muốn dùng.</p>
+      </div>
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex justify-between">
           <span>{error}</span>
@@ -217,6 +254,7 @@ export default function PageBuilderPage() {
                       <select value={editState.block_type} onChange={(e) => setEditState({ ...editState, block_type: e.target.value })} className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500">
                         {BLOCK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                       </select>
+                      <p className="text-[11px] text-forest-400 mt-1">{BLOCK_TYPE_HELP[editState.block_type]}</p>
                     </div>
                     <div>
                       <label className="block text-xs text-forest-600 mb-1">Tiêu đề (VI)</label>
@@ -266,6 +304,7 @@ export default function PageBuilderPage() {
                   <select value={newBlock.block_type} onChange={(e) => setNewBlock({ ...newBlock, block_type: e.target.value })} className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500">
                     {BLOCK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
+                  <p className="text-[11px] text-forest-400 mt-1">{BLOCK_TYPE_HELP[newBlock.block_type]}</p>
                 </div>
                 <div>
                   <label className="block text-xs text-forest-600 mb-1">Tiêu đề</label>

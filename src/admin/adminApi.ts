@@ -2,10 +2,10 @@ import { supabase } from '../lib/supabaseClient';
 import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
 import { resizeImageToWebp } from '../lib/imageResize';
-import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, PageSection, NavItem, BlogCategory, ProductMenuItem, PolicyPageContent } from '../lib/siteContentApi';
+import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, CertificationImage, PageSection, NavItem, BlogCategory, ProductMenuItem, PolicyPageContent } from '../lib/siteContentApi';
 import type { DbOrder, DbRevenueDaily } from './types/admin';
 
-export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage };
+export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, CertificationImage };
 export { fetchAllBlogPostsForAdmin };
 export type { DbOrder, DbRevenueDaily };
 
@@ -992,6 +992,57 @@ export async function uploadHeritageGalleryImage(file: File): Promise<string> {
   });
   if (error) throw new Error(error.message);
   const { data } = supabase.storage.from('heritage-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+export async function fetchAllCertificationImages(): Promise<(CertificationImage & { visible: boolean })[]> {
+  return throwIfError(
+    await supabase
+      .from('certification_images')
+      .select('id, image_url, name_vi, name_en, sort_order, visible')
+      .order('sort_order')
+  );
+}
+
+export async function createCertificationImage(input: {
+  image_url: string;
+  name_vi: string;
+  name_en?: string;
+  sort_order?: number;
+}) {
+  const res = await supabase
+    .from('certification_images')
+    .insert({ name_en: '', sort_order: 0, ...input, visible: true })
+    .select('id, image_url, name_vi, name_en, sort_order, visible')
+    .single();
+  return throwIfError(res);
+}
+
+export async function updateCertificationImage(
+  id: string,
+  patch: Partial<Pick<CertificationImage, 'name_vi' | 'name_en' | 'sort_order'> & { visible: boolean }>
+) {
+  const { error } = await supabase
+    .from('certification_images')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteCertificationImage(id: string) {
+  const { error } = await supabase.from('certification_images').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function uploadCertificationImage(file: File): Promise<string> {
+  const resized = await resizeImageToWebp(file, 1600, 0.85);
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  const { error } = await supabase.storage.from('certification-images').upload(path, resized, {
+    cacheControl: '3600',
+    upsert: false,
+  });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from('certification-images').getPublicUrl(path);
   return data.publicUrl;
 }
 

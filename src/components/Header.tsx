@@ -73,7 +73,8 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const navLabel = (key: string) => {
     const overrideKey = NAV_OVERRIDE_KEYS[key];
     const fallback = t.nav[key as keyof typeof t.nav] ?? key;
-    return (overrideKey && overrides[overrideKey]) || fallback;
+    // site_text_overrides chỉ lưu tiếng Việt — chỉ áp dụng khi lang='vi'.
+    return (lang === 'vi' && overrideKey && overrides[overrideKey]) || fallback;
   };
 
   const FALLBACK_NAV = [
@@ -91,8 +92,10 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
     ? dbNavItems.map((i) => ({ key: i.key, href: i.href, label_vi: i.label_vi }))
     : FALLBACK_NAV;
 
+  // label_vi từ DB (site_sections) chỉ lưu tiếng Việt — chỉ áp dụng khi lang='vi',
+  // ngôn ngữ khác luôn dùng navLabel() (đã có bản dịch t.nav.* đầy đủ).
   const navItemLabel = (item: { key: string; label_vi: string | null }) =>
-    item.label_vi || navLabel(item.key);
+    (lang === 'vi' && item.label_vi) || navLabel(item.key);
 
   // Product dropdown — DB-driven with hardcoded fallback
   const dbSam = dbProductMenu.filter((i) => i.section === 'sam');

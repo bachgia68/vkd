@@ -36,6 +36,22 @@ const FIELDS: FieldDef[] = [
     label: 'Widget Blog — Chữ trên nút',
     placeholder: 'Nhận cẩm nang',
   },
+  {
+    key: 'video_gallery.badge',
+    label: 'Video Thực Địa — Nhãn nhỏ trên tiêu đề',
+    placeholder: 'Câu Chuyện Thực Địa',
+  },
+  {
+    key: 'video_gallery.title',
+    label: 'Video Thực Địa — Tiêu đề lớn',
+    placeholder: 'Nhìn Tận Mắt — Tin Tận Tâm',
+  },
+  {
+    key: 'video_gallery.desc',
+    label: 'Video Thực Địa — Mô tả',
+    placeholder: 'Từng thước phim quay thẳng tại vườn sâm nhà Khánh, Trà Linh — không dàn dựng, không chỉnh sửa.',
+    textarea: true,
+  },
 ];
 
 export default function HomepageTextPage() {

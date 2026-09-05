@@ -25,13 +25,14 @@
 
 ## 💡 Optional Tier-1 (Quick wins, 15-30% token savings)
 
-| # | Name | Purpose | TA Use | Effort | Add? |
+| # | Name | Purpose | TA Use | Effort | Trạng thái thật (2026-08-24) |
 |----|------|---------|--------|--------|------|
-| 1 | **cc-switch** | Model swap (Haiku/Sonnet) | Low-complexity tasks | Low | ✅ ASAP |
-| 2 | **system-prompts-ai** | Prompt optimization | Blog generation (batch) | Medium | ✅ Week 1 |
-| 3 | **caveman** | Response brevity | Reduce output token | Low | ✅ Auto |
-| 4 | **claude-hud** | Token dashboard | Budget visualization | Low | ✅ Week 1 |
-| 5 | **awesome-mcp-servers** | MCP discovery | Add new APIs | Low | ⚠️ If needed |
+| 1 | **cc-switch** | Model swap (Haiku/Sonnet) | Low-complexity tasks | Low | ⚠️ KHÔNG phải npm — desktop app (Tauri, .msi/.zip Windows), Joe tự tải: [farion1231/cc-switch/releases](https://github.com/farion1231/cc-switch/releases) |
+| 2 | **claude-code-router** | Định tuyến tác vụ tới model khác nhau | Chưa cấu hình dùng | Low | ✅ Cài xong `npm i -g claude-code-router`, lệnh `ccr` chạy được (v2.0.0) — CHƯA cấu hình routing |
+| 3 | **system-prompts-ai** | Prompt optimization | Blog generation (batch) | Medium | ☐ Chưa cài — chỉ là tài liệu tham khảo, không phải tool |
+| 4 | **caveman** | Response brevity | Reduce output token | Low | ✅ Auto (đã áp dụng qua CLAUDE.md global, không cần cài riêng) |
+| 5 | **claude-hud** | Token dashboard | Budget visualization | Low | ✅ Xong 2026-09-03 — `jq` cài qua winget (jqlang.jq 1.8.2) + copy jq.exe vào `%APPDATA%\npm` (dir đã có sẵn trong PATH) vì claude-hud gọi `which jq` (POSIX) không chạy được trên cmd.exe/PowerShell thường; `claude-hud` chạy từ Git Bash cài statusline thành công, restart Claude Code để thấy |
+| 6 | **awesome-mcp-servers** | MCP discovery | Add new APIs | Low | ✅ Đã có sẵn qua `mcp-registry` search tool trong môi trường này |
 
 ---
 

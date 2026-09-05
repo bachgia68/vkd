@@ -31,10 +31,10 @@ export default function Showrooms({ lang }: ShowroomsProps) {
             </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {cms?.title_vi || t.showrooms.title}
+            {(lang === 'vi' ? cms?.title_vi : undefined) || t.showrooms.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {cms?.content_vi || t.showrooms.subtitle}
+            {(lang === 'vi' ? cms?.content_vi : undefined) || t.showrooms.subtitle}
           </p>
         </div>
 

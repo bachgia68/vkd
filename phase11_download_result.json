@@ -1,0 +1,332 @@
+[
+  {
+    "sku": "STM-001",
+    "ok": true,
+    "size": 99228,
+    "localPath": "/products/samtramy/stm-001-bia-tuoi-sam-ngoc-linh-lon-1l-stm1.jpg"
+  },
+  {
+    "sku": "STM-002",
+    "ok": true,
+    "size": 1399968,
+    "localPath": "/products/samtramy/stm-002-bia-tuoi-sam-ngoc-linh-ket-6-chai-stm2.png"
+  },
+  {
+    "sku": "STM-003",
+    "ok": true,
+    "size": 1369098,
+    "localPath": "/products/samtramy/stm-003-dau-thao-duoc-sam-ngoc-linh-stm3.png"
+  },
+  {
+    "sku": "STM-004",
+    "ok": true,
+    "size": 1445024,
+    "localPath": "/products/samtramy/stm-004-thach-sam-ngoc-linh-collagen-stm4.png"
+  },
+  {
+    "sku": "STM-005",
+    "ok": true,
+    "size": 1405721,
+    "localPath": "/products/samtramy/stm-005-ruou-whisky-sam-ngoc-linh-500ml-stm5.png"
+  },
+  {
+    "sku": "STM-006",
+    "ok": true,
+    "size": 1793080,
+    "localPath": "/products/samtramy/stm-006-samy-ruou-sam-ngoc-linh-vi-trai-cay-len-men-stm6.png"
+  },
+  {
+    "sku": "STM-007",
+    "ok": true,
+    "size": 1478923,
+    "localPath": "/products/samtramy/stm-007-set-6-hu-yen-sam-ngoc-linh-duong-phen-stm7.png"
+  },
+  {
+    "sku": "STM-008",
+    "ok": true,
+    "size": 1364702,
+    "localPath": "/products/samtramy/stm-008-yen-sam-ngoc-linh-duong-phen-stm8.png"
+  },
+  {
+    "sku": "STM-009",
+    "ok": true,
+    "size": 1376665,
+    "localPath": "/products/samtramy/stm-009-tra-tui-loc-sam-ngoc-linh-stm9.png"
+  },
+  {
+    "sku": "STM-010",
+    "ok": true,
+    "size": 1387690,
+    "localPath": "/products/samtramy/stm-010-ruou-sam-ngoc-linh-vip-750ml-stm10.png"
+  },
+  {
+    "sku": "STM-011",
+    "ok": true,
+    "size": 1438262,
+    "localPath": "/products/samtramy/stm-011-combo-3-chai-ruou-whisky-sam-ngoc-linh-stm11.png"
+  },
+  {
+    "sku": "STM-012",
+    "ok": true,
+    "size": 1340620,
+    "localPath": "/products/samtramy/stm-012-ruou-cay-sam-ngoc-linh-1000ml-stm12.png"
+  },
+  {
+    "sku": "STM-013",
+    "ok": true,
+    "size": 1418181,
+    "localPath": "/products/samtramy/stm-013-ruou-sam-ngoc-linh-187ml-loc-6-stm13.png"
+  },
+  {
+    "sku": "STM-014",
+    "ok": true,
+    "size": 1438595,
+    "localPath": "/products/samtramy/stm-014-ruou-sam-ngoc-linh-chai-premium-stm14.png"
+  },
+  {
+    "sku": "STM-015",
+    "ok": true,
+    "size": 1495746,
+    "localPath": "/products/samtramy/stm-015-ruou-sam-ngoc-linh-chai-classic-stm15.png"
+  },
+  {
+    "sku": "STM-016",
+    "ok": true,
+    "size": 1466306,
+    "localPath": "/products/samtramy/stm-016-combo-3-chai-ruou-sam-ngoc-linh-stm16.png"
+  },
+  {
+    "sku": "TMR-001",
+    "ok": true,
+    "size": 28946,
+    "localPath": "/products/tumorong/tmr-001-ca-phe-sam-ngoc-linh-tmr1.jpg"
+  },
+  {
+    "sku": "TMR-002",
+    "ok": true,
+    "size": 137113,
+    "localPath": "/products/tumorong/tmr-002-dau-gio-thuong-dang-nhan-sam-tmr2.png"
+  },
+  {
+    "sku": "TMR-003",
+    "ok": true,
+    "size": 1550028,
+    "localPath": "/products/tumorong/tmr-003-duong-chat-sam-ngoc-linh-mat-ong-tmr3.png"
+  },
+  {
+    "sku": "TMR-004",
+    "ok": true,
+    "size": 1038921,
+    "localPath": "/products/tumorong/tmr-004-ruou-dang-sam-ngu-vi-tu-500ml-chai-vuong-tmr4.png"
+  },
+  {
+    "sku": "TMR-005",
+    "ok": true,
+    "size": 79591,
+    "localPath": "/products/tumorong/tmr-005-ruou-ngoc-linh-dang-sam-ngu-vi-tu-chai-tron-500ml-tmr5.jpg"
+  },
+  {
+    "sku": "TMR-006",
+    "ok": true,
+    "size": 696567,
+    "localPath": "/products/tumorong/tmr-006-ruou-sam-ngoc-linh-black-500ml-tmr6.png"
+  },
+  {
+    "sku": "TMR-007",
+    "ok": true,
+    "size": 997654,
+    "localPath": "/products/tumorong/tmr-007-ruou-sam-ngoc-linh-green-500ml-tmr7.png"
+  },
+  {
+    "sku": "TMR-008",
+    "ok": true,
+    "size": 897121,
+    "localPath": "/products/tumorong/tmr-008-ruou-sam-ngoc-linh-blue-label-500ml-tmr8.png"
+  },
+  {
+    "sku": "TMR-009",
+    "ok": true,
+    "size": 871399,
+    "localPath": "/products/tumorong/tmr-009-ruou-sam-ngoc-linh-gold-label-750ml-tmr9.png"
+  },
+  {
+    "sku": "TMR-010",
+    "ok": true,
+    "size": 1033870,
+    "localPath": "/products/tumorong/tmr-010-sam-ngoc-linh-ngam-mat-ong-tmr10.png"
+  },
+  {
+    "sku": "TMR-011",
+    "ok": true,
+    "size": 264787,
+    "localPath": "/products/tumorong/tmr-011-thach-collagen-sam-ngoc-linh-tmr11.png"
+  },
+  {
+    "sku": "TMR-012",
+    "ok": true,
+    "size": 482428,
+    "localPath": "/products/tumorong/tmr-012-tra-o-long-sam-ngoc-linh-tmr12.png"
+  },
+  {
+    "sku": "TMR-013",
+    "ok": true,
+    "size": 178375,
+    "localPath": "/products/tumorong/tmr-013-tra-sam-ngoc-linh-tmr13.jpg"
+  },
+  {
+    "sku": "TMS-001",
+    "ok": true,
+    "size": 286542,
+    "localPath": "/products/tumorongshop/tms-001-ruou-sam-ngoc-linh-500ml-tms1.png"
+  },
+  {
+    "sku": "TMS-002",
+    "ok": true,
+    "size": 177156,
+    "localPath": "/products/tumorongshop/tms-002-ruou-sam-ngoc-linh-gold-750ml-tms2.png"
+  },
+  {
+    "sku": "TMS-003",
+    "ok": true,
+    "size": 410095,
+    "localPath": "/products/tumorongshop/tms-003-ruou-sam-ngoc-linh-dragon-tms3.jpg"
+  },
+  {
+    "sku": "KT-001",
+    "ok": true,
+    "size": 2615703,
+    "localPath": "/products/khanhthanh/kt-001-ruou-sam-ngoc-linh-ngam-la-750ml-kt1.png"
+  },
+  {
+    "sku": "KT-002",
+    "ok": true,
+    "size": 1276151,
+    "localPath": "/products/khanhthanh/kt-002-ruou-sam-ngoc-linh-ngam-cu-tuoi-tren-8-nam-tuoi-kt2.png"
+  },
+  {
+    "sku": "KT-003",
+    "ok": true,
+    "size": 316477,
+    "localPath": "/products/khanhthanh/kt-003-sam-ngoc-linh-phong-thuy-12-con-giap-kt3.jpg"
+  },
+  {
+    "sku": "KT-004",
+    "ok": true,
+    "size": 1964108,
+    "localPath": "/products/khanhthanh/kt-004-sam-ngoc-linh-ngam-mat-ong-1g-kt4.png"
+  },
+  {
+    "sku": "KT-005",
+    "ok": true,
+    "size": 2250049,
+    "localPath": "/products/khanhthanh/kt-005-ruou-sam-ngoc-linh-ngam-la-500ml-set-ly-hoang-gia-kt5.png"
+  },
+  {
+    "sku": "KT-006",
+    "ok": true,
+    "size": 2250049,
+    "localPath": "/products/khanhthanh/kt-006-ruou-sam-ngoc-linh-ngam-la-500ml-kt6.png"
+  },
+  {
+    "sku": "KT-007",
+    "ok": true,
+    "size": 2062969,
+    "localPath": "/products/khanhthanh/kt-007-set-ruou-sam-ngoc-linh-ngam-la-500ml-1-ngam-mat-ong-1g-4-ly-hoang-gia-kt7.png"
+  },
+  {
+    "sku": "KT-008",
+    "ok": true,
+    "size": 3938580,
+    "localPath": "/products/khanhthanh/kt-008-ruou-sam-ngoc-linh-ngam-la-750ml-ban-2-kt8.png"
+  },
+  {
+    "sku": "KT-009",
+    "ok": true,
+    "size": 2068415,
+    "localPath": "/products/khanhthanh/kt-009-ruou-sam-ngoc-linh-ngam-la-3-95l-kt9.png"
+  },
+  {
+    "sku": "KT-010",
+    "ok": true,
+    "size": 1674405,
+    "localPath": "/products/khanhthanh/kt-010-sam-ngoc-linh-ngam-la-1l-kt10.png"
+  },
+  {
+    "sku": "KT-011",
+    "ok": true,
+    "size": 233173,
+    "localPath": "/products/khanhthanh/kt-011-la-sam-ngoc-linh-kho-kt11.jpg"
+  },
+  {
+    "sku": "KT-012",
+    "ok": true,
+    "size": 168267,
+    "localPath": "/products/khanhthanh/kt-012-la-sam-ngoc-linh-tuoi-kt12.jpg"
+  },
+  {
+    "sku": "KT-013",
+    "ok": true,
+    "size": 2950304,
+    "localPath": "/products/khanhthanh/kt-013-sam-ngam-mat-ong-500ml-50g-sam-kt13.png"
+  },
+  {
+    "sku": "KT-014",
+    "ok": true,
+    "size": 1724705,
+    "localPath": "/products/khanhthanh/kt-014-sam-ngam-mat-ong-50ml-4g-sam-kt14.png"
+  },
+  {
+    "sku": "KT-015",
+    "ok": true,
+    "size": 3465272,
+    "localPath": "/products/khanhthanh/kt-015-sam-ngam-mat-ong-150ml-12-5g-sam-kt15.png"
+  },
+  {
+    "sku": "KT-016",
+    "ok": true,
+    "size": 238733,
+    "localPath": "/products/khanhthanh/kt-016-cu-sam-ngoc-linh-tuoi-loai-vun-kt16.jpg"
+  },
+  {
+    "sku": "KT-017",
+    "ok": true,
+    "size": 113446,
+    "localPath": "/products/khanhthanh/kt-017-cu-sam-ngoc-linh-tuoi-loai-4-tb-40-cu-kg-kt17.jpg"
+  },
+  {
+    "sku": "KT-018",
+    "ok": true,
+    "size": 129283,
+    "localPath": "/products/khanhthanh/kt-018-cu-sam-ngoc-linh-tuoi-loai-3-tb-30-cu-kg-kt18.jpg"
+  },
+  {
+    "sku": "KT-019",
+    "ok": true,
+    "size": 172208,
+    "localPath": "/products/khanhthanh/kt-019-cu-sam-ngoc-linh-tuoi-loai-2-tb-20-cu-kg-kt19.jpg"
+  },
+  {
+    "sku": "KT-020",
+    "ok": true,
+    "size": 126528,
+    "localPath": "/products/khanhthanh/kt-020-cu-sam-ngoc-linh-tuoi-loai-1-tb-10-cu-kg-kt20.jpg"
+  },
+  {
+    "sku": "KT-021",
+    "ok": true,
+    "size": 199923,
+    "localPath": "/products/khanhthanh/kt-021-sam-ngoc-linh-nguyen-cay-loai-3-kt21.jpg"
+  },
+  {
+    "sku": "KT-022",
+    "ok": true,
+    "size": 239347,
+    "localPath": "/products/khanhthanh/kt-022-sam-ngoc-linh-nguyen-cay-loai-2-kt22.jpg"
+  },
+  {
+    "sku": "KT-023",
+    "ok": true,
+    "size": 162414,
+    "localPath": "/products/khanhthanh/kt-023-sam-ngoc-linh-nguyen-cay-loai-1-kt23.jpg"
+  }
+]

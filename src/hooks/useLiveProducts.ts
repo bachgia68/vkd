@@ -40,7 +40,10 @@ export function useLiveProducts(staticProducts: Product[]): Product[] {
             if (!o) return p;
             return {
               ...p,
-              ...(o.price_vnd !== null ? { price: Number(o.price_vnd) } : {}),
+              // price_vnd null HOẶC 0 đều nghĩa là "Liên hệ/Theo thời giá" — set
+              // price: null để ghi đè hẳn giá tĩnh cũ, không chỉ bỏ qua override
+              // (nếu bỏ qua, sản phẩm vẫn hiện giá cũ dù admin đã đổi sang Liên hệ).
+              price: o.price_vnd !== null && Number(o.price_vnd) !== 0 ? Number(o.price_vnd) : null,
               ...(o.image_url ? { image: o.image_url } : {}),
               ...(o.gallery_images && o.gallery_images.length > 0 ? { galleryImages: o.gallery_images } : {}),
               ...(o.description_short ? { descriptionShort: o.description_short } : {}),

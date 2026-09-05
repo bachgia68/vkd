@@ -12,6 +12,7 @@ import {
   X,
   ChevronRight,
   ShoppingBag,
+  Plus,
 } from 'lucide-react';
 import { products as staticProducts, toCartProduct, type Product } from '../data/products';
 import { healthGoalLabels, type HealthGoal } from '../data/mockData';
@@ -29,11 +30,18 @@ function formatVND(n: number | null): string {
 
 const VND_PER_USD = 25000;
 
-function formatPrice(vndPrice: number | null, lang: Language): string {
-  if (vndPrice === null) return lang === 'vi' ? 'Liên hệ' : 'Contact us';
+function formatPrice(vndPrice: number | null, lang: Language, marketPrice?: boolean): string {
+  if (vndPrice === null) {
+    if (lang === 'vi') return marketPrice ? 'Theo thời giá' : 'Liên hệ';
+    return marketPrice ? 'Market price' : 'Contact us';
+  }
   if (lang === 'vi') return formatVND(vndPrice);
   const usd = Math.round((vndPrice / VND_PER_USD) * 100) / 100;
   return `$${usd.toFixed(2)}`;
+}
+
+function contactUrl(lang: Language): string {
+  return lang === 'vi' ? 'https://zalo.me/0984999309' : 'https://wa.me/84984999309';
 }
 
 /**
@@ -60,11 +68,26 @@ const productTypeIcons: Record<ProductTypeId, typeof Leaf> = {
   'set-qua-tang': Gift,
 };
 
-const descriptionFor = (product: Product): string => {
+const nameFor = (product: Product, lang: Language): string => {
+  if (lang === 'en') return product.nameEn || product.name;
+  if (lang === 'zh') return product.nameZh || product.name;
+  if (lang === 'fr') return product.nameFr || product.name;
+  return product.name;
+};
+
+const descriptionFor = (product: Product, lang: Language): string => {
   if (product.descriptionShort) return product.descriptionShort;
-  return product.activeIngredient
-    ? `${product.description} · ${product.activeIngredient}.`
-    : product.description;
+  const desc =
+    lang === 'en' ? (product.descriptionEn || product.description) :
+    lang === 'zh' ? (product.descriptionZh || product.description) :
+    lang === 'fr' ? (product.descriptionFr || product.description) :
+    product.description;
+  const activeIngredient =
+    lang === 'en' ? (product.activeIngredientEn || product.activeIngredient) :
+    lang === 'zh' ? (product.activeIngredientZh || product.activeIngredient) :
+    lang === 'fr' ? (product.activeIngredientFr || product.activeIngredient) :
+    product.activeIngredient;
+  return activeIngredient ? `${desc} · ${activeIngredient}.` : desc;
 };
 
 interface CatalogUiStrings {
@@ -271,7 +294,7 @@ export default function ProductCatalog({
 
   const selectedProducts = useMemo(
     () => products.filter((p) => selectedSkus.has(p.sku)),
-    [selectedSkus]
+    [selectedSkus, products]
   );
 
   const buildOwnGiftSet = () => {
@@ -311,7 +334,7 @@ export default function ProductCatalog({
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const popularProducts = useMemo(
     () => products.filter((p) => p.badge?.toLowerCase().includes('bán chạy')).slice(0, 4),
-    []
+    [products]
   );
 
   const ui = catalogUi[lang];
@@ -321,7 +344,7 @@ export default function ProductCatalog({
     let list = products.filter((p) => {
       if (activeType !== 'all' && p.productType !== activeType) return false;
       if (activeGoal !== 'all' && p.healthGoal !== activeGoal) return false;
-      if (query.trim() && !p.name.toLowerCase().includes(query.trim().toLowerCase())) return false;
+      if (query.trim() && !nameFor(p, lang).toLowerCase().includes(query.trim().toLowerCase())) return false;
       return true;
     });
 
@@ -331,7 +354,7 @@ export default function ProductCatalog({
       list = [...list].sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
     }
     return list;
-  }, [activeType, activeGoal, query, sortBy]);
+  }, [products, activeType, activeGoal, query, sortBy]);
 
   const visibleCombos = useMemo(() => {
     if (activeType !== 'all' && activeType !== 'set-qua-tang') return [];
@@ -414,8 +437,8 @@ export default function ProductCatalog({
                           onMouseDown={() => onNavigate('product-detail', p.slug)}
                           className="flex items-center gap-2 text-left"
                         >
-                          <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
-                          <span className="text-xs text-forest-700 line-clamp-2">{p.name}</span>
+                          <img src={p.image} alt={nameFor(p, lang)} className="w-10 h-10 rounded-lg object-cover" />
+                          <span className="text-xs text-forest-700 line-clamp-2">{nameFor(p, lang)}</span>
                         </button>
                       ))}
                     </div>
@@ -541,11 +564,16 @@ export default function ProductCatalog({
                     return groups;
                   }, {})
                 ).map(([theme, themeCombos]) => (
+                  // Dải ngang vuốt được (đồng bộ phong cách với các carousel khác trên
+                  // site) thay vì lưới cố định — 1 combo cũng hiện gọn đúng khổ thẻ,
+                  // không bị kéo giãn lấp đầy lưới trống.
                   <div key={theme} className="mb-8">
                     <h3 className="font-display text-lg text-forest-900 mb-4">{theme}</h3>
-                    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {themeCombos.map((combo) => (
-                        <ComboCard key={combo.id} combo={combo} />
+                        <div key={combo.id} className="snap-start flex-shrink-0 w-72">
+                          <ComboCard combo={combo} />
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -740,7 +768,7 @@ function ProductCard({
       >
         <img
           src={product.image}
-          alt={product.name}
+          alt={nameFor(product, lang)}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
@@ -753,16 +781,21 @@ function ProductCard({
           <span
             role="checkbox"
             aria-checked={!!selected}
+            title={lang === 'vi' ? 'Thêm vào set quà tặng tự chọn' : 'Add to custom gift set'}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onToggleSelect();
             }}
             className={`absolute bottom-3 right-3 w-7 h-7 rounded-md border-2 flex items-center justify-center transition-colors ${
-              selected ? 'bg-gold-500 border-gold-500' : 'bg-white/90 border-white'
+              selected ? 'bg-gold-500 border-gold-500' : 'bg-white/90 border-cream-300 hover:border-gold-400'
             }`}
           >
-            {selected && <Check className="w-4 h-4 text-forest-900" />}
+            {selected ? (
+              <Check className="w-4 h-4 text-forest-900" />
+            ) : (
+              <Plus className="w-4 h-4 text-forest-400" />
+            )}
           </span>
         )}
 
@@ -797,21 +830,35 @@ function ProductCard({
           className="text-left"
         >
           <h3 className="font-display text-base font-semibold text-forest-900 mb-2 leading-snug line-clamp-2 group-hover:text-forest-700 transition-colors">
-            {product.name}
+            {nameFor(product, lang)}
           </h3>
         </a>
 
         <div className="inline-flex items-start gap-1.5 mb-3">
           <Check className="w-3.5 h-3.5 text-gold-500 mt-0.5 shrink-0" />
           <span className="text-xs text-forest-600 leading-relaxed line-clamp-2">
-            {descriptionFor(product)}
+            {descriptionFor(product, lang)}
           </span>
         </div>
 
         {/* Price + CTA */}
         <div className="mt-auto pt-4 border-t border-cream-200 flex items-center justify-between gap-3">
           <div>
-            <div className="text-lg font-display font-bold text-forest-900">{formatPrice(product.price, lang)}</div>
+            <div className="text-lg font-display font-bold text-forest-900">
+              {product.price === null ? (
+                <a
+                  href={contactUrl(lang)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-dotted hover:text-gold-600"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {formatPrice(product.price, lang, product.marketPrice)}
+                </a>
+              ) : (
+                formatPrice(product.price, lang, product.marketPrice)
+              )}
+            </div>
             <div className="text-[11px] text-forest-400">{ui.retailPriceLabel}</div>
           </div>
           {canOrder ? (

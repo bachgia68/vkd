@@ -53,10 +53,10 @@ export default function B2B({ lang }: B2BProps) {
           </div>
 
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900 mb-6">
-            {cms?.title_vi || t.b2b.title}
+            {(lang === 'vi' ? cms?.title_vi : undefined) || t.b2b.title}
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">
-            {cms?.content_vi || t.b2b.subtitle}
+            {(lang === 'vi' ? cms?.content_vi : undefined) || t.b2b.subtitle}
           </p>
         </div>
 

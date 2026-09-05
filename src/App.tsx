@@ -150,7 +150,13 @@ function App() {
         : page === 'catalog'
         ? '/products'
         : '/';
-    window.history.pushState({ page, slug: slug ?? selectedSlug }, '', pathname + window.location.search);
+    // Query string (vd. ?page=4) chỉ có ý nghĩa cho trang danh sách phân trang
+    // (catalog, blog) — giữ nguyên khi ở lại 2 trang đó, nhưng PHẢI bỏ khi
+    // điều hướng sang trang chi tiết/trang khác, nếu không URL canonical của
+    // sản phẩm/bài viết sẽ dính rác "?page=4" từ trang danh sách trước đó
+    // (sai SEO, tạo URL trùng nội dung không cần thiết).
+    const search = page === 'catalog' || page === 'blog' ? window.location.search : '';
+    window.history.pushState({ page, slug: slug ?? selectedSlug }, '', pathname + search);
   };
 
   const handleOrderSuccess = (id: string) => {
@@ -190,7 +196,7 @@ function App() {
                   <NewsletterCTA />
                 </div>
               </section>
-              {visibleSections.has('video-gallery') && <VideoGallery />}
+              {visibleSections.has('video-gallery') && <VideoGallery lang={lang} />}
             </>
           )}
 

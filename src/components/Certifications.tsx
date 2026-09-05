@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import { usePageSection } from '../lib/usePageSection';
+import { fetchCertificationImages, type CertificationImage } from '../lib/siteContentApi';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 
 interface CertificationsProps {
@@ -60,6 +61,13 @@ export default function Certifications({ lang }: CertificationsProps) {
   const names = certNames[lang];
   const cms = usePageSection('home', 'certifications');
   const [preview, setPreview] = useState<{ src: string; name: string } | null>(null);
+  const [extraCerts, setExtraCerts] = useState<CertificationImage[]>([]);
+
+  useEffect(() => {
+    fetchCertificationImages()
+      .then(setExtraCerts)
+      .catch(() => setExtraCerts([]));
+  }, []);
 
   const certifications = [
     { image: '/certifications/cgmp.jpg', name: names.cgmp },
@@ -69,6 +77,10 @@ export default function Certifications({ lang }: CertificationsProps) {
     { image: '/certifications/chung-nhan-sam-1.jpg', name: `${names.ginseng} 1` },
     { image: '/certifications/chung-nhan-sam-2.jpg', name: `${names.ginseng} 2` },
     { image: '/certifications/chung-nhan-sam-3.jpg', name: `${names.ginseng} 3` },
+    ...extraCerts.map((c) => ({
+      image: c.image_url,
+      name: lang === 'en' ? (c.name_en || c.name_vi) : c.name_vi,
+    })),
   ];
 
   return (
@@ -77,9 +89,9 @@ export default function Certifications({ lang }: CertificationsProps) {
         {/* Header */}
         <div className="text-center mb-12">
           <h3 className="font-display text-3xl md:text-4xl uppercase tracking-wide text-forest-900 mb-3">
-            {cms?.title_vi || t.certifications.title}
+            {(lang === 'vi' ? cms?.title_vi : undefined) || t.certifications.title}
           </h3>
-          <p className="text-forest-500">{cms?.content_vi || t.certifications.subtitle}</p>
+          <p className="text-forest-500">{(lang === 'vi' ? cms?.content_vi : undefined) || t.certifications.subtitle}</p>
         </div>
 
         {/* Certifications Carousel — real scanned certificates, logo-style layout */}

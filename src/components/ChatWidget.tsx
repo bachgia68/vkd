@@ -254,7 +254,7 @@ export default function ChatWidget({ lang, onNavigate }: ChatWidgetProps) {
                       {categoryProducts.map((p) => {
                         return (
                           <div key={p.slug} className="border border-forest-100 rounded-xl p-3">
-                            <p className="text-sm font-medium text-forest-900">{p.name}</p>
+                            <p className="text-sm font-medium text-forest-900">{l === 'vi' ? p.name : (p.nameEn || p.name)}</p>
                             <p className="text-sm text-gold-600 font-semibold mt-0.5">{formatVND(p.price)}</p>
                             <button
                               onClick={() => viewProduct(p.slug)}
