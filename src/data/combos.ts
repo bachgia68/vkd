@@ -1,7 +1,26 @@
 import { products, type CartCompatibleProduct } from './products';
 import type { ComboSet } from '../lib/siteContentApi';
+import type { Language } from '../i18n/translations';
 
 const VND_PER_USD = 25000;
+
+/** Lang-aware combo name/description/theme — falls back to Vietnamese when
+ * the translated column hasn't been filled in for a given combo. */
+export function comboFieldFor(
+  combo: ComboSet,
+  lang: Language,
+  field: 'name' | 'description' | 'theme'
+): string {
+  const vi = field === 'name' ? combo.name_vi : field === 'description' ? combo.description_vi : combo.theme;
+  if (lang === 'vi') return vi;
+  const translated =
+    field === 'name'
+      ? (lang === 'en' ? combo.name_en : lang === 'zh' ? combo.name_zh : lang === 'fr' ? combo.name_fr : undefined)
+      : field === 'description'
+      ? (lang === 'en' ? combo.description_en : lang === 'zh' ? combo.description_zh : lang === 'fr' ? combo.description_fr : undefined)
+      : (lang === 'en' ? combo.theme_en : lang === 'zh' ? combo.theme_zh : lang === 'fr' ? combo.theme_fr : undefined);
+  return translated || vi;
+}
 
 /** Resolves a combo's component_skus to their full Product records, for
  * display ("gồm: ...") — dropping any SKU that no longer exists in the

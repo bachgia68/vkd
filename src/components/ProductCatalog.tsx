@@ -21,6 +21,7 @@ import { productTypes, type ProductTypeId } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
 import { fetchActiveComboSets, type ComboSet } from '../lib/siteContentApi';
+import { comboFieldFor } from '../data/combos';
 import { comboToCartProduct, getComboPosterImage } from '../data/combos';
 
 function formatVND(n: number | null): string {
@@ -361,14 +362,14 @@ export default function ProductCatalog({
     const currentMonth = new Date().getMonth() + 1;
     const q = query.trim().toLowerCase();
     return [...combos]
-      .filter((c) => !q || c.name_vi.toLowerCase().includes(q))
+      .filter((c) => !q || comboFieldFor(c, lang, 'name').toLowerCase().includes(q))
       .sort((a, b) => {
         const aCurrent = a.month_tags.length === 0 || a.month_tags.includes(currentMonth);
         const bCurrent = b.month_tags.length === 0 || b.month_tags.includes(currentMonth);
         if (aCurrent !== bCurrent) return aCurrent ? -1 : 1;
         return a.sort_order - b.sort_order;
       });
-  }, [combos, activeType, query]);
+  }, [combos, activeType, query, lang]);
 
   const countByType = (id: ProductTypeId) => products.filter((p) => p.productType === id).length;
 
@@ -572,7 +573,7 @@ export default function ProductCatalog({
                     <div className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {themeCombos.map((combo) => (
                         <div key={combo.id} className="snap-start flex-shrink-0 w-72">
-                          <ComboCard combo={combo} />
+                          <ComboCard combo={combo} lang={lang} ui={ui} />
                         </div>
                       ))}
                     </div>
@@ -693,31 +694,32 @@ function CategoryButton({
   );
 }
 
-function ComboCard({ combo }: { combo: ComboSet }) {
+function ComboCard({ combo, lang, ui }: { combo: ComboSet; lang: Language; ui: CatalogUiStrings }) {
   const { addToCart } = useCart();
+  const name = comboFieldFor(combo, lang, 'name');
 
   return (
     <div className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-cream-200 hover:border-gold-300 transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1">
       <div className="relative aspect-[4/5] overflow-hidden bg-cream-100">
         <img
           src={getComboPosterImage(combo)}
-          alt={combo.name_vi}
+          alt={name}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         {combo.theme && (
           <div className="absolute top-3 left-3">
             <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-gold-400 text-forest-900 shadow-sm">
-              {combo.theme}
+              {comboFieldFor(combo, lang, 'theme')}
             </span>
           </div>
         )}
       </div>
       <div className="p-5 flex flex-col flex-1">
         <h3 className="font-display text-base font-semibold text-forest-900 mb-2 leading-snug line-clamp-2">
-          {combo.name_vi}
+          {name}
         </h3>
-        <p className="text-xs text-forest-600 leading-relaxed line-clamp-2 mb-3">{combo.description_vi}</p>
+        <p className="text-xs text-forest-600 leading-relaxed line-clamp-2 mb-3">{comboFieldFor(combo, lang, 'description')}</p>
         <div className="mt-auto pt-4 border-t border-cream-200 flex items-center justify-between gap-3">
           <div className="text-lg font-display font-bold text-forest-900">{formatVND(combo.price_vnd)}</div>
           <button
@@ -725,7 +727,7 @@ function ComboCard({ combo }: { combo: ComboSet }) {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-forest-900 text-cream-50 text-xs font-semibold hover:bg-forest-800 transition-colors active:scale-95"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            Thêm vào giỏ
+            {ui.addToCart}
           </button>
         </div>
       </div>

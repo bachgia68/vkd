@@ -160,19 +160,28 @@ export interface ComboSet {
   id: string;
   slug: string;
   name_vi: string;
+  name_en?: string | null;
+  name_zh?: string | null;
+  name_fr?: string | null;
   theme: string;
+  theme_en?: string | null;
+  theme_zh?: string | null;
+  theme_fr?: string | null;
   month_tags: number[];
   component_skus: string[];
   price_vnd: number;
   poster_image_url: string | null;
   description_vi: string;
+  description_en?: string | null;
+  description_zh?: string | null;
+  description_fr?: string | null;
   sort_order: number;
 }
 
 export async function fetchActiveComboSets(): Promise<ComboSet[]> {
   const { data, error } = await supabase
     .from('combo_sets')
-    .select('id, slug, name_vi, theme, month_tags, component_skus, price_vnd, poster_image_url, description_vi, sort_order')
+    .select('id, slug, name_vi, name_en, name_zh, name_fr, theme, theme_en, theme_zh, theme_fr, month_tags, component_skus, price_vnd, poster_image_url, description_vi, description_en, description_zh, description_fr, sort_order')
     .eq('active', true)
     .order('sort_order');
   if (error) throw new Error(error.message);
