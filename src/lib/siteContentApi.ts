@@ -455,18 +455,24 @@ export async function fetchProductMenuItems(): Promise<ProductMenuItem[]> {
 
 // ---------- Policy Pages ----------
 
+export interface PolicySectionBlock {
+  heading: string;
+  body: string[];
+}
+
 export interface PolicyPageContent {
   id: string;
   policy_key: string;
   title_vi: string;
   body_vi: string;
   updated_label: string;
+  sections_vi: PolicySectionBlock[] | null;
 }
 
 export async function fetchPolicyPage(policyKey: string): Promise<PolicyPageContent | null> {
   const { data, error } = await supabase
     .from('policy_pages')
-    .select('id, policy_key, title_vi, body_vi, updated_label')
+    .select('id, policy_key, title_vi, body_vi, updated_label, sections_vi')
     .eq('policy_key', policyKey)
     .maybeSingle();
   if (error) throw new Error(error.message);

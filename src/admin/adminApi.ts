@@ -1647,7 +1647,7 @@ export async function fetchAllPolicyPages(): Promise<PolicyPageContent[]> {
   return data ?? [];
 }
 
-export async function updatePolicyPage(id: string, updates: Partial<Pick<PolicyPageContent, 'title_vi' | 'body_vi' | 'updated_label'>>): Promise<void> {
+export async function updatePolicyPage(id: string, updates: Partial<Pick<PolicyPageContent, 'title_vi' | 'body_vi' | 'updated_label' | 'sections_vi'>>): Promise<void> {
   const { error } = await supabase.from('policy_pages').update(updates).eq('id', id);
   if (error) throw new Error(error.message);
 }

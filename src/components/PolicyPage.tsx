@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { getPolicyContent, type PolicyKey } from '../data/policyContent';
-import { fetchPolicyPage } from '../lib/siteContentApi';
+import { fetchPolicyPage, type PolicySectionBlock } from '../lib/siteContentApi';
 
 interface PolicyPageProps {
   policyKey: PolicyKey;
@@ -16,16 +16,25 @@ export default function PolicyPage({ policyKey, lang, onNavigate }: PolicyPagePr
   const backLabel = lang === 'vi' ? 'Về trang chủ' : 'Back to home';
   const [cmsTitle, setCmsTitle] = useState<string | null>(null);
   const [cmsBody, setCmsBody] = useState<string | null>(null);
+  const [cmsSections, setCmsSections] = useState<PolicySectionBlock[] | null>(null);
   const [cmsUpdated, setCmsUpdated] = useState<string | null>(null);
 
   useEffect(() => {
+    // sections_vi chi ap dung khi lang='vi' — CMS moi ho tro 1 ngon ngu (viet),
+    // cac ngon ngu khac luon dung ban dich co san trong policyContent.ts.
     fetchPolicyPage(policyKey).then((d) => {
-      if (d) { setCmsTitle(d.title_vi); setCmsBody(d.body_vi); setCmsUpdated(d.updated_label); }
+      if (d && lang === 'vi') {
+        setCmsTitle(d.title_vi);
+        setCmsUpdated(d.updated_label);
+        if (d.sections_vi && d.sections_vi.length > 0) setCmsSections(d.sections_vi);
+        else if (d.body_vi) setCmsBody(d.body_vi);
+      }
     }).catch(() => {});
-  }, [policyKey]);
+  }, [policyKey, lang]);
 
   const title = cmsTitle || fallback.title;
   const updated = cmsUpdated || fallback.updated;
+  const sections = cmsSections || (cmsBody ? null : fallback.sections);
 
   return (
     <section className="section-padding bg-cream-50 min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -42,18 +51,18 @@ export default function PolicyPage({ policyKey, lang, onNavigate }: PolicyPagePr
         <p className="text-sm text-forest-500 mb-10">{updated}</p>
 
         <div className="space-y-4">
-          {cmsBody ? (
-            cmsBody.split('\n').filter(Boolean).map((para, i) => (
-              <p key={i} className="text-forest-700 leading-relaxed">{para}</p>
-            ))
-          ) : (
-            fallback.sections.map((section) => (
-              <div key={section.heading}>
+          {sections ? (
+            sections.map((section, si) => (
+              <div key={si}>
                 <h2 className="font-display text-lg font-semibold text-forest-900 mb-2">{section.heading}</h2>
                 {section.body.map((paragraph, i) => (
                   <p key={i} className="text-forest-700 leading-relaxed mb-2">{paragraph}</p>
                 ))}
               </div>
+            ))
+          ) : (
+            (cmsBody ?? '').split('\n').filter(Boolean).map((para, i) => (
+              <p key={i} className="text-forest-700 leading-relaxed">{para}</p>
             ))
           )}
         </div>

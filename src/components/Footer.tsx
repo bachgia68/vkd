@@ -98,17 +98,37 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
         { key: 'contact', page: 'home', anchor: 'contact' },
       ];
 
+  // "Liên hệ" trong Liên Kết Nhanh truoc day tro thang vao <footer id="contact">
+  // — khi nguoi dung DA o gan cuoi trang (dang doc footer), scrollIntoView vao
+  // chinh no khong tao chuyen dong nao ca, tao cam giac "bam khong an tuong gi"
+  // (bao cao cua Joe: "link Lien he ko di toi dau"). Gio id gan vao dung khoi
+  // "Lien He" (dia chi/Zalo/email) + them hieu ung nhap nhay ngan de nguoi
+  // dung THAY duoc phan hoi ngay ca khi khong can cuon xa.
+  const [highlightContact, setHighlightContact] = useState(false);
+
   const handleFooterNav = (page: string, anchor?: string) => {
     onNavigate?.(page);
     if (anchor) {
-      setTimeout(() => {
-        document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      // Bam lien tiep 2 lan (150ms + 450ms) vi da quan sat that: lan dau doi
+      // khi navigate xong sang trang khac roi cuon co the bi 1 hieu ung khac
+      // tren trang (vd useEffect reset scroll ve dau trang) chay sau do va
+      // de len — cuon lai lan 2 dam bao van toi dung vi tri du co race.
+      const doScroll = () => {
+        document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      };
+      setTimeout(doScroll, 150);
+      setTimeout(doScroll, 500);
+      if (anchor === 'contact') {
+        setTimeout(() => {
+          setHighlightContact(true);
+          setTimeout(() => setHighlightContact(false), 1500);
+        }, 500);
+      }
     }
   };
 
   return (
-    <footer id="contact" className="bg-forest-950 text-white pt-20 pb-8" dir={isRTL ? 'rtl' : 'ltr'}>
+    <footer className="bg-forest-950 text-white pt-20 pb-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
         {/* Widget CRO "Nhận Cẩm Nang" — nổi bật ngay đầu footer, mọi trang đều thấy */}
         <div className="mb-16">
@@ -169,7 +189,12 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
           </div>
 
           {/* Contact */}
-          <div>
+          <div
+            id="contact"
+            className={`rounded-xl transition-all duration-500 ${
+              highlightContact ? 'ring-2 ring-gold-400 bg-forest-900/60 -m-3 p-3' : ''
+            }`}
+          >
             <h5 className="font-semibold mb-6 text-gold-400">{activeOverrides['footer.contact'] ?? t.footer.contact}</h5>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
