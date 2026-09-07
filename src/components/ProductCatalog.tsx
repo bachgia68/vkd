@@ -582,7 +582,7 @@ export default function ProductCatalog({
                 <div className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {visibleCombos.map((combo) => (
                     <div key={combo.id} className="snap-start flex-shrink-0 w-72">
-                      <ComboCard combo={combo} lang={lang} ui={ui} />
+                      <ComboCard combo={combo} lang={lang} ui={ui} products={products} onNavigate={onNavigate} />
                     </div>
                   ))}
                 </div>
@@ -702,13 +702,38 @@ function CategoryButton({
   );
 }
 
-function ComboCard({ combo, lang, ui }: { combo: ComboSet; lang: Language; ui: CatalogUiStrings }) {
+function ComboCard({
+  combo,
+  lang,
+  ui,
+  products,
+  onNavigate,
+}: {
+  combo: ComboSet;
+  lang: Language;
+  ui: CatalogUiStrings;
+  products: Product[];
+  onNavigate: (page: string, slug?: string) => void;
+}) {
   const { addToCart } = useCart();
   const name = comboFieldFor(combo, lang, 'name');
+  // Combo gom nhieu san pham, chua co trang "chi tiet combo" rieng — bam anh
+  // dua khach den trang chi tiet san pham DAU TIEN trong combo de xem day du
+  // thanh phan/canh bao/huong dan dung truoc khi mua, thay vi chi co nut
+  // "Them vao gio" khong cho xem gi ca.
+  const firstProductSlug = products.find((p) => p.sku === combo.component_skus[0])?.slug;
+  const goToDetail = () => {
+    if (firstProductSlug) onNavigate('product-detail', firstProductSlug);
+  };
 
   return (
     <div className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-cream-200 hover:border-gold-300 transition-all duration-500 hover:shadow-elegant-lg hover:-translate-y-1">
-      <div className="relative aspect-[4/5] overflow-hidden bg-cream-100">
+      <button
+        type="button"
+        onClick={goToDetail}
+        disabled={!firstProductSlug}
+        className="relative aspect-[4/5] overflow-hidden bg-cream-100 text-left w-full block disabled:cursor-default"
+      >
         <img
           src={getComboPosterImage(combo)}
           alt={name}
@@ -722,11 +747,13 @@ function ComboCard({ combo, lang, ui }: { combo: ComboSet; lang: Language; ui: C
             </span>
           </div>
         )}
-      </div>
+      </button>
       <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-display text-base font-semibold text-forest-900 mb-2 leading-snug line-clamp-2">
-          {name}
-        </h3>
+        <button type="button" onClick={goToDetail} disabled={!firstProductSlug} className="text-left disabled:cursor-default">
+          <h3 className="font-display text-base font-semibold text-forest-900 mb-2 leading-snug line-clamp-2 hover:text-forest-700 transition-colors">
+            {name}
+          </h3>
+        </button>
         <p className="text-xs text-forest-600 leading-relaxed line-clamp-2 mb-3">{comboFieldFor(combo, lang, 'description')}</p>
         <div className="mt-auto pt-4 border-t border-cream-200 flex items-center justify-between gap-3">
           <div className="text-lg font-display font-bold text-forest-900">{formatVND(combo.price_vnd)}</div>

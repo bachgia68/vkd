@@ -119,8 +119,14 @@ export async function updateProduct(
   if (error) throw new Error(error.message);
 }
 
+// Khong xoa han row — src/data/products.ts la nguon du lieu tinh, khach van
+// doc duoc SKU do du row override o Supabase bi xoa (useLiveProducts coi
+// "khong co row" = hien binh thuong, fail-open), nen "Xoa" truoc day khong
+// an duoc san pham vinh vien (con lam no HIEN LAI neu truoc do da an bang
+// active=false). Doi sang set active=false — giong "An" nhung dung nut nay
+// de an han, khop dung y admin va van an duoc o moi noi doc useLiveProducts.
 export async function deleteProduct(id: string): Promise<{ error?: string }> {
-  const { error } = await supabase.from('products').delete().eq('id', id);
+  const { error } = await supabase.from('products').update({ active: false }).eq('id', id);
   if (error) return { error: error.message };
   return {};
 }

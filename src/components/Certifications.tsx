@@ -92,6 +92,19 @@ export default function Certifications({ lang }: CertificationsProps) {
             {(lang === 'vi' ? cms?.title_vi : undefined) || t.certifications.title}
           </h3>
           <p className="text-forest-500">{(lang === 'vi' ? cms?.content_vi : undefined) || t.certifications.subtitle}</p>
+          {/* CTA tu Page Builder — truoc day admin dien duoc cta_text/cta_url
+              nhung component nay chua doc field nao ca nen nut khong bao gio
+              hien, du da luu duoc trong DB. */}
+          {lang === 'vi' && cms?.cta_text && cms?.cta_url && (
+            <a
+              href={cms.cta_url}
+              target={cms.cta_url.startsWith('http') ? '_blank' : undefined}
+              rel={cms.cta_url.startsWith('http') ? 'noopener noreferrer' : undefined}
+              className="btn-gold inline-flex mt-6"
+            >
+              {cms.cta_text}
+            </a>
+          )}
         </div>
 
         {/* Certifications Carousel — real scanned certificates, logo-style layout */}

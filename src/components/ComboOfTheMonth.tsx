@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { fetchActiveComboSets, type ComboSet } from '../lib/siteContentApi';
 import { comboToCartProduct, getComboPosterImage, comboFieldFor } from '../data/combos';
+import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
 
@@ -21,7 +22,7 @@ const addToCartLabelFor = (lang: Language): string =>
   lang === 'fr' ? 'Ajouter au panier' :
   'Thêm vào giỏ';
 
-export default function ComboOfTheMonth({ lang }: { lang: Language }) {
+export default function ComboOfTheMonth({ lang, onNavigate }: { lang: Language; onNavigate: (page: string, slug?: string) => void }) {
   const [combos, setCombos] = useState<ComboSet[]>([]);
   const { addToCart } = useCart();
   const isRTL = lang === 'ar';
@@ -50,27 +51,38 @@ export default function ComboOfTheMonth({ lang }: { lang: Language }) {
     <div className="mt-12" dir={isRTL ? 'rtl' : 'ltr'}>
       <h3 className="font-display text-2xl text-forest-900 mb-6 text-center">{headingFor(lang)}</h3>
       <div className="flex flex-wrap justify-center gap-6">
-        {combos.map((combo) => (
-          <div key={combo.id} className="product-card w-full sm:w-72 md:w-80">
-            <div className="relative aspect-square overflow-hidden">
-              <img src={getComboPosterImage(combo)} alt={comboFieldFor(combo, lang, 'name')} className="w-full h-full object-cover" />
-              {combo.theme && (
-                <span className="absolute top-4 left-4 px-3 py-1 text-xs font-semibold rounded-full bg-gold-400 text-forest-900">
-                  {comboFieldFor(combo, lang, 'theme')}
-                </span>
-              )}
-            </div>
-            <div className="p-6">
-              <h4 className="font-display text-lg font-semibold text-forest-900 mb-2">{comboFieldFor(combo, lang, 'name')}</h4>
-              <p className="text-forest-500 text-sm line-clamp-2 mb-3">{comboFieldFor(combo, lang, 'description')}</p>
-              <p className="text-gold-600 font-semibold mb-4">{formatVND(combo.price_vnd)}</p>
-              <button onClick={() => addToCart(comboToCartProduct(combo))} className="btn-gold w-full justify-center">
-                <ShoppingBag className="w-4 h-4" />
-                {addToCartLabelFor(lang)}
+        {combos.map((combo) => {
+          const firstProductSlug = products.find((p) => p.sku === combo.component_skus[0])?.slug;
+          const goToDetail = () => { if (firstProductSlug) onNavigate('product-detail', firstProductSlug); };
+          return (
+            <div key={combo.id} className="product-card w-full sm:w-72 md:w-80">
+              <button
+                type="button"
+                onClick={goToDetail}
+                disabled={!firstProductSlug}
+                className="relative aspect-square overflow-hidden w-full block text-left disabled:cursor-default"
+              >
+                <img src={getComboPosterImage(combo)} alt={comboFieldFor(combo, lang, 'name')} className="w-full h-full object-cover" />
+                {combo.theme && (
+                  <span className="absolute top-4 left-4 px-3 py-1 text-xs font-semibold rounded-full bg-gold-400 text-forest-900">
+                    {comboFieldFor(combo, lang, 'theme')}
+                  </span>
+                )}
               </button>
+              <div className="p-6">
+                <button type="button" onClick={goToDetail} disabled={!firstProductSlug} className="text-left disabled:cursor-default">
+                  <h4 className="font-display text-lg font-semibold text-forest-900 mb-2 hover:text-forest-700 transition-colors">{comboFieldFor(combo, lang, 'name')}</h4>
+                </button>
+                <p className="text-forest-500 text-sm line-clamp-2 mb-3">{comboFieldFor(combo, lang, 'description')}</p>
+                <p className="text-gold-600 font-semibold mb-4">{formatVND(combo.price_vnd)}</p>
+                <button onClick={() => addToCart(comboToCartProduct(combo))} className="btn-gold w-full justify-center">
+                  <ShoppingBag className="w-4 h-4" />
+                  {addToCartLabelFor(lang)}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -39,8 +39,17 @@ function loadInterFonts(): Promise<{ regular: string; bold: string } | null> {
   return interFontsPromise;
 }
 
+// Preload som — fetch font + import jsPDF ngay khi module nay duoc load lan
+// dau (thay vi doi den luc bam nut) de generateCamNangPdf() it await hon,
+// giam nguy co trinh duyet coi day khong con la "user-initiated download"
+// (mat "user activation" qua nhieu buoc await async) va am tham chan file
+// tai xuong ma khong bao loi JS nao — jsPDF .save() khong throw du file co
+// thuc su ghi duoc xuong may hay khong.
+void loadInterFonts();
+const jsPdfModulePromise = import('jspdf');
+
 export async function generateCamNangPdf(): Promise<void> {
-  const { jsPDF } = await import('jspdf');
+  const { jsPDF } = await jsPdfModulePromise;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 18;

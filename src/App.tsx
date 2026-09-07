@@ -185,7 +185,7 @@ function App() {
               <Hero lang={lang} onNavigate={navigate} />
               {visibleSections.has('heritage') && <Heritage lang={lang} />}
               <Products lang={lang} onNavigate={navigate} />
-              <ComboOfTheMonth lang={lang} />
+              <ComboOfTheMonth lang={lang} onNavigate={navigate} />
               <EliteTeaser lang={lang} onNavigate={navigate} />
               <ProductAdvisor lang={lang} onNavigate={navigate} />
               <Certifications lang={lang} />
