@@ -209,7 +209,7 @@ function App() {
           )}
 
           {currentPage === 'blog' && (
-            <Blog onNavigate={navigate} />
+            <Blog lang={lang} onNavigate={navigate} />
           )}
 
           {currentPage === 'blog-post' && (

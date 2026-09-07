@@ -4,10 +4,19 @@ import { fetchBlogPosts, fetchBlogCategories, fetchSiteSetting, type BlogPost, t
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import NewsletterCTA from './NewsletterCTA';
+import type { Language } from '../i18n/translations';
 
 interface BlogProps {
+  lang: Language;
   onNavigate?: (page: string, slug?: string) => void;
 }
+
+const catNameFor = (cat: BlogCategory, lang: Language): string => {
+  if (lang === 'en') return cat.name_en || cat.name_vi;
+  if (lang === 'zh') return cat.name_zh || cat.name_vi;
+  if (lang === 'fr') return cat.name_fr || cat.name_vi;
+  return cat.name_vi;
+};
 
 // Rotation fallback — dùng ảnh thật trong public/assets, không dark box
 const FALLBACK_IMAGES = [
@@ -35,6 +44,31 @@ function detectCategory(post: BlogPost): string {
   return 'Kiến thức';
 }
 
+// Slug → detectCategory label map (fallback cho bài chưa gắn category_id)
+const SLUG_TO_DETECT: Record<string, string[]> = {
+  'khoa-hoc-nghien-cuu': ['Khoa học'],
+  'cau-chuyen-vung-trong': ['Câu chuyện', 'Vùng trồng'],
+  'suc-khoe-dinh-duong': ['Sức khoẻ'],
+  'cuoc-song-nui-rung': ['Vùng trồng'],
+  'huong-dan-su-dung': ['Kiến thức'],
+  'cong-thuc-bai-thuoc': ['Kiến thức'],
+  'tin-tuc-ta': ['Kiến thức'],
+};
+
+// Label category cho card/hero: ưu tiên category_id thật (dịch được qua admin),
+// fallback về detectCategory() đoán bằng regex — map ngược qua slug để vẫn ra
+// tên có thể dịch nếu khớp được; nếu không khớp thì đành hiện chuỗi VI đoán được.
+function categoryLabelFor(post: BlogPost, categories: BlogCategory[], lang: Language): string {
+  if (post.category_id) {
+    const cat = categories.find((c) => c.id === post.category_id);
+    if (cat) return catNameFor(cat, lang);
+  }
+  const detected = detectCategory(post);
+  const slug = Object.keys(SLUG_TO_DETECT).find((s) => SLUG_TO_DETECT[s].includes(detected));
+  const cat = slug ? categories.find((c) => c.slug === slug) : undefined;
+  return cat ? catNameFor(cat, lang) : detected;
+}
+
 function formatDate(iso: string | null | undefined) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -51,12 +85,14 @@ function estimateReadingMinutes(body: string | null | undefined) {
 interface PostCardProps {
   post: BlogPost;
   index: number;
+  categories: BlogCategory[];
+  lang: Language;
   onNavigate?: (page: string, slug?: string) => void;
 }
 
-function PostCard({ post, index, onNavigate }: PostCardProps) {
+function PostCard({ post, index, categories, lang, onNavigate }: PostCardProps) {
   const img = post.featured_image_url || getFallback(index);
-  const category = detectCategory(post);
+  const category = categoryLabelFor(post, categories, lang);
   const slug = post.slug;
 
   return (
@@ -97,9 +133,9 @@ function PostCard({ post, index, onNavigate }: PostCardProps) {
   );
 }
 
-function FeaturedPostSlide({ post, index, onNavigate }: PostCardProps) {
+function FeaturedPostSlide({ post, index, categories, lang, onNavigate }: PostCardProps) {
   const img = post.featured_image_url || getFallback(index);
-  const category = detectCategory(post);
+  const category = categoryLabelFor(post, categories, lang);
   const slug = post.slug;
 
   return (
@@ -137,9 +173,9 @@ function FeaturedPostSlide({ post, index, onNavigate }: PostCardProps) {
   );
 }
 
-function HeroPost({ post, onNavigate }: { post: BlogPost; onNavigate?: (page: string, slug?: string) => void }) {
+function HeroPost({ post, categories, lang, onNavigate }: { post: BlogPost; categories: BlogCategory[]; lang: Language; onNavigate?: (page: string, slug?: string) => void }) {
   const img = post.featured_image_url || getFallback(0);
-  const category = detectCategory(post);
+  const category = categoryLabelFor(post, categories, lang);
   const slug = post.slug;
 
   return (
@@ -193,7 +229,7 @@ function setPageInUrl(p: number) {
   window.history.replaceState(null, '', url.toString());
 }
 
-export default function Blog({ onNavigate }: BlogProps) {
+export default function Blog({ lang, onNavigate }: BlogProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [selectedCat, setSelectedCat] = useState<string>('all');
@@ -268,17 +304,6 @@ export default function Blog({ onNavigate }: BlogProps) {
 
   // Category filter uses searchFiltered base when search is active
   const baseForFilter = searchQuery.trim() ? searchFiltered.slice(1) : rest;
-
-  // Slug → detectCategory label map (fallback for posts without category_id)
-  const SLUG_TO_DETECT: Record<string, string[]> = {
-    'khoa-hoc-nghien-cuu': ['Khoa học'],
-    'cau-chuyen-vung-trong': ['Câu chuyện', 'Vùng trồng'],
-    'suc-khoe-dinh-duong': ['Sức khoẻ'],
-    'cuoc-song-nui-rung': ['Vùng trồng'],
-    'huong-dan-su-dung': ['Kiến thức'],
-    'cong-thuc-bai-thuoc': ['Kiến thức'],
-    'tin-tuc-ta': ['Kiến thức'],
-  };
 
   // Category filter — only on full /blog page
   const filteredRest = (isFullPage && selectedCat !== 'all')
@@ -372,7 +397,7 @@ export default function Blog({ onNavigate }: BlogProps) {
                     : 'bg-white border border-cream-300 text-forest-600 hover:border-forest-400 hover:text-forest-900'
                 }`}
               >
-                {cat.name_vi}
+                {catNameFor(cat, lang)}
               </button>
             ))}
           </div>
@@ -380,7 +405,7 @@ export default function Blog({ onNavigate }: BlogProps) {
 
         {/* Hero post */}
         <div className="mb-10">
-          <HeroPost post={hero} onNavigate={onNavigate} />
+          <HeroPost post={hero} categories={categories} lang={lang} onNavigate={onNavigate} />
         </div>
 
         {/* Carousel bài viết nổi bật — vuốt ngang, không thay thế lưới phân trang bên dưới */}
@@ -395,7 +420,7 @@ export default function Blog({ onNavigate }: BlogProps) {
               slideWidthClassName="w-[260px] md:w-[300px]"
               renderSlide={(post, _isActive) => {
                 const idx = featuredPosts.indexOf(post) + 1;
-                return <FeaturedPostSlide post={post} index={idx} onNavigate={onNavigate} />;
+                return <FeaturedPostSlide post={post} index={idx} categories={categories} lang={lang} onNavigate={onNavigate} />;
               }}
             />
           </div>
@@ -415,7 +440,7 @@ export default function Blog({ onNavigate }: BlogProps) {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {gridPosts.map((post, i) => (
               <Fragment key={post.id}>
-                <PostCard post={post} index={i + 1} onNavigate={onNavigate} />
+                <PostCard post={post} index={i + 1} categories={categories} lang={lang} onNavigate={onNavigate} />
                 {isFullPage && i === 2 && (
                   <div className="md:col-span-2 lg:col-span-3">
                     <NewsletterCTA />

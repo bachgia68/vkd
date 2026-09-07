@@ -19,6 +19,13 @@ function nameFor(product: Product, lang: Language): string {
   return product.name;
 }
 
+function badgeFor(product: Product, lang: Language): string | undefined {
+  if (lang === 'en') return product.badgeEn || product.badge;
+  if (lang === 'zh') return product.badgeZh || product.badge;
+  if (lang === 'fr') return product.badgeFr || product.badge;
+  return product.badge;
+}
+
 function formatPrice(price: number | null, lang: Language): string {
   if (price === null) return lang === 'vi' ? 'Liên hệ' : 'Contact us';
   if (lang === 'vi') return price.toLocaleString('vi-VN') + '₫';
@@ -147,7 +154,7 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
               {product.badge && (
                 <div className="absolute top-4 left-4">
                   <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gold-400 text-forest-900">
-                    {product.badge}
+                    {badgeFor(product, lang)}
                   </span>
                 </div>
               )}

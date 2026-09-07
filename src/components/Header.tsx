@@ -97,6 +97,13 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
   const navItemLabel = (item: { key: string; label_vi: string | null }) =>
     (lang === 'vi' && item.label_vi) || navLabel(item.key);
 
+  // Menu sản phẩm (product_menu_items) — dịch EN/FR đã có trong DB, ZH chưa dịch nên fallback EN.
+  const productMenuLabel = (item: ProductMenuItem) => {
+    if (lang === 'vi') return item.label_vi;
+    if (lang === 'fr') return item.label_fr || item.label_en || item.label_vi;
+    return item.label_en || item.label_vi;
+  };
+
   // Product dropdown — DB-driven with hardcoded fallback
   const dbSam = dbProductMenu.filter((i) => i.section === 'sam');
   const dbDacSan = dbProductMenu.filter((i) => i.section === 'dac_san');
@@ -183,7 +190,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                                     onClick={() => { setIsProductMenuOpen(false); onNavigate(item.href); }}
                                     className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
                                   >
-                                    {lang === 'vi' ? item.label_vi : (item.label_en || item.label_vi)}
+                                    {productMenuLabel(item)}
                                   </button>
                                 ))}
                               </div>
@@ -197,7 +204,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                                     onClick={() => { setIsProductMenuOpen(false); onNavigate(item.href); }}
                                     className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
                                   >
-                                    {lang === 'vi' ? item.label_vi : (item.label_en || item.label_vi)}
+                                    {productMenuLabel(item)}
                                   </button>
                                 ))}
                               </div>
@@ -211,7 +218,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                                     onClick={() => { setIsProductMenuOpen(false); onNavigate(item.href); }}
                                     className="w-full text-left px-3 py-2 text-sm rounded-lg text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
                                   >
-                                    {lang === 'vi' ? item.label_vi : (item.label_en || item.label_vi)}
+                                    {productMenuLabel(item)}
                                   </button>
                                 ))}
                               </div>

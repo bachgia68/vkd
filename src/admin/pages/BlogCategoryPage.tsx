@@ -15,6 +15,9 @@ export default function BlogCategoryPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editSlug, setEditSlug] = useState('');
+  const [editNameEn, setEditNameEn] = useState('');
+  const [editNameZh, setEditNameZh] = useState('');
+  const [editNameFr, setEditNameFr] = useState('');
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newSlug, setNewSlug] = useState('');
@@ -47,14 +50,21 @@ export default function BlogCategoryPage() {
     finally { setSaving(null); }
   };
 
-  const startEdit = (c: BlogCategory) => { setEditId(c.id); setEditName(c.name_vi); setEditSlug(c.slug); };
+  const startEdit = (c: BlogCategory) => {
+    setEditId(c.id); setEditName(c.name_vi); setEditSlug(c.slug);
+    setEditNameEn(c.name_en ?? ''); setEditNameZh(c.name_zh ?? ''); setEditNameFr(c.name_fr ?? '');
+  };
 
   const saveEdit = async () => {
     if (!editId) return;
     setSaving(editId);
     try {
-      await updateBlogCategory(editId, { name_vi: editName, slug: editSlug });
-      setCats(cats.map((c) => c.id === editId ? { ...c, name_vi: editName, slug: editSlug } : c));
+      const updates = {
+        name_vi: editName, slug: editSlug,
+        name_en: editNameEn || null, name_zh: editNameZh || null, name_fr: editNameFr || null,
+      };
+      await updateBlogCategory(editId, updates);
+      setCats(cats.map((c) => c.id === editId ? { ...c, ...updates } : c));
       setEditId(null);
     } catch (e) { setError((e as Error).message); }
     finally { setSaving(null); }
@@ -109,6 +119,23 @@ export default function BlogCategoryPage() {
                       <label className="block text-xs text-forest-600 mb-0.5">Slug (URL)</label>
                       <input value={editSlug} onChange={(e) => setEditSlug(e.target.value)}
                         className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500 font-mono" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs text-forest-600 mb-0.5">Tên (EN)</label>
+                      <input value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)}
+                        className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-forest-600 mb-0.5">Tên (中文)</label>
+                      <input value={editNameZh} onChange={(e) => setEditNameZh(e.target.value)}
+                        className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-forest-600 mb-0.5">Tên (FR)</label>
+                      <input value={editNameFr} onChange={(e) => setEditNameFr(e.target.value)}
+                        className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500" />
                     </div>
                   </div>
                   <div className="flex gap-2 justify-end">

@@ -30,6 +30,20 @@ function nameForLang(p: Product, lang: Language): string {
   return p.name;
 }
 
+function badgeForLang(p: Product, lang: Language): string | undefined {
+  if (lang === 'en') return p.badgeEn || p.badge;
+  if (lang === 'zh') return p.badgeZh || p.badge;
+  if (lang === 'fr') return p.badgeFr || p.badge;
+  return p.badge;
+}
+
+// EN/FR only (chưa dịch ZH cho các field mô tả dài: ingredients/usage/warnings/volume)
+function textForLang(vi: string | undefined, en: string | undefined, fr: string | undefined, lang: Language): string | undefined {
+  if (lang === 'en') return en || vi;
+  if (lang === 'fr') return fr || vi;
+  return vi;
+}
+
 interface ProductDetailProps {
   lang: Language;
   slug: string;
@@ -361,7 +375,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
               {product.badge && (
                 <div className="absolute top-5 left-5">
                   <span className="px-4 py-1.5 text-xs font-semibold tracking-wider uppercase rounded-full bg-gold-400 text-forest-900 shadow-sm">
-                    {product.badge}
+                    {badgeForLang(product, lang)}
                   </span>
                 </div>
               )}
@@ -417,7 +431,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
                 formatPrice(product.price, lang, product.marketPrice)
               )}
               {product.volume && (
-                <span className="text-sm font-normal text-forest-400 ml-2">· {product.volume}</span>
+                <span className="text-sm font-normal text-forest-400 ml-2">· {textForLang(product.volume, product.volumeEn, product.volumeFr, lang)}</span>
               )}
             </div>
 
@@ -607,17 +621,17 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-16">
           {product.ingredients && (
             <DetailCard icon={FlaskConical} title={ui.ingredientsTitle}>
-              {product.ingredients}
+              {textForLang(product.ingredients, product.ingredientsEn, product.ingredientsFr, lang) ?? product.ingredients}
             </DetailCard>
           )}
           {product.usage && (
             <DetailCard icon={Check} title={ui.usageTitle}>
-              {product.usage}
+              {textForLang(product.usage, product.usageEn, product.usageFr, lang) ?? product.usage}
             </DetailCard>
           )}
           {product.warnings && (
             <DetailCard icon={AlertTriangle} title={ui.warningsTitle}>
-              {product.warnings}
+              {textForLang(product.warnings, product.warningsEn, product.warningsFr, lang) ?? product.warnings}
             </DetailCard>
           )}
         </div>
@@ -625,8 +639,8 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
         {/* Related Products — KGC style */}
         {(() => {
           const related = [
-            ...staticProducts.filter(p => p.slug !== product.slug && p.productType === product.productType),
-            ...staticProducts.filter(p => p.slug !== product.slug && p.supplierId === product.supplierId && p.productType !== product.productType),
+            ...products.filter(p => p.slug !== product.slug && p.productType === product.productType),
+            ...products.filter(p => p.slug !== product.slug && p.supplierId === product.supplierId && p.productType !== product.productType),
           ].slice(0, 8);
           if (!related.length) return null;
           return (

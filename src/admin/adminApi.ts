@@ -1551,7 +1551,7 @@ export async function createBlogCategory(slug: string, name_vi: string, sort_ord
   if (error) throw new Error(error.message);
 }
 
-export async function updateBlogCategory(id: string, updates: Partial<Pick<BlogCategory, 'name_vi' | 'slug' | 'visible' | 'sort_order'>>): Promise<void> {
+export async function updateBlogCategory(id: string, updates: Partial<Pick<BlogCategory, 'name_vi' | 'name_en' | 'name_zh' | 'name_fr' | 'slug' | 'visible' | 'sort_order'>>): Promise<void> {
   const { error } = await supabase.from('blog_categories').update(updates).eq('id', id);
   if (error) throw new Error(error.message);
 }

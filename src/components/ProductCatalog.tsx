@@ -76,6 +76,19 @@ const nameFor = (product: Product, lang: Language): string => {
   return product.name;
 };
 
+const badgeFor = (product: Product, lang: Language): string | undefined => {
+  if (lang === 'en') return product.badgeEn || product.badge;
+  if (lang === 'zh') return product.badgeZh || product.badge;
+  if (lang === 'fr') return product.badgeFr || product.badge;
+  return product.badge;
+};
+
+const productTypeLabel = (t: { labelVi: string; labelEn: string; labelFr: string }, lang: Language): string => {
+  if (lang === 'en') return t.labelEn;
+  if (lang === 'fr') return t.labelFr;
+  return t.labelVi;
+};
+
 const descriptionFor = (product: Product, lang: Language): string => {
   if (product.descriptionShort) return product.descriptionShort;
   const desc =
@@ -494,7 +507,7 @@ export default function ProductCatalog({
                   </li>
                   {productTypes.map((t) => {
                     const Icon = productTypeIcons[t.id];
-                    const label = lang === 'en' ? t.labelEn : t.labelVi;
+                    const label = productTypeLabel(t, lang);
                     return (
                       <li key={t.id}>
                         <CategoryButton
@@ -589,9 +602,10 @@ export default function ProductCatalog({
                 {activeType !== 'all' && (
                   <span className="text-forest-400">
                     {' · '}
-                    {(lang === 'en'
-                      ? productTypes.find((t) => t.id === activeType)?.labelEn
-                      : productTypes.find((t) => t.id === activeType)?.labelVi)}
+                    {(() => {
+                      const t = productTypes.find((t) => t.id === activeType);
+                      return t ? productTypeLabel(t, lang) : undefined;
+                    })()}
                   </span>
                 )}
               </p>
@@ -804,7 +818,7 @@ function ProductCard({
         {product.badge && (
           <div className="absolute top-3 left-3">
             <span className="px-3 py-1 text-[10px] font-semibold tracking-wider uppercase rounded-full bg-gold-400 text-forest-900 shadow-sm">
-              {product.badge}
+              {badgeFor(product, lang)}
             </span>
           </div>
         )}

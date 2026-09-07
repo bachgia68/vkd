@@ -409,6 +409,9 @@ export interface BlogCategory {
   id: string;
   slug: string;
   name_vi: string;
+  name_en?: string | null;
+  name_zh?: string | null;
+  name_fr?: string | null;
   sort_order: number;
   visible: boolean;
 }
@@ -416,7 +419,7 @@ export interface BlogCategory {
 export async function fetchBlogCategories(): Promise<BlogCategory[]> {
   const { data, error } = await supabase
     .from('blog_categories')
-    .select('id, slug, name_vi, sort_order, visible')
+    .select('id, slug, name_vi, name_en, name_zh, name_fr, sort_order, visible')
     .eq('visible', true)
     .order('sort_order');
   if (error) throw new Error(error.message);
@@ -431,6 +434,7 @@ export interface ProductMenuItem {
   slug: string;
   label_vi: string;
   label_en: string;
+  label_fr?: string | null;
   href: string;
   sort_order: number;
   visible: boolean;
@@ -439,7 +443,7 @@ export interface ProductMenuItem {
 export async function fetchProductMenuItems(): Promise<ProductMenuItem[]> {
   const { data, error } = await supabase
     .from('product_menu_items')
-    .select('id, section, slug, label_vi, label_en, href, sort_order, visible')
+    .select('id, section, slug, label_vi, label_en, label_fr, href, sort_order, visible')
     .eq('visible', true)
     .order('sort_order');
   if (error) throw new Error(error.message);

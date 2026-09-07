@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { useKeenSlider } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -53,6 +53,13 @@ export default function SwipeCarousel<T>({
 }: SwipeCarouselProps<T>) {
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Scope class riêng cho từng instance — nhiều SwipeCarousel trên cùng 1
+  // trang (ảnh, chứng chỉ, video...) trước đây dùng chung 1 literal class
+  // "ta-swipe-slide", nên <style> width của carousel mount SAU đè lên carousel
+  // mount TRƯỚC (cùng selector, cùng specificity — rule cuối trong DOM thắng),
+  // khiến slide bị đo sai kích thước và next()/dot không di chuyển đúng.
+  const scopeClass = `ta-swipe-slide-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
     mode: 'free-snap',
     slides: { perView: 'auto', spacing: 16 },
@@ -61,9 +68,20 @@ export default function SwipeCarousel<T>({
     },
   });
 
+  // keen-slider (perView:'auto') đo width slide đúng 1 lần lúc track khởi tạo
+  // rồi cache lại — không tự đo lại khi danh sách items đổi (vd. carousel
+  // mount trước, data fetch async xong mới có items thật, hoặc trang chưa
+  // active/visible lúc đo). Nếu lỡ đo trúng lúc slide chưa có width thật, mọi
+  // slide bị tính width=0 vĩnh viễn — next()/dot vẫn gọi được nhưng
+  // track không di chuyển vì quãng đường tính ra luôn 0. Ép đo lại sau khi
+  // items đã render xong (kể cả lúc mount) để track luôn khớp DOM thật.
+  useEffect(() => {
+    instanceRef.current?.update();
+  }, [items.length, instanceRef]);
+
   if (items.length === 0) return null;
 
-  const slideWidthCss = buildSlideWidthCss(slideWidthClassName, 'ta-swipe-slide');
+  const slideWidthCss = buildSlideWidthCss(slideWidthClassName, scopeClass);
 
   return (
     <div>
@@ -73,7 +91,7 @@ export default function SwipeCarousel<T>({
           {items.map((item, index) => (
             <div
               key={getKey(item, index)}
-              className={`keen-slider__slide ta-swipe-slide flex-shrink-0 ${slideWidthClassName}`}
+              className={`keen-slider__slide ${scopeClass} flex-shrink-0 ${slideWidthClassName}`}
             >
               {renderSlide(item, index === activeIndex)}
             </div>
