@@ -20,15 +20,28 @@ export default function PolicyPage({ policyKey, lang, onNavigate }: PolicyPagePr
   const [cmsUpdated, setCmsUpdated] = useState<string | null>(null);
 
   useEffect(() => {
+    // BUG DA SUA (2026-09-07): truoc day state cms* chi duoc SET khi
+    // lang==='vi', nhung KHONG BAO GIO duoc RESET khi doi sang ngon ngu
+    // khac hoac doi sang policyKey khac — nen doi ngon ngu VI->EN ngay
+    // tren cung trang (khong reload full) de lai noi dung tieng Viet cu
+    // dinh trong state, hien de len ban dich EN dung le ra phai fallback
+    // ve policyContent.ts (bao cao cua Joe: "dich het ra cac ngon ngu roi
+    // lai thanh tieng Viet het" — that ra la KHONG BAO GIO dich, ban VI cu
+    // bi ket lai do thieu buoc reset nay). Gio LUON reset truoc, chi set
+    // lai khi thuc su co du lieu VI moi cho dung policyKey dang xem.
+    setCmsTitle(null);
+    setCmsUpdated(null);
+    setCmsSections(null);
+    setCmsBody(null);
     // sections_vi chi ap dung khi lang='vi' — CMS moi ho tro 1 ngon ngu (viet),
     // cac ngon ngu khac luon dung ban dich co san trong policyContent.ts.
+    if (lang !== 'vi') return;
     fetchPolicyPage(policyKey).then((d) => {
-      if (d && lang === 'vi') {
-        setCmsTitle(d.title_vi);
-        setCmsUpdated(d.updated_label);
-        if (d.sections_vi && d.sections_vi.length > 0) setCmsSections(d.sections_vi);
-        else if (d.body_vi) setCmsBody(d.body_vi);
-      }
+      if (!d) return;
+      setCmsTitle(d.title_vi);
+      setCmsUpdated(d.updated_label);
+      if (d.sections_vi && d.sections_vi.length > 0) setCmsSections(d.sections_vi);
+      else if (d.body_vi) setCmsBody(d.body_vi);
     }).catch(() => {});
   }, [policyKey, lang]);
 

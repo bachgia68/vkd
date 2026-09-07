@@ -7,6 +7,7 @@ import { productTypes } from '../data/productTypes';
 import { healthGoalLabels } from '../data/mockData';
 import type { HealthGoal } from '../data/mockData';
 import { fetchVisibleLanguages, fetchTextOverrides, fetchVisibleNavItems, fetchProductMenuItems, type SiteLanguage, type NavItem, type ProductMenuItem } from '../lib/siteContentApi';
+import { STATIC_PAGE_PATHS } from '../lib/policyRoutes';
 
 const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
   id: key,
@@ -345,12 +346,17 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                     {isAboutMenuOpen && (
                       <div className="absolute top-full left-0 pt-2 w-64 z-50">
                         <div className="bg-cream-50 rounded-2xl shadow-elegant-lg border border-cream-200 py-3">
-                          <button
-                            onClick={() => { setIsAboutMenuOpen(false); onNavigate('about-story'); }}
-                            className="w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                          {/* <a href> that (khong phai <button>) — truoc day
+                              "Giới Thiệu" khong co URL nao ca (chi la nut mo
+                              dropdown + button con ben trong), Google/nguoi
+                              dung khong copy/mo tab moi duoc trang nay. */}
+                          <a
+                            href={STATIC_PAGE_PATHS['about-story']}
+                            onClick={(e) => { e.preventDefault(); setIsAboutMenuOpen(false); onNavigate('about-story'); }}
+                            className="block w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
                           >
                             {lang === 'vi' ? 'Câu chuyện người sáng lập' : "Founder's Story"}
-                          </button>
+                          </a>
                           {visibleSections.has('about') && (
                             <button
                               onClick={() => { setIsAboutMenuOpen(false); onNavigate('about'); }}
@@ -536,12 +542,13 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                   </div>
                 ) : item.key === 'about' ? (
                   <div key={item.key} className="space-y-1">
-                    <button
-                      onClick={() => handleNav('about-story')}
+                    <a
+                      href={STATIC_PAGE_PATHS['about-story']}
+                      onClick={(e) => { e.preventDefault(); handleNav('about-story'); }}
                       className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
                     >
                       {lang === 'vi' ? 'Câu chuyện người sáng lập' : "Founder's Story"}
-                    </button>
+                    </a>
                     {visibleSections.has('about') && (
                       <button
                         onClick={() => handleNav('about')}

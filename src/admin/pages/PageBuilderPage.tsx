@@ -14,7 +14,23 @@ const PAGE_OPTIONS = [
   { key: 'contact', label: 'Liên Hệ' },
 ];
 
-const BLOCK_TYPES = ['hero', 'text', 'image', 'image-text', 'cta', 'gallery', 'carousel', 'testimonial', 'faq'];
+const BLOCK_TYPES = ['text', 'image', 'image-text', 'cta', 'gallery', 'carousel', 'testimonial', 'faq'];
+
+// Cac block_type nay gan CHET voi 1 component rieng that su tren site (xem
+// DEDICATED_HOME_BLOCKS + NON_ORDERABLE_HOME_TYPES trong App.tsx). Doi
+// block_type cua CHINH cac dong nay qua dropdown se lam MAT HAN tinh nang
+// that (khong phai doi bo cuc) — su co that: doi 'combo-of-the-month' sang
+// 'carousel' roi 'hero' lam khoi "Combo Thang Nay" (nhieu combo that tu
+// combo_sets) bien mat khoi trang chu hoan toan, khong bao loi gi (2026-09-07).
+// 'hero' cung bo khoi BLOCK_TYPES phia tren vi chon no cho block MOI o
+// page_key='home' cung khien block do bi loai khoi danh sach hien (xem
+// NON_ORDERABLE_HOME_TYPES), khong phai "hien qua banner chung" nhu ghi chu
+// cu (sai) tung viet.
+const DEDICATED_BLOCK_TYPES = new Set([
+  'hero', 'about', 'heritage', 'products', 'combo-of-the-month',
+  'elite-teaser', 'product-advisor', 'certifications', 'trust-proof',
+  'b2b', 'newsletter', 'showrooms', 'pillar', 'traceability',
+]);
 
 // "Block type" cho page="Trang Chủ": nếu KHÔNG khớp 1 trong các block_type có
 // component riêng (bảng LIVE_WIRED_BLOCKS dưới), site sẽ hiện qua bộ hiển thị
@@ -267,10 +283,19 @@ export default function PageBuilderPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs text-forest-600 mb-1">Block type</label>
-                      <select value={editState.block_type} onChange={(e) => setEditState({ ...editState, block_type: e.target.value })} className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500">
-                        {BLOCK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-                      </select>
-                      <p className="text-[11px] text-forest-400 mt-1">{BLOCK_TYPE_HELP[editState.block_type]}</p>
+                      {DEDICATED_BLOCK_TYPES.has(s.block_type) ? (
+                        <>
+                          <div className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm bg-gray-100 text-forest-600 font-mono">{s.block_type}</div>
+                          <p className="text-[11px] text-red-500 mt-1">Loại đặc biệt gắn với 1 tính năng riêng trên site (xem bảng phía trên) — không đổi được ở đây để tránh làm mất tính năng, như sự cố "Combo Tháng Này" đã xảy ra.</p>
+                        </>
+                      ) : (
+                        <>
+                          <select value={editState.block_type} onChange={(e) => setEditState({ ...editState, block_type: e.target.value })} className="w-full px-2 py-1.5 border border-forest-200 rounded text-sm focus:outline-none focus:border-forest-500">
+                            {BLOCK_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                          <p className="text-[11px] text-forest-400 mt-1">{BLOCK_TYPE_HELP[editState.block_type]}</p>
+                        </>
+                      )}
                     </div>
                     <div>
                       <label className="block text-xs text-forest-600 mb-1">Tiêu đề (VI)</label>

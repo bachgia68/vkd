@@ -14,7 +14,15 @@ import {
   type NavItem,
 } from '../lib/siteContentApi';
 import NewsletterCTA from './NewsletterCTA';
-import { POLICY_PATHS } from '../lib/policyRoutes';
+import { POLICY_PATHS, STATIC_PAGE_PATHS } from '../lib/policyRoutes';
+
+// 'catalog'/'blog' co URL that rieng (xem navigate() trong App.tsx) nhung
+// khong nam trong STATIC_PAGE_PATHS (do da co route rieng tu truoc, khong
+// dua vao file dung chung voi cac trang tinh moi them). Cac page-key con
+// lai (traceability/showrooms/b2b/autoship/loyalty...) CHUA co URL that —
+// co tinh KHONG gan href gia cho chung, giu <button> nhu cu.
+const REAL_PATH_OVERRIDES: Record<string, string> = { catalog: '/products', blog: '/blog' };
+const realFooterHref = (page: string) => STATIC_PAGE_PATHS[page] ?? REAL_PATH_OVERRIDES[page];
 
 const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
   id: key,
@@ -176,16 +184,30 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
           <div>
             <h5 className="font-semibold mb-6 text-gold-400">{activeOverrides['footer.quickLinks'] ?? t.footer.quickLinks}</h5>
             <ul className="space-y-3">
-              {navItems.map((item) => (
-                <li key={item.key}>
-                  <button
-                    onClick={() => handleFooterNav(item.page, item.anchor)}
-                    className="text-forest-300 hover:text-white transition-colors text-left"
-                  >
-                    {(lang === 'vi' && item.label) || navLabel(item.key)}
-                  </button>
-                </li>
-              ))}
+              {navItems.map((item) => {
+                const href = realFooterHref(item.page);
+                const label = (lang === 'vi' && item.label) || navLabel(item.key);
+                return (
+                  <li key={item.key}>
+                    {href ? (
+                      <a
+                        href={href}
+                        onClick={(e) => { e.preventDefault(); handleFooterNav(item.page, item.anchor); }}
+                        className="text-forest-300 hover:text-white transition-colors text-left"
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <button
+                        onClick={() => handleFooterNav(item.page, item.anchor)}
+                        className="text-forest-300 hover:text-white transition-colors text-left"
+                      >
+                        {label}
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

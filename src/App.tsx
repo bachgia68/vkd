@@ -34,7 +34,7 @@ import VideoGallery from './components/VideoGallery';
 import Showrooms from './components/Showrooms';
 import PolicyPage from './components/PolicyPage';
 import { fetchVisibleSections } from './lib/siteContentApi';
-import { POLICY_PATHS } from './lib/policyRoutes';
+import { STATIC_PAGE_PATHS } from './lib/policyRoutes';
 import type { Language } from './i18n/translations';
 
 const SUPPORTED_LANGS: Language[] = ['vi', 'en', 'zh', 'fr'];
@@ -128,13 +128,13 @@ function App() {
         const q = window.location.search; // gồm dấu '?' nếu có
         return { page: q ? `catalog${q}` : 'catalog' };
       }
-      // 4 trang chính sách có URL thật riêng (xem lib/policyRoutes.ts) — tải
-      // thẳng /chinh-sach-bao-mat hoặc chia sẻ link đó phải mở đúng trang,
-      // không rơi về trang chủ.
-      const policyEntry = Object.entries(POLICY_PATHS).find(
+      // Trang chính sách + Giới Thiệu có URL thật riêng (xem lib/policyRoutes.ts)
+      // — tải thẳng /chinh-sach-bao-mat hoặc /gioi-thieu hoặc chia sẻ link đó
+      // phải mở đúng trang, không rơi về trang chủ.
+      const staticEntry = Object.entries(STATIC_PAGE_PATHS).find(
         ([, path]) => pathname === path || pathname === `${path}/`
       );
-      if (policyEntry) return { page: policyEntry[0] };
+      if (staticEntry) return { page: staticEntry[0] };
       return { page: 'home' };
     };
 
@@ -268,7 +268,7 @@ function App() {
         ? '/blog'
         : pageBase === 'catalog'
         ? '/products'
-        : POLICY_PATHS[pageBase] ?? '/';
+        : STATIC_PAGE_PATHS[pageBase] ?? '/';
     // Query string ưu tiên lấy từ chính `page` truyền vào (vd. type=..., goal=...
     // khi lọc danh mục) — đây là filter MỚI cần áp dụng, không phải query cũ
     // trên address bar. Nếu `page` không mang query riêng (catalog/blog không
