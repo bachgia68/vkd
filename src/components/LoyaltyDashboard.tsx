@@ -1,8 +1,12 @@
-import { Crown, Star, Gift, Zap, Globe, ShoppingBag, TrendingUp, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Crown, Star, Gift, Zap, Globe, ShoppingBag, TrendingUp, ChevronRight, PackageOpen, Sparkles } from 'lucide-react';
 import { loyaltyTiers } from '../data/mockData';
 import type { Language } from '../i18n/translations';
 import TaWordmark from './TaWordmark';
 import { useLoyaltyData } from '../hooks/useLoyaltyData';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+
+type ActivityTab = 'history' | 'redeemed' | 'perks';
 
 interface LoyaltyProps {
   lang: Language;
@@ -14,6 +18,8 @@ interface LoyaltyProps {
 export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: LoyaltyProps) {
   const isVi = lang === 'vi';
   const { data: loyaltyData, loading, error } = useLoyaltyData(userEmail || null);
+  const [selectedTierIdx, setSelectedTierIdx] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<ActivityTab>('history');
 
   if (loading) {
     return (
@@ -121,9 +127,14 @@ export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: Loyalt
               </div>
             </div>
 
-            {/* Tier benefits */}
+            {/* Tier benefits — bam vao 1 the de xem day du quyen loi trong dialog */}
             {loyaltyTiers.map((tier, i) => (
-              <div key={tier.name} className={`rounded-2xl p-5 ${i === currentTierIdx ? 'ring-2 ring-forest-500 bg-white shadow-elegant' : 'bg-cream-100'}`}>
+              <button
+                key={tier.name}
+                type="button"
+                onClick={() => setSelectedTierIdx(i)}
+                className={`w-full text-left rounded-2xl p-5 transition-all hover:shadow-elegant-lg hover:-translate-y-0.5 ${i === currentTierIdx ? 'ring-2 ring-forest-500 bg-white shadow-elegant' : 'bg-cream-100'}`}
+              >
                 <div className="flex items-center gap-2 mb-3">
                   <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${tier.color} flex items-center justify-center`}>
                     <Crown className={`w-4 h-4 ${i === 2 ? 'text-forest-900' : i === 1 ? 'text-white' : 'text-forest-700'}`} />
@@ -146,7 +157,10 @@ export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: Loyalt
                     </li>
                   ))}
                 </ul>
-              </div>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-forest-500 mt-2">
+                  {isVi ? 'Xem đầy đủ quyền lợi' : 'View full benefits'} <ChevronRight className="w-3 h-3" />
+                </span>
+              </button>
             ))}
           </div>
 
@@ -185,37 +199,83 @@ export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: Loyalt
               ))}
             </div>
 
-            {/* Points activity */}
+            {/* Points activity — 3 tab: Lich Su Diem (that, tu don hang) / Qua
+                Da Doi (chua co he thong doi qua that nao, de trong that thay
+                vi bia du lieu) / Dac Quyen Cua Toi (that, day du perks hang
+                hien tai, khong cat bot nhu the ben trai) */}
             <div className="bg-white rounded-2xl shadow-elegant overflow-hidden">
-              <div className="flex items-center justify-between p-5 border-b border-cream-200">
-                <h3 className="font-display font-semibold text-forest-900">
-                  {isVi ? 'Lịch Sử Điểm' : 'Points Activity'}
-                </h3>
-                <Zap className="w-4 h-4 text-gold-500" />
+              <div className="flex items-center border-b border-cream-200">
+                {([
+                  { key: 'history' as const, label: isVi ? 'Lịch Sử Điểm' : 'Points History', icon: Zap },
+                  { key: 'redeemed' as const, label: isVi ? 'Quà Đã Đổi' : 'Redeemed', icon: PackageOpen },
+                  { key: 'perks' as const, label: isVi ? 'Đặc Quyền Của Tôi' : 'My Perks', icon: Sparkles },
+                ]).map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-4 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                      activeTab === key
+                        ? 'border-forest-900 text-forest-900'
+                        : 'border-transparent text-forest-400 hover:text-forest-600'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">{label}</span>
+                  </button>
+                ))}
               </div>
-              {orders.length > 0 ? (
-                <div className="p-5 space-y-3">
-                  {orders.slice(0, 5).map((order) => (
-                    <div key={order.id} className="flex items-center justify-between pb-3 border-b border-cream-100 last:border-0 last:pb-0">
-                      <div>
-                        <p className="text-sm font-medium text-forest-900">
-                          {isVi ? 'Đơn hàng' : 'Order'} #{order.orderNumber}
-                        </p>
-                        <p className="text-xs text-forest-400">
-                          {new Date(order.purchasedAt).toLocaleDateString(isVi ? 'vi-VN' : 'en-US')}
+
+              {activeTab === 'history' && (
+                orders.length > 0 ? (
+                  <div className="p-5 space-y-3">
+                    {orders.slice(0, 5).map((order) => (
+                      <div key={order.id} className="flex items-center justify-between pb-3 border-b border-cream-100 last:border-0 last:pb-0">
+                        <div>
+                          <p className="text-sm font-medium text-forest-900">
+                            {isVi ? 'Đơn hàng' : 'Order'} #{order.orderNumber}
+                          </p>
+                          <p className="text-xs text-forest-400">
+                            {new Date(order.purchasedAt).toLocaleDateString(isVi ? 'vi-VN' : 'en-US')}
+                          </p>
+                        </div>
+                        <p className="font-semibold text-gold-500">
+                          +{Math.round(order.totalAmountUsd)} {isVi ? 'điểm' : 'pts'}
                         </p>
                       </div>
-                      <p className="font-semibold text-gold-500">
-                        +{Math.round(order.totalAmountUsd)} {isVi ? 'điểm' : 'pts'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-forest-400">
+                    <Zap className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">{isVi ? 'Chưa có hoạt động tích điểm nào.' : 'No points activity yet.'}</p>
+                    <p className="text-xs mt-1">{isVi ? 'Mua hàng để bắt đầu tích điểm.' : 'Shop to start earning points.'}</p>
+                  </div>
+                )
+              )}
+
+              {activeTab === 'redeemed' && (
                 <div className="text-center py-12 text-forest-400">
-                  <Zap className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">{isVi ? 'Chưa có hoạt động tích điểm nào.' : 'No points activity yet.'}</p>
-                  <p className="text-xs mt-1">{isVi ? 'Mua hàng để bắt đầu tích điểm.' : 'Shop to start earning points.'}</p>
+                  <PackageOpen className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">{isVi ? 'Chưa có quà nào được đổi.' : 'No rewards redeemed yet.'}</p>
+                  <p className="text-xs mt-1">
+                    {isVi ? 'Tính năng đổi điểm lấy quà sẽ sớm ra mắt.' : 'The points redemption catalog is coming soon.'}
+                  </p>
+                </div>
+              )}
+
+              {activeTab === 'perks' && (
+                <div className="p-5">
+                  <p className="text-xs text-forest-400 mb-3">
+                    {isVi ? 'Toàn bộ quyền lợi của hạng' : 'All benefits of your'} <span className="font-semibold text-forest-700">{isVi ? loyaltyTiers[currentTierIdx].nameVi : loyaltyTiers[currentTierIdx].name}</span>
+                  </p>
+                  <ul className="space-y-2">
+                    {(isVi ? loyaltyTiers[currentTierIdx].perksVi : loyaltyTiers[currentTierIdx].perks).map((perk, j) => (
+                      <li key={j} className="flex items-start gap-2 text-sm text-forest-700">
+                        <Star className="w-4 h-4 text-gold-400 fill-gold-400 flex-shrink-0 mt-0.5" />
+                        {perk}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
@@ -241,6 +301,41 @@ export default function LoyaltyDashboard({ lang, onNavigate, userEmail }: Loyalt
           </div>
         </div>
       </div>
+
+      {/* Chi tiet 1 hang thanh vien — bam the hang o cot trai mo dialog nay,
+          hien du toan bo perks that (khong cat con 3 dong nhu the tom tat). */}
+      <Dialog open={selectedTierIdx !== null} onOpenChange={(open) => !open && setSelectedTierIdx(null)}>
+        <DialogContent className="max-w-md">
+          {selectedTierIdx !== null && (
+            <>
+              <DialogHeader>
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${loyaltyTiers[selectedTierIdx].color} flex items-center justify-center mb-2`}>
+                  <Crown className={`w-6 h-6 ${selectedTierIdx === 2 ? 'text-forest-900' : selectedTierIdx === 1 ? 'text-white' : 'text-forest-700'}`} />
+                </div>
+                <DialogTitle>{isVi ? loyaltyTiers[selectedTierIdx].nameVi : loyaltyTiers[selectedTierIdx].name}</DialogTitle>
+                <p className="text-sm text-forest-500">
+                  {loyaltyTiers[selectedTierIdx].minPoints.toLocaleString()}+ {isVi ? 'điểm' : 'pts'} · {loyaltyTiers[selectedTierIdx].discount}% {isVi ? 'hoàn tiền mọi đơn hàng' : 'cashback on every order'}
+                </p>
+              </DialogHeader>
+              <ul className="space-y-2.5">
+                {(isVi ? loyaltyTiers[selectedTierIdx].perksVi : loyaltyTiers[selectedTierIdx].perks).map((perk, j) => (
+                  <li key={j} className="flex items-start gap-2 text-sm text-forest-700">
+                    <Star className="w-4 h-4 text-gold-400 fill-gold-400 flex-shrink-0 mt-0.5" />
+                    {perk}
+                  </li>
+                ))}
+              </ul>
+              {selectedTierIdx > currentTierIdx && (
+                <p className="text-xs text-forest-400 pt-2 border-t border-cream-200">
+                  {isVi
+                    ? `Tích thêm ${(loyaltyTiers[selectedTierIdx].minPoints - currentPoints).toLocaleString()} điểm để lên hạng này.`
+                    : `Earn ${(loyaltyTiers[selectedTierIdx].minPoints - currentPoints).toLocaleString()} more points to unlock this tier.`}
+                </p>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

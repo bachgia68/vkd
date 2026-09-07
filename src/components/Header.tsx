@@ -151,8 +151,12 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
             />
           </button>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          {/* Desktop Navigation — nguong xl (1280px) thay vi lg (1024px):
+              navItems doc dong tu bang nav_items (Joe them duoc qua admin),
+              o 1024-1150px voi 8-9 muc + gap-8 chu bi xuong dong xau, chen
+              vao khu cart/CTA ben phai — xl cho du cho hon, khong phu thuoc
+              so luong muc co dinh. */}
+          <div className="hidden xl:flex items-center gap-6">
             {navItems.map((item) => {
               if (item.key === 'products') {
                 return (
@@ -448,7 +452,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
+              className={`xl:hidden p-2 rounded-lg transition-colors ${
                 useLightText ? 'text-white hover:bg-white/10' : 'text-forest-700 hover:bg-forest-50'
               }`}
             >
@@ -459,7 +463,7 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-cream-50 shadow-elegant-lg animate-fade-in-down rounded-b-2xl">
+          <div className="xl:hidden absolute top-full left-0 right-0 bg-cream-50 shadow-elegant-lg animate-fade-in-down rounded-b-2xl">
             <div className="container-wide py-4 space-y-2">
               {navItems.map((item) =>
                 item.key === 'products' ? (
