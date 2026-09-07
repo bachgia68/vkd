@@ -32,8 +32,13 @@ export default function ComboOfTheMonth({ lang }: { lang: Language }) {
     fetchActiveComboSets()
       .then((all) => {
         if (cancelled) return;
+        // Uu tien combo dung thang hien tai, neu chua du 3 thi lay them combo
+        // active khac lap cho du — moi combo co theme rieng (khong trung),
+        // hau het thang chi co 1 combo khop nen truoc day section chi hien 1
+        // the don doc, nhin trong rat "coc loc" giua khoang trang rong.
         const thisMonth = all.filter((c) => c.month_tags.length === 0 || c.month_tags.includes(currentMonth));
-        setCombos(thisMonth.slice(0, 3));
+        const rest = all.filter((c) => !thisMonth.includes(c));
+        setCombos([...thisMonth, ...rest].slice(0, 3));
       })
       .catch(() => { if (!cancelled) setCombos([]); });
     return () => { cancelled = true; };
@@ -44,9 +49,9 @@ export default function ComboOfTheMonth({ lang }: { lang: Language }) {
   return (
     <div className="mt-12" dir={isRTL ? 'rtl' : 'ltr'}>
       <h3 className="font-display text-2xl text-forest-900 mb-6 text-center">{headingFor(lang)}</h3>
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="flex flex-wrap justify-center gap-6">
         {combos.map((combo) => (
-          <div key={combo.id} className="product-card">
+          <div key={combo.id} className="product-card w-full sm:w-72 md:w-80">
             <div className="relative aspect-square overflow-hidden">
               <img src={getComboPosterImage(combo)} alt={comboFieldFor(combo, lang, 'name')} className="w-full h-full object-cover" />
               {combo.theme && (

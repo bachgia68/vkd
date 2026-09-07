@@ -6,9 +6,10 @@ import {
   updateComboSet,
   deleteComboSet,
   uploadComboImage,
+  fetchProducts,
   type ComboSet,
 } from '../adminApi';
-import { products } from '../../data/products';
+import { products as allStaticProducts } from '../../data/products';
 import { getComboPosterImage, getComboSuggestedPrice, getComboAutoDescription } from '../../data/combos';
 import { Button } from '../../components/ui/button';
 
@@ -30,6 +31,11 @@ export default function CombosPage() {
   const [combos, setCombos] = useState<EditableCombo[]>([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
+  // SKU bi admin an (active=false) o "San pham & Kho" — loai khoi danh sach
+  // chon SKU cho combo moi, vi truoc day form nay doc thang catalog tinh
+  // (products.ts) nen san pham da an/ngung ban van chon duoc vao combo.
+  const [inactiveSkus, setInactiveSkus] = useState<Set<string>>(new Set());
+  const products = allStaticProducts.filter((p) => !inactiveSkus.has(p.sku));
 
   const [name, setName] = useState('');
   const [theme, setTheme] = useState('');
@@ -66,6 +72,12 @@ export default function CombosPage() {
   };
 
   useEffect(load, []);
+
+  useEffect(() => {
+    fetchProducts()
+      .then((rows) => setInactiveSkus(new Set(rows.filter((r) => !r.active).map((r) => r.sku))))
+      .catch(() => {}); // fail-open: loi thi hien het SKU tinh, khong chan thao tac tao combo
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);

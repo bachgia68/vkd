@@ -570,28 +570,22 @@ export default function ProductCatalog({
           {/* Product Grid */}
           <div>
             {visibleCombos.length > 0 && (
+              // Mot dai ngang vuot duoc gom TAT CA combo dang active — moi combo
+              // co theme rieng (khong trung nhau) nen truoc day group-by-theme
+              // luon ra nhom 1 phan tu, nhin nhu liet ke doc thay vi carousel.
+              // Theme da hien rieng qua badge tren tung the (ComboCard) nen bo
+              // group, gom chung 1 dai la du va dung dung y carousel vuot duoc.
               <div className="mb-10">
-                {Object.entries(
-                  visibleCombos.reduce<Record<string, ComboSet[]>>((groups, combo) => {
-                    const key = combo.theme || (lang === 'en' ? 'Gift Sets' : 'Set Quà Tặng');
-                    (groups[key] ??= []).push(combo);
-                    return groups;
-                  }, {})
-                ).map(([theme, themeCombos]) => (
-                  // Dải ngang vuốt được (đồng bộ phong cách với các carousel khác trên
-                  // site) thay vì lưới cố định — 1 combo cũng hiện gọn đúng khổ thẻ,
-                  // không bị kéo giãn lấp đầy lưới trống.
-                  <div key={theme} className="mb-8">
-                    <h3 className="font-display text-lg text-forest-900 mb-4">{theme}</h3>
-                    <div className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                      {themeCombos.map((combo) => (
-                        <div key={combo.id} className="snap-start flex-shrink-0 w-72">
-                          <ComboCard combo={combo} lang={lang} ui={ui} />
-                        </div>
-                      ))}
+                <h3 className="font-display text-lg text-forest-900 mb-4">
+                  {lang === 'en' ? 'Gift Sets & Combos' : lang === 'fr' ? 'Coffrets & Combos' : 'Set Quà Tặng & Combo'}
+                </h3>
+                <div className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {visibleCombos.map((combo) => (
+                    <div key={combo.id} className="snap-start flex-shrink-0 w-72">
+                      <ComboCard combo={combo} lang={lang} ui={ui} />
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
 
