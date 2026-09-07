@@ -87,6 +87,11 @@ export default function About({ lang, onNavigate }: AboutProps) {
               >
                 {lang === 'vi' ? 'Đọc Toàn Bộ Câu Chuyện' : 'Read Our Full Story'}
               </button>
+              {lang === 'vi' && cms?.cta_text && cms?.cta_url && (
+                <a href={cms.cta_url} target={cms.cta_url.startsWith('http') ? '_blank' : undefined} rel={cms.cta_url.startsWith('http') ? 'noopener noreferrer' : undefined} className="btn-gold inline-flex">
+                  {cms.cta_text}
+                </a>
+              )}
             </div>
           </div>
 

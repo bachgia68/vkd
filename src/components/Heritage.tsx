@@ -78,6 +78,11 @@ export default function Heritage({ lang }: HeritageProps) {
           <p className="text-forest-600 text-lg leading-relaxed">
             {(lang === 'vi' ? cms?.content_vi : undefined) || t.heritage.subtitle}
           </p>
+          {lang === 'vi' && cms?.cta_text && cms?.cta_url && (
+            <a href={cms.cta_url} target={cms.cta_url.startsWith('http') ? '_blank' : undefined} rel={cms.cta_url.startsWith('http') ? 'noopener noreferrer' : undefined} className="btn-gold inline-flex mt-6">
+              {cms.cta_text}
+            </a>
+          )}
         </div>
 
         {/* Bảng so sánh Majonoside-R2 — thay cho khối chỉ lặp lại số "52+" đã

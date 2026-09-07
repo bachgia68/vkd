@@ -46,7 +46,7 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
           <ProductCarousel products={featured} lang={lang} onNavigate={onNavigate} />
         </div>
 
-        <div className="text-center">
+        <div className="text-center flex flex-wrap items-center justify-center gap-4">
           <a
             href="#catalog"
             onClick={(e) => { e.preventDefault(); onNavigate?.('catalog'); }}
@@ -55,6 +55,11 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
             {t.products.viewAll}
             <ArrowRight className={`w-4 h-4 ml-2 ${isRTL ? 'rotate-180' : ''}`} />
           </a>
+          {lang === 'vi' && cms?.cta_text && cms?.cta_url && (
+            <a href={cms.cta_url} target={cms.cta_url.startsWith('http') ? '_blank' : undefined} rel={cms.cta_url.startsWith('http') ? 'noopener noreferrer' : undefined} className="btn-gold inline-flex">
+              {cms.cta_text}
+            </a>
+          )}
         </div>
       </div>
     </section>
