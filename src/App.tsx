@@ -70,7 +70,14 @@ function App() {
       if (pathname === '/blog' || pathname === '/blog/') return { page: 'blog' };
       const productMatch = pathname.match(/^\/product\/([^/]+)\/?$/);
       if (productMatch) return { page: 'product-detail', slug: productMatch[1] };
-      if (pathname === '/products' || pathname === '/products/') return { page: 'catalog' };
+      // /products?type=xxx hoặc ?goal=xxx (link chia sẻ/reload trang danh mục
+      // đã lọc) — giữ nguyên query trong `page` (vd. "catalog?type=xxx") để
+      // khớp đúng format `navigate()` dùng, nếu không app sẽ mở /products
+      // nhưng RỚT MẤT bộ lọc đang chọn khi tải thẳng/refresh URL đó.
+      if (pathname === '/products' || pathname === '/products/') {
+        const q = window.location.search; // gồm dấu '?' nếu có
+        return { page: q ? `catalog${q}` : 'catalog' };
+      }
       return { page: 'home' };
     };
 
@@ -136,26 +143,44 @@ function App() {
   const navigate = (page: string, slug?: string) => {
     if (slug) setSelectedSlug(slug);
     setCurrentPage(page);
+    // ROOT CAUSE (đã vá lại sau khi tái phát 2026-09-07): `page` không phải
+    // lúc nào cũng là 1 key thuần ('catalog', 'blog'...) — Header.tsx gọi
+    // onNavigate(`catalog?type=${id}`) / `catalog?goal=${g}` để lọc danh mục,
+    // nên `page` có thể là "catalog?type=sam-cu-tuoi-kho". Toàn bộ khối dưới
+    // đây PHẢI so sánh trên `pageBase` (phần trước dấu '?'), KHÔNG so sánh
+    // `page` trực tiếp — so sánh `page === 'catalog'` sẽ luôn false với chuỗi
+    // có query, rơi xuống nhánh mặc định '/', làm mất hẳn "/products" khỏi
+    // address bar dù nội dung trang vẫn đúng (state currentPage vẫn đúng).
+    // RULE cho các lần sửa router sau: bất cứ chỗ nào so sánh `currentPage`
+    // hoặc `page` bằng '===', phải tách qua `.split('?')[0]` trước, vì
+    // `currentPage` trong app này là "key" hoặc "key?query", không bao giờ
+    // là key thuần tuý đảm bảo.
+    const [pageBase, pageQuery] = page.split('?');
     // Bài viết Blog và trang chi tiết sản phẩm có route thật (/blog/<id>,
     // /product/<slug>) để chia sẻ link trực tiếp và Google index được từng
     // trang — mọi trang khác trong app dùng state nội bộ như trước, pathname
     // reset về '/' khi rời khỏi các trang này.
     const pathname =
-      page === 'blog-post' && slug
+      pageBase === 'blog-post' && slug
         ? `/blog/${slug}`
-        : page === 'product-detail' && slug
+        : pageBase === 'product-detail' && slug
         ? `/product/${slug}`
-        : page === 'blog'
+        : pageBase === 'blog'
         ? '/blog'
-        : page === 'catalog'
+        : pageBase === 'catalog'
         ? '/products'
         : '/';
-    // Query string (vd. ?page=4) chỉ có ý nghĩa cho trang danh sách phân trang
-    // (catalog, blog) — giữ nguyên khi ở lại 2 trang đó, nhưng PHẢI bỏ khi
-    // điều hướng sang trang chi tiết/trang khác, nếu không URL canonical của
-    // sản phẩm/bài viết sẽ dính rác "?page=4" từ trang danh sách trước đó
-    // (sai SEO, tạo URL trùng nội dung không cần thiết).
-    const search = page === 'catalog' || page === 'blog' ? window.location.search : '';
+    // Query string ưu tiên lấy từ chính `page` truyền vào (vd. type=..., goal=...
+    // khi lọc danh mục) — đây là filter MỚI cần áp dụng, không phải query cũ
+    // trên address bar. Nếu `page` không mang query riêng (catalog/blog không
+    // lọc gì, chỉ đổi trang), giữ lại window.location.search hiện tại để
+    // không mất phân trang (?page=4) đang có. Mọi trang khác bỏ hẳn query.
+    const search =
+      pageBase === 'catalog' && pageQuery
+        ? `?${pageQuery}`
+        : pageBase === 'catalog' || pageBase === 'blog'
+        ? window.location.search
+        : '';
     window.history.pushState({ page, slug: slug ?? selectedSlug }, '', pathname + search);
   };
 
