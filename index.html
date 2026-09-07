@@ -18,13 +18,12 @@
   <link rel="canonical" href="https://tasamngoclinh.com/" />
   <link rel="preload" as="image" href="/assets/images/cay-sam-ngoc-linh.webp" type="image/webp" fetchpriority="high" />
 
-  <!-- hreflang: chỉ khai ngôn ngữ có route thật (URL riêng). Ngôn ngữ chọn
-       trong app (en/zh/fr/ar) là client-side toggle, KHÔNG có URL riêng —
-       khai hreflang cho chúng sẽ trỏ Googlebot tới URL trùng nội dung, bị
-       coi là duplicate content. Chỉ thêm dòng hreflang mới khi ngôn ngữ đó
-       thực sự có URL/route riêng phục vụ nội dung khác biệt. -->
-  <link rel="alternate" hreflang="vi" href="https://tasamngoclinh.com/" />
-  <link rel="alternate" hreflang="x-default" href="https://tasamngoclinh.com/" />
+  <!-- hreflang: 2026-09-07 chuyển sang khai ĐỘNG trong App.tsx (useEffect
+       gần SUPPORTED_LANGS) — vì giờ đổi ngôn ngữ ĐÃ đồng bộ vào URL qua
+       ?lang=en|zh|fr (xem handleLangChange trong App.tsx), tức mỗi ngôn ngữ
+       giờ có URL riêng thật, không còn là client-side-only toggle như trước.
+       KHÔNG khai tĩnh ở đây nữa để tránh trùng lặp — App.tsx tự thêm đủ
+       vi/en/zh/fr/x-default đúng theo URL hiện tại mỗi lần trang đổi. -->
 
   <!-- OpenGraph / Facebook -->
   <meta property="og:type" content="website" />

@@ -21,6 +21,20 @@ function escapeXml(s: string) {
   return s.replace(/&/g, '&amp;');
 }
 
+// Hreflang cho tung URL — dung ?lang= (khong doi sang path /en/...) de khop
+// dung co che App.tsx dang dung (xem comment SUPPORTED_LANGS trong App.tsx).
+const HREFLANG_LANGS = ['en', 'zh', 'fr'];
+function hreflangLinks(url: string): string {
+  const alternates = [
+    `<xhtml:link rel="alternate" hreflang="vi" href="${escapeXml(url)}" />`,
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(url)}" />`,
+    ...HREFLANG_LANGS.map(
+      (l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${escapeXml(`${url}?lang=${l}`)}" />`,
+    ),
+  ];
+  return alternates.join('');
+}
+
 export async function GET() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
@@ -51,21 +65,23 @@ export async function GET() {
     console.error('sitemap: fetch product-slugs.json failed:', err);
   }
 
+  const homeUrl = 'https://tasamngoclinh.com/';
   const urls = [
-    `<url><loc>https://tasamngoclinh.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>`,
-    ...productSlugs.map(
-      (slug) =>
-        `<url><loc>${escapeXml(`https://tasamngoclinh.com/product/${slug}`)}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
-    ),
+    `<url><loc>${homeUrl}</loc><changefreq>weekly</changefreq><priority>1.0</priority>${hreflangLinks(homeUrl)}</url>`,
+    ...productSlugs.map((slug) => {
+      const url = `https://tasamngoclinh.com/product/${slug}`;
+      return `<url><loc>${escapeXml(url)}</loc><changefreq>weekly</changefreq><priority>0.8</priority>${hreflangLinks(url)}</url>`;
+    }),
     ...posts.map((p) => {
       const lastmod = p.created_at?.slice(0, 10);
-      return `<url><loc>${escapeXml(`https://tasamngoclinh.com/blog/${p.slug ?? p.id}`)}</loc>${
+      const url = `https://tasamngoclinh.com/blog/${p.slug ?? p.id}`;
+      return `<url><loc>${escapeXml(url)}</loc>${
         lastmod ? `<lastmod>${lastmod}</lastmod>` : ''
-      }<changefreq>monthly</changefreq><priority>0.7</priority></url>`;
+      }<changefreq>monthly</changefreq><priority>0.7</priority>${hreflangLinks(url)}</url>`;
     }),
   ];
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join('\n')}\n</urlset>`;
 
   return new Response(xml, {
     status: 200,

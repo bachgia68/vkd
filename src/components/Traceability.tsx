@@ -1,6 +1,8 @@
 import { QrCode, ScanLine, FileSearch, CheckCircle, Shield } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
+import PageSectionsList from './PageSectionsList';
 
 interface TraceabilityProps {
   lang: Language;
@@ -9,6 +11,7 @@ interface TraceabilityProps {
 export default function Traceability({ lang }: TraceabilityProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('traceability', 'traceability');
 
   const steps = [
     { icon: ScanLine, title: t.traceability.step1Title, desc: t.traceability.step1Desc },
@@ -18,6 +21,8 @@ export default function Traceability({ lang }: TraceabilityProps) {
   ];
 
   return (
+    <>
+    {cms?.visible !== false && (
     <section
       id="traceability"
       className="section-padding bg-forest-950 text-white relative overflow-hidden"
@@ -122,5 +127,8 @@ export default function Traceability({ lang }: TraceabilityProps) {
         </div>
       </div>
     </section>
+    )}
+    <PageSectionsList pageKey="traceability" excludeBlockTypes={['traceability']} />
+    </>
   );
 }

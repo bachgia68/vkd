@@ -36,8 +36,18 @@ import PolicyPage from './components/PolicyPage';
 import { fetchVisibleSections } from './lib/siteContentApi';
 import type { Language } from './i18n/translations';
 
+const SUPPORTED_LANGS: Language[] = ['vi', 'en', 'zh', 'fr'];
+
 function App() {
-  const [lang, setLang] = useState<Language>('vi');
+  // Doc ?lang= tu URL luc mount (vd link chia se /product/x?lang=en) — chi
+  // doc 1 lan, KHONG dong vao logic navigate() ben duoi (ham do da tung vo
+  // vi so sanh sai chuoi co query, xem comment "ROOT CAUSE" trong navigate())
+  // de tranh tai phat loai bug do. Doi ngon ngu sau nay ghi lai URL qua
+  // history.replaceState truc tiep (handleLangChange ben duoi), khong qua ham navigate.
+  const [lang, setLang] = useState<Language>(() => {
+    const urlLang = new URLSearchParams(window.location.search).get('lang');
+    return urlLang && (SUPPORTED_LANGS as string[]).includes(urlLang) ? (urlLang as Language) : 'vi';
+  });
   const [currentPage, setCurrentPage] = useState<string>('home');
   const [orderId, setOrderId] = useState('');
   const [selectedSlug, setSelectedSlug] = useState('');
@@ -175,6 +185,48 @@ function App() {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
 
+  // hreflang: moi ngon ngu can 1 URL rieng de Google hieu day la ban dich
+  // cua cung 1 trang (khong co URL khac nhau thi hreflang vo nghia). Dung
+  // ?lang= thay vi doi hang path /en/... — khong dong vao navigate()/router
+  // hien co (rui ro cao, xem comment o navigate()), van du dieu kien hreflang
+  // hop le (URL that su khac nhau, xem duoc qua GET truc tiep).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('lang');
+    const basePath = window.location.pathname;
+    const baseQs = params.toString();
+    const urlFor = (l: Language | 'x-default') => {
+      const p = new URLSearchParams(params);
+      if (l !== 'vi' && l !== 'x-default') p.set('lang', l);
+      const qs = p.toString();
+      return `https://tasamngoclinh.com${basePath}${qs ? `?${qs}` : ''}`;
+    };
+
+    const created: HTMLLinkElement[] = [];
+    [...SUPPORTED_LANGS, 'x-default' as const].forEach((l) => {
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.hreflang = l;
+      link.href = l === 'x-default' ? `https://tasamngoclinh.com${basePath}${baseQs ? `?${baseQs}` : ''}` : urlFor(l);
+      document.head.appendChild(link);
+      created.push(link);
+    });
+    return () => created.forEach((el) => el.remove());
+  }, [lang, currentPage, selectedSlug]);
+
+  const handleLangChange = (next: Language) => {
+    setLang(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next === 'vi') params.delete('lang');
+    else params.set('lang', next);
+    const qs = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${qs ? `?${qs}` : ''}`
+    );
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
@@ -237,7 +289,7 @@ function App() {
       <div className="min-h-screen bg-cream-50">
         <Header
           lang={lang}
-          onLangChange={setLang}
+          onLangChange={handleLangChange}
           onNavigate={navigate}
           currentPage={currentPage}
           visibleSections={visibleSections}
@@ -341,7 +393,7 @@ function App() {
         </main>
 
         {currentPage !== 'checkout' && currentPage !== 'order-success' && currentPage !== 'trace' && (
-          <Footer lang={lang} onLangChange={setLang} onNavigate={navigate} />
+          <Footer lang={lang} onLangChange={handleLangChange} onNavigate={navigate} />
         )}
 
         <CartDrawer lang={lang} onCheckout={() => navigate('checkout')} />

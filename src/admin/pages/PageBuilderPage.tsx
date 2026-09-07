@@ -7,8 +7,9 @@ import type { PageSection } from '../../lib/siteContentApi';
 const PAGE_OPTIONS = [
   { key: 'home', label: 'Trang Chủ' },
   { key: 'about', label: 'Giới Thiệu' },
-  { key: 'heritage', label: 'Vùng Trồng' },
   { key: 'products', label: 'Sản Phẩm' },
+  { key: 'traceability', label: 'Truy Xuất' },
+  { key: 'heritage', label: 'Vùng Trồng' },
   { key: 'b2b', label: 'Hợp Tác B2B' },
   { key: 'contact', label: 'Liên Hệ' },
 ];
@@ -40,6 +41,8 @@ const LIVE_WIRED_BLOCKS: { page_key: string; block_type: string; note: string }[
   { page_key: 'home', block_type: 'newsletter', note: 'Khối đăng ký nhận cẩm nang (chỉ ẩn/hiện được — nội dung bên trong sửa riêng ở NewsletterCTA, không phải ở đây)' },
   { page_key: 'home', block_type: 'showrooms', note: 'Khối "Hệ Thống Điểm Kết Nối TA"' },
   { page_key: 'home', block_type: 'pillar', note: '3 trụ cột trong khối Heritage (Tập Hợp Đặc Sản/Cam Kết/52+ Saponin) — QUẢN LÝ Ở TRANG RIÊNG "Nội Dung Trang Chủ" (/gate-vkd-control-2026/homepage-text), không sửa ở đây vì UI ở đây không có chọn icon' },
+  { page_key: 'about', block_type: 'about', note: 'Khối giới thiệu chính (tiêu đề/mô tả/CTA) trên trang "Giới Thiệu"' },
+  { page_key: 'traceability', block_type: 'traceability', note: 'Khối chính (QR + 4 bước) trên trang "Truy Xuất"' },
 ];
 
 const BLOCK_TYPE_HELP: Record<string, string> = {
@@ -205,8 +208,8 @@ export default function PageBuilderPage() {
             <li key={b.block_type}><code className="bg-forest-100 px-1 rounded">{b.block_type}</code> — {b.note}</li>
           ))}
         </ul>
-        <p className="mb-2">Block type KHÁC (text/image/image-text/cta/gallery/carousel/testimonial/faq, hoặc tên tự đặt) ở page "Trang Chủ" vẫn <strong>hiện thật trên site</strong> qua giao diện chung — chỉ khác bố cục theo block_type (xem gợi ý dưới ô chọn Block type). Thứ tự hiện đúng theo mũi tên lên/xuống, ẩn/hiện đúng theo icon con mắt.</p>
-        <p><strong>⚠️ Trang KHÁC "Trang Chủ"</strong> (Giới thiệu/Vùng Trồng/Sản Phẩm/Hợp Tác B2B/Liên Hệ): sửa/thêm block ở đây vẫn chỉ <strong>lưu vào Supabase, CHƯA hiện lên site khách</strong> — các trang đó chưa nối vào Page Builder.</p>
+        <p className="mb-2">Block type KHÁC (text/image/image-text/cta/gallery/carousel/testimonial/faq, hoặc tên tự đặt) ở page <strong>"Trang Chủ", "Giới Thiệu", "Sản Phẩm", "Truy Xuất"</strong> đều <strong>hiện thật trên site</strong> qua giao diện chung — chỉ khác bố cục theo block_type (xem gợi ý dưới ô chọn Block type). Thứ tự hiện đúng theo mũi tên lên/xuống, ẩn/hiện đúng theo icon con mắt.</p>
+        <p><strong>⚠️ Trang KHÁC</strong> (Vùng Trồng/Hợp Tác B2B/Liên Hệ): sửa/thêm block ở đây vẫn chỉ <strong>lưu vào Supabase, CHƯA hiện lên site khách</strong> — các trang đó chưa nối vào Page Builder.</p>
       </div>
 
       {error && (

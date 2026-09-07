@@ -7,9 +7,11 @@ import {
   fetchSocialLinks,
   fetchVisibleLanguages,
   fetchTextOverrides,
+  fetchVisibleNavItems,
   type ContactPhone,
   type SocialLink,
   type SiteLanguage,
+  type NavItem,
 } from '../lib/siteContentApi';
 import NewsletterCTA from './NewsletterCTA';
 
@@ -50,6 +52,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [languages, setLanguages] = useState<SiteLanguage[]>(FALLBACK_LANGUAGES);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
+  const [dbNavItems, setDbNavItems] = useState<NavItem[]>([]);
   // site_text_overrides chỉ lưu 1 ngôn ngữ (value_vi) — admin sửa footer chỉ nhập
   // được tiếng Việt, nên override CHỈ áp dụng khi lang='vi', các ngôn ngữ khác
   // luôn dùng bản dịch t.footer.* đã có sẵn thay vì hiện tiếng Việt lẫn vào.
@@ -62,6 +65,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
       .then((rows) => setLanguages(rows.length > 0 ? rows : FALLBACK_LANGUAGES))
       .catch(() => setLanguages(FALLBACK_LANGUAGES));
     fetchTextOverrides().then(setOverrides).catch(() => setOverrides({}));
+    fetchVisibleNavItems().then(setDbNavItems).catch(() => setDbNavItems([]));
   }, []);
 
   const navLabel = (key: string) => {
@@ -70,18 +74,29 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
     return (overrideKey && activeOverrides[overrideKey]) || fallback;
   };
 
-  // "traceability" và "contact" trỏ tới trang/khối còn tồn tại thật;
-  // "about" đi tới trang FounderStory chuẩn (không phải anchor #about đã bị
-  // gỡ khỏi trang chủ ở bản nâng cấp Phase 1); "b2b" cuộn tới khối B2B vẫn
-  // còn trên trang chủ.
-  const navItems = [
-    { key: 'home', page: 'home' },
-    { key: 'about', page: 'about-story' },
-    { key: 'products', page: 'catalog' },
-    { key: 'traceability', page: 'traceability' },
-    { key: 'b2b', page: 'home', anchor: 'b2b' },
-    { key: 'contact', page: 'home', anchor: 'contact' },
-  ];
+  // Liên Kết Nhanh giờ đọc CHUNG bảng nav_items với menu Header (quản lý ở
+  // /gate-vkd-control-2026/nav-items) — thêm/xóa/ẩn/đổi thứ tự ở đó tự động
+  // phản ánh xuống đây, khỏi cần trang admin riêng cho footer. "Liên hệ"
+  // (cuộn tới #contact ngay trong footer) không có trong nav_items (header
+  // không cần mục này) nên vẫn thêm cứng thêm vào cuối danh sách.
+  const navItems: { key: string; page: string; anchor?: string; label?: string | null }[] = dbNavItems.length > 0
+    ? [
+        ...dbNavItems.map((i) => ({
+          key: i.key,
+          page: i.key === 'b2b' ? 'home' : i.href,
+          anchor: i.key === 'b2b' ? 'b2b' : undefined,
+          label: i.label_vi,
+        })),
+        { key: 'contact', page: 'home', anchor: 'contact' },
+      ]
+    : [
+        { key: 'home', page: 'home' },
+        { key: 'about', page: 'about-story' },
+        { key: 'products', page: 'catalog' },
+        { key: 'traceability', page: 'traceability' },
+        { key: 'b2b', page: 'home', anchor: 'b2b' },
+        { key: 'contact', page: 'home', anchor: 'contact' },
+      ];
 
   const handleFooterNav = (page: string, anchor?: string) => {
     onNavigate?.(page);
@@ -146,7 +161,7 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
                     onClick={() => handleFooterNav(item.page, item.anchor)}
                     className="text-forest-300 hover:text-white transition-colors text-left"
                   >
-                    {navLabel(item.key)}
+                    {(lang === 'vi' && item.label) || navLabel(item.key)}
                   </button>
                 </li>
               ))}

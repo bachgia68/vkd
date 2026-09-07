@@ -2,6 +2,7 @@ import { MapPin, Check } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
 import { usePageSection } from '../lib/usePageSection';
+import PageSectionsList from './PageSectionsList';
 
 interface AboutProps {
   lang: Language;
@@ -11,7 +12,7 @@ interface AboutProps {
 export default function About({ lang, onNavigate }: AboutProps) {
   const t = translations[lang];
   const isRTL = lang === 'ar';
-  const cms = usePageSection('home', 'about');
+  const cms = usePageSection('about', 'about');
 
   const region = { name: t.about.region2Name, desc: t.about.region2Desc, coords: '15°12\'N 108°18\'E' };
 
@@ -26,9 +27,9 @@ export default function About({ lang, onNavigate }: AboutProps) {
       ? ['100% Authentique', 'Certifié GACP', 'R&D avec Docteurs', 'Chaîne Transparente']
       : ['100% أصلي', 'معتمد GACP', 'بحث مع دكاترة', 'سلسلة شفافة'];
 
-  if (cms?.visible === false) return null;
-
   return (
+    <>
+    {cms?.visible !== false && (
     <section id="about" className="section-padding bg-cream-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -137,5 +138,8 @@ export default function About({ lang, onNavigate }: AboutProps) {
         </div>
       </div>
     </section>
+    )}
+    <PageSectionsList pageKey="about" excludeBlockTypes={['about']} />
+    </>
   );
 }

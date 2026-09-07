@@ -17,6 +17,7 @@ import {
 import { products as staticProducts, toCartProduct, type Product } from '../data/products';
 import { healthGoalLabels, type HealthGoal } from '../data/mockData';
 import { useLiveProducts } from '../hooks/useLiveProducts';
+import PageSectionsList from './PageSectionsList';
 import { productTypes, type ProductTypeId } from '../data/productTypes';
 import type { Language } from '../i18n/translations';
 import { useCart } from '../context/CartContext';
@@ -407,6 +408,8 @@ export default function ProductCatalog({
           </h2>
           <p className="text-forest-600 text-lg leading-relaxed">{ui.subtitle}</p>
         </div>
+
+        <PageSectionsList pageKey="products" />
 
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row gap-4 mb-10 items-stretch md:items-center">
