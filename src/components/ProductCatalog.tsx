@@ -571,7 +571,14 @@ export default function ProductCatalog({
           </aside>
 
           {/* Product Grid */}
-          <div>
+          {/* min-w-0 BAT BUOC: day la track "1fr" trong grid 260px_1fr o tren —
+              mac dinh grid item co min-width:auto, khong tu co lai duoi kich
+              thuoc noi dung ben trong. Dai combo ngang (overflow-x-auto, cac
+              the w-72) co noi dung rong hon vung hien (5 combo), nen khi
+              khong co min-w-0, CA GRID TRACK gian ra theo do lam TRAN CA
+              TRANG (scrollbar ngang o muc body) thay vi chi cuon rieng trong
+              dai combo nhu code da dinh (su co that 2026-09-07). */}
+          <div className="min-w-0">
             {visibleCombos.length > 0 && (
               // Mot dai ngang vuot duoc gom TAT CA combo dang active — moi combo
               // co theme rieng (khong trung nhau) nen truoc day group-by-theme

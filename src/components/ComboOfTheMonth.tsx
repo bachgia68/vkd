@@ -35,13 +35,13 @@ export default function ComboOfTheMonth({ lang, onNavigate }: { lang: Language; 
     fetchActiveComboSets()
       .then((all) => {
         if (cancelled) return;
-        // Uu tien combo dung thang hien tai, neu chua du 3 thi lay them combo
-        // active khac lap cho du — moi combo co theme rieng (khong trung),
-        // hau het thang chi co 1 combo khop nen truoc day section chi hien 1
-        // the don doc, nhin trong rat "coc loc" giua khoang trang rong.
+        // Uu tien combo dung thang hien tai len dau, con lai xep sau — hien
+        // TAT CA combo active (khong gioi han con 3 nhu truoc) vi gio la dai
+        // cuon ngang (xem JSX ben duoi), khong phai luoi flex-wrap can giua
+        // nua nen nhieu the khong con lam "tran trang" hay mat can doi.
         const thisMonth = all.filter((c) => c.month_tags.length === 0 || c.month_tags.includes(currentMonth));
         const rest = all.filter((c) => !thisMonth.includes(c));
-        setCombos([...thisMonth, ...rest].slice(0, 3));
+        setCombos([...thisMonth, ...rest]);
       })
       .catch(() => { if (!cancelled) setCombos([]); });
     return () => { cancelled = true; };
@@ -52,15 +52,23 @@ export default function ComboOfTheMonth({ lang, onNavigate }: { lang: Language; 
 
   return (
     <div className="mt-12" dir={isRTL ? 'rtl' : 'ltr'}>
-      <h3 className="font-display text-2xl text-forest-900 mb-6 text-center">
-        {(lang === 'vi' && cms?.title_vi) || headingFor(lang)}
-      </h3>
-      <div className="flex flex-wrap justify-center gap-6">
+      {/* container-wide: block nay truoc gio khong co container nao (bare
+          div toan chieu rong <main>), chi "khong lo" vi flex-wrap it the tu
+          xuong dong thay vi tran. Doi sang dai cuon ngang (yeu cau cua Joe:
+          "combo co nhieu nen de carousel") BAT BUOC phai co container +
+          -mx-4 px-4 md:mx-0 md:px-0 (dung dung pattern da chay on o
+          ProductCatalog.tsx) de dai cuon khong dinh sat mep man hinh va
+          khong lam TRAN TRANG nhu su co truoc do o /products. */}
+      <div className="container-wide">
+        <h3 className="font-display text-2xl text-forest-900 mb-6 text-center">
+          {(lang === 'vi' && cms?.title_vi) || headingFor(lang)}
+        </h3>
+        <div className="flex gap-6 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {combos.map((combo) => {
           const firstProductSlug = products.find((p) => p.sku === combo.component_skus[0])?.slug;
           const goToDetail = () => { if (firstProductSlug) onNavigate('product-detail', firstProductSlug); };
           return (
-            <div key={combo.id} className="product-card w-full sm:w-72 md:w-80">
+            <div key={combo.id} className="product-card snap-start flex-shrink-0 w-72 md:w-80">
               <button
                 type="button"
                 onClick={goToDetail}
@@ -88,6 +96,7 @@ export default function ComboOfTheMonth({ lang, onNavigate }: { lang: Language; 
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
