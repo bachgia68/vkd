@@ -66,8 +66,13 @@ export async function GET() {
   }
 
   const homeUrl = 'https://tasamngoclinh.com/';
+  const policyPaths = ['/chinh-sach-bao-mat', '/dieu-khoan-su-dung', '/chinh-sach-van-chuyen', '/chinh-sach-doi-tra'];
   const urls = [
     `<url><loc>${homeUrl}</loc><changefreq>weekly</changefreq><priority>1.0</priority>${hreflangLinks(homeUrl)}</url>`,
+    ...policyPaths.map((path) => {
+      const url = `https://tasamngoclinh.com${path}`;
+      return `<url><loc>${escapeXml(url)}</loc><changefreq>yearly</changefreq><priority>0.3</priority>${hreflangLinks(url)}</url>`;
+    }),
     ...productSlugs.map((slug) => {
       const url = `https://tasamngoclinh.com/product/${slug}`;
       return `<url><loc>${escapeXml(url)}</loc><changefreq>weekly</changefreq><priority>0.8</priority>${hreflangLinks(url)}</url>`;

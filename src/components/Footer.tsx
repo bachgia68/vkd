@@ -14,6 +14,7 @@ import {
   type NavItem,
 } from '../lib/siteContentApi';
 import NewsletterCTA from './NewsletterCTA';
+import { POLICY_PATHS } from '../lib/policyRoutes';
 
 const FALLBACK_LANGUAGES: SiteLanguage[] = (['vi', 'en', 'zh', 'fr', 'ar'] as Language[]).map((key, i) => ({
   id: key,
@@ -250,30 +251,37 @@ export default function Footer({ lang, onLangChange, onNavigate }: FooterProps) 
             </p>
 
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-forest-400 text-sm">
-              <button
-                onClick={() => handleFooterNav('policy-privacy')}
+              {/* <a href> that (khong phai <button>) de Google index rieng tung
+                  trang chinh sach + mo tab moi/copy link hoat dong dung —
+                  onClick van dieu huong qua SPA state cho click thuong. */}
+              <a
+                href={POLICY_PATHS['policy-privacy']}
+                onClick={(e) => { e.preventDefault(); handleFooterNav('policy-privacy'); }}
                 className="hover:text-white transition-colors"
               >
                 {activeOverrides['policies.privacy'] || t.policies.privacy}
-              </button>
-              <button
-                onClick={() => handleFooterNav('policy-terms')}
+              </a>
+              <a
+                href={POLICY_PATHS['policy-terms']}
+                onClick={(e) => { e.preventDefault(); handleFooterNav('policy-terms'); }}
                 className="hover:text-white transition-colors"
               >
                 {activeOverrides['policies.terms'] || t.policies.terms}
-              </button>
-              <button
-                onClick={() => handleFooterNav('policy-shipping')}
+              </a>
+              <a
+                href={POLICY_PATHS['policy-shipping']}
+                onClick={(e) => { e.preventDefault(); handleFooterNav('policy-shipping'); }}
                 className="hover:text-white transition-colors"
               >
                 {activeOverrides['policies.shipping'] || t.policies.shipping}
-              </button>
-              <button
-                onClick={() => handleFooterNav('policy-refund')}
+              </a>
+              <a
+                href={POLICY_PATHS['policy-refund']}
+                onClick={(e) => { e.preventDefault(); handleFooterNav('policy-refund'); }}
                 className="hover:text-white transition-colors"
               >
                 {activeOverrides['policies.refund'] || t.policies.refund}
-              </button>
+              </a>
             </div>
           </div>
         </div>
