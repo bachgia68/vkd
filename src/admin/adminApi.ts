@@ -1495,7 +1495,7 @@ export async function fetchPageSectionsForAdmin(pageKey: string): Promise<PageSe
 
 export async function updatePageSection(
   id: string,
-  updates: Partial<Pick<PageSection, 'title_vi' | 'content_vi' | 'image_url' | 'cta_text' | 'cta_url' | 'visible' | 'block_type'>>
+  updates: Partial<Pick<PageSection, 'title_vi' | 'content_vi' | 'image_url' | 'cta_text' | 'cta_url' | 'icon_key' | 'visible' | 'block_type' | 'sort_order'>>
 ): Promise<void> {
   const { error } = await supabase
     .from('page_sections')
@@ -1539,6 +1539,7 @@ export async function createPageSection(section: {
   image_url?: string;
   cta_text?: string;
   cta_url?: string;
+  icon_key?: string;
 }): Promise<void> {
   const { error } = await supabase.from('page_sections').insert({ ...section, visible: true });
   if (error) throw new Error(error.message);

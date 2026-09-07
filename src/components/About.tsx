@@ -26,6 +26,8 @@ export default function About({ lang, onNavigate }: AboutProps) {
       ? ['100% Authentique', 'Certifié GACP', 'R&D avec Docteurs', 'Chaîne Transparente']
       : ['100% أصلي', 'معتمد GACP', 'بحث مع دكاترة', 'سلسلة شفافة'];
 
+  if (cms?.visible === false) return null;
+
   return (
     <section id="about" className="section-padding bg-cream-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">

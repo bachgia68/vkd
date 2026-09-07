@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Gift, Loader2, Send, CheckCircle2 } from 'lucide-react';
 import { submitNewsletterSignup, fetchTextOverrides } from '../lib/siteContentApi';
 import { generateCamNangPdf } from '../lib/generateCamNangPdf';
+import { usePageSection } from '../lib/usePageSection';
 
 const DEFAULT_TITLE = 'Nhận Cẩm Nang Phân Biệt Sâm Ngọc Linh — Miễn Phí';
 const DEFAULT_DESC = 'Cách nhận diện sâm thật, chỉ dấu khoa học Majonoside-R2, dấu hiệu cảnh giác khi mua sâm.';
@@ -20,18 +21,21 @@ export default function NewsletterCTA() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [error, setError] = useState('');
   const [copy, setCopy] = useState({ title: DEFAULT_TITLE, desc: DEFAULT_DESC, button: DEFAULT_BUTTON });
+  // Page Builder (block "newsletter") uu tien hon site_text_overrides cu neu
+  // Joe da sua o do — gop 2 nguon lai cho khoi phai sua 2 cho.
+  const cms = usePageSection('home', 'newsletter');
 
   useEffect(() => {
     fetchTextOverrides()
       .then((overrides) => {
         setCopy({
-          title: overrides['newsletter_cta.title'] || DEFAULT_TITLE,
-          desc: overrides['newsletter_cta.desc'] || DEFAULT_DESC,
-          button: overrides['newsletter_cta.button'] || DEFAULT_BUTTON,
+          title: cms?.title_vi || overrides['newsletter_cta.title'] || DEFAULT_TITLE,
+          desc: cms?.content_vi || overrides['newsletter_cta.desc'] || DEFAULT_DESC,
+          button: cms?.cta_text || overrides['newsletter_cta.button'] || DEFAULT_BUTTON,
         });
       })
       .catch(() => {});
-  }, []);
+  }, [cms]);
 
   const submit = async () => {
     const emailTrim = email.trim();

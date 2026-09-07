@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, type ReactElement } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import Header from './components/Header';
@@ -14,6 +14,8 @@ import NewsletterCTA from './components/NewsletterCTA';
 import ProductCatalog from './components/ProductCatalog';
 import ProductDetail from './components/ProductDetail';
 import ProductAdvisor from './components/ProductAdvisor';
+import GenericPageSectionBlock from './components/GenericPageSectionBlock';
+import { fetchPageSections, type PageSection } from './lib/siteContentApi';
 import ResearchHub from './components/ResearchHub';
 import CartDrawer from './components/CartDrawer';
 import Checkout from './components/Checkout';
@@ -48,12 +50,49 @@ function App() {
     () => localStorage.getItem('ta_customer_email') || undefined
   );
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+  const [homeSections, setHomeSections] = useState<PageSection[]>([]);
 
   useEffect(() => {
     fetchVisibleSections()
       .then((rows) => setVisibleSections(new Set(rows.map((r) => r.key))))
       .catch(() => setVisibleSections(new Set()));
   }, []);
+
+  useEffect(() => {
+    fetchPageSections('home')
+      .then((rows) => setHomeSections(rows))
+      .catch(() => setHomeSections([]));
+  }, []);
+
+  // Block co component rieng — thu tu hien tren trang chu di theo sort_order
+  // that su cua page_sections (keo tha trong Page Builder GIO se chuyen block
+  // that, truoc day chi doi sort_order trong DB nhung JSX o day cung hoa
+  // cung nen keo khong co tac dung). 'hero' luon co dinh dau tien (khong keo
+  // duoc), 'about'/'showrooms'/'stats'/'pillar' khong phai section trang chu
+  // (about/showrooms la trang rieng, pillar la muc con trong heritage) nen
+  // khong dua vao day — con lai block_type nao KHONG co trong map nay se roi
+  // ve GenericPageSectionBlock (anh/tieu de/mo ta/CTA tu do, xem file do).
+  const DEDICATED_HOME_BLOCKS: Record<string, () => ReactElement | null> = {
+    heritage: () => (visibleSections.has('heritage') ? <Heritage lang={lang} /> : null),
+    products: () => <Products lang={lang} onNavigate={navigate} />,
+    'combo-of-the-month': () => <ComboOfTheMonth lang={lang} onNavigate={navigate} />,
+    'elite-teaser': () => <EliteTeaser lang={lang} onNavigate={navigate} />,
+    'product-advisor': () => <ProductAdvisor lang={lang} onNavigate={navigate} />,
+    certifications: () => <Certifications lang={lang} />,
+    'trust-proof': () => <TrustProof lang={lang} />,
+    b2b: () => <B2B lang={lang} />,
+    newsletter: () => (
+      <section className="section-padding bg-cream-50">
+        <div className="container-wide max-w-3xl">
+          <NewsletterCTA />
+        </div>
+      </section>
+    ),
+  };
+  const NON_ORDERABLE_HOME_TYPES = new Set(['hero', 'about', 'showrooms', 'stats', 'pillar']);
+  const orderedHomeSections = homeSections
+    .filter((s) => s.visible && !NON_ORDERABLE_HOME_TYPES.has(s.block_type))
+    .sort((a, b) => a.sort_order - b.sort_order);
 
   // Đồng bộ điều hướng trong app với lịch sử trình duyệt, để nút Back của
   // trình duyệt quay về trang trước đó trong app thay vì thoát hẳn ra khỏi
@@ -208,19 +247,14 @@ function App() {
           {currentPage === 'home' && (
             <>
               <Hero lang={lang} onNavigate={navigate} />
-              {visibleSections.has('heritage') && <Heritage lang={lang} />}
-              <Products lang={lang} onNavigate={navigate} />
-              <ComboOfTheMonth lang={lang} onNavigate={navigate} />
-              <EliteTeaser lang={lang} onNavigate={navigate} />
-              <ProductAdvisor lang={lang} onNavigate={navigate} />
-              <Certifications lang={lang} />
-              <TrustProof lang={lang} />
-              <B2B lang={lang} />
-              <section className="section-padding bg-cream-50">
-                <div className="container-wide max-w-3xl">
-                  <NewsletterCTA />
-                </div>
-              </section>
+              {orderedHomeSections.map((s) => {
+                const render = DEDICATED_HOME_BLOCKS[s.block_type];
+                return (
+                  <div key={s.id}>
+                    {render ? render() : <GenericPageSectionBlock section={s} />}
+                  </div>
+                );
+              })}
               {visibleSections.has('video-gallery') && <VideoGallery lang={lang} />}
             </>
           )}

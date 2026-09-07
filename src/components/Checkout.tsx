@@ -235,7 +235,7 @@ export default function Checkout({ lang, onNavigate, onOrderSuccess }: CheckoutP
           {isVi ? 'Quay Lại Cửa Hàng' : 'Back to Shop'}
         </button>
 
-        <div className="grid lg:grid-cols-[1fr_420px] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8">
 
           {/* ── LEFT: Forms ── */}
           <div className="space-y-6">

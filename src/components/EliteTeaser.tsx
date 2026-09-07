@@ -1,6 +1,7 @@
 import { Crown, ArrowRight } from 'lucide-react';
 import { loyaltyTiers } from '../data/mockData';
 import type { Language } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 
 interface EliteTeaserProps {
   lang: Language;
@@ -43,6 +44,11 @@ const COPY: Record<Language, { kicker: string; title: string; body: string; cta:
 export default function EliteTeaser({ lang, onNavigate }: EliteTeaserProps) {
   const c = COPY[lang];
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'elite-teaser');
+  const title = (lang === 'vi' && cms?.title_vi) || c.title;
+  const body = (lang === 'vi' && cms?.content_vi) || c.body;
+
+  if (cms?.visible === false) return null;
 
   return (
     <section className="section-padding-sm bg-cream-50" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -65,8 +71,8 @@ export default function EliteTeaser({ lang, onNavigate }: EliteTeaserProps) {
                 <span className="text-gold-400 text-xs font-semibold tracking-wider uppercase block mb-1">
                   {c.kicker}
                 </span>
-                <h3 className="font-display text-xl md:text-2xl text-white mb-1">{c.title}</h3>
-                <p className="text-white/70 text-sm max-w-xl">{c.body}</p>
+                <h3 className="font-display text-xl md:text-2xl text-white mb-1">{title}</h3>
+                <p className="text-white/70 text-sm max-w-xl">{body}</p>
               </div>
             </div>
             <button

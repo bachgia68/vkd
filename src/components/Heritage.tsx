@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { FlaskConical, Building2, Microscope, Check, X, MapPin } from 'lucide-react';
+import { FlaskConical, Building2, Microscope, Sparkles, ShieldPlus, Check, X, MapPin, type LucideIcon } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { translations } from '../i18n/translations';
-import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
+import { fetchHeritageGalleryImages, fetchPageSections, type HeritageGalleryImage, type PageSection } from '../lib/siteContentApi';
 import { usePageSection } from '../lib/usePageSection';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
 import Reveal from './ui/Reveal';
+
+const PILLAR_ICONS: Record<string, LucideIcon> = { Building2, Microscope, FlaskConical, Sparkles, ShieldPlus };
 
 interface HeritageProps {
   lang: Language;
@@ -16,7 +18,7 @@ export default function Heritage({ lang }: HeritageProps) {
   const isRTL = lang === 'ar';
   const cms = usePageSection('home', 'heritage');
   const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
-  const [overrides, setOverrides] = useState<Record<string, string>>({});
+  const [pillarSections, setPillarSections] = useState<PageSection[]>([]);
 
   useEffect(() => {
     fetchHeritageGalleryImages()
@@ -25,41 +27,28 @@ export default function Heritage({ lang }: HeritageProps) {
   }, []);
 
   useEffect(() => {
-    import('../admin/adminApi').then(({ fetchAllTextOverrides }) =>
-      fetchAllTextOverrides()
-        .then((rows) => {
-          const map: Record<string, string> = {};
-          rows.forEach((r) => { map[r.key] = r.value_vi; });
-          setOverrides(map);
-        })
-        .catch(() => {})
-    );
+    fetchPageSections('home')
+      .then((rows) => setPillarSections(rows.filter((r) => r.block_type === 'pillar' && r.visible)))
+      .catch(() => setPillarSections([]));
   }, []);
 
-  // site_text_overrides chỉ lưu 1 ngôn ngữ (value_vi) — chỉ áp dụng khi lang='vi',
-  // ngôn ngữ khác luôn dùng bản dịch có sẵn thay vì hiện tiếng Việt lẫn vào.
-  const o = (key: string, fallback: string) => (lang === 'vi' ? overrides[key] : undefined) || fallback;
+  // Truong hop chua migrate xong / loi mang: fallback ve 3 tru cot cu trong
+  // translations.ts thay vi de trong trang — pillarSections rong CHI xay ra
+  // khi fetch that bai, khong phai trang thai binh thuong (da seed 3 row that).
+  const pillars =
+    lang === 'vi' && pillarSections.length > 0
+      ? pillarSections.map((s) => ({
+          icon: PILLAR_ICONS[s.icon_key ?? ''] ?? Sparkles,
+          title: s.title_vi ?? '',
+          desc: s.content_vi ?? '',
+        }))
+      : [
+          { icon: Building2, title: t.heritage.scaleTitle, desc: t.heritage.scaleDesc },
+          { icon: Microscope, title: t.heritage.authorityTitle, desc: t.heritage.authorityDesc },
+          { icon: FlaskConical, title: t.heritage.saponinTitle, desc: t.heritage.saponinDesc },
+        ];
 
-  const pillars = [
-    {
-      icon: Building2,
-      title: o('heritage.pillar1.title', t.heritage.scaleTitle),
-      desc: o('heritage.pillar1.desc', t.heritage.scaleDesc),
-      accent: 'forest',
-    },
-    {
-      icon: Microscope,
-      title: o('heritage.pillar2.title', t.heritage.authorityTitle),
-      desc: o('heritage.pillar2.desc', t.heritage.authorityDesc),
-      accent: 'gold',
-    },
-    {
-      icon: FlaskConical,
-      title: o('heritage.pillar3.title', t.heritage.saponinTitle),
-      desc: o('heritage.pillar3.desc', t.heritage.saponinDesc),
-      accent: 'forest',
-    },
-  ];
+  if (cms?.visible === false) return null;
 
   return (
     <section id="heritage" className="section-padding bg-cream-100" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -210,11 +199,12 @@ export default function Heritage({ lang }: HeritageProps) {
           </div>
         )}
 
-        {/* Three pillars grid */}
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Pillars grid — so luong co the thay doi (them/xoa qua admin) nen
+            dung breakpoint linh hoat thay vi co dinh 3 cot */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pillars.map((pillar, index) => {
             const Icon = pillar.icon;
-            const isGold = pillar.accent === 'gold';
+            const isGold = index % 2 === 1;
 
             return (
               <Reveal key={index} delayMs={index * 120}>

@@ -82,7 +82,7 @@ export default function CrmErpPage() {
           Chưa có khách hàng nào trong hệ thống — dữ liệu sẽ xuất hiện khi có đơn hàng thật đầu tiên.
         </p>
       ) : (
-        <div className="grid lg:grid-cols-[2fr_1.2fr] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1.2fr] gap-6 items-start">
           <div>
             <div className="flex flex-wrap gap-3 mb-4">
               <select

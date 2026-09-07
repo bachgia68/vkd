@@ -21,6 +21,7 @@ export default function Products({ lang, onNavigate }: ProductsProps) {
   const liveProducts = useLiveProducts(staticProducts);
   const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
 
+  if (cms?.visible === false) return null;
   if (featured.length === 0) return null;
 
   return (

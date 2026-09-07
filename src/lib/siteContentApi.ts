@@ -366,6 +366,7 @@ export interface PageSection {
   image_url: string | null;
   cta_text: string | null;
   cta_url: string | null;
+  icon_key: string | null;
   visible: boolean;
   created_at: string;
   updated_at: string;
@@ -392,12 +393,14 @@ export async function fetchVisibleNavItems(): Promise<NavItem[]> {
   return data ?? [];
 }
 
+// Tra ve TAT CA rows (ke ca visible=false) — component tu quyet dinh an/hien
+// (xem usePageSection.ts), khac voi truoc day loc san .eq('visible', true) o
+// tang fetch khien nut an/hien trong Page Builder khong co tac dung that.
 export async function fetchPageSections(pageKey: string): Promise<PageSection[]> {
   const { data, error } = await supabase
     .from('page_sections')
     .select('*')
     .eq('page_key', pageKey)
-    .eq('visible', true)
     .order('sort_order');
   if (error) throw new Error(error.message);
   return data ?? [];

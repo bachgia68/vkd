@@ -487,7 +487,7 @@ export default function ProductCatalog({
           </button>
         </div>
 
-        <div className="grid md:grid-cols-[260px_1fr] gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 lg:gap-10">
           {/* Sidebar — Category Hierarchy */}
           <aside className={`${mobileFiltersOpen ? 'block' : 'hidden'} md:block animate-fade-in`}>
             <div className="sticky top-6 space-y-6">
@@ -619,7 +619,7 @@ export default function ProductCatalog({
                 <p className="text-sm">{ui.noResultsSubtitle}</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.sku}

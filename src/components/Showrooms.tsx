@@ -19,6 +19,8 @@ export default function Showrooms({ lang }: ShowroomsProps) {
     fetchSiteAddresses().then(setLocations).catch(() => setLocations([]));
   }, []);
 
+  if (cms?.visible === false) return null;
+
   return (
     <section id="showrooms"  className="section-padding bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">

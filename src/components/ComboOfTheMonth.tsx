@@ -5,6 +5,7 @@ import { comboToCartProduct, getComboPosterImage, comboFieldFor } from '../data/
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 
 function formatVND(n: number): string {
   return n.toLocaleString('vi-VN') + '₫';
@@ -26,6 +27,7 @@ export default function ComboOfTheMonth({ lang, onNavigate }: { lang: Language; 
   const [combos, setCombos] = useState<ComboSet[]>([]);
   const { addToCart } = useCart();
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'combo-of-the-month');
 
   useEffect(() => {
     let cancelled = false;
@@ -45,11 +47,14 @@ export default function ComboOfTheMonth({ lang, onNavigate }: { lang: Language; 
     return () => { cancelled = true; };
   }, []);
 
+  if (cms?.visible === false) return null;
   if (combos.length === 0) return null;
 
   return (
     <div className="mt-12" dir={isRTL ? 'rtl' : 'ltr'}>
-      <h3 className="font-display text-2xl text-forest-900 mb-6 text-center">{headingFor(lang)}</h3>
+      <h3 className="font-display text-2xl text-forest-900 mb-6 text-center">
+        {(lang === 'vi' && cms?.title_vi) || headingFor(lang)}
+      </h3>
       <div className="flex flex-wrap justify-center gap-6">
         {combos.map((combo) => {
           const firstProductSlug = products.find((p) => p.sku === combo.component_skus[0])?.slug;

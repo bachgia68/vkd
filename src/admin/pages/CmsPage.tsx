@@ -465,7 +465,7 @@ export default function CmsPage() {
           Chưa có bài viết nào. Bấm &ldquo;Bài viết mới&rdquo; để bắt đầu.
         </p>
       ) : (
-        <div className="grid lg:grid-cols-[1fr_1.6fr] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] gap-6 items-start">
           <div className="space-y-3">
             {articles.map((a) => (
               <button
@@ -576,7 +576,7 @@ export default function CmsPage() {
           Zalo/Instagram/LinkedIn) và duyệt đăng riêng từng kênh.</strong>
         </p>
 
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6">
           <div className="space-y-3">
             <div>
               <label className="text-[11px] uppercase tracking-wide text-forest-400">Tiêu đề</label>

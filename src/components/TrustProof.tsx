@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Quote, Newspaper, Camera } from 'lucide-react';
 import { fetchTrustProofItems, type TrustProofItem } from '../lib/siteContentApi';
 import type { Language } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 
 const KIND_ICON = { testimonial: Quote, press: Newspaper, photo: Camera } as const;
 
 export default function TrustProof({ lang }: { lang: Language }) {
   const [items, setItems] = useState<TrustProofItem[]>([]);
   const isRTL = lang === 'ar';
+  const cms = usePageSection('home', 'trust-proof');
 
   useEffect(() => {
     let cancelled = false;
@@ -17,6 +19,7 @@ export default function TrustProof({ lang }: { lang: Language }) {
     return () => { cancelled = true; };
   }, []);
 
+  if (cms?.visible === false) return null;
   if (items.length === 0) return null;
 
   return (

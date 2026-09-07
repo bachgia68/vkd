@@ -754,3 +754,305 @@ Joe xác nhận: phần giấy chứng nhận (nhãn hiệu #548804, mã vùng t
 VIETKINGS của Tu Mơ Rông) Joe tự cào và tự up lên admin. Qwen/Ox KHÔNG động
 vào Certifications.tsx hay mục chứng nhận trong brief này — chỉ tập trung
 Task A (fix dịch) + Task B (cào sản phẩm) + Task C (sync Supabase) ở trên.
+
+## Phase 12 — 2026-09-07 giao Qwen/Ox: TA Advisor fix + Page Builder ẩn thật + Heritage pillars quản lý được
+
+**Bối cảnh:** Joe yêu cầu 2 việc (ưu tiên làm trước việc khác):
+1. Trang admin `/gate-vkd-control-2026/homepage-text` phải cho ẩn/hiện/xóa/sửa/
+   thêm nội dung 3 trụ cột Heritage (hiện chỉ sửa được text, không ẩn/xóa/thêm
+   được) — đặc biệt trụ cột "52+ Loại Saponin".
+2. TA Advisor (`ProductAdvisor.tsx`) lọc sai (gợi ý sai tiêu chí), vỡ layout
+   trên mobile, cần chuyển lên đầu trang `/products`. Hỏi lại Joe ý
+   "bỏ qua bước sợ hãi" — Joe xác nhận 3 ý: (a) thêm nút bỏ qua ở câu hỏi số 2
+   (mục tiêu sức khỏe), (b) đưa TA Advisor thành 1 block quản lý được (ẩn/sửa/
+   xóa/thêm) trong Page Builder, (c) đưa luôn TẤT CẢ block trang chủ hiện có
+   vào Page Builder cho dễ quản lý.
+
+**Claude đã tự tra code (không đoán) trước khi viết brief này, phát hiện 2 việc quan trọng:**
+- Bug thật trong `ProductAdvisor.tsx` dòng 64: `return exact[0] ?? byGoal[0] ?? candidates[0] ?? null;`
+  — khi không có sản phẩm nào đúng `goal` đã chọn, code rơi xuống
+  `candidates[0]` (sản phẩm ĐẦU TIÊN bất kỳ, sai mục tiêu) thay vì báo
+  "không tìm thấy". Đây chính là nguyên nhân "chưa lọc đúng tiêu chí" Joe báo.
+- Toggle ẩn/hiện (icon con mắt) trong `PageBuilderPage.tsx` hiện tại **KHÔNG
+  thực sự ẩn được block nào trên site thật** — đã verify qua đọc
+  `fetchPageSections()` (`src/lib/siteContentApi.ts` dòng 395-404, lọc
+  `.eq('visible', true)` ngay ở tầng fetch) + 7 component đang dùng
+  (Hero/Heritage/B2B/Certifications/Products/Showrooms/About) chỉ dùng `cms`
+  để override text/ảnh, KHÔNG có dòng nào `return null` khi `visible=false`.
+  Kết quả: khách vẫn thấy section y nguyên dù Joe đã bấm ẩn trong admin. Phải
+  sửa gốc (Task D0) trước thì "ẩn" ở Task C/D/E mới có tác dụng thật.
+
+### Task D0 (Ox) — ƯU TIÊN NHẤT: sửa "ẩn" cho thật (nền tảng cho mọi task sau)
+
+```
+Mục đích: Icon con mắt (Eye/EyeOff) trong Page Builder phải ẩn được section
+thật trên site, không chỉ đổi giá trị trong Supabase mà site không đọc.
+
+1. Supabase SQL Editor (project "tasamngoclinh.com") — nới RLS SELECT vì
+   page_sections chỉ chứa text/ảnh marketing, không có dữ liệu nhạy cảm:
+   DROP POLICY IF EXISTS "Public can read visible sections" ON page_sections;
+   CREATE POLICY "Public can read all sections" ON page_sections
+     FOR SELECT USING (true);
+
+2. File D:\TA page\site\ta_production\project\src\lib\siteContentApi.ts
+   dòng 395-404, hàm fetchPageSections(pageKey): XÓA dòng `.eq('visible', true)`
+   khỏi query — trả về TẤT CẢ rows (kể cả visible=false) để component tự quyết.
+
+3. Thêm guard ngay dưới dòng gọi usePageSection(...) trong các file sau
+   (return null trước khi render JSX của section, giữ nguyên mọi logic khác):
+   - src/components/Heritage.tsx (dòng 17: const cms = usePageSection(...))
+   - src/components/B2B.tsx (dòng 16)
+   - src/components/Certifications.tsx (dòng 62)
+   - src/components/Products.tsx (dòng 20 — khối "sản phẩm nổi bật" trang chủ,
+     KHÔNG phải trang /products, xác nhận đúng file trước khi sửa)
+   - src/components/Showrooms.tsx (dòng 15)
+   - src/components/About.tsx (dòng 14)
+   Mẫu: `if (cms?.visible === false) return null;`
+   KHÔNG thêm guard này vào Hero.tsx — Hero là phần bắt buộc luôn phải hiện
+   trên trang chủ, không cho ẩn.
+
+Test bắt buộc:
+- npx tsc --noEmit sạch
+- Vào /gate-vkd-control-2026/page-builder, chọn page "Trang Chủ", bấm icon
+  con mắt ẩn block "b2b" → mở TAB ẨN DANH MỚI (không cache), tải lại trang
+  chủ → khối B2B biến mất thật. Bấm hiện lại → khối B2B quay lại.
+- Lặp lại nhanh cho heritage/certifications/products/showrooms.
+Nếu lỗi: ghi rõ, không bỏ qua.
+```
+
+### Task A (Qwen) — Fix TA Advisor: sửa logic gợi ý sai + thêm nút bỏ qua
+
+```
+File: D:\TA page\site\ta_production\project\src\components\ProductAdvisor.tsx
+
+1. Dòng 59-65 (useMemo `match`): sửa dòng 64 từ
+     return exact[0] ?? byGoal[0] ?? candidates[0] ?? null;
+   thành
+     return exact[0] ?? byGoal[0] ?? null;
+   (bỏ hẳn fallback `candidates[0]` — không được gợi ý sản phẩm sai mục tiêu
+   sức khỏe khách đã chọn; nếu không có sản phẩm đúng goal, hiện đúng khối
+   "step === 2 && !match" đã có sẵn ở dòng 243-252, KHÔNG cần thêm code mới
+   cho khối đó).
+
+2. Thêm nút "Bỏ qua" ở step===1 (khối chọn mục tiêu sức khỏe, dòng 150-179),
+   đặt cạnh nút "← Quay lại" (dòng 172-177):
+     <button
+       onClick={() => onNavigate('catalog')}
+       className="mt-6 ml-4 text-sm text-forest-500 hover:text-forest-700 transition-colors"
+     >
+       {isVi ? 'Bỏ qua — Xem tất cả sản phẩm →' : 'Skip — View all products →'}
+     </button>
+   (đặt 2 nút Quay lại + Bỏ qua cạnh nhau trong 1 flex row, không đè lên nhau).
+
+3. Kiểm tra vỡ layout mobile: mở Chrome DevTools responsive mode, test đúng
+   3 khổ 360x800, 390x844, 414x896 ở CẢ 3 step (0/1/2). Nghi vấn có sẵn cần
+   xác nhận bằng mắt (không sửa mù nếu không thấy lỗi thật):
+   - grid-cols-2 (dòng 129, 158) với nhãn dài "Miễn Dịch & Trường Thọ" bị tràn/
+     đè chữ trên màn 360px
+   - grid md:grid-cols-[180px_1fr] (dòng 186) ở step 2 xếp chồng ảnh/chữ có
+     bị lệch khoảng cách không
+   Fix đúng chỗ vỡ thật (chụp trước/sau), KHÔNG đoán sửa lan man.
+
+Test bắt buộc:
+- npx tsc --noEmit sạch
+- npm run preview: chọn audience="Gia Đình" + goal bất kỳ KHÔNG có sản phẩm
+  familySafe đúng goal đó → phải hiện "Chưa tìm được sản phẩm phù hợp", KHÔNG
+  được hiện sản phẩm sai mục tiêu.
+- Bấm "Bỏ qua" ở câu 2 → điều hướng sang /products.
+- Screenshot 3 khổ mobile ở cả 3 step, xác nhận không còn tràn/đè chữ.
+Nếu lỗi: ghi rõ, không bỏ qua.
+```
+
+### Task B (Qwen) — Chuyển TA Advisor lên đầu trang /products
+
+```
+File 1: D:\TA page\site\ta_production\project\src\App.tsx
+- Xóa dòng 215: <ProductAdvisor lang={lang} onNavigate={navigate} /> khỏi
+  trang chủ (không hiện trùng 2 nơi).
+- Có thể xóa import ProductAdvisor ở dòng 16 nếu không còn dùng ở App.tsx
+  sau khi Task C bên dưới chuyển việc render nó vào ProductCatalog.tsx.
+
+File 2: D:\TA page\site\ta_production\project\src\components\ProductCatalog.tsx
+- Mount <ProductAdvisor lang={lang} onNavigate={onNavigate} /> ở ĐẦU JSX trả
+  về, TRƯỚC phần tiêu đề "Danh Mục Sản Phẩm"/thanh filter hiện tại.
+
+Test: /products hiện TA Advisor đầu tiên; trang chủ không còn hiện TA Advisor.
+Nếu lỗi: ghi rõ, không bỏ qua.
+```
+
+### Task C (Ox) — Đưa TA Advisor thành block quản lý được trong Page Builder
+
+```
+Làm SAU Task D0 (cần "ẩn thật" hoạt động trước) và SAU Task B (đã chuyển
+ProductAdvisor sang ProductCatalog.tsx).
+
+1. Supabase: thêm 1 row page_sections mới —
+   page_key='products', block_type='product-advisor', sort_order=0,
+   title_vi='Tìm Sản Phẩm Phù Hợp Với Bạn Trong 10 Giây',
+   content_vi='Trả lời 2 câu hỏi ngắn — hệ thống đề xuất sản phẩm phù hợp nhất
+   từ toàn bộ danh mục TA.', visible=true.
+   (copy đúng nguyên văn 2 câu hiện đang hardcode ở ProductAdvisor.tsx dòng
+   100 và 104 — không viết lại khác nghĩa).
+
+2. src/admin/pages/PageBuilderPage.tsx — thêm vào LIVE_WIRED_BLOCKS (dòng
+   24-32): { page_key: 'products', block_type: 'product-advisor', note: 'TA
+   Advisor — khối hỏi 2 câu ở đầu trang Sản phẩm' }. Xác nhận PAGE_OPTIONS
+   (dòng 7-14) đã có sẵn { key: 'products', label: 'Sản Phẩm' } — không cần
+   thêm option mới.
+
+3. src/components/ProductAdvisor.tsx — thêm optional props titleOverride?:
+   string, descOverride?: string vào ProductAdvisorProps (dòng 24-27), dùng
+   thay cho text hardcode ở dòng 100 và 104 khi có giá trị (giữ nguyên bản EN
+   hardcode khi lang !== 'vi', theo đúng comment i18n-safety ở Heritage.tsx
+   dòng 39-40 — override chỉ áp dụng bản tiếng Việt).
+
+4. src/components/ProductCatalog.tsx — thêm:
+     const advisorCms = usePageSection('products', 'product-advisor');
+   rồi bọc phần mount ProductAdvisor (từ Task B) trong:
+     {advisorCms?.visible !== false && (
+       <ProductAdvisor lang={lang} onNavigate={onNavigate}
+         titleOverride={advisorCms?.title_vi ?? undefined}
+         descOverride={advisorCms?.content_vi ?? undefined} />
+     )}
+
+Test bắt buộc:
+- npx tsc --noEmit sạch
+- Vào Page Builder → page "Sản Phẩm" → thấy block "product-advisor" → sửa
+  tiêu đề → lưu → reload /products → tiêu đề đổi theo.
+- Ẩn block đó → reload tab ẩn danh /products → TA Advisor biến mất hẳn.
+Nếu lỗi: ghi rõ, không bỏ qua.
+```
+
+### Task D (Qwen + Ox, chia đôi) — Đưa các block trang chủ còn lại vào Page Builder
+
+```
+Mục đích: Joe muốn TẤT CẢ block trang chủ quản lý được ở 1 chỗ (Page
+Builder), không chỉ 7 block đã wired sẵn (hero/about/heritage/products/b2b/
+certifications/showrooms). Còn thiếu: ComboOfTheMonth, EliteTeaser,
+TrustProof, khối NewsletterCTA (bọc trực tiếp trong App.tsx, không phải
+component riêng), và VideoGallery (ĐÃ có cơ chế ẩn/hiện riêng qua
+`visibleSections.has('video-gallery')` — xem App.tsx dòng 224 — KHÔNG đụng
+cơ chế đó, chỉ thêm phần override tiêu đề/mô tả qua page_sections nếu 2 cơ
+chế không xung đột, báo lại nếu thấy xung đột thay vì tự ý gỡ cơ chế cũ).
+
+Với mỗi file ComboOfTheMonth.tsx, EliteTeaser.tsx, TrustProof.tsx — làm ĐÚNG
+1 pattern đã dùng ở B2B.tsx (xem file đó làm mẫu):
+1. import { usePageSection } from '../lib/usePageSection';
+2. const cms = usePageSection('home', '<block_type>'); (đặt tên block_type
+   theo tên file viết-thường-gạch-ngang, VD 'combo-of-the-month',
+   'elite-teaser', 'trust-proof')
+3. Thêm guard `if (cms?.visible === false) return null;`
+4. Đổi tiêu đề/mô tả hardcode hiện có sang
+   `(lang === 'vi' ? cms?.title_vi : undefined) || <text cũ>` (giữ nguyên
+   text cũ làm fallback, không xóa)
+5. Đăng ký vào LIVE_WIRED_BLOCKS trong PageBuilderPage.tsx
+6. Seed 1 row page_sections cho mỗi block (page_key='home', title_vi/
+   content_vi = đúng text hiện tại đang hardcode, visible=true) — để Page
+   Builder không hiện trống khi Joe mở lên lần đầu.
+
+Khối NewsletterCTA (App.tsx dòng 219-223, không phải component riêng):
+- Thêm usePageSection('home', 'newsletter') ngay trong App.tsx, bọc cả
+  <section>...</section> đó trong `{newsletterCms?.visible !== false && (...)}`
+  — KHÔNG đổi nội dung bên trong (NewsletterCTA tự quản lý text riêng, không
+  thuộc scope Task D).
+
+Test bắt buộc mỗi block:
+- npx tsc --noEmit sạch sau khi xong cả 4
+- Page Builder → page "Trang Chủ" → thấy đủ 4 block mới, ẩn thử 1 block →
+  tab ẩn danh xác nhận biến mất trên trang chủ thật.
+Nếu lỗi: ghi rõ, không bỏ qua.
+```
+
+### Task E (Qwen) — Trụ cột Heritage quản lý được (ẩn/hiện/xóa/sửa/thêm) tại /gate-vkd-control-2026/homepage-text
+
+```
+Mục đích: Joe cần ẩn/sửa/xóa/thêm trụ cột Heritage (đặc biệt "52+ Loại
+Saponin") NGAY tại trang admin đã quen dùng — /gate-vkd-control-2026/homepage-text
+— thay vì phải qua Page Builder riêng. Hiện tại 3 trụ cột là mảng hardcode
+cố định 3 phần tử trong Heritage.tsx (dòng 43-62), chỉ sửa được text qua
+site_text_overrides (heritage.pillar1/2/3.title/desc) — không ẩn/xóa/thêm
+được. Chuyển hẳn sang page_sections (đã có sẵn hạ tầng add/delete/reorder
+trong adminApi.ts) để có đủ 5 thao tác.
+
+Bước 0 — Supabase SQL: thêm cột icon cho page_sections (để pillar tự chọn icon):
+  ALTER TABLE page_sections ADD COLUMN icon_key text;
+
+Bước 1 — Migrate dữ liệu: tạo 3 row page_sections MỚI (giữ nguyên row 'heritage'
+cũ dùng cho tiêu đề section, KHÔNG xóa):
+  page_key='home', block_type='pillar', sort_order=0,
+    title_vi='Tập Hợp Đặc Sản' (hoặc giá trị hiện có trong
+    site_text_overrides key='heritage.pillar1.title' nếu Joe đã từng sửa —
+    ĐỌC bảng site_text_overrides trước, ưu tiên giá trị đã lưu hơn giá trị
+    mặc định trong translations.ts để không mất nội dung Joe đã sửa),
+    content_vi=tương tự cho pillar1.desc, icon_key='Building2', visible=true
+  sort_order=1: title/desc từ pillar2 (Cam Kết Chất Lượng & Nguồn Gốc),
+    icon_key='Microscope'
+  sort_order=2: title/desc từ pillar3 (52+ Loại Saponin), icon_key='FlaskConical'
+
+Bước 2 — src/lib/siteContentApi.ts dòng 359-372 (interface PageSection):
+  thêm `icon_key: string | null;`
+
+Bước 3 — src/components/Heritage.tsx:
+  - Thêm `import { fetchPageSections } from '../lib/siteContentApi';`
+    (đã import sẵn kiểu khác, kiểm tra tránh import trùng)
+  - Thêm state pillarSections, useEffect gọi
+    `fetchPageSections('home').then(rows => setPillarSections(rows.filter(r => r.block_type === 'pillar')))`
+  - XÓA mảng `pillars` hardcode (dòng 43-62) và các dòng `o('heritage.pillar1...`
+    liên quan — thay bằng map trực tiếp từ pillarSections, sort theo
+    sort_order (fetchPageSections đã ORDER BY sort_order sẵn).
+  - Thêm 1 map icon nhỏ: `const ICONS: Record<string, LucideIcon> =
+    { Building2, Microscope, FlaskConical, Sparkles, ShieldPlus };` (import
+    thêm Sparkles, ShieldPlus từ lucide-react cho pillar mới thêm sau này
+    chọn được icon khác) — dùng `ICONS[pillar.icon_key ?? 'Sparkles'] ??
+    Sparkles` làm fallback an toàn nếu icon_key rỗng/không khớp.
+  - Nếu pillarSections rỗng (chưa migrate xong / lỗi mạng): fallback hiện lại
+    3 pillar cũ từ translations.ts như hiện tại, KHÔNG để trống trắng section.
+
+Bước 4 — src/admin/pages/HomepageTextPage.tsx:
+  - XÓA 6 dòng FIELDS liên quan pillar1/pillar2/pillar3 (dòng 17-22) — không
+    quản lý qua site_text_overrides nữa, tránh 2 nguồn dữ liệu chồng nhau.
+  - Thêm 1 section mới "Trụ Cột Heritage" phía trên hoặc dưới danh sách
+    FIELDS hiện có, dùng lại đúng 5 hàm đã có sẵn trong adminApi.ts (không
+    viết API mới): fetchPageSectionsForAdmin('home') lọc block_type==='pillar',
+    updatePageSection, deletePageSection, createPageSection, reorderPageSections.
+    UI tối giản hơn PageBuilderPage.tsx (không cần trường ảnh/CTA cho pillar):
+    mỗi pillar 1 card gồm: dropdown chọn icon (5 icon ở Bước 3), input tiêu
+    đề, textarea mô tả, nút Lưu, toggle ẩn/hiện (Eye/EyeOff như
+    PageBuilderPage.tsx dòng 237-239), nút Xóa (có confirm()), 2 nút ↑↓ đổi
+    thứ tự (gọi reorderPageSections), và 1 nút "+ Thêm trụ cột" cuối danh
+    sách (gọi createPageSection với block_type='pillar', page_key='home',
+    sort_order=length hiện tại).
+
+Test bắt buộc:
+- npx tsc --noEmit sạch
+- Vào /gate-vkd-control-2026/homepage-text → thấy 3 trụ cột hiện có, sửa
+  tiêu đề trụ cột 3 → lưu → reload trang chủ (tab ẩn danh) → tiêu đề đổi.
+- Ẩn trụ cột 2 → reload trang chủ tab ẩn danh → chỉ còn 2 trụ cột hiện (grid
+  Heritage.tsx dòng 214 `md:grid-cols-3` — kiểm tra layout không vỡ khi còn
+  2 hoặc 4 trụ cột, có thể cần đổi thành `md:grid-cols-2 lg:grid-cols-3` hoặc
+  tương tự nếu 3 cột cứng làm lệch khi số lượng khác 3 — tự quyết định CSS
+  hợp lý, không bắt buộc đúng y class cũ).
+- Thêm 1 trụ cột mới → chọn icon Sparkles → lưu → reload trang chủ → hiện
+  đủ 4 trụ cột.
+- Xóa trụ cột mới thêm → reload → về lại đúng số trụ cột trước đó.
+Nếu lỗi: ghi rõ dòng nào, không bỏ qua lỗi TypeScript, báo lại cho Claude review.
+```
+
+### Checkpoint & Merge Phase 12
+- [ ] Task D0 chạy TRƯỚC TIÊN (Task C/D/E phụ thuộc vào "ẩn thật" hoạt động)
+- [ ] Task A + B độc lập, có thể chạy song song với D0
+- [ ] Task C sau Task D0 + Task B; Task D sau Task D0; Task E độc lập hoàn
+      toàn (không đụng file nào của Task A-D) — có thể chạy song song
+- [ ] Claude review: npx tsc --noEmit sạch + npm run build sạch trên TOÀN BỘ
+      thay đổi trước khi merge, xem DOM thật qua dev server (không tin báo
+      cáo subagent)
+- [ ] git commit + push khi Joe yêu cầu
+
+## Ghi chú riêng — hoãn /en /fr + hreflang (đã chốt với Joe 2026-09-07)
+
+Joe xác nhận giữ quyết định hoãn việc làm chuẩn router /en /fr + hreflang cho
+19 trang — đây là thay đổi kiến trúc lớn (rewrite App.tsx, sitemap, hreflang),
+rủi ro SEO nếu làm vội cùng lúc Phase 12. Kế hoạch: gom hết Phase 12 (bugfix +
+Page Builder) deploy 1 lần lên live trước, sau đó mở phiên `/plan` RIÊNG cho
+việc URL/hreflang — không gộp chung, không tự ý bắt đầu việc này khi chưa mở
+phiên plan riêng.

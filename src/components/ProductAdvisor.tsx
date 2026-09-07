@@ -6,6 +6,7 @@ import { products as staticProducts, toCartProduct } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { useCart } from '../context/CartContext';
 import type { Language } from '../i18n/translations';
+import { usePageSection } from '../lib/usePageSection';
 
 /**
  * ProductAdvisor — "Tìm Sản Phẩm Phù Hợp Trong 10 Giây"
@@ -37,6 +38,7 @@ const goalIconMap: Record<HealthGoal, string> = {
 
 export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps) {
   const isVi = lang === 'vi';
+  const cms = usePageSection('home', 'product-advisor');
   const { addToCart } = useCart();
 
   const [step, setStep] = useState<Step>(0);
@@ -61,7 +63,7 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
     const candidates = audience === 'family' ? pool.filter((p) => p.familySafe) : pool;
     const exact = candidates.filter((p) => p.healthGoal === goal && p.audiences.includes(audience));
     const byGoal = candidates.filter((p) => p.healthGoal === goal);
-    return exact[0] ?? byGoal[0] ?? candidates[0] ?? null;
+    return exact[0] ?? byGoal[0] ?? null;
   }, [goal, audience, pool]);
 
   const reset = () => {
@@ -86,6 +88,8 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
     onNavigate('catalog');
   };
 
+  if (cms?.visible === false) return null;
+
   return (
     <section className="section-padding bg-cream-100 relative overflow-hidden">
       <div className="container-wide relative z-10">
@@ -97,12 +101,13 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
             </span>
           </div>
           <h2 className="font-display text-display-sm md:text-display-md text-forest-900">
-            {isVi ? 'Tìm Sản Phẩm Phù Hợp Với Bạn Trong 10 Giây' : 'Find Your Product Match In 10 Seconds'}
+            {(isVi && cms?.title_vi) || (isVi ? 'Tìm Sản Phẩm Phù Hợp Với Bạn Trong 10 Giây' : 'Find Your Product Match In 10 Seconds')}
           </h2>
           <p className="text-forest-600 text-lg mt-4">
-            {isVi
-              ? 'Trả lời 2 câu hỏi ngắn — hệ thống đề xuất sản phẩm phù hợp nhất từ toàn bộ danh mục TA.'
-              : 'Answer two quick questions for an instant, personalized recommendation across the full TA catalog.'}
+            {(isVi && cms?.content_vi) ||
+              (isVi
+                ? 'Trả lời 2 câu hỏi ngắn — hệ thống đề xuất sản phẩm phù hợp nhất từ toàn bộ danh mục TA.'
+                : 'Answer two quick questions for an instant, personalized recommendation across the full TA catalog.')}
           </p>
         </div>
 
@@ -169,12 +174,20 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => setStep(0)}
-                className="mt-6 text-sm text-forest-500 hover:text-forest-700 transition-colors"
-              >
-                {isVi ? '← Quay lại' : '← Back'}
-              </button>
+              <div className="mt-6 flex items-center gap-4">
+                <button
+                  onClick={() => setStep(0)}
+                  className="text-sm text-forest-500 hover:text-forest-700 transition-colors"
+                >
+                  {isVi ? '← Quay lại' : '← Back'}
+                </button>
+                <button
+                  onClick={() => onNavigate('catalog')}
+                  className="text-sm text-forest-500 hover:text-forest-700 transition-colors underline decoration-dotted"
+                >
+                  {isVi ? 'Bỏ qua — Xem tất cả sản phẩm →' : 'Skip — View all products →'}
+                </button>
+              </div>
             </div>
           )}
 
@@ -183,7 +196,7 @@ export default function ProductAdvisor({ lang, onNavigate }: ProductAdvisorProps
               <span className="text-gold-600 text-xs font-semibold tracking-wider uppercase">
                 {isVi ? 'Đề xuất dành riêng cho bạn' : 'Your personalized match'}
               </span>
-              <div className="grid md:grid-cols-[180px_1fr] gap-6 mt-4 items-center">
+              <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6 mt-4 items-center">
                 <div className="relative rounded-xl overflow-hidden aspect-square bg-cream-100">
                   <img
                     src={match.image}

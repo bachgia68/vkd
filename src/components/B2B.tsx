@@ -40,6 +40,8 @@ export default function B2B({ lang }: B2BProps) {
     },
   ];
 
+  if (cms?.visible === false) return null;
+
   return (
     <section id="b2b" className="section-padding bg-cream-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container-wide">

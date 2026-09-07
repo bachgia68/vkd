@@ -13,33 +13,45 @@ const PAGE_OPTIONS = [
   { key: 'contact', label: 'Liên Hệ' },
 ];
 
-const BLOCK_TYPES = ['hero', 'text', 'image', 'image-text', 'cta', 'gallery', 'testimonial', 'faq'];
+const BLOCK_TYPES = ['hero', 'text', 'image', 'image-text', 'cta', 'gallery', 'carousel', 'testimonial', 'faq'];
 
-// "Block type" chỉ là NHÃN GHI CHÚ nội bộ — hệ thống hiện KHÔNG có bộ hiển thị
-// chung đọc mọi block theo type để render tự động lên site. Chỉ những trang/vị
-// trí đã lập trình sẵn để đọc đúng page_key + 1 block_type cụ thể (bảng dưới)
-// mới thật sự hiện nội dung sửa ở đây lên site khách. Sửa/thêm 1 block khác
-// (page_key hoặc block_type không khớp bảng này) sẽ lưu vào Supabase nhưng
-// KHÔNG hiện ở đâu cả trên site — tránh mất công sửa nhầm chỗ vô tác dụng.
+// "Block type" cho page="Trang Chủ": nếu KHÔNG khớp 1 trong các block_type có
+// component riêng (bảng LIVE_WIRED_BLOCKS dưới), site sẽ hiện qua bộ hiển thị
+// CHUNG (GenericPageSectionBlock.tsx) — nghĩa là mọi block thêm mới ở page
+// "Trang Chủ" ĐỀU hiện được, chỉ khác bố cục theo block_type (xem file đó).
+// GIỚI HẠN: mỗi block chỉ lưu được 1 ảnh (cột image_url) — 'gallery'/'carousel'
+// hiện là 1 ảnh lớn, CHƯA phải carousel trượt nhiều ảnh thật.
+// Thứ tự HIỂN THỊ THẬT trên trang chủ đi theo sort_order (mũi tên lên/xuống ở
+// đây) — kéo/thả đổi vị trí đúng vị trí block trên site thật, không chỉ đổi
+// số trong DB. Với page KHÁC "Trang Chủ" (Giới thiệu/Vùng Trồng/Sản Phẩm/...),
+// bộ hiển thị chung CHƯA được nối vào — sửa/thêm block ở các page đó vẫn chỉ
+// lưu vào Supabase, chưa hiện lên site khách.
 const LIVE_WIRED_BLOCKS: { page_key: string; block_type: string; note: string }[] = [
-  { page_key: 'home', block_type: 'hero', note: 'Banner đầu trang chủ (tiêu đề lớn, ảnh nền, nút CTA)' },
+  { page_key: 'home', block_type: 'hero', note: 'Banner đầu trang chủ (tiêu đề lớn, ảnh nền, nút CTA) — KHÔNG ẩn được (luôn bắt buộc hiện)' },
   { page_key: 'home', block_type: 'about', note: 'Khối "Giới thiệu TA" trên trang chủ' },
   { page_key: 'home', block_type: 'heritage', note: 'Khối "Vùng Trồng / Di sản" trên trang chủ' },
   { page_key: 'home', block_type: 'products', note: 'Tiêu đề + mô tả khối sản phẩm nổi bật trang chủ' },
-  { page_key: 'home', block_type: 'b2b', note: 'Khối "Hợp tác B2B" trên trang chủ' },
+  { page_key: 'home', block_type: 'combo-of-the-month', note: 'Khối "Combo Tháng Này" (tiêu đề đổi được, chỉ hiện khi có combo đang active)' },
+  { page_key: 'home', block_type: 'elite-teaser', note: 'Khối quảng bá TA Elite Club (tích điểm/hạng thành viên)' },
+  { page_key: 'home', block_type: 'product-advisor', note: 'TA Advisor — khối hỏi 2 câu tìm sản phẩm phù hợp' },
   { page_key: 'home', block_type: 'certifications', note: 'Tiêu đề + mô tả carousel chứng nhận (ảnh chứng nhận sửa ở trang "Giấy Chứng Nhận" riêng, không phải ở đây)' },
+  { page_key: 'home', block_type: 'trust-proof', note: 'Khối đánh giá/báo chí/ảnh minh chứng — chỉ ẩn/hiện được, không có tiêu đề riêng để sửa' },
+  { page_key: 'home', block_type: 'b2b', note: 'Khối "Hợp tác B2B" trên trang chủ' },
+  { page_key: 'home', block_type: 'newsletter', note: 'Khối đăng ký nhận cẩm nang (chỉ ẩn/hiện được — nội dung bên trong sửa riêng ở NewsletterCTA, không phải ở đây)' },
   { page_key: 'home', block_type: 'showrooms', note: 'Khối "Hệ Thống Điểm Kết Nối TA"' },
+  { page_key: 'home', block_type: 'pillar', note: '3 trụ cột trong khối Heritage (Tập Hợp Đặc Sản/Cam Kết/52+ Saponin) — QUẢN LÝ Ở TRANG RIÊNG "Nội Dung Trang Chủ" (/gate-vkd-control-2026/homepage-text), không sửa ở đây vì UI ở đây không có chọn icon' },
 ];
 
 const BLOCK_TYPE_HELP: Record<string, string> = {
-  hero: 'Banner lớn đầu trang — tiêu đề, ảnh nền, 1 nút bấm (CTA). Chỉ thật sự hiện nếu page="Trang Chủ".',
-  text: 'Khối chữ đơn giản (tiêu đề + đoạn văn), không có ảnh — hiện tại CHƯA có nơi nào trên site đọc block type này.',
-  image: 'Khối chỉ có 1 ảnh — hiện tại CHƯA có nơi nào trên site đọc block type này.',
-  'image-text': 'Ảnh + chữ song song — hiện tại CHƯA có nơi nào trên site đọc block type này.',
-  cta: 'Khối kêu gọi hành động: 1 dòng chữ + 1 nút bấm dẫn tới link (VD: "Đăng ký hợp tác ngay" → /hop-tac) — hiện tại CHƯA có nơi nào trên site đọc block type này.',
-  gallery: 'Nhiều ảnh trưng bày — LƯU Ý: mỗi block chỉ lưu được 1 ảnh (image_url), chưa hỗ trợ nhiều ảnh/1 block. Muốn thêm nhiều ảnh, dùng trang "Ảnh Vườn Sâm" hoặc "Giấy Chứng Nhận" (đã hỗ trợ nhiều ảnh thật).',
-  testimonial: 'Trích dẫn/đánh giá khách hàng — hiện tại CHƯA có nơi nào trên site đọc block type này.',
-  faq: 'Câu hỏi thường gặp — hiện tại CHƯA có nơi nào trên site đọc block type này.',
+  hero: 'Banner lớn đầu trang — tiêu đề, ảnh nền, 1 nút bấm (CTA). Chỉ thật sự hiện nếu page="Trang Chủ" (dùng type "hero" cho block MỚI ở trang chủ sẽ hiện qua bộ hiển thị chung dạng banner căn giữa, không phải Hero thật của site — Hero thật chỉ 1 cái, không tạo thêm được).',
+  text: 'Khối chữ đơn giản (tiêu đề + đoạn văn), không có ảnh.',
+  image: 'Khối 1 ảnh lớn + tiêu đề/mô tả bên dưới.',
+  'image-text': 'Ảnh + chữ song song.',
+  cta: 'Khối kêu gọi hành động: tiêu đề + mô tả + 1 nút bấm dẫn tới link (điền CTA Text + CTA URL bên dưới).',
+  gallery: '1 ảnh lớn + tiêu đề/mô tả — CHƯA phải nhiều ảnh trượt được (mỗi block chỉ lưu 1 ảnh). Muốn nhiều ảnh thật, dùng trang "Ảnh Vườn Sâm" hoặc "Giấy Chứng Nhận".',
+  carousel: 'Giống "gallery" — hiện tại cũng chỉ 1 ảnh/block, tên gọi khác nhau để phân loại nội dung, CHƯA có carousel nhiều ảnh trượt thật.',
+  testimonial: 'Trích dẫn/đánh giá khách hàng (Nội dung = câu trích, Tiêu đề = tên người nói).',
+  faq: 'Câu hỏi thường gặp (Tiêu đề = câu hỏi, Nội dung = câu trả lời).',
 };
 
 interface EditState {
@@ -187,13 +199,14 @@ export default function PageBuilderPage() {
       </div>
 
       <div className="mb-4 p-4 bg-forest-50 border border-forest-100 rounded-xl text-xs text-forest-700 leading-relaxed">
-        <p className="font-semibold text-forest-800 mb-2">⚠️ Chỉ các mục sau thật sự hiện lên site khi sửa ở đây (page = "Trang Chủ"):</p>
+        <p className="font-semibold text-forest-800 mb-2">Với page = "Trang Chủ": các block sau có giao diện riêng đã thiết kế sẵn</p>
         <ul className="space-y-0.5 mb-2">
           {LIVE_WIRED_BLOCKS.map((b) => (
             <li key={b.block_type}><code className="bg-forest-100 px-1 rounded">{b.block_type}</code> — {b.note}</li>
           ))}
         </ul>
-        <p>Block type khác (text/image/image-text/gallery/testimonial/faq) hoặc trang khác ("Giới Thiệu", "Sản Phẩm"...) hiện <strong>lưu được nhưng chưa hiện ở đâu trên site</strong> — hệ thống chưa có bộ hiển thị chung cho block tuỳ ý. Cần dự án riêng để làm phần này nếu Joe muốn dùng.</p>
+        <p className="mb-2">Block type KHÁC (text/image/image-text/cta/gallery/carousel/testimonial/faq, hoặc tên tự đặt) ở page "Trang Chủ" vẫn <strong>hiện thật trên site</strong> qua giao diện chung — chỉ khác bố cục theo block_type (xem gợi ý dưới ô chọn Block type). Thứ tự hiện đúng theo mũi tên lên/xuống, ẩn/hiện đúng theo icon con mắt.</p>
+        <p><strong>⚠️ Trang KHÁC "Trang Chủ"</strong> (Giới thiệu/Vùng Trồng/Sản Phẩm/Hợp Tác B2B/Liên Hệ): sửa/thêm block ở đây vẫn chỉ <strong>lưu vào Supabase, CHƯA hiện lên site khách</strong> — các trang đó chưa nối vào Page Builder.</p>
       </div>
 
       {error && (

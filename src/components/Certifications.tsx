@@ -83,6 +83,8 @@ export default function Certifications({ lang }: CertificationsProps) {
     })),
   ];
 
+  if (cms?.visible === false) return null;
+
   return (
     <section className="section-padding-sm bg-cream-100">
       <div className="container-wide">

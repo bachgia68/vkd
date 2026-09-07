@@ -256,7 +256,7 @@ export default function ShowroomsPage() {
         </table>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6 items-start">
         <div className="bg-white rounded-2xl border border-forest-100 p-5 shadow-elegant">
           <h3 className="font-display text-lg text-forest-900 mb-1">Điều phối kho nội bộ</h3>
           <p className="text-xs text-forest-500 mb-4">Tạo lệnh chuyển hàng giữa các showroom.</p>
