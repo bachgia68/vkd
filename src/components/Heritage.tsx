@@ -18,7 +18,9 @@ export default function Heritage({ lang }: HeritageProps) {
   const isRTL = lang === 'ar';
   const cms = usePageSection('home', 'heritage');
   const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
-  const [pillarSections, setPillarSections] = useState<PageSection[]>([]);
+  // null = chua tai xong / fetch loi (dung fallback cung); mang (ke ca rong)
+  // = da tai that tu DB, phai tin tuyet doi trang thai visible cua no.
+  const [pillarSections, setPillarSections] = useState<PageSection[] | null>(null);
 
   useEffect(() => {
     fetchHeritageGalleryImages()
@@ -28,20 +30,26 @@ export default function Heritage({ lang }: HeritageProps) {
 
   useEffect(() => {
     fetchPageSections('home')
-      .then((rows) => setPillarSections(rows.filter((r) => r.block_type === 'pillar' && r.visible)))
-      .catch(() => setPillarSections([]));
+      .then((rows) => setPillarSections(rows.filter((r) => r.block_type === 'pillar')))
+      .catch(() => setPillarSections(null));
   }, []);
 
-  // Truong hop chua migrate xong / loi mang: fallback ve 3 tru cot cu trong
-  // translations.ts thay vi de trong trang — pillarSections rong CHI xay ra
-  // khi fetch that bai, khong phai trang thai binh thuong (da seed 3 row that).
+  // BUG DA SUA (2026-09-07): truoc day loc san .visible ngay luc fetch roi
+  // dung "con lai bao nhieu dong" de quyet dinh dung DB hay fallback cung —
+  // khi admin an CA 3 tru cot, con lai 0 dong khien code tuong la "fetch
+  // that bai" va TU DONG hien lai 3 tru cot cung (dung 3 tieu de admin vua
+  // an), nut an trong admin vo tac dung ngay ca khi DB da ghi dung. Gio
+  // pillarSections la null CHI khi chua tai xong/fetch loi — con da tai
+  // duoc (ke ca mang rong vi admin an het) thi tin DB, khong roi ve cung.
   const pillars =
-    lang === 'vi' && pillarSections.length > 0
-      ? pillarSections.map((s) => ({
-          icon: PILLAR_ICONS[s.icon_key ?? ''] ?? Sparkles,
-          title: s.title_vi ?? '',
-          desc: s.content_vi ?? '',
-        }))
+    lang === 'vi' && pillarSections !== null
+      ? pillarSections
+          .filter((r) => r.visible)
+          .map((s) => ({
+            icon: PILLAR_ICONS[s.icon_key ?? ''] ?? Sparkles,
+            title: s.title_vi ?? '',
+            desc: s.content_vi ?? '',
+          }))
       : [
           { icon: Building2, title: t.heritage.scaleTitle, desc: t.heritage.scaleDesc },
           { icon: Microscope, title: t.heritage.authorityTitle, desc: t.heritage.authorityDesc },
