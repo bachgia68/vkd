@@ -1597,7 +1597,11 @@ export async function createLinkKeyword(keyword: string, url: string): Promise<A
   return throwIfError(
     await supabase
       .from('blog_link_keywords')
-      .insert({ keyword, url, sort_order: Date.now() })
+      // sort_order la cot integer (max ~2.1 ty) — Date.now() la mili-giay,
+      // 13 chu so, vuot pham vi va Postgres tu choi voi loi "out of range
+      // for type integer". Dung giay (10 chu so) van du de moi keyword moi
+      // co sort_order lon hon keyword cu, giu dung thu tu "them sau xep sau".
+      .insert({ keyword, url, sort_order: Math.floor(Date.now() / 1000) })
       .select('id, keyword, url, sort_order, active')
       .single()
   );
