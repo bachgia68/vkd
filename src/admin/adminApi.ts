@@ -3,7 +3,7 @@ import { fetchAllBlogPostsForAdmin } from '../lib/siteContentApi';
 import { slugify } from '../lib/slugify';
 import { resizeImageToWebp } from '../lib/imageResize';
 import type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, CertificationImage, PageSection, NavItem, BlogCategory, ProductMenuItem, PolicyPageContent } from '../lib/siteContentApi';
-import type { DbOrder, DbRevenueDaily } from './types/admin';
+import type { DbOrder, DbRevenueDaily, DbSubscription } from './types/admin';
 
 export type { SiteAddress, ContactPhone, SocialLink, BlogPost, TrustProofItem, ComboSet, SiteSection, HeritageGalleryImage, CertificationImage };
 export { fetchAllBlogPostsForAdmin };
@@ -1388,6 +1388,35 @@ export async function updateOrderStatus(id: string, status: DbOrder['status']): 
     .select('id, customer_name, customer_phone, total_vnd, status, created_at, updated_at')
     .single();
   return throwIfError(res);
+}
+
+// ---------- Subscriptions (Autoship) ----------
+// Bang rieng, KHONG chung voi 'orders' — subscriptions.customer_email la PII
+// nen bang nay KHONG co policy public select/insert nao ca (xem migration
+// create_subscriptions_table), khach chi doc/tao/sua qua 3 RPC SECURITY
+// DEFINER trong src/lib/siteContentApi.ts. Ham duoi day la duong rieng cho
+// admin (yeu cau is_admin()), xem toan bo bang khong loc theo email.
+
+export async function fetchAllSubscriptions(): Promise<DbSubscription[]> {
+  return throwIfError(
+    await supabase.from('subscriptions').select('*').order('created_at', { ascending: false })
+  );
+}
+
+export async function updateSubscriptionAdmin(
+  id: string,
+  patch: Partial<Pick<DbSubscription, 'status' | 'next_date' | 'frequency_days'>>
+): Promise<void> {
+  const { error } = await supabase
+    .from('subscriptions')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteSubscriptionAdmin(id: string): Promise<void> {
+  const { error } = await supabase.from('subscriptions').delete().eq('id', id);
+  if (error) throw new Error(error.message);
 }
 
 // ---------- Revenue Daily (metrics) ----------

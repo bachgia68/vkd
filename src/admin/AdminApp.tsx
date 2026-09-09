@@ -42,6 +42,7 @@ import ProductMenuPage from './pages/ProductMenuPage';
 import LeadsPage from './pages/LeadsPage';
 import PolicyContentPage from './pages/PolicyContentPage';
 import SiteConfigPage from './pages/SiteConfigPage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 
 function Gate() {
   const { isAuthenticated, isLoading } = useAdminAuth();
@@ -64,6 +65,7 @@ export default function AdminApp() {
           <Route path="inventory-qr" element={<InventoryQrPage />} />
           <Route path="products" element={<ProductsManagePage />} />
           <Route path="orders" element={<OrdersPage />} />
+          <Route path="subscriptions" element={<SubscriptionsPage />} />
           <Route path="catalog-export" element={<CatalogExportPage />} />
           <Route path="agents" element={<AgentsPage />} />
           <Route path="showrooms" element={<ShowroomsPage />} />

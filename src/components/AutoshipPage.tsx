@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { RefreshCw, CheckCircle, Info, Calendar, Pause, X, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { RefreshCw, CheckCircle, Info, Calendar, Pause, X, Plus, Loader2 } from 'lucide-react';
 import { products as staticProducts, toCartProduct } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
+import { fetchMySubscriptions, createMySubscription, updateMySubscriptionStatus, type CustomerSubscription } from '../lib/siteContentApi';
 import type { Language } from '../i18n/translations';
 
 interface AutoshipProps {
@@ -21,39 +22,64 @@ const frequencies = [
 // 'supplements' cũ (VKD-002, 003, 004, 009, 010, 011) đã được phân loại vào
 // productType 'tra-nuoc-uong-sam' (Trà & Nước Uống Sâm) — nhóm sản phẩm tiêu
 // thụ định kỳ/hàng ngày, phù hợp nhất với mô hình autoship.
-interface MockSubscription {
-  productId: string;
-  frequencyDays: number;
-  nextDate: string;
-  status: 'active' | 'paused';
-}
 
 export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) {
   const isVi = lang === 'vi';
   const liveProducts = useLiveProducts(staticProducts);
   const products = liveProducts.filter((p) => p.productType === 'tra-nuoc-uong-sam').map(toCartProduct);
   const subscriptionProducts = products;
-  const [subscriptions, setSubscriptions] = useState<MockSubscription[]>([
-    { productId: 'VKD-010', frequencyDays: 30, nextDate: '2026-08-10', status: 'active' },
-    { productId: 'VKD-003', frequencyDays: 30, nextDate: '2026-08-10', status: 'active' },
-  ]);
+  // Tra cứu cho các gói ĐÃ ĐĂNG KÝ dùng danh sách TĨNH, KHÔNG lọc theo
+  // active/productType — nếu sau này admin ẩn sản phẩm đó ở "Sản phẩm & Kho"
+  // (active=false), gói định kỳ khách đã tạo trước đó vẫn phải hiện ra (kèm
+  // cảnh báo), không được biến mất im lặng khỏi danh sách của khách.
+  const allProductsById = new Map(staticProducts.map(toCartProduct).map((p) => [p.id, p]));
+
+  // Không có tài khoản đăng nhập thật — nhận diện khách qua email đã dùng ở
+  // lần checkout gần nhất (giống LoyaltyDashboard), lưu ở localStorage bởi
+  // Checkout.tsx. Chưa từng đặt hàng thì chưa có email nào để tra gói đăng ký.
+  const [email, setEmail] = useState(() => localStorage.getItem('ta_customer_email') || '');
+  const [emailInput, setEmailInput] = useState('');
+  const [subscriptions, setSubscriptions] = useState<CustomerSubscription[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [freq, setFreq] = useState(30);
 
-  const togglePause = (id: string) => {
-    setSubscriptions(prev => prev.map(s =>
-      s.productId === id ? { ...s, status: s.status === 'active' ? 'paused' : 'active' } : s
-    ));
+  const loadSubscriptions = (forEmail: string) => {
+    setLoading(true);
+    setError(null);
+    fetchMySubscriptions(forEmail)
+      .then(setSubscriptions)
+      .catch((e) => setError(e instanceof Error ? e.message : 'Lỗi tải gói đăng ký'))
+      .finally(() => setLoading(false));
   };
 
-  const cancelSub = (id: string) => {
-    setSubscriptions(prev => prev.filter(s => s.productId !== id));
+  useEffect(() => {
+    if (email) loadSubscriptions(email);
+  }, [email]);
+
+  const togglePause = (sub: CustomerSubscription) => {
+    const nextStatus = sub.status === 'active' ? 'paused' : 'active';
+    setSubscriptions((prev) => prev.map((s) => (s.id === sub.id ? { ...s, status: nextStatus } : s)));
+    updateMySubscriptionStatus(sub.id, email, nextStatus).catch((e) => {
+      setError(e instanceof Error ? e.message : 'Lỗi cập nhật');
+      loadSubscriptions(email);
+    });
+  };
+
+  const cancelSub = (sub: CustomerSubscription) => {
+    setSubscriptions((prev) => prev.filter((s) => s.id !== sub.id));
+    updateMySubscriptionStatus(sub.id, email, 'cancelled').catch((e) => {
+      setError(e instanceof Error ? e.message : 'Lỗi hủy');
+      loadSubscriptions(email);
+    });
   };
 
   const addSubscription = (productId: string) => {
-    if (subscriptions.find(s => s.productId === productId)) return;
+    if (subscriptions.find((s) => s.product_sku === productId)) return;
     const nextDate = new Date(Date.now() + freq * 86400000).toISOString().split('T')[0];
-    setSubscriptions(prev => [...prev, { productId, frequencyDays: freq, nextDate, status: 'active' }]);
-
+    createMySubscription({ email, sku: productId, frequencyDays: freq, nextDate })
+      .then((created) => setSubscriptions((prev) => [created, ...prev]))
+      .catch((e) => setError(e instanceof Error ? e.message : 'Lỗi thêm gói đăng ký'));
   };
 
   return (
@@ -93,6 +119,45 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
           ))}
         </div>
 
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex justify-between">
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className="underline flex-shrink-0 ml-3">{isVi ? 'Đóng' : 'Dismiss'}</button>
+          </div>
+        )}
+
+        {!email ? (
+          /* Chưa có email nào để tra cứu — chưa từng đặt hàng trên site này
+             thì chưa có 'ta_customer_email' trong localStorage, xin nhập tay. */
+          <div className="bg-white rounded-2xl shadow-elegant p-6 mb-8 max-w-md mx-auto text-center">
+            <RefreshCw className="w-8 h-8 mx-auto mb-3 text-forest-300" />
+            <p className="text-forest-700 text-sm mb-4">
+              {isVi
+                ? 'Nhập email đã dùng khi đặt hàng để xem/tạo gói đăng ký định kỳ của bạn.'
+                : 'Enter the email you used at checkout to view or create your autoship subscriptions.'}
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!emailInput.trim()) return;
+                localStorage.setItem('ta_customer_email', emailInput.trim());
+                setEmail(emailInput.trim());
+              }}
+              className="flex gap-2"
+            >
+              <input
+                type="email"
+                required
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="email@vidu.com"
+                className="flex-1 px-3 py-2 border border-cream-300 rounded-lg text-sm focus:outline-none focus:border-forest-500"
+              />
+              <button type="submit" className="btn-primary px-4 py-2 text-sm">{isVi ? 'Xem' : 'View'}</button>
+            </form>
+          </div>
+        ) : (
+        <>
         {/* Active subscriptions */}
         <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
           <div className="flex items-center justify-between px-6 py-4 border-b border-cream-200 bg-forest-900">
@@ -103,7 +168,11 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
             <span className="px-2 py-0.5 rounded-full bg-gold-400 text-forest-900 text-xs font-bold">{subscriptions.filter(s => s.status === 'active').length}</span>
           </div>
 
-          {subscriptions.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-forest-400">
+              <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin" />
+            </div>
+          ) : subscriptions.length === 0 ? (
             <div className="text-center py-12 text-forest-400">
               <RefreshCw className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p>{isVi ? 'Chưa có đăng ký nào.' : 'No active subscriptions yet.'}</p>
@@ -111,22 +180,28 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
           ) : (
             <div className="divide-y divide-cream-100">
               {subscriptions.map(sub => {
-                const product = products.find(p => p.id === sub.productId);
+                const product = allProductsById.get(sub.product_sku);
                 if (!product) return null;
+                const discontinued = !products.some((p) => p.id === sub.product_sku);
                 return (
-                  <div key={sub.productId} className={`flex items-center gap-4 p-5 ${sub.status === 'paused' ? 'opacity-60 bg-cream-50' : ''}`}>
+                  <div key={sub.id} className={`flex items-center gap-4 p-5 ${sub.status === 'paused' || discontinued ? 'opacity-60 bg-cream-50' : ''}`}>
                     <img src={product.image} alt={product.name} className="w-16 h-20 rounded-xl object-cover flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-forest-900 text-sm leading-snug">{isVi ? product.nameVi : product.name}</p>
+                      {discontinued && (
+                        <p className="text-xs text-red-500 font-medium mt-0.5">
+                          {isVi ? 'Sản phẩm tạm ngưng bán — liên hệ để đổi sang sản phẩm khác' : 'Product currently unavailable — contact us to switch products'}
+                        </p>
+                      )}
                       <p className="text-xs text-forest-400 mt-0.5">{product.activeIngredient}</p>
                       <div className="flex items-center gap-3 mt-2">
                         <div className="flex items-center gap-1.5 text-xs text-forest-600">
                           <RefreshCw className="w-3 h-3" />
-                          {frequencies.find(f => f.days === sub.frequencyDays)?.[isVi ? 'labelVi' : 'labelEn']}
+                          {frequencies.find(f => f.days === sub.frequency_days)?.[isVi ? 'labelVi' : 'labelEn']}
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-forest-600">
                           <Calendar className="w-3 h-3" />
-                          {isVi ? 'Giao tiếp theo:' : 'Next:'} {sub.nextDate}
+                          {isVi ? 'Giao tiếp theo:' : 'Next:'} {sub.next_date}
                         </div>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${sub.status === 'active' ? 'bg-forest-100 text-forest-700' : 'bg-cream-200 text-forest-500'}`}>
                           {sub.status === 'active' ? (isVi ? 'Đang Hoạt Động' : 'Active') : (isVi ? 'Tạm Dừng' : 'Paused')}
@@ -147,11 +222,11 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
                           </>
                         )}
                       </div>
-                      <button onClick={() => togglePause(sub.productId)} className="inline-flex items-center gap-1 text-xs text-forest-500 hover:text-forest-700 transition-colors">
+                      <button onClick={() => togglePause(sub)} className="inline-flex items-center gap-1 text-xs text-forest-500 hover:text-forest-700 transition-colors">
                         <Pause className="w-3 h-3" />
                         {sub.status === 'active' ? (isVi ? 'Tạm dừng' : 'Pause') : (isVi ? 'Tiếp tục' : 'Resume')}
                       </button>
-                      <button onClick={() => cancelSub(sub.productId)} className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors">
+                      <button onClick={() => cancelSub(sub)} className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors">
                         <X className="w-3 h-3" />
                         {isVi ? 'Hủy' : 'Cancel'}
                       </button>
@@ -194,7 +269,7 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
 
             <div className="grid sm:grid-cols-2 gap-4">
               {subscriptionProducts.map(product => {
-                const alreadyAdded = subscriptions.some(s => s.productId === product.id);
+                const alreadyAdded = subscriptions.some(s => s.product_sku === product.id && s.status !== 'cancelled');
                 return (
                   <div key={product.id} className={`flex gap-3 p-4 rounded-xl border ${alreadyAdded ? 'border-forest-200 bg-forest-50' : 'border-cream-200 hover:border-forest-300 transition-colors'}`}>
                     <img src={product.image} alt={product.name} className="w-14 h-16 rounded-lg object-cover flex-shrink-0" />
@@ -234,27 +309,19 @@ export default function AutoshipPage({ lang, onNavigate: _nav }: AutoshipProps) 
           </div>
         </div>
 
-        {/* Notification log */}
-        <div className="bg-white rounded-2xl shadow-elegant p-6">
-          <h3 className="font-display font-semibold text-forest-900 mb-4">
-            {isVi ? 'Thông Báo Tự Động' : 'Automated Notifications'}
-          </h3>
-          <div className="space-y-3">
-            {[
-              { icon: '📦', msg: isVi ? 'Đơn PanaxX của bạn sẽ tự động gửi sau 3 ngày.' : 'Your PanaxX autoship will dispatch in 3 days.', time: isVi ? '7 ngày trước' : '7 days ago', type: 'reminder' },
-              { icon: '✅', msg: isVi ? 'Đơn định kỳ #TA-SUB-001 đã được xác nhận và giao thành công.' : 'Subscription #TA-SUB-001 confirmed and delivered successfully.', time: isVi ? '37 ngày trước' : '37 days ago', type: 'success' },
-              { icon: '🎁', msg: isVi ? 'Tích thêm 280 điểm Elite từ đơn Autoship tháng trước.' : 'Earned +280 Elite points from last month\'s Autoship.', time: isVi ? '37 ngày trước' : '37 days ago', type: 'points' },
-            ].map((n, i) => (
-              <div key={i} className="flex gap-3 p-3 rounded-xl bg-cream-50">
-                <span className="text-xl flex-shrink-0">{n.icon}</span>
-                <div>
-                  <p className="text-forest-800 text-sm">{n.msg}</p>
-                  <p className="text-forest-400 text-xs mt-0.5">{n.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <p className="text-center text-forest-400 text-xs">
+          {isVi
+            ? `Đang xem gói đăng ký của ${email}. `
+            : `Showing subscriptions for ${email}. `}
+          <button
+            onClick={() => { localStorage.removeItem('ta_customer_email'); setEmail(''); setSubscriptions([]); }}
+            className="underline hover:text-forest-600"
+          >
+            {isVi ? 'Không phải bạn?' : 'Not you?'}
+          </button>
+        </p>
+        </>
+        )}
       </div>
     </div>
   );

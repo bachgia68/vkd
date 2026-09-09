@@ -354,6 +354,65 @@ export async function fetchProductOverrides(): Promise<ProductOverride[]> {
   return data ?? [];
 }
 
+// Autoship / đăng ký định kỳ. Không có tài khoản đăng nhập thật cho khách
+// (identity = email lưu ở localStorage lúc checkout, xem 'ta_customer_email'
+// trong App.tsx) nên bảng `subscriptions` KHÔNG có policy public select/
+// insert nào — mọi thao tác của khách đi qua 3 RPC SECURITY DEFINER dưới
+// đây, mỗi RPC đều đòi đúng email mới đọc/sửa được dòng của mình.
+export interface CustomerSubscription {
+  id: string;
+  customer_email: string;
+  customer_name: string | null;
+  customer_phone: string | null;
+  product_sku: string;
+  frequency_days: number;
+  next_date: string;
+  status: 'active' | 'paused' | 'cancelled';
+  discount_percent: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function fetchMySubscriptions(email: string): Promise<CustomerSubscription[]> {
+  const { data, error } = await supabase.rpc('get_my_subscriptions', { p_email: email });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function createMySubscription(input: {
+  email: string;
+  name?: string;
+  phone?: string;
+  sku: string;
+  frequencyDays: number;
+  nextDate: string;
+}): Promise<CustomerSubscription> {
+  const { data, error } = await supabase.rpc('create_my_subscription', {
+    p_email: input.email,
+    p_name: input.name ?? null,
+    p_phone: input.phone ?? null,
+    p_sku: input.sku,
+    p_frequency_days: input.frequencyDays,
+    p_next_date: input.nextDate,
+  });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateMySubscriptionStatus(
+  id: string,
+  email: string,
+  status: 'active' | 'paused' | 'cancelled'
+): Promise<CustomerSubscription> {
+  const { data, error } = await supabase.rpc('update_my_subscription_status', {
+    p_id: id,
+    p_email: email,
+    p_status: status,
+  });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 // ---------- Page Sections (admin-editable blocks for homepage/subpages) ----------
 
 export interface PageSection {

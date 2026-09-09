@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye, Crown, Images, Languages, Type, Clapperboard, Mail, ShieldCheck } from 'lucide-react';
+import { LayoutGrid, FileText, Users, Warehouse, LogOut, Leaf, Package, Handshake, Store, BarChart3, Settings, FileSpreadsheet, Share2, Quote, Gift, Menu, X, Eye, Crown, Images, Languages, Type, Clapperboard, Mail, ShieldCheck, RefreshCw } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
 import { Button } from '../components/ui/button';
 
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/gate-vkd-control-2026/products', end: false, label: 'Sản phẩm & Kho', icon: Package },
   { to: '/gate-vkd-control-2026/catalog-export', end: false, label: 'Catalog & Xuất File', icon: FileSpreadsheet },
   { to: '/gate-vkd-control-2026/combos', end: false, label: 'Combo & Quà Tặng', icon: Gift },
+  { to: '/gate-vkd-control-2026/subscriptions', end: false, label: 'Đăng Ký Định Kỳ (Autoship)', icon: RefreshCw },
   { to: '/gate-vkd-control-2026/agents', end: false, label: 'Đại lý & Affiliate', icon: Handshake },
   { to: '/gate-vkd-control-2026/showrooms', end: false, label: 'Showroom O2O', icon: Store },
   { to: '/gate-vkd-control-2026/revenue', end: false, label: 'Doanh thu đa kênh', icon: BarChart3 },
