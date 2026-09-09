@@ -6,7 +6,8 @@ import type { PageSection } from '../../lib/siteContentApi';
 
 const PAGE_OPTIONS = [
   { key: 'home', label: 'Trang Chủ' },
-  { key: 'about', label: 'Giới Thiệu' },
+  { key: 'about', label: 'Giới Thiệu — Về TA' },
+  { key: 'about-story', label: 'Giới Thiệu — Câu Chuyện Người Sáng Lập' },
   { key: 'products', label: 'Sản Phẩm' },
   { key: 'traceability', label: 'Truy Xuất' },
   { key: 'heritage', label: 'Vùng Trồng' },
@@ -29,7 +30,7 @@ const BLOCK_TYPES = ['text', 'image', 'image-text', 'cta', 'gallery', 'carousel'
 const DEDICATED_BLOCK_TYPES = new Set([
   'hero', 'about', 'heritage', 'products', 'combo-of-the-month',
   'elite-teaser', 'product-advisor', 'certifications', 'trust-proof',
-  'b2b', 'newsletter', 'showrooms', 'pillar', 'traceability',
+  'b2b', 'newsletter', 'showrooms', 'pillar', 'traceability', 'founder-story',
 ]);
 
 // "Block type" cho page="Trang Chủ": nếu KHÔNG khớp 1 trong các block_type có
@@ -57,7 +58,8 @@ const LIVE_WIRED_BLOCKS: { page_key: string; block_type: string; note: string }[
   { page_key: 'home', block_type: 'newsletter', note: 'Khối đăng ký nhận cẩm nang (chỉ ẩn/hiện được — nội dung bên trong sửa riêng ở NewsletterCTA, không phải ở đây)' },
   { page_key: 'home', block_type: 'showrooms', note: 'Khối "Hệ Thống Điểm Kết Nối TA"' },
   { page_key: 'home', block_type: 'pillar', note: '3 trụ cột trong khối Heritage (Tập Hợp Đặc Sản/Cam Kết/52+ Saponin) — QUẢN LÝ Ở TRANG RIÊNG "Nội Dung Trang Chủ" (/gate-vkd-control-2026/homepage-text), không sửa ở đây vì UI ở đây không có chọn icon' },
-  { page_key: 'about', block_type: 'about', note: 'Khối giới thiệu chính (tiêu đề/mô tả/CTA) trên trang "Giới Thiệu"' },
+  { page_key: 'about', block_type: 'about', note: 'Khối giới thiệu chính (tiêu đề/mô tả/CTA) trên trang "Giới Thiệu" — đây cũng là mục "Về TA" trong menu Giới Thiệu trên Header' },
+  { page_key: 'about-story', block_type: 'founder-story', note: 'Đoạn mở đầu (sau câu "Chào bạn, tôi là Khánh.") trên trang "Câu chuyện người sáng lập" — sửa Nội dung (VI) ở đây để đổi đoạn văn này. Phần còn lại của trang (tiêu đề phụ, 2 thẻ cam kết, câu trích dẫn cuối) là văn bản dài đã viết sẵn, CHƯA đưa vào CMS được vì phải giữ đúng cấu trúc — cần sửa trực tiếp trong code nếu muốn đổi.' },
   { page_key: 'traceability', block_type: 'traceability', note: 'Khối chính (QR + 4 bước) trên trang "Truy Xuất"' },
 ];
 

@@ -355,6 +355,10 @@ function App() {
             <FounderStory lang={lang} onNavigate={navigate} />
           )}
 
+          {currentPage === 'certifications-page' && (
+            <Certifications lang={lang} />
+          )}
+
           {currentPage === 'checkout' && (
             <Checkout
               lang={lang}

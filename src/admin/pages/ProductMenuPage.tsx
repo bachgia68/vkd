@@ -84,6 +84,69 @@ export default function ProductMenuPage() {
         </Button>
       </div>
 
+      <div className="mb-6 p-4 bg-forest-50 border border-forest-100 rounded-xl text-xs text-forest-700 leading-relaxed space-y-3">
+        <p className="font-semibold text-forest-800">Hướng dẫn: thêm một dòng sản phẩm mới vào menu này</p>
+
+        <p>
+          <strong>⚠️ Thêm item ở đây chỉ tạo LINK trong menu — KHÔNG tự tạo sản phẩm.</strong> Href
+          phải trỏ đúng vào một mã loại đã tồn tại thì trang danh mục mới lọc ra sản phẩm thật; nếu
+          gõ sai/gõ mã tự nghĩ ra, trang danh mục mở ra sẽ trống trơn (không lỗi, không cảnh báo).
+        </p>
+
+        <div>
+          <p className="font-medium text-forest-800 mb-1">Bước 1 — Xác định mã loại (href) đúng:</p>
+          <ul className="list-disc pl-4 space-y-1">
+            <li>
+              Nhóm <strong>"Sản phẩm Sâm"</strong> / <strong>"Đặc Sản Việt Nam"</strong>: href =
+              <code className="bg-forest-100 px-1 rounded mx-1">catalog?type=&lt;mã&gt;</code>
+              — mã phải là 1 trong 7 mã có sẵn:
+              <code className="bg-forest-100 px-1 rounded">sam-cu-tuoi-kho</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">sam-ngam-mat-ong</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">tra-nuoc-uong-sam</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">ruou-sam</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">nam-lim-duoc-lieu</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">my-pham-sam</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">set-qua-tang</code>
+              {' '}(vd. "Trà & Nước Uống Sâm" → <code className="bg-forest-100 px-1 rounded">catalog?type=tra-nuoc-uong-sam</code>, không phải "tra-nuoc-uong").
+            </li>
+            <li>
+              Nhóm <strong>"Theo Mục Tiêu"</strong>: href =
+              <code className="bg-forest-100 px-1 rounded mx-1">catalog?goal=&lt;mã&gt;</code>
+              — mã là 1 trong 4: <code className="bg-forest-100 px-1 rounded">energy</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">stress</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">immunity</code>,{' '}
+              <code className="bg-forest-100 px-1 rounded">youth</code>.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="font-medium text-forest-800 mb-1">Bước 2 — Nếu dòng sản phẩm THẬT SỰ MỚI (không khớp 7 mã trên):</p>
+          <p>
+            7 mã trên là danh sách cố định trong code (<code className="bg-forest-100 px-1 rounded">src/data/productTypes.ts</code>),
+            không thêm được từ trang admin này. Nhờ Claude/dev thêm mã mới vào file đó + gán mã cho
+            các sản phẩm liên quan trong <code className="bg-forest-100 px-1 rounded">src/data/products.ts</code>, build lại và deploy —
+            xong bước này rồi mới quay lại Bước 3.
+          </p>
+        </div>
+
+        <div>
+          <p className="font-medium text-forest-800 mb-1">Bước 3 — Đảm bảo có sản phẩm thật mang mã đó:</p>
+          <p>
+            Trang <strong>"Sản phẩm & Kho"</strong> hiện chỉ SỬA được sản phẩm CÓ SẴN (giá/tồn/ảnh/mô
+            tả) — nút "Thêm sản phẩm" ở đó và ô "Danh mục" KHÔNG tạo sản phẩm mới hiện trên trang
+            danh mục khách xem, cũng không liên quan gì tới mã loại ở Bước 1. Muốn có SKU thật mới
+            mang mã loại này, nhờ Claude/dev thêm trực tiếp vào{' '}
+            <code className="bg-forest-100 px-1 rounded">src/data/products.ts</code>.
+          </p>
+        </div>
+
+        <div>
+          <p className="font-medium text-forest-800 mb-1">Bước 4 — Thêm link vào menu (mới làm ở trang này):</p>
+          <p>Bấm "Thêm item" phía trên → chọn Nhóm → điền Slug (không dấu, không trùng) → Label VI/EN → Href đúng mã ở Bước 1 → Lưu. Menu hiện ngay trên Header, không cần deploy.</p>
+        </div>
+      </div>
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex justify-between">
           <span>{error}</span><button onClick={() => setError(null)} className="underline">Đóng</button>

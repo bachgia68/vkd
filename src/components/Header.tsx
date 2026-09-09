@@ -365,6 +365,13 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                               {lang === 'vi' ? 'Về TA' : 'About TA'}
                             </button>
                           )}
+                          <a
+                            href={STATIC_PAGE_PATHS['certifications-page']}
+                            onClick={(e) => { e.preventDefault(); setIsAboutMenuOpen(false); onNavigate('certifications-page'); }}
+                            className="block w-full text-left px-5 py-2.5 text-sm text-forest-700 hover:bg-gold-50 hover:text-forest-900 transition-colors"
+                          >
+                            {lang === 'vi' ? 'Chứng Nhận Quốc Tế' : 'International Certifications'}
+                          </a>
                         </div>
                       </div>
                     )}
@@ -557,6 +564,13 @@ export default function Header({ lang, onLangChange, onNavigate, currentPage, vi
                         {lang === 'vi' ? 'Về TA' : 'About TA'}
                       </button>
                     )}
+                    <a
+                      href={STATIC_PAGE_PATHS['certifications-page']}
+                      onClick={(e) => { e.preventDefault(); handleNav('certifications-page'); }}
+                      className="block w-full text-left px-4 py-3 text-forest-700 hover:bg-forest-50 hover:text-forest-900 rounded-lg transition-colors"
+                    >
+                      {lang === 'vi' ? 'Chứng Nhận Quốc Tế' : 'International Certifications'}
+                    </a>
                   </div>
                 ) : (
                   <button

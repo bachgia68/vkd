@@ -17,4 +17,5 @@ export const POLICY_PATHS: Record<string, string> = {
 export const STATIC_PAGE_PATHS: Record<string, string> = {
   ...POLICY_PATHS,
   'about-story': '/gioi-thieu',
+  'certifications-page': '/chung-nhan-quoc-te',
 };

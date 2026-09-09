@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, Heart, MapPin, Leaf, ShieldCheck, Phone } from 'lucide-react';
 import type { Language } from '../i18n/translations';
 import { fetchHeritageGalleryImages, type HeritageGalleryImage } from '../lib/siteContentApi';
+import { usePageSection } from '../lib/usePageSection';
 
 interface FounderStoryProps {
   lang: Language;
@@ -19,6 +20,7 @@ export default function FounderStory({ lang, onNavigate }: FounderStoryProps) {
   const isVi = lang === 'vi';
   const isRTL = lang === 'ar';
   const [galleryImages, setGalleryImages] = useState<HeritageGalleryImage[]>([]);
+  const cms = usePageSection('about-story', 'founder-story');
 
   useEffect(() => {
     fetchHeritageGalleryImages()
@@ -58,11 +60,15 @@ export default function FounderStory({ lang, onNavigate }: FounderStoryProps) {
           <div className="prose-story space-y-6 text-forest-700 leading-relaxed text-lg">
             <p className="text-xl font-medium text-forest-900">Chào bạn, tôi là Khánh.</p>
 
-            <p>
-              Nếu bạn đang tìm kiếm Sâm Ngọc Linh — "Quốc bảo" của Việt Nam — nhưng lại hoang mang
-              giữa một "mê hồn trận" thật giả, giá cả hỗn loạn và giấy tờ mập mờ, thì TA Sâm Ngọc
-              Linh chính là nơi được tạo ra để mang lại cho bạn sự an tâm tuyệt đối.
-            </p>
+            {cms?.content_vi ? (
+              <p>{cms.content_vi}</p>
+            ) : (
+              <p>
+                Nếu bạn đang tìm kiếm Sâm Ngọc Linh — "Quốc bảo" của Việt Nam — nhưng lại hoang mang
+                giữa một "mê hồn trận" thật giả, giá cả hỗn loạn và giấy tờ mập mờ, thì TA Sâm Ngọc
+                Linh chính là nơi được tạo ra để mang lại cho bạn sự an tâm tuyệt đối.
+              </p>
+            )}
 
             <h2 className="font-display text-2xl text-forest-900 pt-6">
               Hành Trình Hơn 10 Năm Tìm Kiếm "Năng Lượng Chữa Lành Tinh Sạch"
