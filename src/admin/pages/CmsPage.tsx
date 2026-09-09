@@ -1075,6 +1075,21 @@ function CaptionPanel({
 // -> bài viết giải thích...). Trang chi tiết bài viết (BlogPostDetail.tsx) tự
 // gắn thẻ <a auto-internal-link> vào lần xuất hiện đầu tiên của mỗi từ khoá
 // trong nội dung — không cần admin tự chèn link tay khi viết bài.
+// "TypeError: Failed to fetch" nghia la request KHONG BAO GIO toi duoc may
+// chu Supabase (mang/VPN/tuong lua, hoac tien ich chan quang cao chan POST
+// toi domain la) — khac han loi that tu Supabase (RLS/JWT het han), nhung
+// truoc day gop chung 1 cau "co the phien dang nhap het han" khien Joe cu
+// dang xuat/dang nhap lai vo ich ma khong sua duoc. Tach 2 truong hop ro.
+function describeSaveError(e: unknown): string {
+  if (e instanceof TypeError && /failed to fetch/i.test(e.message)) {
+    return 'Không kết nối được tới máy chủ (không phải do đăng nhập) — thử tắt tiện ích chặn quảng cáo/VPN, đổi mạng khác, hoặc mở bằng cửa sổ ẩn danh để loại trừ tiện ích trình duyệt đang chặn.';
+  }
+  if (e instanceof Error) {
+    return `${e.message} — nếu là lỗi quyền/JWT thì đăng xuất rồi đăng nhập lại.`;
+  }
+  return 'Lỗi không xác định — thử lại, nếu vẫn lỗi thì đăng xuất rồi đăng nhập lại.';
+}
+
 function AutoLinkKeywordsPanel() {
   const [items, setItems] = useState<AdminLinkKeyword[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1100,11 +1115,7 @@ function AutoLinkKeywordsPanel() {
       setNewKeyword('');
       setNewUrl('');
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? `Không thêm được: ${e.message} — có thể phiên đăng nhập admin đã hết hạn, thử đăng xuất rồi đăng nhập lại.`
-          : 'Không thêm được — thử đăng xuất rồi đăng nhập lại.'
-      );
+      setError(`Không thêm được: ${describeSaveError(e)}`);
     } finally {
       setSaving(false);
     }
@@ -1116,7 +1127,7 @@ function AutoLinkKeywordsPanel() {
       await updateLinkKeyword(item.id, { active: !item.active });
       setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, active: !i.active } : i)));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Không đổi được trạng thái.');
+      setError(`Không đổi được trạng thái: ${describeSaveError(e)}`);
     }
   };
 
@@ -1126,7 +1137,7 @@ function AutoLinkKeywordsPanel() {
       await deleteLinkKeyword(id);
       setItems((prev) => prev.filter((i) => i.id !== id));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Không xoá được.');
+      setError(`Không xoá được: ${describeSaveError(e)}`);
     }
   };
 
