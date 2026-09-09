@@ -39,17 +39,24 @@ function loadInterFonts(): Promise<{ regular: string; bold: string } | null> {
   return interFontsPromise;
 }
 
-// Preload som — fetch font + import jsPDF ngay khi module nay duoc load lan
-// dau (thay vi doi den luc bam nut) de generateCamNangPdf() it await hon,
-// giam nguy co trinh duyet coi day khong con la "user-initiated download"
-// (mat "user activation" qua nhieu buoc await async) va am tham chan file
-// tai xuong ma khong bao loi JS nao — jsPDF .save() khong throw du file co
-// thuc su ghi duoc xuong may hay khong.
-void loadInterFonts();
-const jsPdfModulePromise = import('jspdf');
+// Preload theo "tin hieu quan tam" (focus vao form) thay vi ngay khi module
+// nay duoc load — truoc day goi tai module-level nen CHAY NGAY LUC TRANG TAI,
+// vi NewsletterCTA nam trong Footer o MOI TRANG cong khai: 100% khach vao
+// blog/trang chu deu bi tai ngam ~130KB gzip (jsPDF) + 2 file font du 99%
+// khong bao gio bam nut nay. preloadCamNangAssets() de NewsletterCTA tu goi
+// luc nguoi dung focus vao o email/Zalo — van kip "am" truoc luc ho bam nut
+// (giu duoc loi ich giam await cho generateCamNangPdf() ma cmt cu mo ta),
+// nhung chi khach THAT SU tuong tac voi form moi tai.
+let jsPdfModulePromise: Promise<typeof import('jspdf')> | null = null;
+
+export function preloadCamNangAssets(): void {
+  void loadInterFonts();
+  if (!jsPdfModulePromise) jsPdfModulePromise = import('jspdf');
+}
 
 export async function generateCamNangPdf(): Promise<void> {
-  const { jsPDF } = await jsPdfModulePromise;
+  preloadCamNangAssets();
+  const { jsPDF } = await jsPdfModulePromise!;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 18;

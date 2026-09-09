@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Gift, Loader2, Send, CheckCircle2 } from 'lucide-react';
 import { submitNewsletterSignup, fetchTextOverrides } from '../lib/siteContentApi';
-import { generateCamNangPdf } from '../lib/generateCamNangPdf';
+import { generateCamNangPdf, preloadCamNangAssets } from '../lib/generateCamNangPdf';
 import { usePageSection } from '../lib/usePageSection';
 
 const DEFAULT_TITLE = 'Nhận Cẩm Nang Phân Biệt Sâm Ngọc Linh — Miễn Phí';
@@ -90,6 +90,7 @@ export default function NewsletterCTA() {
           placeholder="Email của bạn"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onFocus={preloadCamNangAssets}
           className="flex-1 px-4 py-2.5 rounded-full bg-white/10 border border-white/15 text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-gold-400"
         />
         <input
@@ -97,6 +98,7 @@ export default function NewsletterCTA() {
           placeholder="Số Zalo (tuỳ chọn)"
           value={zalo}
           onChange={(e) => setZalo(e.target.value)}
+          onFocus={preloadCamNangAssets}
           className="flex-1 px-4 py-2.5 rounded-full bg-white/10 border border-white/15 text-white text-sm placeholder:text-white/40 focus:outline-none focus:border-gold-400"
         />
         <button
