@@ -42,7 +42,14 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
   // a mouse user (desktop, no touchscreen) has no way to "swipe" it at all without
   // this. Tracks click-vs-drag via total pointer movement so a drag that ends on
   // top of a card doesn't also fire its navigation.
-  const dragState = useRef<{ startX: number; startScrollLeft: number; moved: number; startTime: number } | null>(null);
+  const dragState = useRef<{
+    startX: number;
+    startScrollLeft: number;
+    moved: number;
+    startTime: number;
+    pointerId: number;
+    captured: boolean;
+  } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const updateArrows = useCallback(() => {
@@ -68,9 +75,20 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
     if (e.pointerType !== 'mouse') return;
     const el = trackRef.current;
     if (!el) return;
-    dragState.current = { startX: e.clientX, startScrollLeft: el.scrollLeft, moved: 0, startTime: Date.now() };
-    setIsDragging(true);
-    el.setPointerCapture(e.pointerId);
+    // KHÔNG setPointerCapture ở đây — Chromium chuyển target của click SANG
+    // chính element capture (track) một khi capture đã được set, dù click
+    // rơi đúng lên 1 thẻ sản phẩm bên trong. Đây là lý do bấm chuột (desktop)
+    // không mở được sản phẩm trong khi chạm (mobile, không đi qua nhánh
+    // pointerType==='mouse' này nên chưa từng bị capture) vẫn bấm được bình
+    // thường. Chỉ capture khi pointermove xác nhận đây thực sự là một cú kéo.
+    dragState.current = {
+      startX: e.clientX,
+      startScrollLeft: el.scrollLeft,
+      moved: 0,
+      startTime: Date.now(),
+      pointerId: e.pointerId,
+      captured: false,
+    };
   };
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
@@ -79,10 +97,26 @@ export default function ProductCarousel({ products, lang, onNavigate }: ProductC
     if (!el || !drag) return;
     const delta = e.clientX - drag.startX;
     drag.moved = Math.max(drag.moved, Math.abs(delta));
-    el.scrollLeft = drag.startScrollLeft - delta;
+    if (!drag.captured && drag.moved > 4) {
+      drag.captured = true;
+      setIsDragging(true);
+      el.setPointerCapture(drag.pointerId);
+    }
+    if (drag.captured) {
+      el.scrollLeft = drag.startScrollLeft - delta;
+    }
   };
 
   const endDrag = () => {
+    const el = trackRef.current;
+    const drag = dragState.current;
+    if (drag?.captured && el) {
+      try {
+        el.releasePointerCapture(drag.pointerId);
+      } catch {
+        // pointer đã tự nhả capture (vd. rời viewport) — bỏ qua
+      }
+    }
     setIsDragging(false);
     // Clear on next tick so the click handler on the card (fired right after
     // pointerup) can still read dragState.current.moved this one last time.
