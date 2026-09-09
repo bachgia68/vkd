@@ -1082,6 +1082,7 @@ function AutoLinkKeywordsPanel() {
   const [newUrl, setNewUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const load = () => {
     fetchAllLinkKeywords().then(setItems).catch(() => {}).finally(() => setLoading(false));
@@ -1092,26 +1093,41 @@ function AutoLinkKeywordsPanel() {
   const add = async () => {
     if (!newKeyword.trim() || !newUrl.trim()) return;
     setSaving(true);
+    setError(null);
     try {
       const created = await createLinkKeyword(newKeyword.trim(), newUrl.trim());
       setItems((prev) => [...prev, created]);
       setNewKeyword('');
       setNewUrl('');
-    } catch {
-      // im lặng — danh sách vẫn giữ nguyên, admin thử lại
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? `Không thêm được: ${e.message} — có thể phiên đăng nhập admin đã hết hạn, thử đăng xuất rồi đăng nhập lại.`
+          : 'Không thêm được — thử đăng xuất rồi đăng nhập lại.'
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const toggleActive = async (item: AdminLinkKeyword) => {
-    await updateLinkKeyword(item.id, { active: !item.active });
-    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, active: !i.active } : i)));
+    setError(null);
+    try {
+      await updateLinkKeyword(item.id, { active: !item.active });
+      setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, active: !i.active } : i)));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Không đổi được trạng thái.');
+    }
   };
 
   const remove = async (id: string) => {
-    await deleteLinkKeyword(id);
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    setError(null);
+    try {
+      await deleteLinkKeyword(id);
+      setItems((prev) => prev.filter((i) => i.id !== id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Không xoá được.');
+    }
   };
 
   return (
@@ -1148,6 +1164,10 @@ function AutoLinkKeywordsPanel() {
               <Plus className="w-4 h-4" /> Thêm
             </Button>
           </div>
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+          )}
 
           {loading ? (
             <p className="text-sm text-forest-400">Đang tải...</p>

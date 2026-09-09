@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState, type ReactElement, type ReactNode } from 'react';
 import { ArrowLeft, Clock, UserRound, Quote, List } from 'lucide-react';
 import type { Language } from '../i18n/translations';
-import { fetchBlogPost, fetchBlogLinkKeywords, type BlogPost, type BlogLinkKeyword } from '../lib/siteContentApi';
+import {
+  fetchBlogPost,
+  fetchBlogLinkKeywords,
+  fetchSocialLinks,
+  type BlogPost,
+  type BlogLinkKeyword,
+} from '../lib/siteContentApi';
 import { products as staticProducts } from '../data/products';
 import { useLiveProducts } from '../hooks/useLiveProducts';
 import { getFeaturedProducts } from '../data/featuredProducts';
@@ -38,6 +44,7 @@ function estimateReadingMinutes(body: string | null | undefined) {
 interface TocEntry {
   id: string;
   text: string;
+  level: 2 | 3;
 }
 
 // Bài viết được sinh với định dạng markdown cố định (H2/H3, bullet, bold,
@@ -97,12 +104,29 @@ function renderMarkdown(
   const usedKeywordIds = new Set<string>();
 
   const renderInline = (text: string, autoLink = false): ReactNode[] =>
-    text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).flatMap((part, i): ReactNode[] => {
+    text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g).flatMap((part, i): ReactNode[] => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return [<strong key={i}>{part.slice(2, -2)}</strong>];
       }
       if (part.startsWith('*') && part.endsWith('*')) {
         return [<em key={i}>{part.slice(1, -1)}</em>];
+      }
+      const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      if (linkMatch) {
+        const [, label, url] = linkMatch;
+        const isExternal = /^https?:\/\//i.test(url);
+        return [
+          <a
+            key={i}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold-700 underline decoration-gold-400/60 underline-offset-2 hover:text-gold-800 hover:decoration-gold-600 font-medium"
+          >
+            {label}
+            {isExternal && <span className="sr-only"> (mở tab mới)</span>}
+          </a>,
+        ];
       }
       if (autoLink && keywords.length) {
         return autoLinkSegment(part, keywords, usedKeywordIds, `il${i}`);
@@ -126,7 +150,7 @@ function renderMarkdown(
       const Tag = listType === 'ol' ? 'ol' : 'ul';
       const listClass = listType === 'ol' ? 'list-decimal' : 'list-disc';
       blocks.push(
-        <Tag key={key++} className={`${listClass} pl-5 space-y-1.5 text-forest-700 leading-relaxed mb-4`}>
+        <Tag key={key++} className={`${listClass} pl-5 space-y-1.5 text-forest-700 leading-[1.75] mb-4`}>
           {listItems.map((item, i) => (
             <li key={i}>{renderInline(item, true)}</li>
           ))}
@@ -140,7 +164,7 @@ function renderMarkdown(
   const flushParagraph = () => {
     if (paragraph.length) {
       blocks.push(
-        <p key={key++} className="text-forest-700 leading-relaxed mb-4">
+        <p key={key++} className="text-forest-700 leading-[1.75] mb-4">
           {renderInline(paragraph.join(' '), true)}
         </p>
       );
@@ -252,9 +276,12 @@ function renderMarkdown(
       flushList();
       flushParagraph();
       flushQuote();
+      const text = line.slice(4);
+      const id = slugifyHeading(text, headingIndex++);
+      toc.push({ id, text, level: 3 });
       blocks.push(
-        <h3 key={key++} className="font-display text-lg font-semibold text-forest-900 mt-6 mb-2">
-          {renderInline(line.slice(4))}
+        <h3 key={key++} id={id} className="font-display text-lg font-semibold text-forest-900 mt-6 mb-2 scroll-mt-24">
+          {renderInline(text)}
         </h3>
       );
     } else if (line.startsWith('## ')) {
@@ -263,12 +290,12 @@ function renderMarkdown(
       flushQuote();
       const text = line.slice(3);
       const id = slugifyHeading(text, headingIndex++);
-      toc.push({ id, text });
+      toc.push({ id, text, level: 2 });
       blocks.push(
         <h2
           key={key++}
           id={id}
-          className="font-display text-xl md:text-2xl font-semibold text-forest-900 mt-10 mb-4 scroll-mt-24"
+          className="font-display text-xl md:text-2xl font-semibold text-forest-900 mt-10 mb-4 pl-4 border-l-4 border-gold-400 scroll-mt-24"
         >
           {renderInline(text)}
         </h2>
@@ -303,6 +330,7 @@ function renderMarkdown(
 export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetailProps) {
   const [post, setPost] = useState<BlogPost | null | undefined>(undefined);
   const [linkKeywords, setLinkKeywords] = useState<BlogLinkKeyword[]>([]);
+  const [fanpageUrl, setFanpageUrl] = useState<string | null>(null);
   const liveProducts = useLiveProducts(staticProducts);
   const featured = useMemo(() => getFeaturedProducts(liveProducts), [liveProducts]);
   const featuredTitle = lang === 'vi' ? 'Tiếp Tục Khám Phá' : 'Keep Exploring';
@@ -317,6 +345,12 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
 
   useEffect(() => {
     fetchBlogLinkKeywords().then(setLinkKeywords).catch(() => setLinkKeywords([]));
+  }, []);
+
+  useEffect(() => {
+    fetchSocialLinks()
+      .then((rows) => setFanpageUrl(rows.find((r) => r.platform === 'Facebook')?.url ?? null))
+      .catch(() => setFanpageUrl(null));
   }, []);
 
   const [readProgress, setReadProgress] = useState(0);
@@ -446,26 +480,62 @@ export default function BlogPostDetail({ slug, lang, onNavigate }: BlogPostDetai
                   <List className="w-3.5 h-3.5" /> Mục Lục
                 </p>
                 <ol className="space-y-2">
-                  {toc.map((item, i) => (
-                    <li key={item.id}>
-                      <a
-                        href={`#${item.id}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="flex gap-2 text-sm text-forest-600 hover:text-gold-700 transition-colors"
-                      >
-                        <span className="text-gold-500 font-medium">{i + 1}.</span>
-                        {item.text}
-                      </a>
-                    </li>
-                  ))}
+                  {(() => {
+                    let h2Count = 0;
+                    return toc.map((item) => {
+                      if (item.level === 2) h2Count += 1;
+                      return (
+                        <li key={item.id} className={item.level === 3 ? 'pl-5' : undefined}>
+                          <a
+                            href={`#${item.id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="flex gap-2 text-sm text-forest-600 hover:text-gold-700 transition-colors"
+                          >
+                            {item.level === 2 && <span className="text-gold-500 font-medium">{h2Count}.</span>}
+                            {item.text}
+                          </a>
+                        </li>
+                      );
+                    });
+                  })()}
                 </ol>
               </nav>
             )}
 
             <article>{blocks}</article>
+
+            {/* Chia sẻ — mở share dialog Facebook cho URL bài viết, hoặc dẫn thẳng
+                sang fanpage bán hàng chính (lấy từ social_links, không hard-code
+                để khớp fanpage thật admin đã cấu hình ở Footer). */}
+            <div className="mt-10 pt-8 border-t border-forest-100 flex flex-wrap items-center gap-3">
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://tasamngoclinh.com/blog/${slug}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-lg transition-colors shadow-elegant"
+              >
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+                </svg>
+                Chia sẻ Facebook
+              </a>
+              {fanpageUrl && (
+                <a
+                  href={fanpageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-forest-900 hover:bg-forest-950 text-gold-300 text-sm font-medium rounded-lg transition-colors shadow-elegant"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+                  </svg>
+                  Ghé thăm Fanpage Vườn Sâm Nhà Khánh
+                </a>
+              )}
+            </div>
           </div>
         </>
       )}
