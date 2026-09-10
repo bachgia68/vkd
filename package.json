@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/check-no-supplier-names.js && npx tsx scripts/generate-product-slugs.mjs",
+    "prebuild": "node scripts/check-no-supplier-names.js && npx tsx scripts/generate-product-slugs.mjs && node scripts/generate-sitemap.mjs",
     "build": "tsc -b && vite build",
     "check:brand": "node scripts/check-no-supplier-names.js",
     "check:design": "node scripts/check-no-decorative-gradient.js",
