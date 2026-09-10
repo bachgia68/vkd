@@ -22,6 +22,7 @@ import { useCart } from '../context/CartContext';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useJsonLd } from '../hooks/useJsonLd';
 import SwipeCarousel, { CarouselImage } from './ui/SwipeCarousel';
+import { fetchLatestBatchQrForSku } from '../lib/traceabilityApi';
 
 function nameForLang(p: Product, lang: Language): string {
   if (lang === 'en') return p.nameEn || p.name;
@@ -221,6 +222,7 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
   const [liked, setLiked] = useState(false);
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [traceQrHash, setTraceQrHash] = useState<string | null>(null);
   const { addToCart } = useCart();
 
   // Messenger (m.me) không hỗ trợ điền sẵn tin nhắn qua URL như WhatsApp/Zalo —
@@ -251,6 +253,18 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
   useEffect(() => {
     setActiveImage(null);
   }, [slug]);
+
+  useEffect(() => {
+    if (!product) return;
+    let cancelled = false;
+    setTraceQrHash(null);
+    fetchLatestBatchQrForSku(product.sku).then((hash) => {
+      if (!cancelled) setTraceQrHash(hash);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [product?.sku]);
 
   useJsonLd(
     product && product.price !== null
@@ -614,6 +628,16 @@ export default function ProductDetail({ lang, slug, onNavigate }: ProductDetailP
               <ShieldCheck className="w-3 h-3" />
               {ui.fulfillmentNote}
             </p>
+
+            {traceQrHash && (
+              <a
+                href={`/?trace=${encodeURIComponent(traceQrHash)}`}
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-forest-700 hover:text-gold-600 transition-colors w-fit"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-gold-500" />
+                {lang === 'vi' ? 'Xem truy xuất nguồn gốc lô hàng này' : 'View batch traceability'}
+              </a>
+            )}
           </div>
         </div>
 

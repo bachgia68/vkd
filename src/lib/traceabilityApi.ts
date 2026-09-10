@@ -16,6 +16,19 @@ export interface PublicBatch {
   is_demo: boolean;
 }
 
+export async function fetchLatestBatchQrForSku(sku: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('batches')
+    .select('qr_hash, created_at, products!inner(sku)')
+    .eq('products.sku', sku)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) return null;
+  return (data as { qr_hash: string } | null)?.qr_hash ?? null;
+}
+
 export async function fetchBatchByQr(qrHash: string): Promise<PublicBatch | null> {
   const { data, error } = await supabase
     .from('batches')
